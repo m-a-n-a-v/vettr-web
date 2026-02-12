@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { AlertRule, AlertType, AlertFrequency, StockSearchResult } from '@/types/api'
 import SearchInput from '@/components/ui/SearchInput'
 import SelectDropdown from '@/components/ui/SelectDropdown'
@@ -12,6 +12,9 @@ interface AlertRuleCreatorProps {
   onClose: () => void
   onSubmit: (rule: Partial<AlertRule>) => Promise<void>
   isCreating: boolean
+  editingRule?: AlertRule | null
+  onDelete?: (id: string) => Promise<void>
+  isDeleting?: boolean
 }
 
 type Step = 1 | 2 | 3 | 4 | 5
@@ -69,7 +72,7 @@ const FREQUENCY_OPTIONS: { value: AlertFrequency; label: string; description: st
   },
 ]
 
-export default function AlertRuleCreator({ isOpen, onClose, onSubmit, isCreating }: AlertRuleCreatorProps) {
+export default function AlertRuleCreator({ isOpen, onClose, onSubmit, isCreating, editingRule, onDelete, isDeleting }: AlertRuleCreatorProps) {
   const [currentStep, setCurrentStep] = useState<Step>(1)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedStock, setSelectedStock] = useState<StockSearchResult | null>(null)
@@ -77,8 +80,40 @@ export default function AlertRuleCreator({ isOpen, onClose, onSubmit, isCreating
   const [selectedFrequency, setSelectedFrequency] = useState<AlertFrequency>('Real-time')
   const [condition, setCondition] = useState<Record<string, unknown>>({})
   const [threshold, setThreshold] = useState('')
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
   const { results: stocks, isSearching } = useStockSearch(searchQuery)
+  const isEditMode = !!editingRule
+
+  // Pre-fill form when editing
+  useEffect(() => {
+    if (editingRule && isOpen) {
+      // Create a StockSearchResult from the editing rule
+      const stockData: StockSearchResult = {
+        ticker: editingRule.ticker,
+        company_name: '', // We don't have this, but it's required for the type
+        sector: '',
+        exchange: '',
+        vetr_score: 0,
+        current_price: 0,
+      }
+      setSelectedStock(stockData)
+      setSelectedAlertType(editingRule.alert_type)
+      setSelectedFrequency(editingRule.frequency)
+      setCondition(editingRule.condition || {})
+
+      // Extract threshold from condition
+      if (editingRule.condition) {
+        if (editingRule.condition.min_severity && typeof editingRule.condition.min_severity === 'string') {
+          setThreshold(editingRule.condition.min_severity)
+        } else if (editingRule.condition.min_amount && typeof editingRule.condition.min_amount === 'number') {
+          setThreshold(editingRule.condition.min_amount.toString())
+        } else if (editingRule.condition.threshold && typeof editingRule.condition.threshold === 'string') {
+          setThreshold(editingRule.condition.threshold)
+        }
+      }
+    }
+  }, [editingRule, isOpen])
 
   const handleClose = () => {
     // Reset all state
@@ -144,7 +179,7 @@ export default function AlertRuleCreator({ isOpen, onClose, onSubmit, isCreating
   const handleSubmit = async () => {
     if (!selectedStock || !selectedAlertType) return
 
-    const newRule: Partial<AlertRule> = {
+    const ruleData: Partial<AlertRule> = {
       ticker: selectedStock.ticker,
       alert_type: selectedAlertType,
       frequency: selectedFrequency,
@@ -152,8 +187,21 @@ export default function AlertRuleCreator({ isOpen, onClose, onSubmit, isCreating
       is_enabled: true,
     }
 
-    await onSubmit(newRule)
+    // Include ID when editing
+    if (isEditMode && editingRule) {
+      ruleData.id = editingRule.id
+    }
+
+    await onSubmit(ruleData)
     handleClose()
+  }
+
+  const handleDeleteClick = async () => {
+    if (editingRule && onDelete) {
+      await onDelete(editingRule.id)
+      setShowDeleteConfirm(false)
+      handleClose()
+    }
   }
 
   if (!isOpen) return null
@@ -168,7 +216,9 @@ export default function AlertRuleCreator({ isOpen, onClose, onSubmit, isCreating
         {/* Header */}
         <div className="sticky top-0 bg-primaryLight border-b border-border px-6 py-4 flex items-center justify-between z-10">
           <div>
-            <h2 className="text-xl font-bold text-textPrimary">Create Alert Rule</h2>
+            <h2 className="text-xl font-bold text-textPrimary">
+              {isEditMode ? 'Edit Alert Rule' : 'Create Alert Rule'}
+            </h2>
             <p className="text-sm text-textSecondary mt-1">Step {currentStep} of 5</p>
           </div>
           <button
@@ -510,34 +560,47 @@ export default function AlertRuleCreator({ isOpen, onClose, onSubmit, isCreating
                 </div>
               </div>
 
-              <div className="mt-6 bg-accent/10 border border-accent/30 rounded-lg p-4">
-                <div className="flex items-start gap-2">
-                  <svg
-                    className="w-5 h-5 text-accent flex-shrink-0 mt-0.5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <p className="text-sm text-textSecondary">
-                    This alert rule will be enabled immediately after creation. You can disable it anytime from the Alerts page.
-                  </p>
+              {!isEditMode && (
+                <div className="mt-6 bg-accent/10 border border-accent/30 rounded-lg p-4">
+                  <div className="flex items-start gap-2">
+                    <svg
+                      className="w-5 h-5 text-accent flex-shrink-0 mt-0.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p className="text-sm text-textSecondary">
+                      This alert rule will be enabled immediately after creation. You can disable it anytime from the Alerts page.
+                    </p>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           )}
         </div>
 
         {/* Footer */}
         <div className="sticky bottom-0 bg-primaryLight border-t border-border px-6 py-4 flex items-center justify-between">
-          <button
-            onClick={currentStep === 1 ? handleClose : handleBack}
-            className="px-4 py-2 text-textSecondary hover:text-textPrimary transition-colors"
-            disabled={isCreating}
-          >
-            {currentStep === 1 ? 'Cancel' : 'Back'}
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={currentStep === 1 ? handleClose : handleBack}
+              className="px-4 py-2 text-textSecondary hover:text-textPrimary transition-colors"
+              disabled={isCreating || isDeleting}
+            >
+              {currentStep === 1 ? 'Cancel' : 'Back'}
+            </button>
+            {isEditMode && currentStep === 5 && onDelete && (
+              <button
+                onClick={() => setShowDeleteConfirm(true)}
+                disabled={isDeleting}
+                className="px-4 py-2 bg-error text-white rounded-lg font-medium hover:bg-error/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Delete
+              </button>
+            )}
+          </div>
 
           {currentStep < 5 && currentStep !== 3 && (
             <button
@@ -591,12 +654,66 @@ export default function AlertRuleCreator({ isOpen, onClose, onSubmit, isCreating
                   Creating...
                 </>
               ) : (
-                'Create Alert Rule'
+                isEditMode ? 'Update Alert Rule' : 'Create Alert Rule'
               )}
             </button>
           )}
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowDeleteConfirm(false)} />
+          <div className="relative bg-primaryLight rounded-lg w-full max-w-md mx-4 p-6">
+            <h3 className="text-lg font-bold text-textPrimary mb-2">Delete Alert Rule</h3>
+            <p className="text-textSecondary mb-6">
+              Are you sure you want to delete this alert rule? This action cannot be undone.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={isDeleting}
+                className="px-4 py-2 bg-surface text-textPrimary rounded-lg font-medium hover:bg-surfaceLight transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteClick}
+                disabled={isDeleting}
+                className="px-4 py-2 bg-error text-white rounded-lg font-medium hover:bg-error/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {isDeleting ? (
+                  <>
+                    <svg
+                      className="animate-spin h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      />
+                    </svg>
+                    Deleting...
+                  </>
+                ) : (
+                  'Delete'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -41,13 +41,14 @@ const mockRecentTriggers = [
 type FilterType = 'All' | 'Active' | 'Inactive';
 
 export default function AlertsPage() {
-  const { rules, isLoading, error, deleteRule, toggleRule, createRule, isCreating } = useAlertRules();
+  const { rules, isLoading, error, deleteRule, toggleRule, createRule, updateRule, isCreating, isUpdating, isDeleting } = useAlertRules();
   const { showToast } = useToast();
   const [filter, setFilter] = useState<FilterType>('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [togglingRuleId, setTogglingRuleId] = useState<string | null>(null);
   const [showCreator, setShowCreator] = useState(false);
+  const [editingRule, setEditingRule] = useState<AlertRule | null>(null);
 
   // Filter rules based on active/inactive filter and search query
   const filteredRules = useMemo(() => {
@@ -109,6 +110,43 @@ export default function AlertsPage() {
       showToast('Alert rule created successfully', 'success');
     } else {
       showToast('Failed to create alert rule', 'error');
+    }
+  };
+
+  // Handle update alert rule
+  const handleUpdateRule = async (rule: Partial<AlertRule>) => {
+    if (!rule.id) return;
+
+    const success = await updateRule(rule.id, rule);
+
+    if (success) {
+      showToast('Alert rule updated successfully', 'success');
+      setEditingRule(null);
+    } else {
+      showToast('Failed to update alert rule', 'error');
+    }
+  };
+
+  // Handle edit button click
+  const handleEdit = (rule: AlertRule) => {
+    setEditingRule(rule);
+    setShowCreator(true);
+  };
+
+  // Handle creator close
+  const handleCreatorClose = () => {
+    setShowCreator(false);
+    setEditingRule(null);
+  };
+
+  // Handle delete from creator modal
+  const handleDeleteFromCreator = async (id: string) => {
+    const success = await deleteRule(id);
+
+    if (success) {
+      showToast('Alert rule deleted successfully', 'success');
+    } else {
+      showToast('Failed to delete alert rule', 'error');
     }
   };
 
@@ -335,6 +373,27 @@ export default function AlertsPage() {
                       />
                     </button>
 
+                    {/* Edit Button */}
+                    <button
+                      onClick={() => handleEdit(rule)}
+                      className="p-2 text-textMuted hover:text-accent transition-colors"
+                      title="Edit alert rule"
+                    >
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                        />
+                      </svg>
+                    </button>
+
                     {/* Delete Button */}
                     <button
                       onClick={() => setDeleteConfirmId(rule.id)}
@@ -405,9 +464,12 @@ export default function AlertsPage() {
       {/* Alert Rule Creator Modal */}
       <AlertRuleCreator
         isOpen={showCreator}
-        onClose={() => setShowCreator(false)}
-        onSubmit={handleCreateRule}
-        isCreating={isCreating}
+        onClose={handleCreatorClose}
+        onSubmit={editingRule ? handleUpdateRule : handleCreateRule}
+        isCreating={editingRule ? isUpdating : isCreating}
+        editingRule={editingRule}
+        onDelete={handleDeleteFromCreator}
+        isDeleting={isDeleting}
       />
     </div>
   );
