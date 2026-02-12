@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
@@ -102,14 +103,18 @@ export function Toast({ toast, onDismiss }: ToastProps) {
   const style = typeStyles[toast.type];
 
   return (
-    <div
+    <motion.div
       className={`
         mb-3 p-4 rounded-lg border backdrop-blur-sm
         ${style.bg} ${style.border}
         flex items-start gap-3
         shadow-lg
-        ${isExiting ? 'animate-slideOutToTop' : 'animate-slideInFromTop'}
       `}
+      initial={{ opacity: 0, y: -50, scale: 0.9 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -50, scale: 0.9 }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
+      layout
     >
       {/* Icon */}
       <div className={`flex-shrink-0 ${style.text}`}>{style.icon}</div>
@@ -138,7 +143,7 @@ export function Toast({ toast, onDismiss }: ToastProps) {
           />
         </svg>
       </button>
-    </div>
+    </motion.div>
   );
 }
 
@@ -164,9 +169,11 @@ export function ToastContainer({
 
   return (
     <div className={`fixed ${positionClasses[position]} z-[100] w-full max-w-sm`}>
-      {toasts.map((toast) => (
-        <Toast key={toast.id} toast={toast} onDismiss={onDismiss} />
-      ))}
+      <AnimatePresence mode="popLayout">
+        {toasts.map((toast) => (
+          <Toast key={toast.id} toast={toast} onDismiss={onDismiss} />
+        ))}
+      </AnimatePresence>
     </div>
   );
 }

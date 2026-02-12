@@ -144,6 +144,15 @@ html:not(.dark) .bg-warning {
     }
   }
 
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
   .animate-fadeIn {
     animation: fadeIn 0.2s ease-out;
   }
@@ -160,6 +169,17 @@ html:not(.dark) .bg-warning {
     animation: slideOutToTop 0.3s ease-out;
   }
 
+  .animate-shimmer {
+    background: linear-gradient(
+      90deg,
+      rgba(30, 51, 72, 0.8) 0%,
+      rgba(42, 64, 88, 1) 50%,
+      rgba(30, 51, 72, 0.8) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s ease-in-out infinite;
+  }
+
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -167,5 +187,16 @@ html:not(.dark) .bg-warning {
 
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+
+  /* Respect prefers-reduced-motion */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }

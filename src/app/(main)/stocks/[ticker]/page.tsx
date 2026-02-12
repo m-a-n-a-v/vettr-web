@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useStock } from '@/hooks/useStock';
 import { useVetrScore } from '@/hooks/useVetrScore';
@@ -407,8 +408,16 @@ export default function StockDetailPage() {
 
       {/* Tab content */}
       <div className="max-w-6xl mx-auto p-6 pb-20 md:pb-6">
-        {activeTab === 'overview' && (
-          <div className="space-y-6">
+        <AnimatePresence mode="wait">
+          {activeTab === 'overview' && (
+            <motion.div
+              key="overview"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.3, ease: 'easeInOut' }}
+              className="space-y-6"
+            >
             {/* VETTR Score section */}
             <div className="bg-primaryLight rounded-lg p-6 border border-border">
               <h2 className="text-xl font-bold text-textPrimary mb-4">VETTR Score</h2>
@@ -422,7 +431,7 @@ export default function StockDetailPage() {
                   className="w-full flex flex-col items-center justify-center cursor-pointer hover:bg-surface/50 rounded-lg p-4 transition-colors group"
                   aria-label="View score details"
                 >
-                  <VetrScoreBadge score={score.overall_score} size="lg" />
+                  <VetrScoreBadge score={score.overall_score} size="lg" animate={true} />
                   <p className="text-textSecondary text-sm mt-4 group-hover:text-textPrimary transition-colors">
                     Click to view detailed breakdown
                   </p>
@@ -629,11 +638,18 @@ export default function StockDetailPage() {
                 />
               )}
             </div>
-          </div>
+          </motion.div>
         )}
 
         {activeTab === 'pedigree' && (
-          <div className="space-y-6">
+          <motion.div
+            key="pedigree"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            className="space-y-6"
+          >
             {/* Search and Filters */}
             <div className="bg-primaryLight rounded-lg p-6 border border-border">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -772,11 +788,18 @@ export default function StockDetailPage() {
                 />
               )}
             </div>
-          </div>
+          </motion.div>
         )}
 
         {activeTab === 'red-flags' && (
-          <div className="space-y-6">
+          <motion.div
+            key="red-flags"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            className="space-y-6"
+          >
             {redFlagsLoading ? (
               <div className="space-y-6">
                 {[1, 2, 3].map(i => (
@@ -1103,8 +1126,9 @@ export default function StockDetailPage() {
                 message="Unable to load red flag analysis for this stock."
               />
             )}
-          </div>
+          </motion.div>
         )}
+        </AnimatePresence>
       </div>
 
       {/* Executive Detail Modal */}

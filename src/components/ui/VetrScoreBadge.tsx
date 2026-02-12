@@ -1,18 +1,46 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
+
 interface VetrScoreBadgeProps {
   score: number;
   size?: 'sm' | 'md' | 'lg';
   showLabel?: boolean;
   onClick?: () => void;
+  animate?: boolean;
 }
 
 export default function VetrScoreBadge({
   score,
   size = 'md',
   showLabel = false,
-  onClick
+  onClick,
+  animate: shouldAnimate = false
 }: VetrScoreBadgeProps) {
+  const [displayScore, setDisplayScore] = useState(shouldAnimate ? 0 : score);
+  const count = useMotionValue(shouldAnimate ? 0 : score);
+  const rounded = useTransform(count, Math.round);
+
+  useEffect(() => {
+    if (shouldAnimate) {
+      const animation = animate(count, score, {
+        duration: 1.5,
+        ease: 'easeOut',
+      });
+
+      const unsubscribe = rounded.on('change', (latest) => {
+        setDisplayScore(latest);
+      });
+
+      return () => {
+        animation.stop();
+        unsubscribe();
+      };
+    } else {
+      setDisplayScore(score);
+    }
+  }, [score, shouldAnimate, count, rounded]);
   // Determine color based on score
   const getColor = () => {
     if (score >= 80) return 'text-accent'; // Green for excellent
@@ -60,7 +88,7 @@ export default function VetrScoreBadge({
   const borderColorClass = getBorderColor();
 
   const badge = (
-    <div
+    <motion.div
       className={`
         ${config.container}
         ${bgColorClass}
@@ -69,14 +97,16 @@ export default function VetrScoreBadge({
         flex items-center justify-center
         font-bold
         ${colorClass}
-        ${onClick ? 'cursor-pointer hover:scale-105 transition-transform duration-200' : ''}
+        ${onClick ? 'cursor-pointer' : ''}
       `}
       onClick={onClick}
       role={onClick ? 'button' : undefined}
       aria-label={`VETTR Score: ${score}`}
+      whileHover={onClick ? { scale: 1.05 } : undefined}
+      transition={{ duration: 0.2 }}
     >
-      {score}
-    </div>
+      {displayScore}
+    </motion.div>
   );
 
   if (showLabel) {

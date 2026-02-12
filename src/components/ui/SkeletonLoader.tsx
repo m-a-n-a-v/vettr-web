@@ -13,7 +13,7 @@ export default function SkeletonLoader({
   height,
   className = ''
 }: SkeletonLoaderProps) {
-  const baseClasses = 'animate-pulse bg-surface';
+  const baseClasses = 'animate-shimmer bg-surface';
 
   const getVariantClasses = () => {
     switch (variant) {

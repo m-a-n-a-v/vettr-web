@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import { Stock } from '@/types/api';
 import VetrScoreBadge from './VetrScoreBadge';
 import SectorChip from './SectorChip';
@@ -43,7 +44,11 @@ export default function StockCard({
 
   return (
     <Link href={`/stocks/${stock.ticker}`}>
-      <div className="relative bg-primaryLight hover:bg-surfaceLight border border-border rounded-lg p-4 transition-all duration-200 hover:shadow-lg cursor-pointer group">
+      <motion.div
+        className="relative bg-primaryLight border border-border rounded-lg p-4 cursor-pointer group"
+        whileHover={{ y: -4, boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)' }}
+        transition={{ duration: 0.2, ease: 'easeOut' }}
+      >
         {/* Favorite Star (if enabled) */}
         {showFavorite && onFavoriteToggle && (
           <button
@@ -105,7 +110,7 @@ export default function StockCard({
             </div>
           </div>
         )}
-      </div>
+      </motion.div>
     </Link>
   );
 }
