@@ -22,6 +22,7 @@ import EmptyState from '@/components/ui/EmptyState';
 import SearchInput from '@/components/ui/SearchInput';
 import SelectDropdown from '@/components/ui/SelectDropdown';
 import ExecutiveDetail from '@/components/ExecutiveDetail';
+import VetrScoreDetail from '@/components/VetrScoreDetail';
 
 type Tab = 'overview' | 'pedigree' | 'red-flags';
 
@@ -41,6 +42,9 @@ export default function StockDetailPage() {
   const [selectedFlag, setSelectedFlag] = useState<RedFlag | null>(null);
   const [isAcknowledgingAll, setIsAcknowledgingAll] = useState(false);
   const [acknowledgingFlagId, setAcknowledgingFlagId] = useState<string | null>(null);
+
+  // Score detail modal state
+  const [showScoreDetail, setShowScoreDetail] = useState(false);
 
   const { stock, isLoading: stockLoading, error: stockError } = useStock(ticker);
   const { score, isLoading: scoreLoading } = useVetrScore({ ticker });
@@ -310,9 +314,16 @@ export default function StockDetailPage() {
                   <LoadingSpinner size="lg" color="accent" />
                 </div>
               ) : score ? (
-                <div className="flex items-center justify-center">
+                <button
+                  onClick={() => setShowScoreDetail(true)}
+                  className="w-full flex flex-col items-center justify-center cursor-pointer hover:bg-surface/50 rounded-lg p-4 transition-colors group"
+                  aria-label="View score details"
+                >
                   <VetrScoreBadge score={score.overall_score} size="lg" />
-                </div>
+                  <p className="text-textSecondary text-sm mt-4 group-hover:text-textPrimary transition-colors">
+                    Click to view detailed breakdown
+                  </p>
+                </button>
               ) : (
                 <p className="text-textSecondary text-center py-4">Score not available</p>
               )}
@@ -878,6 +889,14 @@ export default function StockDetailPage() {
         <ExecutiveDetail
           executive={selectedExecutive}
           onClose={() => setSelectedExecutive(null)}
+        />
+      )}
+
+      {/* VETTR Score Detail Modal */}
+      {showScoreDetail && score && (
+        <VetrScoreDetail
+          score={score}
+          onClose={() => setShowScoreDetail(false)}
         />
       )}
 
