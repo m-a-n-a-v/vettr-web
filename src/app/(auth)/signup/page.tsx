@@ -139,13 +139,13 @@ export default function SignupPage() {
 
           {/* Error Message */}
           {error && (
-            <div className="mb-4 rounded-md bg-error/10 border border-error/30 p-3 text-sm text-error">
+            <div id="signup-error" role="alert" className="mb-4 rounded-md bg-error/10 border border-error/30 p-3 text-sm text-error">
               {error}
             </div>
           )}
 
           {/* Signup Form */}
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5" aria-describedby={error ? "signup-error" : undefined}>
             {/* Email Field */}
             <div>
               <label
@@ -163,6 +163,8 @@ export default function SignupPage() {
                 placeholder="you@example.com"
                 disabled={isLoading}
                 autoComplete="email"
+                aria-invalid={error ? "true" : "false"}
+                aria-describedby={error ? "signup-error" : undefined}
               />
             </div>
 
@@ -183,6 +185,8 @@ export default function SignupPage() {
                 placeholder="John Doe"
                 disabled={isLoading}
                 autoComplete="name"
+                aria-invalid={error ? "true" : "false"}
+                aria-describedby={error ? "signup-error" : undefined}
               />
             </div>
 
@@ -203,6 +207,8 @@ export default function SignupPage() {
                 placeholder="Minimum 8 characters"
                 disabled={isLoading}
                 autoComplete="new-password"
+                aria-invalid={error ? "true" : "false"}
+                aria-describedby={error ? "signup-error" : undefined}
               />
 
               {/* Password Strength Indicator */}
@@ -249,6 +255,8 @@ export default function SignupPage() {
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
+                aria-invalid={error ? "true" : "false"}
+                aria-describedby={error ? "signup-error" : undefined}
                 className="w-full rounded-md bg-surface border border-border px-4 py-2.5 text-textPrimary placeholder-textMuted focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all"
                 placeholder="Re-enter your password"
                 disabled={isLoading}

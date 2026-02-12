@@ -371,8 +371,12 @@ export default function StockDetailPage() {
       {/* Tab navigation */}
       <div className="bg-primaryLight border-b border-border sticky top-0 z-30">
         <div className="max-w-6xl mx-auto px-6">
-          <div className="flex gap-1">
+          <div className="flex gap-1" role="tablist" aria-label="Stock information tabs">
             <button
+              role="tab"
+              aria-selected={activeTab === 'overview'}
+              aria-controls="overview-panel"
+              id="overview-tab"
               onClick={() => setActiveTab('overview')}
               className={`px-6 py-4 font-medium transition-colors border-b-2 ${
                 activeTab === 'overview'
@@ -383,6 +387,10 @@ export default function StockDetailPage() {
               Overview
             </button>
             <button
+              role="tab"
+              aria-selected={activeTab === 'pedigree'}
+              aria-controls="pedigree-panel"
+              id="pedigree-tab"
               onClick={() => setActiveTab('pedigree')}
               className={`px-6 py-4 font-medium transition-colors border-b-2 ${
                 activeTab === 'pedigree'
@@ -393,6 +401,10 @@ export default function StockDetailPage() {
               Pedigree
             </button>
             <button
+              role="tab"
+              aria-selected={activeTab === 'red-flags'}
+              aria-controls="red-flags-panel"
+              id="red-flags-tab"
               onClick={() => setActiveTab('red-flags')}
               className={`px-6 py-4 font-medium transition-colors border-b-2 ${
                 activeTab === 'red-flags'
@@ -412,6 +424,9 @@ export default function StockDetailPage() {
           {activeTab === 'overview' && (
             <motion.div
               key="overview"
+              role="tabpanel"
+              id="overview-panel"
+              aria-labelledby="overview-tab"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
@@ -644,6 +659,9 @@ export default function StockDetailPage() {
         {activeTab === 'pedigree' && (
           <motion.div
             key="pedigree"
+            role="tabpanel"
+            id="pedigree-panel"
+            aria-labelledby="pedigree-tab"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 20 }}
@@ -793,6 +811,9 @@ export default function StockDetailPage() {
 
         {activeTab === 'red-flags' && (
           <motion.div
+            role="tabpanel"
+            id="red-flags-panel"
+            aria-labelledby="red-flags-tab"
             key="red-flags"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}

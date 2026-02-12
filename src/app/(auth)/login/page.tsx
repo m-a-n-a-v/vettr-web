@@ -84,13 +84,13 @@ export default function LoginPage() {
 
           {/* Error Message */}
           {error && (
-            <div className="mb-4 rounded-md bg-error/10 border border-error/30 p-3 text-sm text-error">
+            <div id="login-error" role="alert" className="mb-4 rounded-md bg-error/10 border border-error/30 p-3 text-sm text-error">
               {error}
             </div>
           )}
 
           {/* Login Form */}
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5" aria-describedby={error ? "login-error" : undefined}>
             {/* Email Field */}
             <div>
               <label
@@ -108,6 +108,8 @@ export default function LoginPage() {
                 placeholder="you@example.com"
                 disabled={isLoading}
                 autoComplete="email"
+                aria-invalid={error ? "true" : "false"}
+                aria-describedby={error ? "login-error" : undefined}
               />
             </div>
 
@@ -128,6 +130,8 @@ export default function LoginPage() {
                 placeholder="Enter your password"
                 disabled={isLoading}
                 autoComplete="current-password"
+                aria-invalid={error ? "true" : "false"}
+                aria-describedby={error ? "login-error" : undefined}
               />
             </div>
 

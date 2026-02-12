@@ -60,7 +60,7 @@ export function Navigation() {
         </div>
 
         {/* Navigation Items */}
-        <nav className="flex-1 py-6">
+        <nav className="flex-1 py-6" aria-label="Main navigation">
           <ul className="space-y-2 px-3">
             {navItems.map((item) => {
               const active = isActive(item.href);
@@ -68,6 +68,8 @@ export function Navigation() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
+                    aria-label={item.label}
+                    aria-current={active ? 'page' : undefined}
                     className={`
                       flex items-center gap-4 px-4 py-3 rounded-lg
                       transition-all duration-200
@@ -107,6 +109,7 @@ export function Navigation() {
           bg-primaryDark border-t border-border
           z-50
         "
+        aria-label="Main navigation"
       >
         <ul className="flex justify-around items-center h-16">
           {navItems.map((item) => {
@@ -115,6 +118,8 @@ export function Navigation() {
               <li key={item.href} className="flex-1">
                 <Link
                   href={item.href}
+                  aria-label={item.label}
+                  aria-current={active ? 'page' : undefined}
                   className={`
                     flex flex-col items-center justify-center h-full gap-1
                     transition-colors duration-200

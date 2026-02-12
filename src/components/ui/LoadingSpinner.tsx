@@ -33,6 +33,8 @@ export default function LoadingSpinner({
       className={`animate-spin ${sizeClasses[size]} ${colorClasses[color]} ${className}`}
       fill="none"
       viewBox="0 0 24 24"
+      role="status"
+      aria-label={message || "Loading"}
     >
       <circle
         className="opacity-25"
@@ -52,7 +54,7 @@ export default function LoadingSpinner({
 
   if (centered) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[200px]">
+      <div className="flex flex-col items-center justify-center min-h-[200px]" aria-busy="true">
         {spinner}
         {message && (
           <p className="mt-3 text-sm text-textSecondary">{message}</p>
@@ -63,7 +65,7 @@ export default function LoadingSpinner({
 
   if (message) {
     return (
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2" aria-busy="true">
         {spinner}
         <p className="text-sm text-textSecondary">{message}</p>
       </div>

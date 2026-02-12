@@ -102,8 +102,14 @@ export function Toast({ toast, onDismiss }: ToastProps) {
 
   const style = typeStyles[toast.type];
 
+  // Use 'alert' role for errors/warnings, 'status' for success/info
+  const role = toast.type === 'error' || toast.type === 'warning' ? 'alert' : 'status';
+
   return (
     <motion.div
+      role={role}
+      aria-live={toast.type === 'error' || toast.type === 'warning' ? 'assertive' : 'polite'}
+      aria-atomic="true"
       className={`
         mb-3 p-4 rounded-lg border backdrop-blur-sm
         ${style.bg} ${style.border}
@@ -168,7 +174,11 @@ export function ToastContainer({
   };
 
   return (
-    <div className={`fixed ${positionClasses[position]} z-[100] w-full max-w-sm`}>
+    <div
+      className={`fixed ${positionClasses[position]} z-[100] w-full max-w-sm`}
+      aria-label="Notifications"
+      role="region"
+    >
       <AnimatePresence mode="popLayout">
         {toasts.map((toast) => (
           <Toast key={toast.id} toast={toast} onDismiss={onDismiss} />

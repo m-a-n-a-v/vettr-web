@@ -83,10 +83,12 @@ export default function ExecutiveTable({ executives, onExecutiveClick }: Executi
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full border-collapse">
+      <table className="w-full border-collapse" role="table" aria-label="Executive team members">
         <thead>
-          <tr className="border-b border-border">
+          <tr role="row" className="border-b border-border">
             <th
+              role="columnheader"
+              aria-sort={sortField === 'name' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
               className="px-4 py-3 text-left text-sm font-semibold text-textSecondary hover:text-textPrimary cursor-pointer group"
               onClick={() => handleSort('name')}
             >
@@ -96,6 +98,8 @@ export default function ExecutiveTable({ executives, onExecutiveClick }: Executi
               </div>
             </th>
             <th
+              role="columnheader"
+              aria-sort={sortField === 'title' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
               className="px-4 py-3 text-left text-sm font-semibold text-textSecondary hover:text-textPrimary cursor-pointer group"
               onClick={() => handleSort('title')}
             >
@@ -105,6 +109,8 @@ export default function ExecutiveTable({ executives, onExecutiveClick }: Executi
               </div>
             </th>
             <th
+              role="columnheader"
+              aria-sort={sortField === 'tenure' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
               className="px-4 py-3 text-center text-sm font-semibold text-textSecondary hover:text-textPrimary cursor-pointer group"
               onClick={() => handleSort('tenure')}
             >
@@ -114,6 +120,8 @@ export default function ExecutiveTable({ executives, onExecutiveClick }: Executi
               </div>
             </th>
             <th
+              role="columnheader"
+              aria-sort={sortField === 'experience' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
               className="px-4 py-3 text-center text-sm font-semibold text-textSecondary hover:text-textPrimary cursor-pointer group"
               onClick={() => handleSort('experience')}
             >
@@ -123,6 +131,8 @@ export default function ExecutiveTable({ executives, onExecutiveClick }: Executi
               </div>
             </th>
             <th
+              role="columnheader"
+              aria-sort={sortField === 'specialization' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
               className="px-4 py-3 text-left text-sm font-semibold text-textSecondary hover:text-textPrimary cursor-pointer group"
               onClick={() => handleSort('specialization')}
             >
@@ -132,6 +142,8 @@ export default function ExecutiveTable({ executives, onExecutiveClick }: Executi
               </div>
             </th>
             <th
+              role="columnheader"
+              aria-sort={sortField === 'risk' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
               className="px-4 py-3 text-center text-sm font-semibold text-textSecondary hover:text-textPrimary cursor-pointer group"
               onClick={() => handleSort('risk')}
             >
@@ -146,10 +158,11 @@ export default function ExecutiveTable({ executives, onExecutiveClick }: Executi
           {sortedExecutives.map((executive) => (
             <tr
               key={executive.id}
+              role="row"
               className="border-b border-border/50 hover:bg-surface/50 transition-colors cursor-pointer"
               onClick={() => onExecutiveClick?.(executive)}
             >
-              <td className="px-4 py-4">
+              <td role="cell" className="px-4 py-4">
                 <div className="flex items-center gap-3">
                   {/* Initials Avatar */}
                   <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0">
@@ -167,22 +180,22 @@ export default function ExecutiveTable({ executives, onExecutiveClick }: Executi
                   </span>
                 </div>
               </td>
-              <td className="px-4 py-4">
+              <td role="cell" className="px-4 py-4">
                 <span className="text-sm text-textSecondary">
                   {executive.title}
                 </span>
               </td>
-              <td className="px-4 py-4 text-center">
+              <td role="cell" className="px-4 py-4 text-center">
                 <span className="text-sm text-textPrimary font-medium">
                   {executive.years_at_company} {executive.years_at_company === 1 ? 'year' : 'years'}
                 </span>
               </td>
-              <td className="px-4 py-4 text-center">
+              <td role="cell" className="px-4 py-4 text-center">
                 <span className="text-sm text-textPrimary font-medium">
                   {executive.total_experience_years} {executive.total_experience_years === 1 ? 'year' : 'years'}
                 </span>
               </td>
-              <td className="px-4 py-4">
+              <td role="cell" className="px-4 py-4">
                 {executive.specialization ? (
                   <span className="inline-block px-2 py-1 rounded bg-primary text-accent text-xs font-medium">
                     {executive.specialization}
@@ -191,7 +204,7 @@ export default function ExecutiveTable({ executives, onExecutiveClick }: Executi
                   <span className="text-sm text-textMuted">-</span>
                 )}
               </td>
-              <td className="px-4 py-4 text-center">
+              <td role="cell" className="px-4 py-4 text-center">
                 <span
                   className={`inline-block px-2 py-1 rounded text-xs font-medium ${
                     executive.tenure_risk === 'Stable'

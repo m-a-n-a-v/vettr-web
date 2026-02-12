@@ -84,10 +84,12 @@ export default function FilingTable({ filings, showStock = true }: FilingTablePr
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full border-collapse">
+      <table className="w-full border-collapse" role="table" aria-label="Filings">
         <thead>
-          <tr className="border-b border-border">
+          <tr role="row" className="border-b border-border">
             <th
+              role="columnheader"
+              aria-sort={sortField === 'type' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
               className="px-4 py-3 text-left text-sm font-semibold text-textSecondary hover:text-textPrimary cursor-pointer group"
               onClick={() => handleSort('type')}
             >
@@ -97,6 +99,8 @@ export default function FilingTable({ filings, showStock = true }: FilingTablePr
               </div>
             </th>
             <th
+              role="columnheader"
+              aria-sort={sortField === 'title' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
               className="px-4 py-3 text-left text-sm font-semibold text-textSecondary hover:text-textPrimary cursor-pointer group"
               onClick={() => handleSort('title')}
             >
@@ -107,6 +111,8 @@ export default function FilingTable({ filings, showStock = true }: FilingTablePr
             </th>
             {showStock && (
               <th
+                role="columnheader"
+                aria-sort={sortField === 'ticker' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
                 className="px-4 py-3 text-left text-sm font-semibold text-textSecondary hover:text-textPrimary cursor-pointer group"
                 onClick={() => handleSort('ticker')}
               >
@@ -117,6 +123,8 @@ export default function FilingTable({ filings, showStock = true }: FilingTablePr
               </th>
             )}
             <th
+              role="columnheader"
+              aria-sort={sortField === 'date' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
               className="px-4 py-3 text-left text-sm font-semibold text-textSecondary hover:text-textPrimary cursor-pointer group"
               onClick={() => handleSort('date')}
             >
@@ -126,6 +134,8 @@ export default function FilingTable({ filings, showStock = true }: FilingTablePr
               </div>
             </th>
             <th
+              role="columnheader"
+              aria-sort={sortField === 'material' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
               className="px-4 py-3 text-center text-sm font-semibold text-textSecondary hover:text-textPrimary cursor-pointer group"
               onClick={() => handleSort('material')}
             >
@@ -135,6 +145,8 @@ export default function FilingTable({ filings, showStock = true }: FilingTablePr
               </div>
             </th>
             <th
+              role="columnheader"
+              aria-sort={sortField === 'status' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
               className="px-4 py-3 text-center text-sm font-semibold text-textSecondary hover:text-textPrimary cursor-pointer group"
               onClick={() => handleSort('status')}
             >
@@ -149,19 +161,20 @@ export default function FilingTable({ filings, showStock = true }: FilingTablePr
           {sortedFilings.map((filing) => (
             <tr
               key={filing.id}
+              role="row"
               className="border-b border-border/50 hover:bg-surface/50 transition-colors"
             >
-              <td className="px-4 py-4">
+              <td role="cell" className="px-4 py-4">
                 <Link href={`/filings/${filing.id}`} className="flex items-center gap-3">
                   <FilingTypeIcon type={filing.type as FilingType} size="sm" />
                   <span className="text-sm text-textSecondary">{filing.type}</span>
                 </Link>
               </td>
-              <td className="px-4 py-4">
+              <td role="cell" className="px-4 py-4">
                 <Link href={`/filings/${filing.id}`} className="block">
                   <div className="flex items-center gap-2">
                     {!filing.is_read && (
-                      <div className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />
+                      <div className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" aria-label="Unread filing" />
                     )}
                     <span className="text-sm text-textPrimary font-medium hover:text-accent transition-colors line-clamp-2">
                       {filing.title}
@@ -170,7 +183,7 @@ export default function FilingTable({ filings, showStock = true }: FilingTablePr
                 </Link>
               </td>
               {showStock && (
-                <td className="px-4 py-4">
+                <td role="cell" className="px-4 py-4">
                   <Link
                     href={`/stocks/${filing.ticker}`}
                     className="text-sm text-accent hover:text-accentDim font-medium transition-colors"
@@ -179,7 +192,7 @@ export default function FilingTable({ filings, showStock = true }: FilingTablePr
                   </Link>
                 </td>
               )}
-              <td className="px-4 py-4">
+              <td role="cell" className="px-4 py-4">
                 <Link href={`/filings/${filing.id}`} className="block">
                   <span className="text-sm text-textSecondary">
                     {new Date(filing.date_filed).toLocaleDateString('en-US', {
@@ -190,7 +203,7 @@ export default function FilingTable({ filings, showStock = true }: FilingTablePr
                   </span>
                 </Link>
               </td>
-              <td className="px-4 py-4 text-center">
+              <td role="cell" className="px-4 py-4 text-center">
                 <Link href={`/filings/${filing.id}`} className="block">
                   {filing.is_material ? (
                     <span className="inline-block px-2 py-1 bg-warning/20 border border-warning/30 rounded text-xs font-medium text-warning">
@@ -201,7 +214,7 @@ export default function FilingTable({ filings, showStock = true }: FilingTablePr
                   )}
                 </Link>
               </td>
-              <td className="px-4 py-4 text-center">
+              <td role="cell" className="px-4 py-4 text-center">
                 <Link href={`/filings/${filing.id}`} className="block">
                   <span
                     className={`inline-block px-2 py-1 rounded text-xs font-medium ${
