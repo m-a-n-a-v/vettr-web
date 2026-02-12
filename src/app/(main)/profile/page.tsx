@@ -9,6 +9,7 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import Modal from '@/components/ui/Modal';
 import { useToast } from '@/contexts/ToastContext';
 import FeedbackForm from '@/components/FeedbackForm';
+import Onboarding from '@/components/Onboarding';
 
 export default function ProfilePage() {
   const { user, logout } = useAuth();
@@ -19,6 +20,7 @@ export default function ProfilePage() {
   const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [showFeedbackForm, setShowFeedbackForm] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   // Get user initials for avatar
   const getInitials = (name: string) => {
@@ -247,6 +249,22 @@ export default function ProfilePage() {
           <h2 className="text-xl font-bold text-textPrimary mb-4">Help &amp; Learning</h2>
 
           <div className="space-y-3">
+            <button
+              onClick={() => setShowOnboarding(true)}
+              className="flex items-center justify-between p-3 bg-surface hover:bg-surfaceLight rounded-lg transition-colors group w-full text-left"
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">🚀</span>
+                <div>
+                  <h3 className="text-textPrimary font-semibold">View Onboarding</h3>
+                  <p className="text-sm text-textMuted">Quick tour of VETTR features</p>
+                </div>
+              </div>
+              <svg className="w-5 h-5 text-textMuted group-hover:text-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+
             <Link
               href="/profile/glossary"
               className="flex items-center justify-between p-3 bg-surface hover:bg-surfaceLight rounded-lg transition-colors group"
@@ -391,6 +409,12 @@ export default function ProfilePage() {
       <FeedbackForm
         isOpen={showFeedbackForm}
         onClose={() => setShowFeedbackForm(false)}
+      />
+
+      {/* Onboarding Modal */}
+      <Onboarding
+        isOpen={showOnboarding}
+        onClose={() => setShowOnboarding(false)}
       />
     </div>
   );
