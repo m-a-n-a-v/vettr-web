@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useStock } from '@/hooks/useStock';
 import { useVetrScore } from '@/hooks/useVetrScore';
 import { useFilings } from '@/hooks/useFilings';
+import { useExecutives } from '@/hooks/useExecutives';
 import { useWatchlist } from '@/hooks/useWatchlist';
 import { useToast } from '@/contexts/ToastContext';
 import VetrScoreBadge from '@/components/ui/VetrScoreBadge';
@@ -14,6 +15,8 @@ import PriceChangeIndicator from '@/components/ui/PriceChangeIndicator';
 import FilingTypeIcon from '@/components/ui/FilingTypeIcon';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import EmptyState from '@/components/ui/EmptyState';
+import SearchInput from '@/components/ui/SearchInput';
+import SelectDropdown from '@/components/ui/SelectDropdown';
 
 type Tab = 'overview' | 'pedigree' | 'red-flags';
 
@@ -23,13 +26,55 @@ export default function StockDetailPage() {
   const [activeTab, setActiveTab] = useState<Tab>('overview');
   const { showToast } = useToast();
 
+  // Pedigree tab state
+  const [executiveSearch, setExecutiveSearch] = useState('');
+  const [executiveTitleFilter, setExecutiveTitleFilter] = useState('all');
+  const [executiveSortBy, setExecutiveSortBy] = useState<'title' | 'tenure' | 'experience' | 'specialization'>('title');
+
   const { stock, isLoading: stockLoading, error: stockError } = useStock(ticker);
   const { score, isLoading: scoreLoading } = useVetrScore({ ticker });
   const { filings, isLoading: filingsLoading } = useFilings({ ticker, limit: 5 });
+  const { executives, isLoading: executivesLoading } = useExecutives({ ticker, search: executiveSearch });
   const { watchlist, isAdding, isRemoving, addToWatchlist, removeFromWatchlist } = useWatchlist();
 
   const isInWatchlist = watchlist.some(item => item.ticker === ticker);
   const isTogglingFavorite = isAdding || isRemoving;
+
+  // Filter and sort executives
+  const filteredAndSortedExecutives = useMemo(() => {
+    let result = [...executives];
+
+    // Apply title filter
+    if (executiveTitleFilter !== 'all') {
+      result = result.filter(exec =>
+        exec.title.toLowerCase().includes(executiveTitleFilter.toLowerCase())
+      );
+    }
+
+    // Apply sorting
+    result.sort((a, b) => {
+      switch (executiveSortBy) {
+        case 'title':
+          return a.title.localeCompare(b.title);
+        case 'tenure':
+          return b.years_at_company - a.years_at_company;
+        case 'experience':
+          return b.total_experience_years - a.total_experience_years;
+        case 'specialization':
+          return a.specialization.localeCompare(b.specialization);
+        default:
+          return 0;
+      }
+    });
+
+    return result;
+  }, [executives, executiveTitleFilter, executiveSortBy]);
+
+  // Extract unique titles for filter options
+  const uniqueTitles = useMemo(() => {
+    const titles = new Set(executives.map(exec => exec.title));
+    return Array.from(titles).sort();
+  }, [executives]);
 
   const handleFavoriteToggle = async () => {
     try {
@@ -317,12 +362,134 @@ export default function StockDetailPage() {
         )}
 
         {activeTab === 'pedigree' && (
-          <div className="bg-primaryLight rounded-lg p-6 border border-border">
-            <EmptyState
-              icon="👔"
-              title="Pedigree tab"
-              message="Executive information will be displayed here. Coming soon!"
-            />
+          <div className="space-y-6">
+            {/* Search and Filters */}
+            <div className="bg-primaryLight rounded-lg p-6 border border-border">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <SearchInput
+                  value={executiveSearch}
+                  onChange={setExecutiveSearch}
+                  placeholder="Search executives by name..."
+                />
+                <SelectDropdown
+                  label="Filter by Title"
+                  value={executiveTitleFilter}
+                  onChange={setExecutiveTitleFilter}
+                  options={[
+                    { value: 'all', label: 'All Titles' },
+                    ...uniqueTitles.map(title => ({ value: title, label: title })),
+                  ]}
+                />
+                <SelectDropdown
+                  label="Sort By"
+                  value={executiveSortBy}
+                  onChange={(val) => setExecutiveSortBy(val as typeof executiveSortBy)}
+                  options={[
+                    { value: 'title', label: 'Title' },
+                    { value: 'tenure', label: 'Tenure (Years)' },
+                    { value: 'experience', label: 'Total Experience' },
+                    { value: 'specialization', label: 'Specialization' },
+                  ]}
+                />
+              </div>
+            </div>
+
+            {/* Executives List */}
+            <div className="bg-primaryLight rounded-lg p-6 border border-border">
+              <h2 className="text-xl font-bold text-textPrimary mb-4">Executive Team</h2>
+              {executivesLoading ? (
+                <div className="space-y-4">
+                  {[1, 2, 3].map(i => (
+                    <div
+                      key={i}
+                      className="h-32 bg-surface/50 rounded-lg animate-pulse"
+                    />
+                  ))}
+                </div>
+              ) : filteredAndSortedExecutives.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {filteredAndSortedExecutives.map(executive => (
+                    <div
+                      key={executive.id}
+                      className="p-4 bg-surface hover:bg-surfaceLight rounded-lg border border-border transition-colors cursor-pointer"
+                    >
+                      <div className="flex items-start gap-4">
+                        {/* Initials Avatar */}
+                        <div className="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0">
+                          <span className="text-accent font-bold text-lg">
+                            {executive.name
+                              .split(' ')
+                              .map(n => n[0])
+                              .join('')
+                              .slice(0, 2)
+                              .toUpperCase()}
+                          </span>
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          {/* Name and Title */}
+                          <h3 className="text-textPrimary font-semibold mb-1 truncate">
+                            {executive.name}
+                          </h3>
+                          <p className="text-textSecondary text-sm mb-2">{executive.title}</p>
+
+                          {/* Details Grid */}
+                          <div className="grid grid-cols-2 gap-2 text-sm">
+                            <div>
+                              <p className="text-textMuted">Years at Company</p>
+                              <p className="text-textPrimary font-medium">
+                                {executive.years_at_company} {executive.years_at_company === 1 ? 'year' : 'years'}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-textMuted">Total Experience</p>
+                              <p className="text-textPrimary font-medium">
+                                {executive.total_experience_years} {executive.total_experience_years === 1 ? 'year' : 'years'}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Specialization Badge */}
+                          {executive.specialization && (
+                            <div className="mt-2">
+                              <span className="inline-block px-2 py-1 rounded bg-primary text-accent text-xs font-medium">
+                                {executive.specialization}
+                              </span>
+                            </div>
+                          )}
+
+                          {/* Tenure Risk Indicator */}
+                          <div className="mt-2 flex items-center gap-2">
+                            <span className="text-textMuted text-xs">Tenure Risk:</span>
+                            <span
+                              className={`px-2 py-0.5 rounded text-xs font-medium ${
+                                executive.tenure_risk === 'Stable'
+                                  ? 'bg-accent/20 text-accent'
+                                  : executive.tenure_risk === 'Watch'
+                                  ? 'bg-warning/20 text-warning'
+                                  : 'bg-error/20 text-error'
+                              }`}
+                            >
+                              {executive.tenure_risk}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <EmptyState
+                  icon="👔"
+                  title="No executives found"
+                  message={
+                    executiveSearch || executiveTitleFilter !== 'all'
+                      ? 'No executives match your search criteria. Try adjusting your filters.'
+                      : 'This stock doesn\'t have any executive information available.'
+                  }
+                />
+              )}
+            </div>
           </div>
         )}
 
