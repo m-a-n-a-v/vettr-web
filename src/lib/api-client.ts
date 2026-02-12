@@ -64,6 +64,7 @@ export interface AuthResponse {
 export interface ApiRequestOptions extends RequestInit {
   requiresAuth?: boolean;
   skipRefresh?: boolean;
+  retryCount?: number; // Internal: tracks retry attempts for rate limiting
 }
 
 /**
@@ -145,6 +146,34 @@ async function refreshAccessToken(): Promise<AuthTokens | null> {
 }
 
 /**
+ * Sleep for a specified number of milliseconds
+ */
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
+ * Calculate exponential backoff delay
+ */
+function getExponentialBackoffDelay(retryCount: number): number {
+  // Base delay: 1 second, doubles with each retry (1s, 2s, 4s)
+  return Math.min(1000 * Math.pow(2, retryCount), 8000); // Max 8 seconds
+}
+
+/**
+ * Show a toast notification for rate limiting (if toast context is available)
+ */
+function showRateLimitToast(retryAfterSeconds: number): void {
+  if (typeof window !== 'undefined') {
+    // Dispatch a custom event that the toast context can listen to
+    // This avoids circular dependencies and keeps the API client independent
+    window.dispatchEvent(new CustomEvent('api:rate-limit', {
+      detail: { retryAfterSeconds }
+    }));
+  }
+}
+
+/**
  * Main API client function
  *
  * @param endpoint - API endpoint (e.g., '/stocks', '/auth/login')
@@ -158,6 +187,7 @@ export async function apiClient<T = unknown>(
   const {
     requiresAuth = true,
     skipRefresh = false,
+    retryCount = 0,
     headers = {},
     ...fetchOptions
   } = options;
@@ -206,6 +236,53 @@ export async function apiClient<T = unknown>(
           },
         };
       }
+    }
+
+    // Handle 429 Too Many Requests - rate limiting
+    if (response.status === 429 && retryCount < 3) {
+      // Read Retry-After header (can be in seconds or HTTP date format)
+      const retryAfterHeader = response.headers.get('Retry-After');
+      let retryAfterMs = getExponentialBackoffDelay(retryCount);
+
+      if (retryAfterHeader) {
+        // Check if it's a number (seconds) or a date
+        const retryAfterSeconds = parseInt(retryAfterHeader, 10);
+        if (!isNaN(retryAfterSeconds)) {
+          retryAfterMs = retryAfterSeconds * 1000;
+        } else {
+          // Try parsing as HTTP date
+          const retryAfterDate = new Date(retryAfterHeader);
+          if (!isNaN(retryAfterDate.getTime())) {
+            retryAfterMs = Math.max(0, retryAfterDate.getTime() - Date.now());
+          }
+        }
+      }
+
+      // Cap retry delay at 30 seconds for better UX
+      retryAfterMs = Math.min(retryAfterMs, 30000);
+
+      // Show toast notification
+      showRateLimitToast(Math.ceil(retryAfterMs / 1000));
+
+      // Wait for the specified time
+      await sleep(retryAfterMs);
+
+      // Retry the request
+      return apiClient<T>(endpoint, {
+        ...options,
+        retryCount: retryCount + 1,
+      });
+    }
+
+    // If we've exhausted retries on 429, return error
+    if (response.status === 429) {
+      return {
+        success: false,
+        error: {
+          code: 'RATE_LIMIT_EXCEEDED',
+          message: 'Rate limit exceeded. Please try again later.',
+        },
+      };
     }
 
     // Parse response

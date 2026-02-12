@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { ToastContainer, ToastData, ToastType } from '@/components/ui/Toast';
 
 interface ToastContextValue {
@@ -40,6 +40,24 @@ export function ToastProvider({ children, position = 'top-right' }: ToastProvide
   const dismissToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((toast) => toast.id !== id));
   }, []);
+
+  // Listen for rate limit events from the API client
+  useEffect(() => {
+    const handleRateLimit = (event: Event) => {
+      const customEvent = event as CustomEvent<{ retryAfterSeconds: number }>;
+      const seconds = customEvent.detail.retryAfterSeconds;
+      showToast(
+        `Rate limited. Retrying in ${seconds} second${seconds !== 1 ? 's' : ''}...`,
+        'warning',
+        seconds * 1000
+      );
+    };
+
+    window.addEventListener('api:rate-limit', handleRateLimit);
+    return () => {
+      window.removeEventListener('api:rate-limit', handleRateLimit);
+    };
+  }, [showToast]);
 
   return (
     <ToastContext.Provider value={{ showToast }}>
