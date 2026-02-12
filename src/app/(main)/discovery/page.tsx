@@ -292,6 +292,11 @@ function FilingRow({ filing }: FilingRowProps) {
       "
     >
       <div className="flex items-start gap-4">
+        {/* Unread indicator (blue dot) */}
+        {!filing.is_read && (
+          <div className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0 mt-2" />
+        )}
+
         {/* Filing Type Icon */}
         <div className="flex-shrink-0">
           <FilingTypeIcon type={filing.type as FilingType} size="md" />

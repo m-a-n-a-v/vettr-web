@@ -379,6 +379,10 @@ export default function StockDetailPage() {
                       className="block p-4 bg-surface hover:bg-surfaceLight rounded-lg border border-border transition-colors"
                     >
                       <div className="flex items-start gap-4">
+                        {/* Unread indicator (blue dot) */}
+                        {!filing.is_read && (
+                          <div className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0 mt-2" />
+                        )}
                         <FilingTypeIcon type={filing.type} />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">

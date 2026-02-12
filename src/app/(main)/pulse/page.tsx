@@ -180,7 +180,14 @@ export default function PulsePage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         {/* Recent Events Section */}
         <section>
-          <h2 className="text-xl font-bold text-textPrimary mb-4">Recent Events</h2>
+          <div className="flex items-center gap-3 mb-4">
+            <h2 className="text-xl font-bold text-textPrimary">Recent Events</h2>
+            {filings && filings.length > 0 && (
+              <span className="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs font-medium rounded border border-blue-500/30">
+                {filings.filter(f => !f.is_read).length} unread
+              </span>
+            )}
+          </div>
 
           {isLoadingFilings ? (
             <div className="space-y-3">
@@ -209,6 +216,10 @@ export default function PulsePage() {
                   className="block bg-primaryLight p-4 rounded-lg border border-border hover:border-accent transition-all group"
                 >
                   <div className="flex items-start gap-3">
+                    {/* Unread indicator (blue dot) */}
+                    {!filing.is_read && (
+                      <div className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0 mt-2" />
+                    )}
                     <FilingTypeIcon type={filing.type} size="md" />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2 mb-1">
