@@ -626,7 +626,7 @@
         "npm run build passes"
       ],
       "priority": 36,
-      "passes": false
+      "passes": true
     },
     {
       "id": "WEB-037",
@@ -642,7 +642,7 @@
         "npm run build passes"
       ],
       "priority": 37,
-      "passes": false
+      "passes": true
     },
     {
       "id": "WEB-038",
@@ -658,7 +658,7 @@
         "npm run build passes"
       ],
       "priority": 38,
-      "passes": false
+      "passes": true
     },
     {
       "id": "WEB-039",
