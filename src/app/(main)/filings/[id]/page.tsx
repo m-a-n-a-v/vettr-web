@@ -11,6 +11,7 @@ import VetrScoreBadge from '@/components/ui/VetrScoreBadge';
 import PriceChangeIndicator from '@/components/ui/PriceChangeIndicator';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import EmptyState from '@/components/ui/EmptyState';
+import Breadcrumb from '@/components/ui/Breadcrumb';
 import { useToast } from '@/contexts/ToastContext';
 import { shareContent } from '@/lib/share';
 
@@ -97,13 +98,12 @@ export default function FilingDetailPage() {
     <div className="min-h-screen bg-primary p-4 md:p-6 pb-20 md:pb-6">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-textSecondary">
-          <Link href="/discovery" className="hover:text-accent transition-colors">
-            Discovery
-          </Link>
-          <span>/</span>
-          <span className="text-textPrimary">Filing Detail</span>
-        </div>
+        <Breadcrumb
+          items={[
+            { label: 'Filings', href: '/discovery' },
+            { label: filing.title }
+          ]}
+        />
 
         {/* Header: Filing Type Icon, Title, Status Badge */}
         <div className="bg-primaryLight rounded-lg p-6 border border-border">

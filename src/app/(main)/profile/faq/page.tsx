@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import SearchInput from '@/components/ui/SearchInput'
+import Breadcrumb from '@/components/ui/Breadcrumb'
 
 // FAQ items
 interface FAQItem {
@@ -165,6 +166,14 @@ export default function FAQPage() {
       {/* Header */}
       <div className="bg-primaryLight border-b border-border sticky top-0 z-20">
         <div className="max-w-4xl mx-auto px-4 py-4">
+          {/* Breadcrumb */}
+          <Breadcrumb
+            items={[
+              { label: 'Profile', href: '/profile' },
+              { label: 'FAQ' }
+            ]}
+          />
+
           <div className="flex items-center gap-4 mb-4">
             <button
               onClick={() => router.push('/profile')}

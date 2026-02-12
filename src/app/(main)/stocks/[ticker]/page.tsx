@@ -32,6 +32,7 @@ import VetrScoreDetail from '@/components/VetrScoreDetail';
 import VetrScoreComparison from '@/components/VetrScoreComparison';
 import VetrScoreTrend from '@/components/VetrScoreTrend';
 import { SkeletonStockDetailHeader, SkeletonVetrScoreSection, SkeletonCard, SkeletonFilingRow, SkeletonStockRow } from '@/components/ui/SkeletonLoader';
+import Breadcrumb from '@/components/ui/Breadcrumb';
 
 type Tab = 'overview' | 'pedigree' | 'red-flags';
 
@@ -231,6 +232,14 @@ export default function StockDetailPage() {
 
   return (
     <div className="min-h-screen bg-primary">
+      <div className="max-w-6xl mx-auto px-6 pt-6">
+        <Breadcrumb
+          items={[
+            { label: 'Stocks', href: '/stocks' },
+            { label: ticker }
+          ]}
+        />
+      </div>
       {/* Header with price info */}
       <div className="bg-primaryLight border-b border-border p-6">
         <div className="max-w-6xl mx-auto">

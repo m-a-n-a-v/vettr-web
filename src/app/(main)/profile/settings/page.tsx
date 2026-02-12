@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useUserSettings } from '@/hooks/useUserSettings';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import SelectDropdown from '@/components/ui/SelectDropdown';
+import Breadcrumb from '@/components/ui/Breadcrumb';
 import { useToast } from '@/contexts/ToastContext';
 import { useTheme, type Theme } from '@/contexts/ThemeContext';
 
@@ -93,6 +94,14 @@ export default function SettingsPage() {
   return (
     <div className="min-h-screen pb-20 md:pb-6 px-4 md:px-6 pt-6">
       <div className="max-w-2xl mx-auto">
+        {/* Breadcrumb */}
+        <Breadcrumb
+          items={[
+            { label: 'Profile', href: '/profile' },
+            { label: 'Settings' }
+          ]}
+        />
+
         {/* Header */}
         <div className="mb-6">
           <button
