@@ -528,7 +528,7 @@
         "npm run build passes"
       ],
       "priority": 30,
-      "passes": false
+      "passes": true
     },
     {
       "id": "WEB-031",
