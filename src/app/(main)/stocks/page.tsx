@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import Link from 'next/link'
 import { useStocks } from '@/hooks/useStocks'
 import { useWatchlist } from '@/hooks/useWatchlist'
@@ -14,13 +14,32 @@ import EmptyState from '@/components/ui/EmptyState'
 import { SkeletonCard } from '@/components/ui/SkeletonLoader'
 
 type SortOption = 'vetr_score' | 'current_price' | 'price_change_percent' | 'company_name' | 'sector'
+type ViewMode = 'card' | 'table'
 
 export default function StocksPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState<SortOption>('vetr_score')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [favoritesOnly, setFavoritesOnly] = useState(false)
+  const [viewMode, setViewMode] = useState<ViewMode>('card')
+  const [isClient, setIsClient] = useState(false)
   const { showToast } = useToast()
+
+  // Load view preference from localStorage on mount
+  useEffect(() => {
+    setIsClient(true)
+    const savedView = localStorage.getItem('stocks_view_mode')
+    if (savedView === 'card' || savedView === 'table') {
+      setViewMode(savedView)
+    }
+  }, [])
+
+  // Save view preference to localStorage when it changes
+  useEffect(() => {
+    if (isClient) {
+      localStorage.setItem('stocks_view_mode', viewMode)
+    }
+  }, [viewMode, isClient])
 
   // Fetch all stocks and watchlist
   const { stocks, isLoading: stocksLoading, isError: stocksError } = useStocks({
@@ -94,6 +113,23 @@ export default function StocksPage() {
   // Toggle favorites filter
   const toggleFavoritesOnly = () => {
     setFavoritesOnly(prev => !prev)
+  }
+
+  // Toggle view mode
+  const toggleViewMode = () => {
+    setViewMode(prev => prev === 'card' ? 'table' : 'card')
+  }
+
+  // Handle table column header click for sorting
+  const handleColumnSort = (column: SortOption) => {
+    if (sortBy === column) {
+      // Toggle order if same column
+      setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')
+    } else {
+      // New column, default to descending for scores/prices, ascending for names
+      setSortBy(column)
+      setSortOrder(column === 'company_name' || column === 'sector' ? 'asc' : 'desc')
+    }
   }
 
   // Handle favorite toggle with optimistic UI and toast notifications
@@ -200,6 +236,25 @@ export default function StocksPage() {
           >
             ★
           </button>
+
+          {/* View toggle - Only shown on desktop (>= 1024px) */}
+          <button
+            onClick={toggleViewMode}
+            className="hidden lg:flex items-center justify-center px-4 py-2 bg-primaryLight text-textPrimary rounded-lg hover:bg-surfaceLight transition-colors"
+            title={viewMode === 'card' ? 'Switch to Table View' : 'Switch to Card View'}
+          >
+            {viewMode === 'card' ? (
+              // Table icon
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M5 4a3 3 0 00-3 3v6a3 3 0 003 3h10a3 3 0 003-3V7a3 3 0 00-3-3H5zm-1 9v-1h5v2H5a1 1 0 01-1-1zm7 1h4a1 1 0 001-1v-1h-5v2zm0-4h5V8h-5v2zM9 8H4v2h5V8z" clipRule="evenodd" />
+              </svg>
+            ) : (
+              // Grid/card icon
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M3 4a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 12a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H4a1 1 0 01-1-1v-4zM11 4a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V4zM11 12a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
+              </svg>
+            )}
+          </button>
         </div>
 
         <EmptyState
@@ -269,6 +324,25 @@ export default function StocksPage() {
         >
           ★
         </button>
+
+        {/* View toggle - Only shown on desktop (>= 1024px) */}
+        <button
+          onClick={toggleViewMode}
+          className="hidden lg:flex items-center justify-center px-4 py-2 bg-primaryLight text-textPrimary rounded-lg hover:bg-surfaceLight transition-colors"
+          title={viewMode === 'card' ? 'Switch to Table View' : 'Switch to Card View'}
+        >
+          {viewMode === 'card' ? (
+            // Table icon
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M5 4a3 3 0 00-3 3v6a3 3 0 003 3h10a3 3 0 003-3V7a3 3 0 00-3-3H5zm-1 9v-1h5v2H5a1 1 0 01-1-1zm7 1h4a1 1 0 001-1v-1h-5v2zm0-4h5V8h-5v2zM9 8H4v2h5V8z" clipRule="evenodd" />
+            </svg>
+          ) : (
+            // Grid/card icon
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M3 4a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 12a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H4a1 1 0 01-1-1v-4zM11 4a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V4zM11 12a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
+            </svg>
+          )}
+        </button>
       </div>
 
       {/* Stock count */}
@@ -276,84 +350,222 @@ export default function StocksPage() {
         {filteredStocks.length} {filteredStocks.length === 1 ? 'stock' : 'stocks'}
       </div>
 
-      {/* Stock list - Mobile: Card view, Desktop: Table-like grid */}
-      <div className="space-y-3">
-        {filteredStocks.map(stock => (
-          <Link
-            key={stock.ticker}
-            href={`/stocks/${stock.ticker}`}
-            className="block bg-primaryLight rounded-lg p-4 hover:bg-surfaceLight transition-colors relative group"
-          >
-            <div className="flex items-center gap-4">
-              {/* Company initials avatar */}
-              <div className="flex-shrink-0 w-12 h-12 bg-surface rounded-full flex items-center justify-center text-accent font-bold text-lg">
-                {stock.company_name
-                  .split(' ')
-                  .map(word => word[0])
-                  .slice(0, 2)
-                  .join('')
-                  .toUpperCase()}
-              </div>
-
-              {/* Stock info */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-bold text-textPrimary">
-                    {stock.ticker}
-                  </span>
+      {/* Stock list - Responsive: Card view on mobile/tablet, Card or Table on desktop */}
+      {viewMode === 'table' ? (
+        // Table view - Desktop only (>= 1024px)
+        <div className="hidden lg:block overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-border">
+                <th className="text-left py-3 px-4">
                   <button
-                    onClick={(e) => handleFavoriteToggle(stock.ticker, e)}
-                    disabled={isAdding || isRemoving}
-                    className="text-lg transition-all duration-200 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
-                    aria-label={favoritedTickers.has(stock.ticker) ? 'Remove from watchlist' : 'Add to watchlist'}
+                    onClick={() => handleColumnSort('company_name')}
+                    className="flex items-center gap-2 text-textSecondary hover:text-textPrimary transition-colors font-semibold"
                   >
-                    {isAdding || isRemoving ? (
-                      <span className="text-textMuted animate-pulse">⋯</span>
-                    ) : favoritedTickers.has(stock.ticker) ? (
-                      <span className="text-accent drop-shadow-sm">★</span>
-                    ) : (
-                      <span className="text-textMuted group-hover:text-textSecondary">☆</span>
+                    Ticker
+                    {sortBy === 'company_name' && (
+                      <span>{sortOrder === 'asc' ? '↑' : '↓'}</span>
                     )}
                   </button>
+                </th>
+                <th className="text-left py-3 px-4">
+                  <button
+                    onClick={() => handleColumnSort('company_name')}
+                    className="flex items-center gap-2 text-textSecondary hover:text-textPrimary transition-colors font-semibold"
+                  >
+                    Name
+                    {sortBy === 'company_name' && (
+                      <span>{sortOrder === 'asc' ? '↑' : '↓'}</span>
+                    )}
+                  </button>
+                </th>
+                <th className="text-right py-3 px-4">
+                  <button
+                    onClick={() => handleColumnSort('current_price')}
+                    className="flex items-center gap-2 ml-auto text-textSecondary hover:text-textPrimary transition-colors font-semibold"
+                  >
+                    Price
+                    {sortBy === 'current_price' && (
+                      <span>{sortOrder === 'asc' ? '↑' : '↓'}</span>
+                    )}
+                  </button>
+                </th>
+                <th className="text-right py-3 px-4">
+                  <button
+                    onClick={() => handleColumnSort('price_change_percent')}
+                    className="flex items-center gap-2 ml-auto text-textSecondary hover:text-textPrimary transition-colors font-semibold"
+                  >
+                    Change%
+                    {sortBy === 'price_change_percent' && (
+                      <span>{sortOrder === 'asc' ? '↑' : '↓'}</span>
+                    )}
+                  </button>
+                </th>
+                <th className="text-center py-3 px-4">
+                  <button
+                    onClick={() => handleColumnSort('vetr_score')}
+                    className="flex items-center gap-2 mx-auto text-textSecondary hover:text-textPrimary transition-colors font-semibold"
+                  >
+                    VETTR Score
+                    {sortBy === 'vetr_score' && (
+                      <span>{sortOrder === 'asc' ? '↑' : '↓'}</span>
+                    )}
+                  </button>
+                </th>
+                <th className="text-left py-3 px-4">
+                  <button
+                    onClick={() => handleColumnSort('sector')}
+                    className="flex items-center gap-2 text-textSecondary hover:text-textPrimary transition-colors font-semibold"
+                  >
+                    Sector
+                    {sortBy === 'sector' && (
+                      <span>{sortOrder === 'asc' ? '↑' : '↓'}</span>
+                    )}
+                  </button>
+                </th>
+                <th className="text-right py-3 px-4">
+                  <span className="text-textSecondary font-semibold">Market Cap</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredStocks.map(stock => (
+                <tr
+                  key={stock.ticker}
+                  className="border-b border-border hover:bg-primaryLight transition-colors group cursor-pointer"
+                  onClick={() => window.location.href = `/stocks/${stock.ticker}`}
+                >
+                  <td className="py-4 px-4">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={(e) => handleFavoriteToggle(stock.ticker, e)}
+                        disabled={isAdding || isRemoving}
+                        className="text-lg transition-all duration-200 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+                        aria-label={favoritedTickers.has(stock.ticker) ? 'Remove from watchlist' : 'Add to watchlist'}
+                      >
+                        {isAdding || isRemoving ? (
+                          <span className="text-textMuted animate-pulse">⋯</span>
+                        ) : favoritedTickers.has(stock.ticker) ? (
+                          <span className="text-accent drop-shadow-sm">★</span>
+                        ) : (
+                          <span className="text-textMuted group-hover:text-textSecondary">☆</span>
+                        )}
+                      </button>
+                      <span className="font-bold text-textPrimary">{stock.ticker}</span>
+                    </div>
+                  </td>
+                  <td className="py-4 px-4">
+                    <span className="text-textPrimary">{stock.company_name}</span>
+                  </td>
+                  <td className="py-4 px-4 text-right">
+                    <span className="font-semibold text-textPrimary">
+                      ${stock.current_price?.toFixed(2) || 'N/A'}
+                    </span>
+                  </td>
+                  <td className="py-4 px-4 text-right">
+                    <PriceChangeIndicator
+                      change={stock.price_change_percent || 0}
+                      size="sm"
+                    />
+                  </td>
+                  <td className="py-4 px-4">
+                    <div className="flex justify-center">
+                      <VetrScoreBadge score={stock.vetr_score || 0} size="sm" />
+                    </div>
+                  </td>
+                  <td className="py-4 px-4">
+                    <span className="text-textSecondary">{stock.sector || 'N/A'}</span>
+                  </td>
+                  <td className="py-4 px-4 text-right">
+                    <span className="text-textSecondary">
+                      {stock.market_cap ? `$${(stock.market_cap / 1000000).toFixed(1)}M` : 'N/A'}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        // Card view - All screen sizes
+        <div className="space-y-3">
+          {filteredStocks.map(stock => (
+            <Link
+              key={stock.ticker}
+              href={`/stocks/${stock.ticker}`}
+              className="block bg-primaryLight rounded-lg p-4 hover:bg-surfaceLight transition-colors relative group"
+            >
+              <div className="flex items-center gap-4">
+                {/* Company initials avatar */}
+                <div className="flex-shrink-0 w-12 h-12 bg-surface rounded-full flex items-center justify-center text-accent font-bold text-lg">
+                  {stock.company_name
+                    .split(' ')
+                    .map(word => word[0])
+                    .slice(0, 2)
+                    .join('')
+                    .toUpperCase()}
                 </div>
-                <div className="text-sm text-textSecondary truncate">
-                  {stock.company_name}
+
+                {/* Stock info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-bold text-textPrimary">
+                      {stock.ticker}
+                    </span>
+                    <button
+                      onClick={(e) => handleFavoriteToggle(stock.ticker, e)}
+                      disabled={isAdding || isRemoving}
+                      className="text-lg transition-all duration-200 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+                      aria-label={favoritedTickers.has(stock.ticker) ? 'Remove from watchlist' : 'Add to watchlist'}
+                    >
+                      {isAdding || isRemoving ? (
+                        <span className="text-textMuted animate-pulse">⋯</span>
+                      ) : favoritedTickers.has(stock.ticker) ? (
+                        <span className="text-accent drop-shadow-sm">★</span>
+                      ) : (
+                        <span className="text-textMuted group-hover:text-textSecondary">☆</span>
+                      )}
+                    </button>
+                  </div>
+                  <div className="text-sm text-textSecondary truncate">
+                    {stock.company_name}
+                  </div>
+                </div>
+
+                {/* Price info - Hidden on mobile, shown on tablet+ */}
+                <div className="hidden sm:flex flex-col items-end gap-1">
+                  <div className="font-semibold text-textPrimary">
+                    ${stock.current_price?.toFixed(2) || 'N/A'}
+                  </div>
+                  <PriceChangeIndicator
+                    change={stock.price_change_percent || 0}
+                    size="sm"
+                  />
+                </div>
+
+                {/* VETTR Score */}
+                <div className="flex-shrink-0">
+                  <VetrScoreBadge score={stock.vetr_score || 0} size="sm" />
                 </div>
               </div>
 
-              {/* Price info - Hidden on mobile, shown on tablet+ */}
-              <div className="hidden sm:flex flex-col items-end gap-1">
-                <div className="font-semibold text-textPrimary">
-                  ${stock.current_price?.toFixed(2) || 'N/A'}
+              {/* Mobile-only: Price info below */}
+              <div className="sm:hidden mt-3 pt-3 border-t border-border flex justify-between items-center">
+                <div>
+                  <div className="text-xs text-textMuted mb-1">Price</div>
+                  <div className="font-semibold text-textPrimary">
+                    ${stock.current_price?.toFixed(2) || 'N/A'}
+                  </div>
                 </div>
                 <PriceChangeIndicator
                   change={stock.price_change_percent || 0}
                   size="sm"
                 />
               </div>
-
-              {/* VETTR Score */}
-              <div className="flex-shrink-0">
-                <VetrScoreBadge score={stock.vetr_score || 0} size="sm" />
-              </div>
-            </div>
-
-            {/* Mobile-only: Price info below */}
-            <div className="sm:hidden mt-3 pt-3 border-t border-border flex justify-between items-center">
-              <div>
-                <div className="text-xs text-textMuted mb-1">Price</div>
-                <div className="font-semibold text-textPrimary">
-                  ${stock.current_price?.toFixed(2) || 'N/A'}
-                </div>
-              </div>
-              <PriceChangeIndicator
-                change={stock.price_change_percent || 0}
-                size="sm"
-              />
-            </div>
-          </Link>
-        ))}
-      </div>
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
