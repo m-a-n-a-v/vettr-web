@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useEffect, useCallback } from 'react'
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { useStocks } from '@/hooks/useStocks'
 import { useWatchlist } from '@/hooks/useWatchlist'
@@ -16,9 +16,12 @@ import EmptyState from '@/components/ui/EmptyState'
 import { SkeletonStockRow } from '@/components/ui/SkeletonLoader'
 import RefreshButton from '@/components/ui/RefreshButton'
 import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator'
+import type { Stock } from '@/types/api'
 
 type SortOption = 'vetr_score' | 'current_price' | 'price_change_percent' | 'company_name' | 'sector'
 type ViewMode = 'card' | 'table'
+
+const STOCKS_PER_PAGE = 25
 
 export default function StocksPage() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -28,6 +31,10 @@ export default function StocksPage() {
   const [viewMode, setViewMode] = useState<ViewMode>('card')
   const [isClient, setIsClient] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
+  const [offset, setOffset] = useState(0)
+  const [allStocks, setAllStocks] = useState<Stock[]>([])
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
+  const loadMoreRef = useRef<HTMLDivElement>(null)
   const { showToast } = useToast()
 
   // Load view preference from localStorage on mount
@@ -56,15 +63,70 @@ export default function StocksPage() {
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
-  // Fetch all stocks and watchlist
-  const { stocks, isLoading: stocksLoading, isError: stocksError, mutate: mutateStocks } = useStocks({
+  // Fetch stocks with pagination
+  const { stocks, pagination, isLoading: stocksLoading, isError: stocksError, mutate: mutateStocks } = useStocks({
     search: searchQuery || undefined,
+    limit: STOCKS_PER_PAGE,
+    offset: offset,
   })
   const { watchlist, addToWatchlist, removeFromWatchlist, isAdding, isRemoving, isLoading: watchlistLoading } = useWatchlist()
+
+  // Accumulate stocks as we load more pages
+  useEffect(() => {
+    if (stocks && stocks.length > 0) {
+      if (offset === 0) {
+        // First page - replace all stocks
+        setAllStocks(stocks)
+      } else {
+        // Subsequent pages - append new stocks, avoiding duplicates
+        setAllStocks(prev => {
+          const existingTickers = new Set(prev.map(s => s.ticker))
+          const newStocks = stocks.filter(s => !existingTickers.has(s.ticker))
+          return [...prev, ...newStocks]
+        })
+      }
+      setIsLoadingMore(false)
+    }
+  }, [stocks, offset])
+
+  // Reset offset when search/sort changes
+  useEffect(() => {
+    setOffset(0)
+    setAllStocks([])
+  }, [searchQuery, sortBy, sortOrder])
+
+  // Load more stocks
+  const loadMoreStocks = useCallback(() => {
+    if (!pagination || !pagination.hasMore || isLoadingMore || stocksLoading) {
+      return
+    }
+    setIsLoadingMore(true)
+    setOffset(prev => prev + STOCKS_PER_PAGE)
+  }, [pagination, isLoadingMore, stocksLoading])
+
+  // Intersection Observer for infinite scroll on mobile
+  useEffect(() => {
+    if (!isMobile || !loadMoreRef.current) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && pagination?.hasMore && !isLoadingMore && !stocksLoading) {
+          loadMoreStocks()
+        }
+      },
+      { threshold: 0.1 }
+    )
+
+    observer.observe(loadMoreRef.current)
+
+    return () => observer.disconnect()
+  }, [isMobile, pagination, isLoadingMore, stocksLoading, loadMoreStocks])
 
   // Refresh handler
   const handleRefreshData = useCallback(async () => {
     try {
+      setOffset(0)
+      setAllStocks([])
       await mutateStocks()
       showToast('Data refreshed successfully', 'success')
     } catch (error) {
@@ -92,26 +154,16 @@ export default function StocksPage() {
     return new Set(watchlist.map(stock => stock.ticker))
   }, [watchlist])
 
-  // Filter and sort stocks
+  // Filter and sort stocks (use allStocks for accumulated data)
   const filteredStocks = useMemo(() => {
-    let result = stocks || []
-
-    // Filter by search query
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase()
-      result = result.filter(
-        stock =>
-          stock.ticker.toLowerCase().includes(query) ||
-          stock.company_name.toLowerCase().includes(query)
-      )
-    }
+    let result = allStocks || []
 
     // Filter by favorites only
     if (favoritesOnly) {
       result = result.filter(stock => favoritedTickers.has(stock.ticker))
     }
 
-    // Sort stocks
+    // Sort stocks (note: search filtering is done server-side via API)
     result = [...result].sort((a, b) => {
       let compareValue = 0
 
@@ -137,7 +189,7 @@ export default function StocksPage() {
     })
 
     return result
-  }, [stocks, searchQuery, favoritesOnly, favoritedTickers, sortBy, sortOrder])
+  }, [allStocks, favoritesOnly, favoritedTickers, sortBy, sortOrder])
 
   // Handle sort option change
   const handleSortChange = (value: string) => {
@@ -632,6 +684,47 @@ export default function StocksPage() {
               </div>
             </Link>
           ))}
+        </div>
+      )}
+
+      {/* Load More / Infinite Scroll Trigger */}
+      {pagination && pagination.hasMore && (
+        <div ref={loadMoreRef} className="mt-6 flex justify-center">
+          {/* Desktop: Load More button */}
+          <button
+            onClick={loadMoreStocks}
+            disabled={isLoadingMore || stocksLoading}
+            className="hidden md:flex items-center gap-2 px-6 py-3 bg-primaryLight text-textPrimary rounded-lg hover:bg-surfaceLight transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoadingMore || stocksLoading ? (
+              <>
+                <LoadingSpinner size="sm" />
+                <span>Loading more stocks...</span>
+              </>
+            ) : (
+              <>
+                <span>Load More</span>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </>
+            )}
+          </button>
+
+          {/* Mobile: Loading indicator for infinite scroll */}
+          {(isLoadingMore || stocksLoading) && (
+            <div className="md:hidden flex items-center gap-2 text-textSecondary">
+              <LoadingSpinner size="sm" />
+              <span>Loading more stocks...</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* No more stocks indicator */}
+      {pagination && !pagination.hasMore && filteredStocks.length > 0 && (
+        <div className="mt-6 text-center text-textMuted">
+          All stocks loaded ({pagination.total} total)
         </div>
       )}
     </div>
