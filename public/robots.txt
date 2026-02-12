@@ -1,0 +1,12 @@
+# Allow all crawlers to index public pages
+User-agent: *
+Allow: /
+
+# Disallow authenticated/private pages
+Disallow: /login
+Disallow: /signup
+Disallow: /profile/settings
+Disallow: /alerts
+
+# Sitemap (if available in future)
+# Sitemap: https://vettr.vercel.app/sitemap.xml
