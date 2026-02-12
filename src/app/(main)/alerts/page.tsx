@@ -10,6 +10,7 @@ import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { SkeletonCard } from '@/components/ui/SkeletonLoader';
 import Modal from '@/components/ui/Modal';
+import AlertRuleCreator from '@/components/AlertRuleCreator';
 
 // Mock recent triggers - in production this would come from an API endpoint
 // The backend doesn't have a triggers endpoint yet, so we'll show placeholder data
@@ -40,12 +41,13 @@ const mockRecentTriggers = [
 type FilterType = 'All' | 'Active' | 'Inactive';
 
 export default function AlertsPage() {
-  const { rules, isLoading, error, deleteRule, toggleRule } = useAlertRules();
+  const { rules, isLoading, error, deleteRule, toggleRule, createRule, isCreating } = useAlertRules();
   const { showToast } = useToast();
   const [filter, setFilter] = useState<FilterType>('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [togglingRuleId, setTogglingRuleId] = useState<string | null>(null);
+  const [showCreator, setShowCreator] = useState(false);
 
   // Filter rules based on active/inactive filter and search query
   const filteredRules = useMemo(() => {
@@ -96,6 +98,17 @@ export default function AlertsPage() {
       showToast('Alert rule deleted successfully', 'success');
     } else {
       showToast('Failed to delete alert rule', 'error');
+    }
+  };
+
+  // Handle create alert rule
+  const handleCreateRule = async (rule: Partial<AlertRule>) => {
+    const success = await createRule(rule);
+
+    if (success) {
+      showToast('Alert rule created successfully', 'success');
+    } else {
+      showToast('Failed to create alert rule', 'error');
     }
   };
 
@@ -182,10 +195,7 @@ export default function AlertsPage() {
         {/* Create New Alert Button - Desktop */}
         <button
           className="hidden md:flex items-center gap-2 px-4 py-2 bg-accent text-primary rounded-lg font-medium hover:bg-accentDim transition-colors"
-          onClick={() => {
-            // This will be wired up in WEB-023
-            showToast('Alert creator coming soon!', 'info');
-          }}
+          onClick={() => setShowCreator(true)}
         >
           <span className="text-xl">+</span>
           Create Alert
@@ -268,10 +278,7 @@ export default function AlertsPage() {
             title="No alert rules yet"
             message="Create your first alert rule to get notified about important stock events."
             actionLabel="Create Alert"
-            onAction={() => {
-              // This will be wired up in WEB-023
-              showToast('Alert creator coming soon!', 'info');
-            }}
+            onAction={() => setShowCreator(true)}
           />
         ) : filteredRules.length === 0 ? (
           <EmptyState
@@ -359,10 +366,7 @@ export default function AlertsPage() {
       {/* Floating Action Button (Mobile) */}
       <button
         className="md:hidden fixed bottom-20 right-4 w-14 h-14 bg-accent text-primary rounded-full shadow-lg flex items-center justify-center text-2xl font-bold hover:bg-accentDim transition-colors z-40"
-        onClick={() => {
-          // This will be wired up in WEB-023
-          showToast('Alert creator coming soon!', 'info');
-        }}
+        onClick={() => setShowCreator(true)}
         title="Create new alert"
       >
         +
@@ -397,6 +401,14 @@ export default function AlertsPage() {
           </div>
         </Modal>
       )}
+
+      {/* Alert Rule Creator Modal */}
+      <AlertRuleCreator
+        isOpen={showCreator}
+        onClose={() => setShowCreator(false)}
+        onSubmit={handleCreateRule}
+        isCreating={isCreating}
+      />
     </div>
   );
 }
