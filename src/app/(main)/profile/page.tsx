@@ -10,6 +10,7 @@ import Modal from '@/components/ui/Modal';
 import { useToast } from '@/contexts/ToastContext';
 import FeedbackForm from '@/components/FeedbackForm';
 import Onboarding from '@/components/Onboarding';
+import { SkeletonUserHeader, SkeletonProfileSection } from '@/components/ui/SkeletonLoader';
 
 export default function ProfilePage() {
   const { user, logout } = useAuth();
@@ -74,8 +75,13 @@ export default function ProfilePage() {
   // Loading state
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <LoadingSpinner size="lg" color="accent" centered message="Loading profile..." />
+      <div className="min-h-screen bg-primary pb-20 md:pb-6">
+        <div className="max-w-4xl mx-auto p-6 space-y-6">
+          <SkeletonUserHeader />
+          <SkeletonProfileSection />
+          <SkeletonProfileSection />
+          <SkeletonProfileSection />
+        </div>
       </div>
     );
   }

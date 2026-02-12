@@ -13,7 +13,7 @@ import VetrScoreBadge from '@/components/ui/VetrScoreBadge'
 import PriceChangeIndicator from '@/components/ui/PriceChangeIndicator'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import EmptyState from '@/components/ui/EmptyState'
-import { SkeletonCard } from '@/components/ui/SkeletonLoader'
+import { SkeletonStockRow } from '@/components/ui/SkeletonLoader'
 import RefreshButton from '@/components/ui/RefreshButton'
 import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator'
 
@@ -194,20 +194,32 @@ export default function StocksPage() {
   if (stocksLoading || watchlistLoading) {
     return (
       <div className="p-4 md:p-6 pb-20 md:pb-6">
-        <h1 className="text-2xl font-bold mb-6">Stocks</h1>
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold">Stocks</h1>
+          <div className="h-10 w-10 bg-surface rounded-lg animate-pulse hidden md:block"></div>
+        </div>
 
         {/* Filters skeleton */}
-        <div className="mb-6 flex flex-col md:flex-row gap-4">
-          <SkeletonCard className="h-12 flex-1" />
-          <SkeletonCard className="h-12 w-full md:w-48" />
-          <SkeletonCard className="h-12 w-12" />
-          <SkeletonCard className="h-12 w-12" />
+        <div className="mb-6 space-y-4">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="h-12 flex-1 bg-surface rounded-lg animate-pulse"></div>
+            <div className="h-12 w-full md:w-48 bg-surface rounded-lg animate-pulse"></div>
+            <div className="h-12 w-12 bg-surface rounded-lg animate-pulse"></div>
+            <div className="h-12 w-12 bg-surface rounded-lg animate-pulse"></div>
+          </div>
+          <div className="flex items-center justify-between">
+            <div className="h-6 w-24 bg-surface rounded animate-pulse"></div>
+            <div className="flex gap-2">
+              <div className="h-8 w-8 bg-surface rounded animate-pulse"></div>
+              <div className="h-8 w-8 bg-surface rounded animate-pulse"></div>
+            </div>
+          </div>
         </div>
 
         {/* Stock list skeleton */}
         <div className="space-y-3">
-          {[1, 2, 3, 4, 5].map(i => (
-            <SkeletonCard key={i} className="h-24" />
+          {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
+            <SkeletonStockRow key={i} />
           ))}
         </div>
       </div>

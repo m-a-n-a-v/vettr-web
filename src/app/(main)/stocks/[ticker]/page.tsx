@@ -30,6 +30,7 @@ import ExecutiveDetail from '@/components/ExecutiveDetail';
 import VetrScoreDetail from '@/components/VetrScoreDetail';
 import VetrScoreComparison from '@/components/VetrScoreComparison';
 import VetrScoreTrend from '@/components/VetrScoreTrend';
+import { SkeletonStockDetailHeader, SkeletonVetrScoreSection, SkeletonCard, SkeletonFilingRow, SkeletonStockRow } from '@/components/ui/SkeletonLoader';
 
 type Tab = 'overview' | 'pedigree' | 'red-flags';
 
@@ -177,8 +178,48 @@ export default function StockDetailPage() {
 
   if (stockLoading) {
     return (
-      <div className="min-h-screen bg-primary p-6 pb-20 md:pb-6">
-        <LoadingSpinner centered size="lg" message="Loading stock details..." />
+      <div className="min-h-screen bg-primary">
+        {/* Header skeleton */}
+        <div className="bg-primaryLight border-b border-border p-6">
+          <div className="max-w-6xl mx-auto">
+            <SkeletonStockDetailHeader className="mb-6" />
+          </div>
+        </div>
+
+        {/* Tab navigation skeleton */}
+        <div className="max-w-6xl mx-auto px-6 pt-4">
+          <div className="flex gap-4 border-b border-border mb-6">
+            <div className="h-10 w-24 bg-surface rounded animate-pulse"></div>
+            <div className="h-10 w-24 bg-surface rounded animate-pulse"></div>
+            <div className="h-10 w-24 bg-surface rounded animate-pulse"></div>
+          </div>
+
+          {/* Content skeleton */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pb-20 md:pb-6">
+            <div className="lg:col-span-2 space-y-6">
+              <SkeletonVetrScoreSection />
+              <div className="bg-primaryLight border border-border rounded-lg p-6">
+                <div className="h-6 bg-surface rounded animate-pulse w-32 mb-4"></div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="h-20 bg-surface rounded animate-pulse"></div>
+                  <div className="h-20 bg-surface rounded animate-pulse"></div>
+                  <div className="h-20 bg-surface rounded animate-pulse"></div>
+                  <div className="h-20 bg-surface rounded animate-pulse"></div>
+                </div>
+              </div>
+            </div>
+            <div className="space-y-6">
+              <div className="bg-primaryLight border border-border rounded-lg p-6">
+                <div className="h-6 bg-surface rounded animate-pulse w-40 mb-4"></div>
+                <div className="space-y-3">
+                  <SkeletonFilingRow />
+                  <SkeletonFilingRow />
+                  <SkeletonFilingRow />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }

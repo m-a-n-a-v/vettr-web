@@ -9,7 +9,7 @@ import { shareContent } from '@/lib/share';
 import SearchInput from '@/components/ui/SearchInput';
 import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
-import { SkeletonCard } from '@/components/ui/SkeletonLoader';
+import { SkeletonAlertRule, SkeletonAlertTrigger } from '@/components/ui/SkeletonLoader';
 import Modal from '@/components/ui/Modal';
 import AlertRuleCreator from '@/components/AlertRuleCreator';
 
@@ -207,21 +207,36 @@ export default function AlertsPage() {
   if (isLoading) {
     return (
       <div className="p-4 md:p-6 pb-20 md:pb-6">
-        <h1 className="text-2xl font-bold mb-6">Alerts</h1>
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold">Alerts</h1>
+          <div className="h-10 w-32 bg-surface rounded-lg animate-pulse"></div>
+        </div>
+
         <div className="space-y-6">
+          {/* Recent Triggers skeleton */}
           <div>
             <h2 className="text-lg font-semibold mb-4">Recent Triggers</h2>
             <div className="space-y-3">
-              {[1, 2, 3].map((i) => (
-                <SkeletonCard key={i} />
+              {[1, 2, 3, 4, 5].map((i) => (
+                <SkeletonAlertTrigger key={i} />
               ))}
             </div>
           </div>
+
+          {/* My Alert Rules skeleton */}
           <div>
-            <h2 className="text-lg font-semibold mb-4">My Alert Rules</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold">My Alert Rules</h2>
+              <div className="h-8 w-48 bg-surface rounded animate-pulse"></div>
+            </div>
+
+            {/* Search bar skeleton */}
+            <div className="h-10 bg-surface rounded-lg animate-pulse mb-4"></div>
+
+            {/* Rules skeleton */}
             <div className="space-y-3">
-              {[1, 2, 3].map((i) => (
-                <SkeletonCard key={i} />
+              {[1, 2, 3, 4, 5].map((i) => (
+                <SkeletonAlertRule key={i} />
               ))}
             </div>
           </div>
