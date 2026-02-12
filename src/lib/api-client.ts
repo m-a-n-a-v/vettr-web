@@ -44,21 +44,19 @@ export interface PaginatedResponse<T> extends ApiResponse {
   data: PaginatedData<T>;
 }
 
+// Import types from centralized types file
+import type { AuthResponse as ApiAuthResponse, User } from '@/types/api';
+
 // Auth response types
 export interface AuthTokens {
   accessToken: string;
   refreshToken: string;
 }
 
-export interface User {
-  id: string;
-  email: string;
-  displayName: string;
-  tier: 'Free' | 'Pro' | 'Premium';
-  createdAt: string;
-}
-
-export interface AuthResponse extends AuthTokens {
+// Re-map the backend auth response to camelCase for convenience in the API client
+export interface AuthResponse {
+  accessToken: string;
+  refreshToken: string;
   user: User;
 }
 
@@ -118,7 +116,7 @@ async function refreshAccessToken(): Promise<AuthTokens | null> {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ refreshToken }),
+      body: JSON.stringify({ refresh_token: refreshToken }),
     });
 
     if (!response.ok) {
@@ -126,11 +124,15 @@ async function refreshAccessToken(): Promise<AuthTokens | null> {
       return null;
     }
 
-    const data: ApiResponse<AuthTokens> = await response.json();
+    const data: ApiResponse<{ access_token: string; refresh_token: string }> = await response.json();
 
     if (data.success && data.data) {
-      setTokens(data.data.accessToken, data.data.refreshToken);
-      return data.data;
+      const tokens: AuthTokens = {
+        accessToken: data.data.access_token,
+        refreshToken: data.data.refresh_token,
+      };
+      setTokens(tokens.accessToken, tokens.refreshToken);
+      return tokens;
     }
 
     clearTokens();
@@ -274,26 +276,40 @@ export const authApi = {
    * Login with email and password
    */
   login: async (email: string, password: string): Promise<ApiResponse<AuthResponse>> => {
-    const response = await api.post<AuthResponse>('/auth/login', { email, password }, { requiresAuth: false });
+    const response = await api.post<ApiAuthResponse>('/auth/login', { email, password }, { requiresAuth: false });
 
     if (response.success && response.data) {
-      setTokens(response.data.accessToken, response.data.refreshToken);
+      // Convert snake_case API response to camelCase
+      const authData: AuthResponse = {
+        accessToken: response.data.access_token,
+        refreshToken: response.data.refresh_token,
+        user: response.data.user,
+      };
+      setTokens(authData.accessToken, authData.refreshToken);
+      return { ...response, data: authData };
     }
 
-    return response;
+    return { success: false, error: response.error };
   },
 
   /**
    * Sign up with email, password, and display name
    */
   signup: async (email: string, password: string, displayName: string): Promise<ApiResponse<AuthResponse>> => {
-    const response = await api.post<AuthResponse>('/auth/signup', { email, password, displayName }, { requiresAuth: false });
+    const response = await api.post<ApiAuthResponse>('/auth/signup', { email, password, display_name: displayName }, { requiresAuth: false });
 
     if (response.success && response.data) {
-      setTokens(response.data.accessToken, response.data.refreshToken);
+      // Convert snake_case API response to camelCase
+      const authData: AuthResponse = {
+        accessToken: response.data.access_token,
+        refreshToken: response.data.refresh_token,
+        user: response.data.user,
+      };
+      setTokens(authData.accessToken, authData.refreshToken);
+      return { ...response, data: authData };
     }
 
-    return response;
+    return { success: false, error: response.error };
   },
 
   /**
