@@ -13,6 +13,7 @@ import { useRedFlags } from '@/hooks/useRedFlags';
 import { useRedFlagHistory } from '@/hooks/useRedFlagHistory';
 import { useVetrScoreHistory } from '@/hooks/useVetrScoreHistory';
 import { useVetrScoreComparison } from '@/hooks/useVetrScoreComparison';
+import { useVetrScoreTrend } from '@/hooks/useVetrScoreTrend';
 import { useToast } from '@/contexts/ToastContext';
 import { Executive, RedFlag } from '@/types/api';
 import { api } from '@/lib/api-client';
@@ -27,6 +28,7 @@ import SelectDropdown from '@/components/ui/SelectDropdown';
 import ExecutiveDetail from '@/components/ExecutiveDetail';
 import VetrScoreDetail from '@/components/VetrScoreDetail';
 import VetrScoreComparison from '@/components/VetrScoreComparison';
+import VetrScoreTrend from '@/components/VetrScoreTrend';
 
 type Tab = 'overview' | 'pedigree' | 'red-flags';
 
@@ -62,6 +64,7 @@ export default function StockDetailPage() {
   const { history: flagHistory, isLoading: flagHistoryLoading } = useRedFlagHistory({ ticker, limit: 10 });
   const { history: scoreHistory, isLoading: scoreHistoryLoading } = useVetrScoreHistory({ ticker, period: scoreHistoryPeriod });
   const { comparison, isLoading: comparisonLoading } = useVetrScoreComparison({ ticker });
+  const { trend, isLoading: trendLoading } = useVetrScoreTrend({ ticker });
 
   const isInWatchlist = watchlist.some(item => item.ticker === ticker);
   const isTogglingFavorite = isAdding || isRemoving;
@@ -337,6 +340,17 @@ export default function StockDetailPage() {
                 <p className="text-textSecondary text-center py-4">Score not available</p>
               )}
             </div>
+
+            {/* VETTR Score Trend */}
+            {trendLoading ? (
+              <div className="bg-primaryLight rounded-lg p-6 border border-border">
+                <div className="flex justify-center py-8">
+                  <LoadingSpinner size="lg" color="accent" />
+                </div>
+              </div>
+            ) : trend ? (
+              <VetrScoreTrend trend={trend} />
+            ) : null}
 
             {/* Score History Chart */}
             <div className="bg-primaryLight rounded-lg p-6 border border-border">
