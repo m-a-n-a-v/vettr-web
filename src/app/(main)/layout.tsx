@@ -4,7 +4,9 @@ import { useState, useEffect } from 'react';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { Navigation } from '@/components/Navigation';
 import Onboarding from '@/components/Onboarding';
+import KeyboardShortcutsModal from '@/components/KeyboardShortcutsModal';
 import { useAuth } from '@/contexts/AuthContext';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 
 export default function MainLayout({
   children,
@@ -13,6 +15,7 @@ export default function MainLayout({
 }) {
   const { isAuthenticated } = useAuth();
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showKeyboardShortcutsModal, setShowKeyboardShortcutsModal] = useState(false);
 
   useEffect(() => {
     // Check if user has seen onboarding before
@@ -32,6 +35,18 @@ export default function MainLayout({
     }
   };
 
+  // Initialize keyboard shortcuts
+  useKeyboardShortcuts({
+    onOpenHelp: () => setShowKeyboardShortcutsModal(true),
+    onCloseModal: () => {
+      // Close any open modals
+      if (showKeyboardShortcutsModal) {
+        setShowKeyboardShortcutsModal(false);
+      }
+    },
+    enabled: isAuthenticated,
+  });
+
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-primary">
@@ -42,6 +57,11 @@ export default function MainLayout({
         </main>
         {/* Onboarding overlay */}
         <Onboarding isOpen={showOnboarding} onClose={handleCloseOnboarding} />
+        {/* Keyboard shortcuts help modal */}
+        <KeyboardShortcutsModal
+          isOpen={showKeyboardShortcutsModal}
+          onClose={() => setShowKeyboardShortcutsModal(false)}
+        />
       </div>
     </ProtectedRoute>
   );
