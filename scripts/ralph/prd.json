@@ -223,7 +223,7 @@
         "npm run build passes"
       ],
       "priority": 13,
-      "passes": false
+      "passes": true
     },
     {
       "id": "WEB-014",
@@ -242,7 +242,7 @@
         "npm run build passes"
       ],
       "priority": 14,
-      "passes": false
+      "passes": true
     },
     {
       "id": "WEB-015",
