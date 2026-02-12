@@ -8,6 +8,7 @@ import { useWatchlist } from '@/hooks/useWatchlist';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import Modal from '@/components/ui/Modal';
 import { useToast } from '@/contexts/ToastContext';
+import FeedbackForm from '@/components/FeedbackForm';
 
 export default function ProfilePage() {
   const { user, logout } = useAuth();
@@ -17,6 +18,7 @@ export default function ProfilePage() {
 
   const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
+  const [showFeedbackForm, setShowFeedbackForm] = useState(false);
 
   // Get user initials for avatar
   const getInitials = (name: string) => {
@@ -318,6 +320,16 @@ export default function ProfilePage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
             </Link>
+
+            <button
+              onClick={() => setShowFeedbackForm(true)}
+              className="flex items-center justify-between p-3 bg-surface hover:bg-surfaceLight rounded-lg transition-colors group w-full text-left"
+            >
+              <span className="text-textPrimary">Send Feedback</span>
+              <svg className="w-5 h-5 text-textMuted group-hover:text-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+              </svg>
+            </button>
           </div>
         </div>
 
@@ -374,6 +386,12 @@ export default function ProfilePage() {
           </div>
         </Modal>
       )}
+
+      {/* Feedback Form Modal */}
+      <FeedbackForm
+        isOpen={showFeedbackForm}
+        onClose={() => setShowFeedbackForm(false)}
+      />
     </div>
   );
 }
