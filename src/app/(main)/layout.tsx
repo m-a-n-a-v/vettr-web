@@ -5,6 +5,7 @@ import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { Navigation } from '@/components/Navigation';
 import Onboarding from '@/components/Onboarding';
 import KeyboardShortcutsModal from '@/components/KeyboardShortcutsModal';
+import QuickSearch from '@/components/QuickSearch';
 import { useAuth } from '@/contexts/AuthContext';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 
@@ -16,6 +17,7 @@ export default function MainLayout({
   const { isAuthenticated } = useAuth();
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showKeyboardShortcutsModal, setShowKeyboardShortcutsModal] = useState(false);
+  const [showQuickSearch, setShowQuickSearch] = useState(false);
 
   useEffect(() => {
     // Check if user has seen onboarding before
@@ -37,11 +39,15 @@ export default function MainLayout({
 
   // Initialize keyboard shortcuts
   useKeyboardShortcuts({
+    onOpenQuickSearch: () => setShowQuickSearch(true),
     onOpenHelp: () => setShowKeyboardShortcutsModal(true),
     onCloseModal: () => {
       // Close any open modals
       if (showKeyboardShortcutsModal) {
         setShowKeyboardShortcutsModal(false);
+      }
+      if (showQuickSearch) {
+        setShowQuickSearch(false);
       }
     },
     enabled: isAuthenticated,
@@ -61,6 +67,11 @@ export default function MainLayout({
         <KeyboardShortcutsModal
           isOpen={showKeyboardShortcutsModal}
           onClose={() => setShowKeyboardShortcutsModal(false)}
+        />
+        {/* Quick search overlay */}
+        <QuickSearch
+          isOpen={showQuickSearch}
+          onClose={() => setShowQuickSearch(false)}
         />
       </div>
     </ProtectedRoute>
