@@ -2,10 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Dark theme colors (default) */
 :root {
   --foreground-rgb: 255, 255, 255;
   --background-start-rgb: 13, 27, 42;
   --background-end-rgb: 13, 27, 42;
+}
+
+/* Light theme colors - applied when html has class "light" (NOT dark) */
+html:not(.dark) {
+  --foreground-rgb: 15, 23, 42;
+  --background-start-rgb: 248, 250, 252;
+  --background-end-rgb: 248, 250, 252;
+}
+
+/* Smooth theme transitions */
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+/* Disable transitions for animations and transforms */
+*:where([class*="animate-"], [class*="transition-transform"], [class*="transition-opacity"]) {
+  transition-property: transform, opacity !important;
 }
 
 body {
@@ -16,6 +36,69 @@ body {
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
+}
+
+/* Light theme overrides for common utility classes */
+html:not(.dark) .bg-primary {
+  background-color: #F8FAFC;
+}
+
+html:not(.dark) .bg-primaryLight {
+  background-color: #FFFFFF;
+}
+
+html:not(.dark) .bg-primaryDark {
+  background-color: #E2E8F0;
+}
+
+html:not(.dark) .bg-surface {
+  background-color: #FFFFFF;
+}
+
+html:not(.dark) .bg-surfaceLight {
+  background-color: #F1F5F9;
+}
+
+html:not(.dark) .text-white,
+html:not(.dark) .text-textPrimary {
+  color: #0F172A;
+}
+
+html:not(.dark) .text-textSecondary {
+  color: #475569;
+}
+
+html:not(.dark) .text-textMuted {
+  color: #94A3B8;
+}
+
+html:not(.dark) .border-border {
+  border-color: #E2E8F0;
+}
+
+/* Preserve accent and error colors in light theme */
+html:not(.dark) .text-accent {
+  color: #00C853;
+}
+
+html:not(.dark) .bg-accent {
+  background-color: #00E676;
+}
+
+html:not(.dark) .text-error {
+  color: #DC2626;
+}
+
+html:not(.dark) .bg-error {
+  background-color: #FF5252;
+}
+
+html:not(.dark) .text-warning {
+  color: #D97706;
+}
+
+html:not(.dark) .bg-warning {
+  background-color: #FFB300;
 }
 
 @layer utilities {

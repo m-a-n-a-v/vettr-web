@@ -6,11 +6,13 @@ import { useUserSettings } from '@/hooks/useUserSettings';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import SelectDropdown from '@/components/ui/SelectDropdown';
 import { useToast } from '@/contexts/ToastContext';
+import { useTheme, type Theme } from '@/contexts/ThemeContext';
 
 export default function SettingsPage() {
   const router = useRouter();
   const { settings, isLoading, isError, isUpdating, updateSettings } = useUserSettings();
   const { showToast } = useToast();
+  const { theme, setTheme: setThemeContext } = useTheme();
 
   // Local state for form fields
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
@@ -18,7 +20,6 @@ export default function SettingsPage() {
   const [alertFinancing, setAlertFinancing] = useState(false);
   const [alertDrillResult, setAlertDrillResult] = useState(false);
   const [alertManagementChange, setAlertManagementChange] = useState(false);
-  const [theme, setTheme] = useState<'dark' | 'light' | 'system'>('dark');
   const [defaultSortOrder, setDefaultSortOrder] = useState('vetr_score');
 
   // Initialize form fields when settings load
@@ -29,10 +30,18 @@ export default function SettingsPage() {
       setAlertFinancing(settings.alert_preferences.financing);
       setAlertDrillResult(settings.alert_preferences.drill_result);
       setAlertManagementChange(settings.alert_preferences.management_change);
-      setTheme(settings.theme);
+      // Theme is managed by ThemeContext, sync if needed
+      if (settings.theme && settings.theme !== theme) {
+        setThemeContext(settings.theme);
+      }
       setDefaultSortOrder(settings.default_sort_order);
     }
-  }, [settings]);
+  }, [settings, theme, setThemeContext]);
+
+  // Handle theme change
+  const handleThemeChange = (newTheme: Theme) => {
+    setThemeContext(newTheme);
+  };
 
   // Handle save settings
   const handleSaveSettings = async () => {
@@ -236,19 +245,19 @@ export default function SettingsPage() {
         <div className="bg-primaryLight border border-border rounded-lg p-6 mb-4">
           <h2 className="text-xl font-semibold text-white mb-4">Appearance</h2>
 
-          {/* Dark Mode Toggle */}
+          {/* Theme Toggle */}
           <div className="mb-4">
-            <label className="block text-white font-medium mb-2">Theme</label>
+            <label className="block text-white dark:text-white font-medium mb-2">Theme</label>
             <SelectDropdown
               value={theme}
-              onChange={(value) => setTheme(value as 'dark' | 'light' | 'system')}
+              onChange={(value) => handleThemeChange(value as Theme)}
               options={[
                 { value: 'dark', label: 'Dark (Default)' },
                 { value: 'light', label: 'Light' },
                 { value: 'system', label: 'System' },
               ]}
             />
-            <p className="text-textSecondary text-sm mt-2">Choose your preferred theme</p>
+            <p className="text-textSecondary dark:text-textSecondary text-sm mt-2">Choose your preferred theme. Changes apply immediately.</p>
           </div>
         </div>
 
