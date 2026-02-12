@@ -19,7 +19,7 @@
         "npm run lint passes with zero errors"
       ],
       "priority": 1,
-      "passes": false
+      "passes": true
     },
     {
       "id": "WEB-002",
