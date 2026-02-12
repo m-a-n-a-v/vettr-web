@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useAlertRules } from '@/hooks/useAlertRules';
 import { useToast } from '@/contexts/ToastContext';
 import type { AlertRule, AlertType } from '@/types/api';
+import { shareContent } from '@/lib/share';
 import SearchInput from '@/components/ui/SearchInput';
 import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
@@ -187,6 +188,22 @@ export default function AlertsPage() {
     }
   };
 
+  // Share alert trigger
+  const handleShareTrigger = async (trigger: typeof mockRecentTriggers[0]) => {
+    const shareText = `${trigger.ticker} Alert: ${trigger.alert_type}\n` +
+      `${trigger.message}\n` +
+      `Triggered: ${formatRelativeTime(trigger.triggered_at)}`;
+
+    await shareContent(
+      {
+        title: `${trigger.ticker} - ${trigger.alert_type}`,
+        text: shareText,
+      },
+      () => showToast('Alert copied to clipboard', 'success'),
+      () => showToast('Failed to share', 'error')
+    );
+  };
+
   if (isLoading) {
     return (
       <div className="p-4 md:p-6 pb-20 md:pb-6">
@@ -252,28 +269,56 @@ export default function AlertsPage() {
         ) : (
           <div className="space-y-3">
             {mockRecentTriggers.slice(0, 5).map((trigger) => (
-              <Link
+              <div
                 key={trigger.id}
-                href={`/stocks/${trigger.ticker}`}
-                className="block bg-primaryLight border border-border rounded-lg p-4 hover:bg-surfaceLight transition-colors"
+                className="bg-primaryLight border border-border rounded-lg p-4 hover:bg-surfaceLight transition-colors"
               >
                 <div className="flex items-start gap-3">
                   <span className="text-2xl flex-shrink-0">
                     {getAlertIcon(trigger.alert_type)}
                   </span>
-                  <div className="flex-1 min-w-0">
+                  <Link
+                    href={`/stocks/${trigger.ticker}`}
+                    className="flex-1 min-w-0"
+                  >
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-medium text-accent">{trigger.ticker}</span>
+                      <span className="font-medium text-accent hover:underline">{trigger.ticker}</span>
                       <span className="text-textSecondary">•</span>
                       <span className="text-sm text-textSecondary">{trigger.alert_type}</span>
                     </div>
                     <p className="text-sm text-textSecondary">{trigger.message}</p>
+                  </Link>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <span className="text-xs text-textMuted">
+                      {formatRelativeTime(trigger.triggered_at)}
+                    </span>
+                    {/* Share Button */}
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleShareTrigger(trigger);
+                      }}
+                      className="p-1.5 rounded hover:bg-surface transition-colors"
+                      aria-label="Share alert"
+                      title="Share alert"
+                    >
+                      <svg
+                        className="w-4 h-4 text-textMuted hover:text-accent transition-colors"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+                        />
+                      </svg>
+                    </button>
                   </div>
-                  <span className="text-xs text-textMuted flex-shrink-0">
-                    {formatRelativeTime(trigger.triggered_at)}
-                  </span>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
         )}

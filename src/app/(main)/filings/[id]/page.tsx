@@ -12,6 +12,7 @@ import PriceChangeIndicator from '@/components/ui/PriceChangeIndicator';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import EmptyState from '@/components/ui/EmptyState';
 import { useToast } from '@/contexts/ToastContext';
+import { shareContent } from '@/lib/share';
 
 export default function FilingDetailPage() {
   const params = useParams();
@@ -72,6 +73,26 @@ export default function FilingDetailPage() {
     });
   };
 
+  // Share filing
+  const handleShare = async () => {
+    if (!filing) return;
+
+    const shareText = `${filing.title}\n` +
+      `Company: ${filing.company_name} (${filing.ticker})\n` +
+      `Type: ${filing.type}\n` +
+      `Filed: ${formatDate(filing.date_filed)}\n` +
+      `Material: ${filing.is_material ? 'Yes' : 'No'}`;
+
+    await shareContent(
+      {
+        title: filing.title,
+        text: shareText,
+      },
+      () => showToast('Filing copied to clipboard', 'success'),
+      () => showToast('Failed to share', 'error')
+    );
+  };
+
   return (
     <div className="min-h-screen bg-primary p-4 md:p-6 pb-20 md:pb-6">
       <div className="max-w-4xl mx-auto space-y-6">
@@ -91,20 +112,43 @@ export default function FilingDetailPage() {
               <FilingTypeIcon type={filing.type} size="lg" />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-3 mb-2 flex-wrap">
-                <h1 className="text-2xl md:text-3xl font-bold text-textPrimary break-words">
-                  {filing.title}
-                </h1>
-                {/* Status Badge */}
-                <span
-                  className={`px-3 py-1 rounded-full text-sm font-medium flex-shrink-0 ${
-                    filing.is_read
-                      ? 'bg-accent/20 text-accent border border-accent/30'
-                      : 'bg-warning/20 text-warning border border-warning/30'
-                  }`}
+              <div className="flex items-start justify-between gap-3 mb-2">
+                <div className="flex items-center gap-3 flex-wrap flex-1">
+                  <h1 className="text-2xl md:text-3xl font-bold text-textPrimary break-words">
+                    {filing.title}
+                  </h1>
+                  {/* Status Badge */}
+                  <span
+                    className={`px-3 py-1 rounded-full text-sm font-medium flex-shrink-0 ${
+                      filing.is_read
+                        ? 'bg-accent/20 text-accent border border-accent/30'
+                        : 'bg-warning/20 text-warning border border-warning/30'
+                    }`}
+                  >
+                    {filing.is_read ? 'Read' : 'Unread'}
+                  </span>
+                </div>
+                {/* Share Button */}
+                <button
+                  onClick={handleShare}
+                  className="p-2 rounded-lg bg-surface hover:bg-surfaceLight transition-colors flex-shrink-0"
+                  aria-label="Share filing"
+                  title="Share filing"
                 >
-                  {filing.is_read ? 'Read' : 'Unread'}
-                </span>
+                  <svg
+                    className="w-6 h-6 text-textSecondary hover:text-textPrimary transition-colors"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+                    />
+                  </svg>
+                </button>
               </div>
 
               {/* Stock Info */}
