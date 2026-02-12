@@ -12,6 +12,7 @@ import { useWatchlist } from '@/hooks/useWatchlist';
 import { useRedFlags } from '@/hooks/useRedFlags';
 import { useRedFlagHistory } from '@/hooks/useRedFlagHistory';
 import { useVetrScoreHistory } from '@/hooks/useVetrScoreHistory';
+import { useVetrScoreComparison } from '@/hooks/useVetrScoreComparison';
 import { useToast } from '@/contexts/ToastContext';
 import { Executive, RedFlag } from '@/types/api';
 import { api } from '@/lib/api-client';
@@ -25,6 +26,7 @@ import SearchInput from '@/components/ui/SearchInput';
 import SelectDropdown from '@/components/ui/SelectDropdown';
 import ExecutiveDetail from '@/components/ExecutiveDetail';
 import VetrScoreDetail from '@/components/VetrScoreDetail';
+import VetrScoreComparison from '@/components/VetrScoreComparison';
 
 type Tab = 'overview' | 'pedigree' | 'red-flags';
 
@@ -59,6 +61,7 @@ export default function StockDetailPage() {
   const { redFlags, isLoading: redFlagsLoading, mutate: mutateRedFlags } = useRedFlags({ ticker });
   const { history: flagHistory, isLoading: flagHistoryLoading } = useRedFlagHistory({ ticker, limit: 10 });
   const { history: scoreHistory, isLoading: scoreHistoryLoading } = useVetrScoreHistory({ ticker, period: scoreHistoryPeriod });
+  const { comparison, isLoading: comparisonLoading } = useVetrScoreComparison({ ticker });
 
   const isInWatchlist = watchlist.some(item => item.ticker === ticker);
   const isTogglingFavorite = isAdding || isRemoving;
@@ -422,6 +425,13 @@ export default function StockDetailPage() {
                 </div>
               )}
             </div>
+
+            {/* VETTR Score Comparison */}
+            <VetrScoreComparison
+              comparison={comparison}
+              isLoading={comparisonLoading}
+              currentTicker={ticker}
+            />
 
             {/* Key Metrics grid */}
             <div className="bg-primaryLight rounded-lg p-6 border border-border">
