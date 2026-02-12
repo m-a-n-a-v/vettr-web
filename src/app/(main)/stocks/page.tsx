@@ -1,10 +1,12 @@
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { useStocks } from '@/hooks/useStocks'
 import { useWatchlist } from '@/hooks/useWatchlist'
 import { useToast } from '@/contexts/ToastContext'
+import { useRefresh } from '@/hooks/useRefresh'
+import { usePullToRefresh } from '@/hooks/usePullToRefresh'
 import SearchInput from '@/components/ui/SearchInput'
 import SelectDropdown from '@/components/ui/SelectDropdown'
 import VetrScoreBadge from '@/components/ui/VetrScoreBadge'
@@ -12,6 +14,8 @@ import PriceChangeIndicator from '@/components/ui/PriceChangeIndicator'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import EmptyState from '@/components/ui/EmptyState'
 import { SkeletonCard } from '@/components/ui/SkeletonLoader'
+import RefreshButton from '@/components/ui/RefreshButton'
+import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator'
 
 type SortOption = 'vetr_score' | 'current_price' | 'price_change_percent' | 'company_name' | 'sector'
 type ViewMode = 'card' | 'table'
@@ -23,6 +27,7 @@ export default function StocksPage() {
   const [favoritesOnly, setFavoritesOnly] = useState(false)
   const [viewMode, setViewMode] = useState<ViewMode>('card')
   const [isClient, setIsClient] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
   const { showToast } = useToast()
 
   // Load view preference from localStorage on mount
@@ -41,11 +46,45 @@ export default function StocksPage() {
     }
   }, [viewMode, isClient])
 
+  // Detect mobile viewport
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
   // Fetch all stocks and watchlist
-  const { stocks, isLoading: stocksLoading, isError: stocksError } = useStocks({
+  const { stocks, isLoading: stocksLoading, isError: stocksError, mutate: mutateStocks } = useStocks({
     search: searchQuery || undefined,
   })
   const { watchlist, addToWatchlist, removeFromWatchlist, isAdding, isRemoving, isLoading: watchlistLoading } = useWatchlist()
+
+  // Refresh handler
+  const handleRefreshData = useCallback(async () => {
+    try {
+      await mutateStocks()
+      showToast('Data refreshed successfully', 'success')
+    } catch (error) {
+      showToast('Failed to refresh data', 'error')
+      throw error
+    }
+  }, [mutateStocks, showToast])
+
+  // Use refresh hook with debouncing
+  const { isRefreshing, handleRefresh, canRefresh } = useRefresh({
+    onRefresh: handleRefreshData,
+    debounceMs: 5000,
+  })
+
+  // Pull-to-refresh for mobile
+  const { isPulling, pullDistance } = usePullToRefresh({
+    onRefresh: handleRefresh,
+    enabled: isMobile,
+    threshold: 80,
+  })
 
   // Create set of favorited tickers for quick lookup
   const favoritedTickers = useMemo(() => {
@@ -281,7 +320,24 @@ export default function StocksPage() {
 
   return (
     <div className="p-4 md:p-6 pb-20 md:pb-6">
-      <h1 className="text-2xl font-bold mb-6">Stocks</h1>
+      {/* Pull-to-refresh indicator (mobile only) */}
+      <PullToRefreshIndicator
+        isPulling={isPulling}
+        pullDistance={pullDistance}
+        threshold={80}
+      />
+
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold">Stocks</h1>
+        {/* Desktop refresh button */}
+        <div className="hidden md:block">
+          <RefreshButton
+            onClick={handleRefresh}
+            isRefreshing={isRefreshing}
+            disabled={!canRefresh}
+          />
+        </div>
+      </div>
 
       {/* Filters */}
       <div className="mb-6 flex flex-col md:flex-row gap-4">

@@ -4,24 +4,28 @@ import { useStocks } from '@/hooks/useStocks'
 import { useFilings } from '@/hooks/useFilings'
 import { useWatchlist } from '@/hooks/useWatchlist'
 import { useToast } from '@/contexts/ToastContext'
+import { useRefresh } from '@/hooks/useRefresh'
+import { usePullToRefresh } from '@/hooks/usePullToRefresh'
 import StockCard from '@/components/ui/StockCard'
 import FilingTypeIcon from '@/components/ui/FilingTypeIcon'
 import VetrScoreBadge from '@/components/ui/VetrScoreBadge'
 import PriceChangeIndicator from '@/components/ui/PriceChangeIndicator'
 import { SkeletonCard, SkeletonStockCard } from '@/components/ui/SkeletonLoader'
 import EmptyState from '@/components/ui/EmptyState'
+import RefreshButton from '@/components/ui/RefreshButton'
+import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator'
 import Link from 'next/link'
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 
 export default function PulsePage() {
-  const [lastRefreshed, setLastRefreshed] = useState<Date>(new Date())
   const { showToast } = useToast()
+  const [isMobile, setIsMobile] = useState(false)
 
   // Fetch all stocks for analysis
-  const { stocks, isLoading: isLoadingStocks, error: stocksError } = useStocks({ limit: 100 })
+  const { stocks, isLoading: isLoadingStocks, error: stocksError, mutate: mutateStocks } = useStocks({ limit: 100 })
 
   // Fetch recent filings
-  const { filings, isLoading: isLoadingFilings, error: filingsError } = useFilings({ limit: 5 })
+  const { filings, isLoading: isLoadingFilings, error: filingsError, mutate: mutateFilings } = useFilings({ limit: 5 })
 
   // Fetch watchlist for favorites
   const { watchlist, addToWatchlist, removeFromWatchlist, isAdding, isRemoving } = useWatchlist()
@@ -31,12 +35,42 @@ export default function PulsePage() {
     return new Set(watchlist.map(stock => stock.ticker))
   }, [watchlist])
 
-  // Update last refreshed timestamp when data loads
+  // Detect mobile viewport
   useEffect(() => {
-    if (!isLoadingStocks && !isLoadingFilings) {
-      setLastRefreshed(new Date())
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
     }
-  }, [isLoadingStocks, isLoadingFilings])
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
+  // Refresh handler
+  const handleRefreshData = useCallback(async () => {
+    try {
+      await Promise.all([
+        mutateStocks(),
+        mutateFilings(),
+      ])
+      showToast('Data refreshed successfully', 'success')
+    } catch (error) {
+      showToast('Failed to refresh data', 'error')
+      throw error
+    }
+  }, [mutateStocks, mutateFilings, showToast])
+
+  // Use refresh hook with debouncing
+  const { isRefreshing, lastRefreshed, handleRefresh, canRefresh } = useRefresh({
+    onRefresh: handleRefreshData,
+    debounceMs: 5000,
+  })
+
+  // Pull-to-refresh for mobile
+  const { isPulling, pullDistance } = usePullToRefresh({
+    onRefresh: handleRefresh,
+    enabled: isMobile,
+    threshold: 80,
+  })
 
   // Calculate market overview metrics
   const stocksTracked = stocks?.length || 0
@@ -85,21 +119,40 @@ export default function PulsePage() {
 
   return (
     <div className="p-4 md:p-6 pb-20 md:pb-6">
+      {/* Pull-to-refresh indicator (mobile only) */}
+      <PullToRefreshIndicator
+        isPulling={isPulling}
+        pullDistance={pullDistance}
+        threshold={80}
+      />
+
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-textPrimary mb-2">Pulse</h1>
-        <p className="text-textSecondary">Market overview and recent activity</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-textPrimary mb-2">Pulse</h1>
+            <p className="text-textSecondary">Market overview and recent activity</p>
+          </div>
+          {/* Desktop refresh button */}
+          <div className="hidden md:block">
+            <RefreshButton
+              onClick={handleRefresh}
+              isRefreshing={isRefreshing}
+              disabled={!canRefresh}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Last Refreshed Banner */}
       <div className="mb-6 px-4 py-2 bg-surface rounded-lg border border-border">
         <p className="text-sm text-textSecondary">
-          Last refreshed: {lastRefreshed.toLocaleString('en-US', {
+          Last refreshed: {lastRefreshed ? lastRefreshed.toLocaleString('en-US', {
             month: 'short',
             day: 'numeric',
             hour: 'numeric',
             minute: '2-digit'
-          })}
+          }) : 'Never'}
         </p>
       </div>
 

@@ -1,15 +1,19 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useStocks } from '@/hooks/useStocks';
 import { useFilings } from '@/hooks/useFilings';
 import { useWatchlist } from '@/hooks/useWatchlist';
 import { useToast } from '@/contexts/ToastContext';
+import { useRefresh } from '@/hooks/useRefresh';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import SearchInput from '@/components/ui/SearchInput';
 import StockCard from '@/components/ui/StockCard';
 import FilingTypeIcon from '@/components/ui/FilingTypeIcon';
 import EmptyState from '@/components/ui/EmptyState';
 import { SkeletonStockCard, SkeletonCard } from '@/components/ui/SkeletonLoader';
+import RefreshButton from '@/components/ui/RefreshButton';
+import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator';
 import type { Filing, FilingType } from '@/types/api';
 
 /**
@@ -25,6 +29,7 @@ import type { Filing, FilingType } from '@/types/api';
 export default function DiscoveryPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSector, setSelectedSector] = useState<string>('All');
+  const [isMobile, setIsMobile] = useState(false);
   const { showToast } = useToast();
 
   // Fetch all stocks for featured section and sector extraction
@@ -32,12 +37,14 @@ export default function DiscoveryPage() {
     stocks: allStocks,
     isLoading: isLoadingStocks,
     isError: isErrorStocks,
+    mutate: mutateAllStocks,
   } = useStocks({ limit: 100 }); // Fetch more stocks for better variety
 
   // Fetch stocks filtered by search and sector
   const {
     stocks: filteredStocks,
     isLoading: isLoadingFiltered,
+    mutate: mutateFilteredStocks,
   } = useStocks({
     limit: 8,
     search: searchQuery || undefined,
@@ -49,6 +56,7 @@ export default function DiscoveryPage() {
     filings,
     isLoading: isLoadingFilings,
     error: filingsError,
+    mutate: mutateFilings,
   } = useFilings({
     limit: 10,
     // Note: Backend may not support filtering filings by sector directly
@@ -57,6 +65,44 @@ export default function DiscoveryPage() {
 
   // Fetch watchlist for favorites
   const { watchlist, addToWatchlist, removeFromWatchlist, isAdding, isRemoving } = useWatchlist();
+
+  // Detect mobile viewport
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Refresh handler
+  const handleRefreshData = useCallback(async () => {
+    try {
+      await Promise.all([
+        mutateAllStocks(),
+        mutateFilteredStocks(),
+        mutateFilings(),
+      ]);
+      showToast('Data refreshed successfully', 'success');
+    } catch (error) {
+      showToast('Failed to refresh data', 'error');
+      throw error;
+    }
+  }, [mutateAllStocks, mutateFilteredStocks, mutateFilings, showToast]);
+
+  // Use refresh hook with debouncing
+  const { isRefreshing, handleRefresh, canRefresh } = useRefresh({
+    onRefresh: handleRefreshData,
+    debounceMs: 5000,
+  });
+
+  // Pull-to-refresh for mobile
+  const { isPulling, pullDistance } = usePullToRefresh({
+    onRefresh: handleRefresh,
+    enabled: isMobile,
+    threshold: 80,
+  });
 
   // Create set of favorited tickers for quick lookup
   const favoritedTickers = useMemo(() => {
@@ -119,12 +165,31 @@ export default function DiscoveryPage() {
 
   return (
     <div className="min-h-screen bg-primary pb-20 md:pb-6">
+      {/* Pull-to-refresh indicator (mobile only) */}
+      <PullToRefreshIndicator
+        isPulling={isPulling}
+        pullDistance={pullDistance}
+        threshold={80}
+      />
+
       {/* Page Header */}
       <div className="bg-primaryLight border-b border-border px-4 py-6 md:px-6">
-        <h1 className="text-2xl font-bold text-textPrimary mb-2">Discovery</h1>
-        <p className="text-sm text-textSecondary">
-          Explore stocks and recent filings by sector
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-textPrimary mb-2">Discovery</h1>
+            <p className="text-sm text-textSecondary">
+              Explore stocks and recent filings by sector
+            </p>
+          </div>
+          {/* Desktop refresh button */}
+          <div className="hidden md:block">
+            <RefreshButton
+              onClick={handleRefresh}
+              isRefreshing={isRefreshing}
+              disabled={!canRefresh}
+            />
+          </div>
+        </div>
       </div>
 
       <div className="px-4 py-6 md:px-6 space-y-8">
