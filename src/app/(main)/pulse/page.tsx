@@ -2,6 +2,8 @@
 
 import { useStocks } from '@/hooks/useStocks'
 import { useFilings } from '@/hooks/useFilings'
+import { useWatchlist } from '@/hooks/useWatchlist'
+import { useToast } from '@/contexts/ToastContext'
 import StockCard from '@/components/ui/StockCard'
 import FilingTypeIcon from '@/components/ui/FilingTypeIcon'
 import VetrScoreBadge from '@/components/ui/VetrScoreBadge'
@@ -9,16 +11,25 @@ import PriceChangeIndicator from '@/components/ui/PriceChangeIndicator'
 import { SkeletonCard, SkeletonStockCard } from '@/components/ui/SkeletonLoader'
 import EmptyState from '@/components/ui/EmptyState'
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 
 export default function PulsePage() {
   const [lastRefreshed, setLastRefreshed] = useState<Date>(new Date())
+  const { showToast } = useToast()
 
   // Fetch all stocks for analysis
   const { stocks, isLoading: isLoadingStocks, error: stocksError } = useStocks({ limit: 100 })
 
   // Fetch recent filings
   const { filings, isLoading: isLoadingFilings, error: filingsError } = useFilings({ limit: 5 })
+
+  // Fetch watchlist for favorites
+  const { watchlist, addToWatchlist, removeFromWatchlist, isAdding, isRemoving } = useWatchlist()
+
+  // Create set of favorited tickers for quick lookup
+  const favoritedTickers = useMemo(() => {
+    return new Set(watchlist.map(stock => stock.ticker))
+  }, [watchlist])
 
   // Update last refreshed timestamp when data loads
   useEffect(() => {
@@ -55,6 +66,22 @@ export default function PulsePage() {
         .sort((a, b) => Math.abs(b.price_change_percent || 0) - Math.abs(a.price_change_percent || 0))
         .slice(0, 5)
     : []
+
+  // Handle favorite toggle with optimistic UI and toast notifications
+  const handleFavoriteToggle = async (ticker: string) => {
+    try {
+      const isFavorite = favoritedTickers.has(ticker)
+      if (isFavorite) {
+        await removeFromWatchlist(ticker)
+        showToast('Removed from watchlist', 'success')
+      } else {
+        await addToWatchlist(ticker)
+        showToast('Added to watchlist', 'success')
+      }
+    } catch (error) {
+      showToast('Failed to update watchlist', 'error')
+    }
+  }
 
   return (
     <div className="p-4 md:p-6 pb-20 md:pb-6">
@@ -293,7 +320,13 @@ export default function PulsePage() {
           <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
             {topScores.map((stock) => (
               <div key={stock.ticker} className="flex-shrink-0 w-72">
-                <StockCard stock={stock} />
+                <StockCard
+                  stock={stock}
+                  showFavorite={true}
+                  isFavorite={favoritedTickers.has(stock.ticker)}
+                  onFavoriteToggle={handleFavoriteToggle}
+                  isTogglingFavorite={isAdding || isRemoving}
+                />
               </div>
             ))}
           </div>

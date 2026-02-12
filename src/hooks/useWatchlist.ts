@@ -53,7 +53,7 @@ export function useWatchlist(): UseWatchlistReturn {
   };
 
   /**
-   * Add a stock to the watchlist
+   * Add a stock to the watchlist with optimistic updates
    */
   const addToWatchlist = async (ticker: string): Promise<void> => {
     setIsAdding(true);
@@ -74,20 +74,41 @@ export function useWatchlist(): UseWatchlistReturn {
   };
 
   /**
-   * Remove a stock from the watchlist
+   * Remove a stock from the watchlist with optimistic updates
    */
   const removeFromWatchlist = async (ticker: string): Promise<void> => {
     setIsRemoving(true);
+
+    // Store current data for potential rollback
+    const previousData = data;
+
     try {
+      // Optimistically update the local cache immediately
+      if (data?.items) {
+        mutate(
+          {
+            ...data,
+            items: data.items.filter((s) => s.ticker !== ticker),
+          },
+          false // Don't revalidate yet
+        );
+      }
+
+      // Make the API call
       const response = await api.delete(`/watchlist/${ticker}`);
       if (!response.success) {
         throw new Error(
           response.error?.message || 'Failed to remove from watchlist'
         );
       }
-      // Revalidate watchlist after successful remove
+
+      // Revalidate to get fresh data from server
       await mutate();
     } catch (error) {
+      // Rollback on error
+      if (previousData) {
+        mutate(previousData, false);
+      }
       throw error;
     } finally {
       setIsRemoving(false);

@@ -9,21 +9,23 @@ import PriceChangeIndicator from './PriceChangeIndicator';
 interface StockCardProps {
   stock: Stock;
   showFavorite?: boolean;
-  onFavoriteToggle?: (ticker: string) => void;
+  onFavoriteToggle?: (ticker: string) => Promise<void>;
   isFavorite?: boolean;
+  isTogglingFavorite?: boolean;
 }
 
 export default function StockCard({
   stock,
-  showFavorite = false,
+  showFavorite = true,
   onFavoriteToggle,
-  isFavorite = false
+  isFavorite = false,
+  isTogglingFavorite = false
 }: StockCardProps) {
-  const handleFavoriteClick = (e: React.MouseEvent) => {
+  const handleFavoriteClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (onFavoriteToggle) {
-      onFavoriteToggle(stock.ticker);
+    if (onFavoriteToggle && !isTogglingFavorite) {
+      await onFavoriteToggle(stock.ticker);
     }
   };
 
@@ -43,14 +45,17 @@ export default function StockCard({
     <Link href={`/stocks/${stock.ticker}`}>
       <div className="relative bg-primaryLight hover:bg-surfaceLight border border-border rounded-lg p-4 transition-all duration-200 hover:shadow-lg cursor-pointer group">
         {/* Favorite Star (if enabled) */}
-        {showFavorite && (
+        {showFavorite && onFavoriteToggle && (
           <button
             onClick={handleFavoriteClick}
-            className="absolute top-3 right-3 text-xl transition-colors duration-200 hover:scale-110 z-10"
+            disabled={isTogglingFavorite}
+            className="absolute top-3 right-3 text-xl transition-all duration-200 hover:scale-110 z-10 disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label={isFavorite ? 'Remove from watchlist' : 'Add to watchlist'}
           >
-            {isFavorite ? (
-              <span className="text-accent">★</span>
+            {isTogglingFavorite ? (
+              <span className="text-textMuted animate-pulse">⋯</span>
+            ) : isFavorite ? (
+              <span className="text-accent drop-shadow-sm">★</span>
             ) : (
               <span className="text-textMuted group-hover:text-textSecondary">☆</span>
             )}

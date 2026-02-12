@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { useStocks } from '@/hooks/useStocks'
 import { useWatchlist } from '@/hooks/useWatchlist'
+import { useToast } from '@/contexts/ToastContext'
 import SearchInput from '@/components/ui/SearchInput'
 import SelectDropdown from '@/components/ui/SelectDropdown'
 import VetrScoreBadge from '@/components/ui/VetrScoreBadge'
@@ -19,12 +20,13 @@ export default function StocksPage() {
   const [sortBy, setSortBy] = useState<SortOption>('vetr_score')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [favoritesOnly, setFavoritesOnly] = useState(false)
+  const { showToast } = useToast()
 
   // Fetch all stocks and watchlist
   const { stocks, isLoading: stocksLoading, isError: stocksError } = useStocks({
     search: searchQuery || undefined,
   })
-  const { watchlist, isLoading: watchlistLoading } = useWatchlist()
+  const { watchlist, addToWatchlist, removeFromWatchlist, isAdding, isRemoving, isLoading: watchlistLoading } = useWatchlist()
 
   // Create set of favorited tickers for quick lookup
   const favoritedTickers = useMemo(() => {
@@ -92,6 +94,25 @@ export default function StocksPage() {
   // Toggle favorites filter
   const toggleFavoritesOnly = () => {
     setFavoritesOnly(prev => !prev)
+  }
+
+  // Handle favorite toggle with optimistic UI and toast notifications
+  const handleFavoriteToggle = async (ticker: string, e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    try {
+      const isFavorite = favoritedTickers.has(ticker)
+      if (isFavorite) {
+        await removeFromWatchlist(ticker)
+        showToast('Removed from watchlist', 'success')
+      } else {
+        await addToWatchlist(ticker)
+        showToast('Added to watchlist', 'success')
+      }
+    } catch (error) {
+      showToast('Failed to update watchlist', 'error')
+    }
   }
 
   // Loading state
@@ -261,7 +282,7 @@ export default function StocksPage() {
           <Link
             key={stock.ticker}
             href={`/stocks/${stock.ticker}`}
-            className="block bg-primaryLight rounded-lg p-4 hover:bg-surfaceLight transition-colors"
+            className="block bg-primaryLight rounded-lg p-4 hover:bg-surfaceLight transition-colors relative group"
           >
             <div className="flex items-center gap-4">
               {/* Company initials avatar */}
@@ -280,9 +301,20 @@ export default function StocksPage() {
                   <span className="font-bold text-textPrimary">
                     {stock.ticker}
                   </span>
-                  {favoritedTickers.has(stock.ticker) && (
-                    <span className="text-accent">★</span>
-                  )}
+                  <button
+                    onClick={(e) => handleFavoriteToggle(stock.ticker, e)}
+                    disabled={isAdding || isRemoving}
+                    className="text-lg transition-all duration-200 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+                    aria-label={favoritedTickers.has(stock.ticker) ? 'Remove from watchlist' : 'Add to watchlist'}
+                  >
+                    {isAdding || isRemoving ? (
+                      <span className="text-textMuted animate-pulse">⋯</span>
+                    ) : favoritedTickers.has(stock.ticker) ? (
+                      <span className="text-accent drop-shadow-sm">★</span>
+                    ) : (
+                      <span className="text-textMuted group-hover:text-textSecondary">☆</span>
+                    )}
+                  </button>
                 </div>
                 <div className="text-sm text-textSecondary truncate">
                   {stock.company_name}

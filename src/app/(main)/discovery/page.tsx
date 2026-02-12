@@ -3,6 +3,8 @@
 import { useState, useMemo } from 'react';
 import { useStocks } from '@/hooks/useStocks';
 import { useFilings } from '@/hooks/useFilings';
+import { useWatchlist } from '@/hooks/useWatchlist';
+import { useToast } from '@/contexts/ToastContext';
 import SearchInput from '@/components/ui/SearchInput';
 import StockCard from '@/components/ui/StockCard';
 import FilingTypeIcon from '@/components/ui/FilingTypeIcon';
@@ -23,6 +25,7 @@ import type { Filing, FilingType } from '@/types/api';
 export default function DiscoveryPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSector, setSelectedSector] = useState<string>('All');
+  const { showToast } = useToast();
 
   // Fetch all stocks for featured section and sector extraction
   const {
@@ -51,6 +54,14 @@ export default function DiscoveryPage() {
     // Note: Backend may not support filtering filings by sector directly
     // We'll filter client-side if needed
   });
+
+  // Fetch watchlist for favorites
+  const { watchlist, addToWatchlist, removeFromWatchlist, isAdding, isRemoving } = useWatchlist();
+
+  // Create set of favorited tickers for quick lookup
+  const favoritedTickers = useMemo(() => {
+    return new Set(watchlist.map(stock => stock.ticker))
+  }, [watchlist]);
 
   // Extract unique sectors from all stocks
   const sectors = useMemo(() => {
@@ -88,6 +99,22 @@ export default function DiscoveryPage() {
   // Handle search change
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);
+  };
+
+  // Handle favorite toggle with optimistic UI and toast notifications
+  const handleFavoriteToggle = async (ticker: string) => {
+    try {
+      const isFavorite = favoritedTickers.has(ticker)
+      if (isFavorite) {
+        await removeFromWatchlist(ticker)
+        showToast('Removed from watchlist', 'success')
+      } else {
+        await addToWatchlist(ticker)
+        showToast('Added to watchlist', 'success')
+      }
+    } catch (error) {
+      showToast('Failed to update watchlist', 'error')
+    }
   };
 
   return (
@@ -178,7 +205,13 @@ export default function DiscoveryPage() {
             <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
               {featuredStocks.map((stock) => (
                 <div key={stock.ticker} className="flex-shrink-0 w-80">
-                  <StockCard stock={stock} />
+                  <StockCard
+                    stock={stock}
+                    showFavorite={true}
+                    isFavorite={favoritedTickers.has(stock.ticker)}
+                    onFavoriteToggle={handleFavoriteToggle}
+                    isTogglingFavorite={isAdding || isRemoving}
+                  />
                 </div>
               ))}
             </div>
