@@ -9,6 +9,7 @@ import { useFilings } from '@/hooks/useFilings';
 import { useExecutives } from '@/hooks/useExecutives';
 import { useWatchlist } from '@/hooks/useWatchlist';
 import { useToast } from '@/contexts/ToastContext';
+import { Executive } from '@/types/api';
 import VetrScoreBadge from '@/components/ui/VetrScoreBadge';
 import SectorChip from '@/components/ui/SectorChip';
 import PriceChangeIndicator from '@/components/ui/PriceChangeIndicator';
@@ -17,6 +18,7 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import EmptyState from '@/components/ui/EmptyState';
 import SearchInput from '@/components/ui/SearchInput';
 import SelectDropdown from '@/components/ui/SelectDropdown';
+import ExecutiveDetail from '@/components/ExecutiveDetail';
 
 type Tab = 'overview' | 'pedigree' | 'red-flags';
 
@@ -30,6 +32,7 @@ export default function StockDetailPage() {
   const [executiveSearch, setExecutiveSearch] = useState('');
   const [executiveTitleFilter, setExecutiveTitleFilter] = useState('all');
   const [executiveSortBy, setExecutiveSortBy] = useState<'title' | 'tenure' | 'experience' | 'specialization'>('title');
+  const [selectedExecutive, setSelectedExecutive] = useState<Executive | null>(null);
 
   const { stock, isLoading: stockLoading, error: stockError } = useStock(ticker);
   const { score, isLoading: scoreLoading } = useVetrScore({ ticker });
@@ -411,6 +414,7 @@ export default function StockDetailPage() {
                   {filteredAndSortedExecutives.map(executive => (
                     <div
                       key={executive.id}
+                      onClick={() => setSelectedExecutive(executive)}
                       className="p-4 bg-surface hover:bg-surfaceLight rounded-lg border border-border transition-colors cursor-pointer"
                     >
                       <div className="flex items-start gap-4">
@@ -503,6 +507,14 @@ export default function StockDetailPage() {
           </div>
         )}
       </div>
+
+      {/* Executive Detail Modal */}
+      {selectedExecutive && (
+        <ExecutiveDetail
+          executive={selectedExecutive}
+          onClose={() => setSelectedExecutive(null)}
+        />
+      )}
     </div>
   );
 }
