@@ -3,9 +3,9 @@ import type { Metadata } from 'next'
 export async function generateMetadata({
   params,
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }): Promise<Metadata> {
-  const filingId = params.id
+  const { id: filingId } = await params
 
   try {
     // Fetch filing data for metadata (server-side)

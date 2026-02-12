@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
@@ -30,6 +30,7 @@
     "eslint-config-next": "^14.2.35",
     "framer-motion": "^12.34.0",
     "next": "^16.1.6",
+    "next-pwa": "^5.6.0",
     "postcss": "^8.5.6",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",

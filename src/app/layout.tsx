@@ -5,6 +5,7 @@ import { AuthProvider } from '@/contexts/AuthContext'
 import { SWRProvider } from '@/lib/swr-config'
 import { ToastProvider } from '@/contexts/ToastContext'
 import { ThemeProvider } from '@/contexts/ThemeContext'
+import OfflineBanner from '@/components/ui/OfflineBanner'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -85,7 +86,10 @@ export default function RootLayout({
         <ThemeProvider>
           <SWRProvider>
             <AuthProvider>
-              <ToastProvider>{children}</ToastProvider>
+              <ToastProvider>
+                <OfflineBanner />
+                {children}
+              </ToastProvider>
             </AuthProvider>
           </SWRProvider>
         </ThemeProvider>

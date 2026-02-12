@@ -911,7 +911,7 @@
         "npm run build passes"
       ],
       "priority": 53,
-      "passes": false
+      "passes": true
     },
     {
       "id": "WEB-054",

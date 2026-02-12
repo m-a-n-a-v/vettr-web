@@ -4,9 +4,10 @@ import { api } from '@/lib/api-client'
 export async function generateMetadata({
   params,
 }: {
-  params: { ticker: string }
+  params: Promise<{ ticker: string }>
 }): Promise<Metadata> {
-  const ticker = params.ticker.toUpperCase()
+  const { ticker: rawTicker } = await params
+  const ticker = rawTicker.toUpperCase()
 
   try {
     // Fetch stock data for metadata (server-side)
