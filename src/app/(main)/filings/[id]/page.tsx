@@ -22,7 +22,7 @@ export default function FilingDetailPage() {
   const { showToast } = useToast();
 
   // Fetch filing data
-  const { filing, isLoading: isLoadingFiling, error: filingError } = useFiling({ id: filingId });
+  const { filing, isLoading: isLoadingFiling, error: filingError, mutate: mutateFiling } = useFiling({ id: filingId });
 
   // Fetch related stock data (only when we have the filing ticker)
   const { stock, isLoading: isLoadingStock } = useStock(filing?.ticker || '');
@@ -30,16 +30,32 @@ export default function FilingDetailPage() {
   // Mark filing as read hook
   const { markAsRead } = useMarkFilingRead();
 
-  // Auto-mark filing as read on view
+  // Auto-mark filing as read on view with optimistic update
   useEffect(() => {
     if (filing && !filing.is_read) {
-      // Mark as read in the background (don't block UI)
-      markAsRead(filing.id).catch((error) => {
-        console.error('Failed to mark filing as read:', error);
-        // Silently fail - user can still view the filing
-      });
+      const markFilingAsRead = async () => {
+        // Store current data for rollback
+        const previousFiling = filing;
+
+        try {
+          // Optimistically update the filing as read immediately
+          mutateFiling({ ...filing, is_read: true }, false);
+
+          // Make the API call in the background
+          await markAsRead(filing.id);
+
+          // Revalidate to get fresh data from server
+          await mutateFiling();
+        } catch (error) {
+          console.error('Failed to mark filing as read:', error);
+          // Rollback on error
+          mutateFiling(previousFiling, false);
+        }
+      };
+
+      markFilingAsRead();
     }
-  }, [filing, markAsRead]);
+  }, [filing, markAsRead, mutateFiling]);
 
   // Loading state
   if (isLoadingFiling) {

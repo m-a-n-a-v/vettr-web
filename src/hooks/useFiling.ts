@@ -13,7 +13,7 @@ interface UseFilingReturn {
   filing: Filing | null;
   isLoading: boolean;
   error: Error | null;
-  mutate: () => void;
+  mutate: (data?: Filing | Promise<Filing> | ((currentData?: Filing) => Filing | Promise<Filing>), shouldRevalidate?: boolean) => Promise<Filing | undefined>;
 }
 
 /**

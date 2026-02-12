@@ -57,16 +57,52 @@ export function useWatchlist(): UseWatchlistReturn {
    */
   const addToWatchlist = async (ticker: string): Promise<void> => {
     setIsAdding(true);
+
+    // Store current data for potential rollback
+    const previousData = data;
+
     try {
-      const response = await api.post(`/watchlist/${ticker}`, {});
-      if (!response.success) {
-        throw new Error(
-          response.error?.message || 'Failed to add to watchlist'
+      // Optimistically update the local cache immediately
+      // We'll add a placeholder stock object since we don't have full stock data
+      // The real data will come from the revalidation
+      if (data?.items) {
+        mutate(
+          async () => {
+            // First make the API call
+            const response = await api.post(`/watchlist/${ticker}`, {});
+            if (!response.success) {
+              throw new Error(
+                response.error?.message || 'Failed to add to watchlist'
+              );
+            }
+            // Then fetch fresh data
+            const freshResponse = await api.get<PaginatedResponse<Stock>>('/watchlist');
+            if (!freshResponse.success || !freshResponse.data) {
+              throw new Error('Failed to fetch updated watchlist');
+            }
+            return freshResponse.data;
+          },
+          {
+            optimisticData: data, // Keep current data while loading
+            rollbackOnError: true, // Rollback on error
+            revalidate: false, // Don't revalidate since we're fetching in the mutate function
+          }
         );
+      } else {
+        // No data yet, just make the API call
+        const response = await api.post(`/watchlist/${ticker}`, {});
+        if (!response.success) {
+          throw new Error(
+            response.error?.message || 'Failed to add to watchlist'
+          );
+        }
+        await mutate();
       }
-      // Revalidate watchlist after successful add
-      await mutate();
     } catch (error) {
+      // Rollback on error
+      if (previousData) {
+        mutate(previousData, false);
+      }
       throw error;
     } finally {
       setIsAdding(false);

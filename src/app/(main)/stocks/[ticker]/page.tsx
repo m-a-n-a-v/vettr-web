@@ -146,16 +146,40 @@ export default function StockDetailPage() {
 
   const handleAcknowledgeFlag = async (flagId: string) => {
     setAcknowledgingFlagId(flagId);
+
+    // Store current data for rollback
+    const previousRedFlags = redFlags;
+
     try {
+      // Optimistically update the flag as acknowledged
+      if (redFlags) {
+        mutateRedFlags(
+          {
+            ...redFlags,
+            detected_flags: redFlags.detected_flags.map(flag =>
+              flag.id === flagId ? { ...flag, is_acknowledged: true } : flag
+            ),
+          },
+          false // Don't revalidate yet
+        );
+      }
+
+      // Make the API call
       const response = await api.post(`/red-flags/${flagId}/acknowledge`, {});
-      if (response.success) {
-        showToast('Flag acknowledged', 'success');
-        await mutateRedFlags();
-      } else {
+      if (!response.success) {
         throw new Error('Failed to acknowledge flag');
       }
+
+      showToast('Flag acknowledged', 'success');
+      // Revalidate to get fresh data
+      await mutateRedFlags();
     } catch (error) {
       showToast('Failed to acknowledge flag', 'error');
+
+      // Rollback on error
+      if (previousRedFlags) {
+        mutateRedFlags(previousRedFlags, false);
+      }
     } finally {
       setAcknowledgingFlagId(null);
     }
@@ -163,16 +187,41 @@ export default function StockDetailPage() {
 
   const handleAcknowledgeAll = async () => {
     setIsAcknowledgingAll(true);
+
+    // Store current data for rollback
+    const previousRedFlags = redFlags;
+
     try {
+      // Optimistically update all flags as acknowledged
+      if (redFlags) {
+        mutateRedFlags(
+          {
+            ...redFlags,
+            detected_flags: redFlags.detected_flags.map(flag => ({
+              ...flag,
+              is_acknowledged: true,
+            })),
+          },
+          false // Don't revalidate yet
+        );
+      }
+
+      // Make the API call
       const response = await api.post(`/stocks/${ticker}/red-flags/acknowledge-all`, {});
-      if (response.success) {
-        showToast('All flags acknowledged', 'success');
-        await mutateRedFlags();
-      } else {
+      if (!response.success) {
         throw new Error('Failed to acknowledge all flags');
       }
+
+      showToast('All flags acknowledged', 'success');
+      // Revalidate to get fresh data
+      await mutateRedFlags();
     } catch (error) {
       showToast('Failed to acknowledge all flags', 'error');
+
+      // Rollback on error
+      if (previousRedFlags) {
+        mutateRedFlags(previousRedFlags, false);
+      }
     } finally {
       setIsAcknowledgingAll(false);
     }

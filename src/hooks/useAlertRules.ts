@@ -112,11 +112,26 @@ export function useAlertRules(): UseAlertRulesReturn {
   };
 
   /**
-   * Enable or disable an alert rule
+   * Enable or disable an alert rule with optimistic updates
    */
   const toggleRule = async (id: string, enabled: boolean): Promise<boolean> => {
     setIsToggling(true);
+
+    // Store current data for potential rollback
+    const previousData = data;
+
     try {
+      // Optimistically update the local cache immediately
+      if (data) {
+        mutate(
+          data.map(rule =>
+            rule.id === id ? { ...rule, enabled } : rule
+          ),
+          false // Don't revalidate yet
+        );
+      }
+
+      // Make the API call
       const endpoint = enabled
         ? `/alerts/rules/${id}/enable`
         : `/alerts/rules/${id}/disable`;
@@ -124,11 +139,18 @@ export function useAlertRules(): UseAlertRulesReturn {
       if (!response.success) {
         throw new Error(`Failed to ${enabled ? 'enable' : 'disable'} alert rule`);
       }
-      // Revalidate the cache
+
+      // Revalidate to get fresh data from server
       await mutate();
       return true;
     } catch (err) {
       console.error(`Error ${enabled ? 'enabling' : 'disabling'} alert rule:`, err);
+
+      // Rollback on error
+      if (previousData) {
+        mutate(previousData, false);
+      }
+
       return false;
     } finally {
       setIsToggling(false);

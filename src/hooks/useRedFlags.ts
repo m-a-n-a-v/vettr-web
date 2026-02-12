@@ -13,7 +13,7 @@ interface UseRedFlagsReturn {
   redFlags: RedFlagsResponse | null;
   isLoading: boolean;
   error: Error | null;
-  mutate: () => void;
+  mutate: (data?: RedFlagsResponse | Promise<RedFlagsResponse> | ((currentData?: RedFlagsResponse) => RedFlagsResponse | Promise<RedFlagsResponse>), shouldRevalidate?: boolean) => Promise<RedFlagsResponse | undefined>;
 }
 
 /**
