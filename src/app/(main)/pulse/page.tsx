@@ -3,6 +3,7 @@
 import { useStocks } from '@/hooks/useStocks'
 import { useFilings } from '@/hooks/useFilings'
 import { useWatchlist } from '@/hooks/useWatchlist'
+import { useRedFlagTrend } from '@/hooks/useRedFlagTrend'
 import { useToast } from '@/contexts/ToastContext'
 import { useRefresh } from '@/hooks/useRefresh'
 import { usePullToRefresh } from '@/hooks/usePullToRefresh'
@@ -26,6 +27,9 @@ export default function PulsePage() {
 
   // Fetch recent filings
   const { filings, isLoading: isLoadingFilings, error: filingsError, mutate: mutateFilings } = useFilings({ limit: 5 })
+
+  // Fetch red flag trend data
+  const { trend: redFlagTrend, isLoading: isLoadingRedFlagTrend, error: redFlagTrendError, mutate: mutateRedFlagTrend } = useRedFlagTrend()
 
   // Fetch watchlist for favorites
   const { watchlist, addToWatchlist, removeFromWatchlist, isAdding, isRemoving } = useWatchlist()
@@ -51,13 +55,14 @@ export default function PulsePage() {
       await Promise.all([
         mutateStocks(),
         mutateFilings(),
+        mutateRedFlagTrend(),
       ])
       showToast('Data refreshed successfully', 'success')
     } catch (error) {
       showToast('Failed to refresh data', 'error')
       throw error
     }
-  }, [mutateStocks, mutateFilings, showToast])
+  }, [mutateStocks, mutateFilings, mutateRedFlagTrend, showToast])
 
   // Use refresh hook with debouncing
   const { isRefreshing, lastRefreshed, handleRefresh, canRefresh } = useRefresh({
@@ -227,6 +232,110 @@ export default function PulsePage() {
             </div>
           </div>
         )}
+      </section>
+
+      {/* Red Flag Trends Section */}
+      <section className="mb-8">
+        <h2 className="text-xl font-bold text-textPrimary mb-4">Red Flag Trends</h2>
+
+        {isLoadingRedFlagTrend ? (
+          <div className="bg-primaryLight p-6 rounded-lg border border-border">
+            <SkeletonCard />
+          </div>
+        ) : redFlagTrendError ? (
+          <EmptyState
+            icon="🚩"
+            title="Error loading red flag trends"
+            message="Unable to fetch red flag trend data."
+          />
+        ) : redFlagTrend ? (
+          <div className="bg-primaryLight p-6 rounded-lg border border-border">
+            {/* Summary Stats */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+              {/* Total Active Flags */}
+              <div>
+                <p className="text-textSecondary text-sm mb-2">Total Active Flags</p>
+                <div className="flex items-baseline gap-3">
+                  <p className="text-4xl font-bold text-textPrimary">{redFlagTrend.total_active_flags}</p>
+                  {redFlagTrend.change_30_days !== 0 && (
+                    <div className={`flex items-center gap-1 text-sm font-medium ${
+                      redFlagTrend.change_30_days > 0 ? 'text-error' : 'text-accent'
+                    }`}>
+                      <span>{redFlagTrend.change_30_days > 0 ? '↑' : '↓'}</span>
+                      <span>{Math.abs(redFlagTrend.change_30_days)}</span>
+                    </div>
+                  )}
+                </div>
+                <p className="text-xs text-textMuted mt-1">Last 30 days</p>
+              </div>
+
+              {/* 30-Day Change Visualization */}
+              <div>
+                <p className="text-textSecondary text-sm mb-2">30-Day Change</p>
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 bg-surface rounded-full h-3 overflow-hidden">
+                    <div
+                      className={`h-full transition-all duration-500 ${
+                        redFlagTrend.change_30_days > 0 ? 'bg-error' : 'bg-accent'
+                      }`}
+                      style={{
+                        width: `${Math.min(Math.abs(redFlagTrend.change_30_days) / redFlagTrend.total_active_flags * 100, 100)}%`
+                      }}
+                    />
+                  </div>
+                  <span className={`text-lg font-bold ${
+                    redFlagTrend.change_30_days > 0 ? 'text-error' :
+                    redFlagTrend.change_30_days < 0 ? 'text-accent' : 'text-textMuted'
+                  }`}>
+                    {redFlagTrend.change_30_days > 0 ? '+' : ''}{redFlagTrend.change_30_days}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Severity Breakdown */}
+            <div>
+              <p className="text-textSecondary text-sm mb-3">Breakdown by Severity</p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {/* Critical */}
+                <div className="bg-surface p-4 rounded-lg border border-error/30">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-3 h-3 rounded-full bg-error" />
+                    <p className="text-xs font-medium text-textSecondary uppercase tracking-wide">Critical</p>
+                  </div>
+                  <p className="text-2xl font-bold text-error">{redFlagTrend.breakdown_by_severity.critical}</p>
+                </div>
+
+                {/* High */}
+                <div className="bg-surface p-4 rounded-lg border border-warning/30">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-3 h-3 rounded-full bg-warning" />
+                    <p className="text-xs font-medium text-textSecondary uppercase tracking-wide">High</p>
+                  </div>
+                  <p className="text-2xl font-bold text-warning">{redFlagTrend.breakdown_by_severity.high}</p>
+                </div>
+
+                {/* Moderate */}
+                <div className="bg-surface p-4 rounded-lg border border-yellow-500/30">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                    <p className="text-xs font-medium text-textSecondary uppercase tracking-wide">Moderate</p>
+                  </div>
+                  <p className="text-2xl font-bold text-yellow-500">{redFlagTrend.breakdown_by_severity.moderate}</p>
+                </div>
+
+                {/* Low */}
+                <div className="bg-surface p-4 rounded-lg border border-blue-400/30">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-3 h-3 rounded-full bg-blue-400" />
+                    <p className="text-xs font-medium text-textSecondary uppercase tracking-wide">Low</p>
+                  </div>
+                  <p className="text-2xl font-bold text-blue-400">{redFlagTrend.breakdown_by_severity.low}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : null}
       </section>
 
       {/* Two-column layout for desktop */}
