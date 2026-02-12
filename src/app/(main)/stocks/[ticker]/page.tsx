@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useStock } from '@/hooks/useStock';
 import { useVetrScore } from '@/hooks/useVetrScore';
 import { useFilings } from '@/hooks/useFilings';
@@ -10,6 +11,7 @@ import { useExecutives } from '@/hooks/useExecutives';
 import { useWatchlist } from '@/hooks/useWatchlist';
 import { useRedFlags } from '@/hooks/useRedFlags';
 import { useRedFlagHistory } from '@/hooks/useRedFlagHistory';
+import { useVetrScoreHistory } from '@/hooks/useVetrScoreHistory';
 import { useToast } from '@/contexts/ToastContext';
 import { Executive, RedFlag } from '@/types/api';
 import { api } from '@/lib/api-client';
@@ -46,6 +48,9 @@ export default function StockDetailPage() {
   // Score detail modal state
   const [showScoreDetail, setShowScoreDetail] = useState(false);
 
+  // Score history chart state
+  const [scoreHistoryPeriod, setScoreHistoryPeriod] = useState('6M');
+
   const { stock, isLoading: stockLoading, error: stockError } = useStock(ticker);
   const { score, isLoading: scoreLoading } = useVetrScore({ ticker });
   const { filings, isLoading: filingsLoading } = useFilings({ ticker, limit: 5 });
@@ -53,6 +58,7 @@ export default function StockDetailPage() {
   const { watchlist, isAdding, isRemoving, addToWatchlist, removeFromWatchlist } = useWatchlist();
   const { redFlags, isLoading: redFlagsLoading, mutate: mutateRedFlags } = useRedFlags({ ticker });
   const { history: flagHistory, isLoading: flagHistoryLoading } = useRedFlagHistory({ ticker, limit: 10 });
+  const { history: scoreHistory, isLoading: scoreHistoryLoading } = useVetrScoreHistory({ ticker, period: scoreHistoryPeriod });
 
   const isInWatchlist = watchlist.some(item => item.ticker === ticker);
   const isTogglingFavorite = isAdding || isRemoving;
@@ -326,6 +332,94 @@ export default function StockDetailPage() {
                 </button>
               ) : (
                 <p className="text-textSecondary text-center py-4">Score not available</p>
+              )}
+            </div>
+
+            {/* Score History Chart */}
+            <div className="bg-primaryLight rounded-lg p-6 border border-border">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-textPrimary">Score History</h2>
+                {/* Time Range Selector */}
+                <div className="flex gap-2">
+                  {['1M', '3M', '6M', '12M', '24M'].map((period) => (
+                    <button
+                      key={period}
+                      onClick={() => setScoreHistoryPeriod(period)}
+                      className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
+                        scoreHistoryPeriod === period
+                          ? 'bg-accent text-primary'
+                          : 'bg-surface text-textSecondary hover:bg-surfaceLight hover:text-textPrimary'
+                      }`}
+                    >
+                      {period}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {scoreHistoryLoading ? (
+                <div className="h-64 flex items-center justify-center">
+                  <LoadingSpinner size="lg" color="accent" />
+                </div>
+              ) : scoreHistory.length > 0 && scoreHistory[0]?.history && scoreHistory[0].history.length >= 2 ? (
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart
+                      data={scoreHistory[0].history}
+                      margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} />
+                      <XAxis
+                        dataKey="date"
+                        stroke="#94A3B8"
+                        tick={{ fill: '#94A3B8', fontSize: 12 }}
+                        tickFormatter={(value) => {
+                          const date = new Date(value);
+                          return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                        }}
+                      />
+                      <YAxis
+                        stroke="#94A3B8"
+                        tick={{ fill: '#94A3B8', fontSize: 12 }}
+                        domain={[0, 100]}
+                      />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: '#1E3348',
+                          border: '1px solid #334155',
+                          borderRadius: '8px',
+                          color: '#FFFFFF',
+                        }}
+                        labelStyle={{ color: '#94A3B8' }}
+                        formatter={(value: number | undefined) => [value?.toFixed(1) ?? 'N/A', 'Score']}
+                        labelFormatter={(label) => {
+                          const date = new Date(label);
+                          return date.toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                          });
+                        }}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="score"
+                        stroke="#00E676"
+                        strokeWidth={2}
+                        dot={{ fill: '#00E676', r: 4 }}
+                        activeDot={{ r: 6 }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <div className="h-64 flex items-center justify-center">
+                  <EmptyState
+                    icon="📊"
+                    title="Not enough data"
+                    message="Score history will be displayed once sufficient data is available."
+                  />
+                </div>
               )}
             </div>
 
