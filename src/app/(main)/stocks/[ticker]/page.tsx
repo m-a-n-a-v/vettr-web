@@ -8,8 +8,11 @@ import { useVetrScore } from '@/hooks/useVetrScore';
 import { useFilings } from '@/hooks/useFilings';
 import { useExecutives } from '@/hooks/useExecutives';
 import { useWatchlist } from '@/hooks/useWatchlist';
+import { useRedFlags } from '@/hooks/useRedFlags';
+import { useRedFlagHistory } from '@/hooks/useRedFlagHistory';
 import { useToast } from '@/contexts/ToastContext';
-import { Executive } from '@/types/api';
+import { Executive, RedFlag } from '@/types/api';
+import { api } from '@/lib/api-client';
 import VetrScoreBadge from '@/components/ui/VetrScoreBadge';
 import SectorChip from '@/components/ui/SectorChip';
 import PriceChangeIndicator from '@/components/ui/PriceChangeIndicator';
@@ -34,11 +37,18 @@ export default function StockDetailPage() {
   const [executiveSortBy, setExecutiveSortBy] = useState<'title' | 'tenure' | 'experience' | 'specialization'>('title');
   const [selectedExecutive, setSelectedExecutive] = useState<Executive | null>(null);
 
+  // Red Flags tab state
+  const [selectedFlag, setSelectedFlag] = useState<RedFlag | null>(null);
+  const [isAcknowledgingAll, setIsAcknowledgingAll] = useState(false);
+  const [acknowledgingFlagId, setAcknowledgingFlagId] = useState<string | null>(null);
+
   const { stock, isLoading: stockLoading, error: stockError } = useStock(ticker);
   const { score, isLoading: scoreLoading } = useVetrScore({ ticker });
   const { filings, isLoading: filingsLoading } = useFilings({ ticker, limit: 5 });
   const { executives, isLoading: executivesLoading } = useExecutives({ ticker, search: executiveSearch });
   const { watchlist, isAdding, isRemoving, addToWatchlist, removeFromWatchlist } = useWatchlist();
+  const { redFlags, isLoading: redFlagsLoading, mutate: mutateRedFlags } = useRedFlags({ ticker });
+  const { history: flagHistory, isLoading: flagHistoryLoading } = useRedFlagHistory({ ticker, limit: 10 });
 
   const isInWatchlist = watchlist.some(item => item.ticker === ticker);
   const isTogglingFavorite = isAdding || isRemoving;
@@ -111,6 +121,40 @@ export default function StockDetailPage() {
       } catch (error) {
         showToast('Failed to copy', 'error');
       }
+    }
+  };
+
+  const handleAcknowledgeFlag = async (flagId: string) => {
+    setAcknowledgingFlagId(flagId);
+    try {
+      const response = await api.post(`/red-flags/${flagId}/acknowledge`, {});
+      if (response.success) {
+        showToast('Flag acknowledged', 'success');
+        await mutateRedFlags();
+      } else {
+        throw new Error('Failed to acknowledge flag');
+      }
+    } catch (error) {
+      showToast('Failed to acknowledge flag', 'error');
+    } finally {
+      setAcknowledgingFlagId(null);
+    }
+  };
+
+  const handleAcknowledgeAll = async () => {
+    setIsAcknowledgingAll(true);
+    try {
+      const response = await api.post(`/stocks/${ticker}/red-flags/acknowledge-all`, {});
+      if (response.success) {
+        showToast('All flags acknowledged', 'success');
+        await mutateRedFlags();
+      } else {
+        throw new Error('Failed to acknowledge all flags');
+      }
+    } catch (error) {
+      showToast('Failed to acknowledge all flags', 'error');
+    } finally {
+      setIsAcknowledgingAll(false);
     }
   };
 
@@ -498,12 +542,333 @@ export default function StockDetailPage() {
         )}
 
         {activeTab === 'red-flags' && (
-          <div className="bg-primaryLight rounded-lg p-6 border border-border">
-            <EmptyState
-              icon="🚩"
-              title="Red Flags tab"
-              message="Red flag analysis will be displayed here. Coming soon!"
-            />
+          <div className="space-y-6">
+            {redFlagsLoading ? (
+              <div className="space-y-6">
+                {[1, 2, 3].map(i => (
+                  <div
+                    key={i}
+                    className="h-48 bg-primaryLight/50 rounded-lg animate-pulse"
+                  />
+                ))}
+              </div>
+            ) : redFlags ? (
+              <>
+                {/* Overall Red Flag Score */}
+                <div className="bg-primaryLight rounded-lg p-6 border border-border">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-bold text-textPrimary">Red Flag Score</h2>
+                    {redFlags.detected_flags.some(flag => !flag.is_acknowledged) && (
+                      <button
+                        onClick={handleAcknowledgeAll}
+                        disabled={isAcknowledgingAll}
+                        className="px-4 py-2 bg-accent hover:bg-accentDim text-primary font-medium rounded-lg transition-colors disabled:opacity-50"
+                      >
+                        {isAcknowledgingAll ? 'Acknowledging...' : 'Acknowledge All'}
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-center mb-8">
+                    {/* Circular progress indicator */}
+                    <div className="relative w-40 h-40">
+                      <svg className="w-40 h-40 transform -rotate-90">
+                        {/* Background circle */}
+                        <circle
+                          cx="80"
+                          cy="80"
+                          r="70"
+                          fill="none"
+                          stroke="#1E3348"
+                          strokeWidth="12"
+                        />
+                        {/* Progress circle */}
+                        <circle
+                          cx="80"
+                          cy="80"
+                          r="70"
+                          fill="none"
+                          stroke={
+                            redFlags.overall_score >= 80
+                              ? '#FF5252'
+                              : redFlags.overall_score >= 60
+                              ? '#FFB300'
+                              : redFlags.overall_score >= 40
+                              ? '#FFB300'
+                              : '#00E676'
+                          }
+                          strokeWidth="12"
+                          strokeDasharray={`${(redFlags.overall_score / 100) * 439.8} 439.8`}
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                      <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <span className="text-4xl font-bold text-textPrimary">
+                          {redFlags.overall_score}
+                        </span>
+                        <span className="text-sm text-textMuted">Risk Score</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Flag Breakdown Progress Bars */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-textPrimary mb-4">Flag Breakdown</h3>
+
+                    {/* Consolidation Velocity - 30% */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm text-textSecondary">Consolidation Velocity</span>
+                        <span className="text-sm font-medium text-textPrimary">
+                          {redFlags.breakdown.consolidation_velocity}%
+                        </span>
+                      </div>
+                      <div className="w-full bg-surface rounded-full h-2">
+                        <div
+                          className="bg-error h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${redFlags.breakdown.consolidation_velocity}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Financing Velocity - 25% */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm text-textSecondary">Financing Velocity</span>
+                        <span className="text-sm font-medium text-textPrimary">
+                          {redFlags.breakdown.financing_velocity}%
+                        </span>
+                      </div>
+                      <div className="w-full bg-surface rounded-full h-2">
+                        <div
+                          className="bg-warning h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${redFlags.breakdown.financing_velocity}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Executive Churn - 20% */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm text-textSecondary">Executive Churn</span>
+                        <span className="text-sm font-medium text-textPrimary">
+                          {redFlags.breakdown.executive_churn}%
+                        </span>
+                      </div>
+                      <div className="w-full bg-surface rounded-full h-2">
+                        <div
+                          className="bg-warning h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${redFlags.breakdown.executive_churn}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Disclosure Gaps - 15% */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm text-textSecondary">Disclosure Gaps</span>
+                        <span className="text-sm font-medium text-textPrimary">
+                          {redFlags.breakdown.disclosure_gaps}%
+                        </span>
+                      </div>
+                      <div className="w-full bg-surface rounded-full h-2">
+                        <div
+                          className="bg-accent h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${redFlags.breakdown.disclosure_gaps}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Debt Trend - 10% */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm text-textSecondary">Debt Trend</span>
+                        <span className="text-sm font-medium text-textPrimary">
+                          {redFlags.breakdown.debt_trend}%
+                        </span>
+                      </div>
+                      <div className="w-full bg-surface rounded-full h-2">
+                        <div
+                          className="bg-accent h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${redFlags.breakdown.debt_trend}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Detected Flags List */}
+                <div className="bg-primaryLight rounded-lg p-6 border border-border">
+                  <h2 className="text-xl font-bold text-textPrimary mb-4">Detected Flags</h2>
+                  {redFlags.detected_flags.length > 0 ? (
+                    <div className="space-y-3">
+                      {redFlags.detected_flags.map(flag => (
+                        <div
+                          key={flag.id}
+                          className={`p-4 rounded-lg border transition-all ${
+                            flag.is_acknowledged
+                              ? 'bg-surface/50 border-border opacity-60'
+                              : 'bg-surface border-border hover:border-accent cursor-pointer'
+                          }`}
+                          onClick={() => !flag.is_acknowledged && setSelectedFlag(flag)}
+                        >
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex items-start gap-3 flex-1">
+                              {/* Flag Icon */}
+                              <div className={`text-2xl flex-shrink-0 ${flag.is_acknowledged ? 'opacity-50' : ''}`}>
+                                🚩
+                              </div>
+
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <h3 className={`font-semibold ${flag.is_acknowledged ? 'text-textMuted line-through' : 'text-textPrimary'}`}>
+                                    {flag.name}
+                                  </h3>
+                                  {/* Severity Badge */}
+                                  <span
+                                    className={`px-2 py-0.5 rounded text-xs font-medium flex-shrink-0 ${
+                                      flag.severity === 'Critical'
+                                        ? 'bg-error/20 text-error'
+                                        : flag.severity === 'High'
+                                        ? 'bg-error/20 text-error'
+                                        : flag.severity === 'Moderate'
+                                        ? 'bg-warning/20 text-warning'
+                                        : 'bg-accent/20 text-accent'
+                                    }`}
+                                  >
+                                    {flag.severity}
+                                  </span>
+                                  {flag.is_acknowledged && (
+                                    <span className="text-textMuted text-xs flex items-center gap-1">
+                                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path
+                                          fillRule="evenodd"
+                                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                          clipRule="evenodd"
+                                        />
+                                      </svg>
+                                      Acknowledged
+                                    </span>
+                                  )}
+                                </div>
+                                <p className={`text-sm mb-2 ${flag.is_acknowledged ? 'text-textMuted' : 'text-textSecondary'}`}>
+                                  {flag.explanation}
+                                </p>
+                                <p className="text-xs text-textMuted">
+                                  Detected: {new Date(flag.detected_at).toLocaleDateString('en-US', {
+                                    year: 'numeric',
+                                    month: 'short',
+                                    day: 'numeric',
+                                  })}
+                                </p>
+                              </div>
+                            </div>
+
+                            {/* Acknowledge Button */}
+                            {!flag.is_acknowledged && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleAcknowledgeFlag(flag.id);
+                                }}
+                                disabled={acknowledgingFlagId === flag.id}
+                                className="px-3 py-1.5 bg-surface hover:bg-surfaceLight border border-border rounded text-sm text-textSecondary hover:text-textPrimary transition-colors disabled:opacity-50"
+                              >
+                                {acknowledgingFlagId === flag.id ? 'Acknowledging...' : 'Acknowledge'}
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <EmptyState
+                      icon="✅"
+                      title="No red flags detected"
+                      message="This stock currently has no red flags. Great news!"
+                    />
+                  )}
+                </div>
+
+                {/* Flag History Timeline */}
+                <div className="bg-primaryLight rounded-lg p-6 border border-border">
+                  <h2 className="text-xl font-bold text-textPrimary mb-4">Flag History</h2>
+                  {flagHistoryLoading ? (
+                    <div className="space-y-3">
+                      {[1, 2, 3].map(i => (
+                        <div
+                          key={i}
+                          className="h-16 bg-surface/50 rounded-lg animate-pulse"
+                        />
+                      ))}
+                    </div>
+                  ) : flagHistory && flagHistory.length > 0 ? (
+                    <div className="space-y-3">
+                      {flagHistory.flatMap((item) => item.history).map((entry, index) => (
+                        <div
+                          key={entry.id}
+                          className="flex items-start gap-4 p-3 bg-surface rounded-lg border border-border"
+                        >
+                          {/* Timeline dot and line */}
+                          <div className="flex flex-col items-center flex-shrink-0">
+                            <div
+                              className={`w-3 h-3 rounded-full ${
+                                entry.severity === 'Critical' || entry.severity === 'High'
+                                  ? 'bg-error'
+                                  : entry.severity === 'Moderate'
+                                  ? 'bg-warning'
+                                  : 'bg-accent'
+                              }`}
+                            />
+                            {index < flagHistory.flatMap((item) => item.history).length - 1 && (
+                              <div className="w-0.5 h-12 bg-border mt-1" />
+                            )}
+                          </div>
+
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h4 className="text-textPrimary font-medium">{entry.flag_name}</h4>
+                              <span
+                                className={`px-2 py-0.5 rounded text-xs font-medium ${
+                                  entry.severity === 'Critical' || entry.severity === 'High'
+                                    ? 'bg-error/20 text-error'
+                                    : entry.severity === 'Moderate'
+                                    ? 'bg-warning/20 text-warning'
+                                    : 'bg-accent/20 text-accent'
+                                }`}
+                              >
+                                {entry.severity}
+                              </span>
+                            </div>
+                            <p className="text-sm text-textMuted">
+                              {new Date(entry.detected_at).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <EmptyState
+                      icon="📊"
+                      title="No history available"
+                      message="No historical red flag data is available for this stock."
+                    />
+                  )}
+                </div>
+              </>
+            ) : (
+              <EmptyState
+                icon="🚩"
+                title="No red flag data"
+                message="Unable to load red flag analysis for this stock."
+              />
+            )}
           </div>
         )}
       </div>
@@ -514,6 +879,112 @@ export default function StockDetailPage() {
           executive={selectedExecutive}
           onClose={() => setSelectedExecutive(null)}
         />
+      )}
+
+      {/* Flag Detail Modal */}
+      {selectedFlag && (
+        <div
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+          onClick={() => setSelectedFlag(null)}
+        >
+          <div
+            className="bg-primaryLight rounded-lg border border-border max-w-2xl w-full max-h-[80vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="sticky top-0 bg-primaryLight border-b border-border p-6 flex items-start justify-between">
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="text-3xl">🚩</span>
+                  <h2 className="text-2xl font-bold text-textPrimary">{selectedFlag.name}</h2>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`px-3 py-1 rounded text-sm font-medium ${
+                      selectedFlag.severity === 'Critical'
+                        ? 'bg-error/20 text-error'
+                        : selectedFlag.severity === 'High'
+                        ? 'bg-error/20 text-error'
+                        : selectedFlag.severity === 'Moderate'
+                        ? 'bg-warning/20 text-warning'
+                        : 'bg-accent/20 text-accent'
+                    }`}
+                  >
+                    {selectedFlag.severity} Severity
+                  </span>
+                  {selectedFlag.is_acknowledged && (
+                    <span className="px-3 py-1 rounded bg-surface text-textMuted text-sm flex items-center gap-1">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      Acknowledged
+                    </span>
+                  )}
+                </div>
+              </div>
+              <button
+                onClick={() => setSelectedFlag(null)}
+                className="text-textSecondary hover:text-textPrimary transition-colors p-1"
+                aria-label="Close"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="p-6 space-y-6">
+              {/* Explanation */}
+              <div>
+                <h3 className="text-lg font-semibold text-textPrimary mb-3">Explanation</h3>
+                <p className="text-textSecondary leading-relaxed">
+                  {selectedFlag.explanation}
+                </p>
+              </div>
+
+              {/* Detection Date */}
+              <div>
+                <h3 className="text-lg font-semibold text-textPrimary mb-3">Detection Date</h3>
+                <p className="text-textSecondary">
+                  {new Date(selectedFlag.detected_at).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </p>
+              </div>
+
+              {/* Actions */}
+              {!selectedFlag.is_acknowledged && (
+                <div className="flex gap-3 pt-4 border-t border-border">
+                  <button
+                    onClick={() => {
+                      handleAcknowledgeFlag(selectedFlag.id);
+                      setSelectedFlag(null);
+                    }}
+                    disabled={acknowledgingFlagId === selectedFlag.id}
+                    className="flex-1 px-4 py-2 bg-accent hover:bg-accentDim text-primary font-medium rounded-lg transition-colors disabled:opacity-50"
+                  >
+                    {acknowledgingFlagId === selectedFlag.id ? 'Acknowledging...' : 'Acknowledge Flag'}
+                  </button>
+                  <button
+                    onClick={() => setSelectedFlag(null)}
+                    className="px-4 py-2 bg-surface hover:bg-surfaceLight text-textPrimary font-medium rounded-lg transition-colors"
+                  >
+                    Close
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
