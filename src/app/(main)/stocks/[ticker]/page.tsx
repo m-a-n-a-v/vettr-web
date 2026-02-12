@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { useParams } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useStock } from '@/hooks/useStock';
@@ -183,17 +184,7 @@ export default function StockDetailPage() {
   }
 
   if (stockError || !stock) {
-    return (
-      <div className="min-h-screen bg-primary p-6 pb-20 md:pb-6">
-        <EmptyState
-          icon="⚠️"
-          title="Stock not found"
-          message="The stock you're looking for doesn't exist or couldn't be loaded."
-          actionLabel="Back to Stocks"
-          onAction={() => window.history.back()}
-        />
-      </div>
-    );
+    notFound();
   }
 
   return (
