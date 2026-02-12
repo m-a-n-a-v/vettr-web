@@ -26,6 +26,7 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import EmptyState from '@/components/ui/EmptyState';
 import SearchInput from '@/components/ui/SearchInput';
 import SelectDropdown from '@/components/ui/SelectDropdown';
+import ExecutiveTable from '@/components/ui/ExecutiveTable';
 import ExecutiveDetail from '@/components/ExecutiveDetail';
 import VetrScoreDetail from '@/components/VetrScoreDetail';
 import VetrScoreComparison from '@/components/VetrScoreComparison';
@@ -606,7 +607,7 @@ export default function StockDetailPage() {
               </div>
             </div>
 
-            {/* Executives List */}
+            {/* Executives List - Responsive: Cards on mobile, Table on desktop */}
             <div className="bg-primaryLight rounded-lg p-6 border border-border">
               <h2 className="text-xl font-bold text-textPrimary mb-4">Executive Team</h2>
               {executivesLoading ? (
@@ -619,78 +620,88 @@ export default function StockDetailPage() {
                   ))}
                 </div>
               ) : filteredAndSortedExecutives.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {filteredAndSortedExecutives.map(executive => (
-                    <div
-                      key={executive.id}
-                      onClick={() => setSelectedExecutive(executive)}
-                      className="p-4 bg-surface hover:bg-surfaceLight rounded-lg border border-border transition-colors cursor-pointer"
-                    >
-                      <div className="flex items-start gap-4">
-                        {/* Initials Avatar */}
-                        <div className="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0">
-                          <span className="text-accent font-bold text-lg">
-                            {executive.name
-                              .split(' ')
-                              .map(n => n[0])
-                              .join('')
-                              .slice(0, 2)
-                              .toUpperCase()}
-                          </span>
-                        </div>
-
-                        <div className="flex-1 min-w-0">
-                          {/* Name and Title */}
-                          <h3 className="text-textPrimary font-semibold mb-1 truncate">
-                            {executive.name}
-                          </h3>
-                          <p className="text-textSecondary text-sm mb-2">{executive.title}</p>
-
-                          {/* Details Grid */}
-                          <div className="grid grid-cols-2 gap-2 text-sm">
-                            <div>
-                              <p className="text-textMuted">Years at Company</p>
-                              <p className="text-textPrimary font-medium">
-                                {executive.years_at_company} {executive.years_at_company === 1 ? 'year' : 'years'}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-textMuted">Total Experience</p>
-                              <p className="text-textPrimary font-medium">
-                                {executive.total_experience_years} {executive.total_experience_years === 1 ? 'year' : 'years'}
-                              </p>
-                            </div>
+                <>
+                  {/* Desktop: Table View */}
+                  <div className="hidden md:block">
+                    <ExecutiveTable
+                      executives={filteredAndSortedExecutives}
+                      onExecutiveClick={setSelectedExecutive}
+                    />
+                  </div>
+                  {/* Mobile/Tablet: Card View */}
+                  <div className="md:hidden grid grid-cols-1 gap-4">
+                    {filteredAndSortedExecutives.map(executive => (
+                      <div
+                        key={executive.id}
+                        onClick={() => setSelectedExecutive(executive)}
+                        className="p-4 bg-surface hover:bg-surfaceLight rounded-lg border border-border transition-colors cursor-pointer"
+                      >
+                        <div className="flex items-start gap-4">
+                          {/* Initials Avatar */}
+                          <div className="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0">
+                            <span className="text-accent font-bold text-lg">
+                              {executive.name
+                                .split(' ')
+                                .map(n => n[0])
+                                .join('')
+                                .slice(0, 2)
+                                .toUpperCase()}
+                            </span>
                           </div>
 
-                          {/* Specialization Badge */}
-                          {executive.specialization && (
-                            <div className="mt-2">
-                              <span className="inline-block px-2 py-1 rounded bg-primary text-accent text-xs font-medium">
-                                {executive.specialization}
+                          <div className="flex-1 min-w-0">
+                            {/* Name and Title */}
+                            <h3 className="text-textPrimary font-semibold mb-1 truncate">
+                              {executive.name}
+                            </h3>
+                            <p className="text-textSecondary text-sm mb-2">{executive.title}</p>
+
+                            {/* Details Grid */}
+                            <div className="grid grid-cols-2 gap-2 text-sm">
+                              <div>
+                                <p className="text-textMuted">Years at Company</p>
+                                <p className="text-textPrimary font-medium">
+                                  {executive.years_at_company} {executive.years_at_company === 1 ? 'year' : 'years'}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="text-textMuted">Total Experience</p>
+                                <p className="text-textPrimary font-medium">
+                                  {executive.total_experience_years} {executive.total_experience_years === 1 ? 'year' : 'years'}
+                                </p>
+                              </div>
+                            </div>
+
+                            {/* Specialization Badge */}
+                            {executive.specialization && (
+                              <div className="mt-2">
+                                <span className="inline-block px-2 py-1 rounded bg-primary text-accent text-xs font-medium">
+                                  {executive.specialization}
+                                </span>
+                              </div>
+                            )}
+
+                            {/* Tenure Risk Indicator */}
+                            <div className="mt-2 flex items-center gap-2">
+                              <span className="text-textMuted text-xs">Tenure Risk:</span>
+                              <span
+                                className={`px-2 py-0.5 rounded text-xs font-medium ${
+                                  executive.tenure_risk === 'Stable'
+                                    ? 'bg-accent/20 text-accent'
+                                    : executive.tenure_risk === 'Watch'
+                                    ? 'bg-warning/20 text-warning'
+                                    : 'bg-error/20 text-error'
+                                }`}
+                              >
+                                {executive.tenure_risk}
                               </span>
                             </div>
-                          )}
-
-                          {/* Tenure Risk Indicator */}
-                          <div className="mt-2 flex items-center gap-2">
-                            <span className="text-textMuted text-xs">Tenure Risk:</span>
-                            <span
-                              className={`px-2 py-0.5 rounded text-xs font-medium ${
-                                executive.tenure_risk === 'Stable'
-                                  ? 'bg-accent/20 text-accent'
-                                  : executive.tenure_risk === 'Watch'
-                                  ? 'bg-warning/20 text-warning'
-                                  : 'bg-error/20 text-error'
-                              }`}
-                            >
-                              {executive.tenure_risk}
-                            </span>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                </>
               ) : (
                 <EmptyState
                   icon="👔"

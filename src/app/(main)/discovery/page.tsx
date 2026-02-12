@@ -10,6 +10,7 @@ import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import SearchInput from '@/components/ui/SearchInput';
 import StockCard from '@/components/ui/StockCard';
 import FilingTypeIcon from '@/components/ui/FilingTypeIcon';
+import FilingTable from '@/components/ui/FilingTable';
 import EmptyState from '@/components/ui/EmptyState';
 import { SkeletonStockCard, SkeletonCard } from '@/components/ui/SkeletonLoader';
 import RefreshButton from '@/components/ui/RefreshButton';
@@ -296,7 +297,7 @@ export default function DiscoveryPage() {
             </div>
           </div>
 
-          {/* Filings List */}
+          {/* Filings List - Responsive: Cards on mobile, Table on desktop */}
           {isLoadingFilings ? (
             <div className="space-y-3">
               {[...Array(5)].map((_, i) => (
@@ -320,11 +321,18 @@ export default function DiscoveryPage() {
               }
             />
           ) : (
-            <div className="space-y-3">
-              {filteredFilings.map((filing) => (
-                <FilingRow key={filing.id} filing={filing} />
-              ))}
-            </div>
+            <>
+              {/* Desktop: Table View */}
+              <div className="hidden md:block bg-primaryLight rounded-lg border border-border overflow-hidden">
+                <FilingTable filings={filteredFilings} showStock={true} />
+              </div>
+              {/* Mobile: Card View */}
+              <div className="md:hidden space-y-3">
+                {filteredFilings.map((filing) => (
+                  <FilingRow key={filing.id} filing={filing} />
+                ))}
+              </div>
+            </>
           )}
         </div>
       </div>
