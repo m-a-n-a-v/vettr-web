@@ -32,18 +32,18 @@ export function Navigation() {
       <aside
         className={`
           hidden md:flex md:flex-col
-          fixed left-0 top-0 h-screen
+          fixed left-0 top-16 h-[calc(100vh-4rem)]
           bg-primaryDark border-r border-border
           transition-all duration-300 ease-in-out
           ${isSidebarCollapsed ? 'w-20' : 'w-64'}
           z-40
         `}
       >
-        {/* Logo/Header */}
-        <div className="h-16 flex items-center justify-between px-6 border-b border-border">
+        {/* Logo/Header - Now shows collapse button */}
+        <div className="h-12 flex items-center justify-between px-6 border-b border-border">
           <h1
             className={`
-              font-bold text-xl text-accent
+              font-bold text-lg text-accent
               transition-opacity duration-300
               ${isSidebarCollapsed ? 'opacity-0 w-0' : 'opacity-100'}
             `}

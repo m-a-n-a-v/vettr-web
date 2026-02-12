@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { Navigation } from '@/components/Navigation';
+import { Header } from '@/components/Header';
 import Onboarding from '@/components/Onboarding';
 import KeyboardShortcutsModal from '@/components/KeyboardShortcutsModal';
 import QuickSearch from '@/components/QuickSearch';
@@ -56,9 +57,10 @@ export default function MainLayout({
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-primary">
+        <Header />
         <Navigation />
-        {/* Main content area - offset for desktop sidebar and mobile bottom bar */}
-        <main className="md:ml-64 pb-16 md:pb-0">
+        {/* Main content area - offset for header, desktop sidebar, and mobile bottom bar */}
+        <main className="md:ml-64 pt-16 pb-16 md:pb-0">
           {children}
         </main>
         {/* Onboarding overlay */}
