@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAlertRules } from '@/hooks/useAlertRules';
 import { useToast } from '@/contexts/ToastContext';
 import type { AlertRule, AlertType } from '@/types/api';
@@ -42,14 +43,39 @@ const mockRecentTriggers = [
 type FilterType = 'All' | 'Active' | 'Inactive';
 
 export default function AlertsPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const { rules, isLoading, error, deleteRule, toggleRule, createRule, updateRule, isCreating, isUpdating, isDeleting } = useAlertRules();
   const { showToast } = useToast();
-  const [filter, setFilter] = useState<FilterType>('All');
+
+  // Initialize state from URL params
+  const [filter, setFilter] = useState<FilterType>((searchParams.get('filter') as FilterType) || 'All');
   const [searchQuery, setSearchQuery] = useState('');
+  const [isClient, setIsClient] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [togglingRuleId, setTogglingRuleId] = useState<string | null>(null);
   const [showCreator, setShowCreator] = useState(false);
   const [editingRule, setEditingRule] = useState<AlertRule | null>(null);
+
+  // Set client flag on mount
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Update URL when filter changes
+  useEffect(() => {
+    if (!isClient) return;
+
+    const params = new URLSearchParams();
+
+    if (filter !== 'All') params.set('filter', filter);
+
+    const queryString = params.toString();
+    const newUrl = queryString ? `/alerts?${queryString}` : '/alerts';
+
+    router.replace(newUrl, { scroll: false });
+  }, [filter, isClient, router]);
 
   // Filter rules based on active/inactive filter and search query
   const filteredRules = useMemo(() => {

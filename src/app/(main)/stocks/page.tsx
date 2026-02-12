@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react'
 import Link from 'next/link'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useStocks } from '@/hooks/useStocks'
 import { useWatchlist } from '@/hooks/useWatchlist'
 import { useToast } from '@/contexts/ToastContext'
@@ -24,10 +25,14 @@ type ViewMode = 'card' | 'table'
 const STOCKS_PER_PAGE = 25
 
 export default function StocksPage() {
-  const [searchQuery, setSearchQuery] = useState('')
-  const [sortBy, setSortBy] = useState<SortOption>('vetr_score')
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
-  const [favoritesOnly, setFavoritesOnly] = useState(false)
+  const router = useRouter()
+  const searchParams = useSearchParams()
+
+  // Initialize state from URL params
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '')
+  const [sortBy, setSortBy] = useState<SortOption>((searchParams.get('sort') as SortOption) || 'vetr_score')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>((searchParams.get('order') as 'asc' | 'desc') || 'desc')
+  const [favoritesOnly, setFavoritesOnly] = useState(searchParams.get('favorites') === 'true')
   const [viewMode, setViewMode] = useState<ViewMode>('card')
   const [isClient, setIsClient] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
@@ -88,6 +93,23 @@ export default function StocksPage() {
       setIsLoadingMore(false)
     }
   }, [stocks, offset])
+
+  // Update URL when state changes
+  useEffect(() => {
+    if (!isClient) return
+
+    const params = new URLSearchParams()
+
+    if (searchQuery) params.set('search', searchQuery)
+    if (sortBy !== 'vetr_score') params.set('sort', sortBy)
+    if (sortOrder !== 'desc') params.set('order', sortOrder)
+    if (favoritesOnly) params.set('favorites', 'true')
+
+    const queryString = params.toString()
+    const newUrl = queryString ? `/stocks?${queryString}` : '/stocks'
+
+    router.replace(newUrl, { scroll: false })
+  }, [searchQuery, sortBy, sortOrder, favoritesOnly, isClient, router])
 
   // Reset offset when search/sort changes
   useEffect(() => {

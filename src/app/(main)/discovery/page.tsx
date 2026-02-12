@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useStocks } from '@/hooks/useStocks';
 import { useFilings } from '@/hooks/useFilings';
 import { useWatchlist } from '@/hooks/useWatchlist';
@@ -28,9 +29,14 @@ import type { Filing, FilingType } from '@/types/api';
  * - Recent filings list
  */
 export default function DiscoveryPage() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedSector, setSelectedSector] = useState<string>('All');
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Initialize state from URL params
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+  const [selectedSector, setSelectedSector] = useState<string>(searchParams.get('sector') || 'All');
   const [isMobile, setIsMobile] = useState(false);
+  const [isClient, setIsClient] = useState(false);
   const { showToast } = useToast();
 
   // Fetch all stocks for featured section and sector extraction
@@ -67,6 +73,11 @@ export default function DiscoveryPage() {
   // Fetch watchlist for favorites
   const { watchlist, addToWatchlist, removeFromWatchlist, isAdding, isRemoving } = useWatchlist();
 
+  // Set client flag on mount
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   // Detect mobile viewport
   useEffect(() => {
     const checkMobile = () => {
@@ -76,6 +87,21 @@ export default function DiscoveryPage() {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  // Update URL when state changes
+  useEffect(() => {
+    if (!isClient) return;
+
+    const params = new URLSearchParams();
+
+    if (searchQuery) params.set('search', searchQuery);
+    if (selectedSector !== 'All') params.set('sector', selectedSector);
+
+    const queryString = params.toString();
+    const newUrl = queryString ? `/discovery?${queryString}` : '/discovery';
+
+    router.replace(newUrl, { scroll: false });
+  }, [searchQuery, selectedSector, isClient, router]);
 
   // Refresh handler
   const handleRefreshData = useCallback(async () => {
