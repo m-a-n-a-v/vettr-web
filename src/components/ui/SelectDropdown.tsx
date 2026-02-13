@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { ChevronDownIcon } from '@/components/icons';
 
 export interface SelectOption {
   value: string;
@@ -32,7 +33,7 @@ export default function SelectDropdown({
     <div className={`${className}`}>
       {/* Label */}
       {label && (
-        <label className="block text-sm font-medium text-textSecondary mb-1.5">
+        <label className="block text-sm font-medium text-gray-300 mb-1.5">
           {label}
         </label>
       )}
@@ -44,12 +45,12 @@ export default function SelectDropdown({
           onChange={(e) => onChange(e.target.value)}
           disabled={disabled}
           className={`
-            w-full px-4 py-2.5 pr-10 rounded-lg appearance-none
-            bg-primaryLight border transition-all duration-200
-            text-textPrimary
-            focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent
+            w-full px-4 py-2.5 pr-10 rounded-xl appearance-none text-sm
+            bg-white/5 border transition-all
+            text-white
+            focus:outline-none focus:border-vettr-accent/40 focus:ring-1 focus:ring-vettr-accent/20
             disabled:opacity-50 disabled:cursor-not-allowed
-            ${error ? 'border-error' : 'border-border'}
+            ${error ? 'border-red-400' : 'border-white/10'}
           `}
         >
           {placeholder && (
@@ -66,25 +67,13 @@ export default function SelectDropdown({
 
         {/* Dropdown Arrow Icon */}
         <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-          <svg
-            className="w-5 h-5 text-textMuted"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 9l-7 7-7-7"
-            />
-          </svg>
+          <ChevronDownIcon className="w-5 h-5 text-gray-500" />
         </div>
       </div>
 
       {/* Error Message */}
       {error && (
-        <p className="mt-1.5 text-sm text-error">{error}</p>
+        <p className="mt-1.5 text-sm text-red-400">{error}</p>
       )}
     </div>
   );

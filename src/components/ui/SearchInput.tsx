@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { SearchIcon, XIcon } from '@/components/icons';
 
 interface SearchInputProps {
   value: string;
@@ -49,20 +50,8 @@ export default function SearchInput({
   return (
     <div className={`relative ${className}`}>
       {/* Search Icon */}
-      <div className="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-        <svg
-          className="w-5 h-5 text-textMuted"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-          />
-        </svg>
+      <div className="absolute left-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+        <SearchIcon className="w-5 h-5 text-gray-500" />
       </div>
 
       {/* Input Field */}
@@ -74,11 +63,11 @@ export default function SearchInput({
         disabled={disabled}
         autoFocus={autoFocus}
         className={`
-          w-full pl-10 pr-10 py-3 rounded-xl
-          bg-surface border border-border/50
-          text-textPrimary placeholder:text-textMuted
-          focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50
-          transition-all duration-200
+          w-full pl-11 pr-10 py-2.5 rounded-xl text-sm
+          bg-white/5 border border-white/10
+          text-white placeholder:text-gray-500
+          focus:outline-none focus:border-vettr-accent/40 focus:ring-1 focus:ring-vettr-accent/20 focus:bg-white/[0.07]
+          transition-all
           disabled:opacity-50 disabled:cursor-not-allowed
         `}
       />
@@ -90,26 +79,14 @@ export default function SearchInput({
           onClick={handleClear}
           className="
             absolute right-3 top-1/2 transform -translate-y-1/2
-            text-textMuted hover:text-textPrimary
-            transition-colors duration-200
-            focus:outline-none focus:ring-2 focus:ring-accent rounded-full
-            p-0.5
+            text-gray-500 hover:text-white
+            transition-colors
+            focus:outline-none focus-visible:ring-2 focus-visible:ring-vettr-accent/30 rounded-lg
+            p-1
           "
           aria-label="Clear search"
         >
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
+          <XIcon className="w-4 h-4" />
         </button>
       )}
     </div>
