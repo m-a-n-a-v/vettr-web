@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import SearchInput from '@/components/ui/SearchInput'
-import Breadcrumb from '@/components/ui/Breadcrumb'
+import { ChevronLeftIcon, ChevronDownIcon } from '@/components/icons'
 
 // FAQ items
 interface FAQItem {
@@ -162,37 +162,17 @@ export default function FAQPage() {
   const categories = Object.keys(groupedItems)
 
   return (
-    <div className="min-h-screen bg-primary text-textPrimary pb-20 md:pb-6">
+    <div className="min-h-screen bg-vettr-navy text-white pb-20 md:pb-6">
       {/* Header */}
-      <div className="bg-primaryLight border-b border-border sticky top-0 z-20">
+      <div className="bg-vettr-dark border-b border-white/5 sticky top-16 z-20">
         <div className="max-w-4xl mx-auto px-4 py-4">
-          {/* Breadcrumb */}
-          <Breadcrumb
-            items={[
-              { label: 'Profile', href: '/profile' },
-              { label: 'FAQ' }
-            ]}
-          />
-
           <div className="flex items-center gap-4 mb-4">
             <button
               onClick={() => router.push('/profile')}
-              className="text-textSecondary hover:text-textPrimary transition-colors"
+              className="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
               aria-label="Back to Profile"
             >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
+              <ChevronLeftIcon className="w-5 h-5" />
             </button>
             <h1 className="text-2xl font-bold">Frequently Asked Questions</h1>
           </div>
@@ -210,7 +190,7 @@ export default function FAQPage() {
       {/* Content */}
       <div className="max-w-4xl mx-auto px-4 py-6">
         {/* Question Count */}
-        <div className="mb-6 text-sm text-textSecondary">
+        <div className="mb-6 text-sm text-gray-500">
           {filteredItems.length} {filteredItems.length === 1 ? 'question' : 'questions'}
           {searchQuery.trim() && ' found'}
         </div>
@@ -218,14 +198,26 @@ export default function FAQPage() {
         {/* No Results */}
         {filteredItems.length === 0 && (
           <div className="text-center py-12">
-            <div className="text-4xl mb-4">❓</div>
-            <h3 className="text-lg font-semibold mb-2">No questions found</h3>
-            <p className="text-textSecondary mb-4">
+            <svg
+              className="w-16 h-16 mx-auto mb-4 text-gray-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
+              />
+            </svg>
+            <h3 className="text-lg font-medium text-gray-400 mb-2">No questions found</h3>
+            <p className="text-gray-500 mb-4">
               Try a different search term or clear your search.
             </p>
             <button
               onClick={() => setSearchQuery('')}
-              className="text-accent hover:text-accentDim transition-colors"
+              className="text-vettr-accent hover:text-vettr-accent/80 transition-colors"
             >
               Clear Search
             </button>
@@ -237,53 +229,43 @@ export default function FAQPage() {
           <div key={category} className="mb-8">
             {/* Category Header */}
             <div className="flex items-center gap-3 mb-4">
-              <h2 className="text-xl font-semibold text-accent">{category}</h2>
-              <div className="flex-1 h-px bg-border" />
+              <h2 className="text-lg font-semibold text-white">{category}</h2>
+              <div className="flex-1 h-px bg-white/5" />
             </div>
 
-            {/* Questions in this category */}
-            <div className="space-y-3">
+            {/* Questions in this category - Accordion */}
+            <div className="border-b border-white/5">
               {groupedItems[category].map((item) => {
                 const isExpanded = expandedQuestions.has(item.question)
 
                 return (
                   <div
                     key={item.question}
-                    className="bg-primaryLight border border-border rounded-lg overflow-hidden transition-all hover:border-accent/30"
+                    className="border-b border-white/5 last:border-b-0"
                   >
                     {/* Question Header (clickable) */}
                     <button
                       onClick={() => toggleQuestion(item.question)}
-                      className="w-full text-left px-4 py-3 flex items-start justify-between gap-3 hover:bg-surfaceLight transition-colors"
+                      className="w-full text-left px-4 py-4 flex items-start justify-between gap-3 hover:bg-white/[0.03] transition-colors"
                     >
                       <div className="flex-1">
-                        <h3 className="font-semibold text-textPrimary">
+                        <h3 className="text-sm font-medium text-white">
                           {item.question}
                         </h3>
                       </div>
 
                       {/* Expand/Collapse Icon */}
-                      <svg
-                        className={`w-5 h-5 text-textSecondary transition-transform flex-shrink-0 mt-0.5 ${
+                      <ChevronDownIcon
+                        className={`w-5 h-5 text-gray-400 transition-transform flex-shrink-0 mt-0.5 ${
                           isExpanded ? 'rotate-180' : ''
                         }`}
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
+                      />
                     </button>
 
                     {/* Answer (expandable) */}
                     {isExpanded && (
-                      <div className="px-4 pb-4 pt-2 border-t border-border bg-primary/50">
-                        <p className="text-textSecondary leading-relaxed">
+                      <div className="px-4 pb-4 animate-in fade-in duration-200">
+                        <p className="text-sm text-gray-400 leading-relaxed">
                           {item.answer}
                         </p>
                       </div>
