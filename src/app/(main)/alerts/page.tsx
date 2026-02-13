@@ -16,6 +16,7 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { SkeletonAlertRule, SkeletonAlertTrigger } from '@/components/ui/SkeletonLoader';
 import Modal from '@/components/ui/Modal';
 import AlertRuleCreator from '@/components/AlertRuleCreator';
+import { BellIcon, EditIcon, TrashIcon, PlusIcon, ShareIcon, FlagIcon, AlertTriangleIcon, FilterIcon } from '@/components/icons';
 
 // Mock recent triggers - in production this would come from an API endpoint
 // The backend doesn't have a triggers endpoint yet, so we'll show placeholder data
@@ -180,21 +181,21 @@ function AlertsPageContent() {
     }
   };
 
-  // Get alert type icon
+  // Get alert type icon and color
   const getAlertIcon = (type: AlertType) => {
     switch (type) {
       case 'Red Flag':
-        return '🚩';
+        return { Icon: FlagIcon, color: 'text-red-400' };
       case 'Financing':
-        return '💰';
+        return { Icon: BellIcon, color: 'text-yellow-400' };
       case 'Executive Changes':
-        return '👔';
+        return { Icon: BellIcon, color: 'text-purple-400' };
       case 'Consolidation':
-        return '📊';
+        return { Icon: BellIcon, color: 'text-blue-400' };
       case 'Drill Results':
-        return '⛏️';
+        return { Icon: BellIcon, color: 'text-blue-400' };
       default:
-        return '🔔';
+        return { Icon: BellIcon, color: 'text-gray-400' };
     }
   };
 
@@ -237,17 +238,17 @@ function AlertsPageContent() {
     return (
       <div className="p-4 md:p-6 pb-20 md:pb-6">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">Alerts</h1>
-          <div className="h-10 w-32 bg-surface rounded-lg animate-pulse"></div>
+          <h1 className="text-2xl font-bold text-white">Alerts</h1>
+          <div className="h-10 w-32 bg-white/5 rounded-xl animate-pulse"></div>
         </div>
 
         <div className="space-y-6">
           {/* Recent Triggers skeleton */}
           <div>
-            <h2 className="text-lg font-semibold mb-4">Recent Triggers</h2>
+            <h2 className="text-lg font-semibold text-white mb-4">Recent Triggers</h2>
             <div className="space-y-3">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <SkeletonAlertTrigger key={i} />
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-white/5 rounded-xl h-20 animate-pulse" />
               ))}
             </div>
           </div>
@@ -255,17 +256,17 @@ function AlertsPageContent() {
           {/* My Alert Rules skeleton */}
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold">My Alert Rules</h2>
-              <div className="h-8 w-48 bg-surface rounded animate-pulse"></div>
+              <h2 className="text-lg font-semibold text-white">My Alert Rules</h2>
+              <div className="h-8 w-48 bg-white/5 rounded-xl animate-pulse"></div>
             </div>
 
             {/* Search bar skeleton */}
-            <div className="h-10 bg-surface rounded-lg animate-pulse mb-4"></div>
+            <div className="h-10 bg-white/5 rounded-xl animate-pulse mb-4"></div>
 
             {/* Rules skeleton */}
             <div className="space-y-3">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <SkeletonAlertRule key={i} />
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-white/5 rounded-xl h-24 animate-pulse" />
               ))}
             </div>
           </div>
@@ -277,9 +278,9 @@ function AlertsPageContent() {
   if (error) {
     return (
       <div className="p-4 md:p-6 pb-20 md:pb-6">
-        <h1 className="text-2xl font-bold mb-6">Alerts</h1>
+        <h1 className="text-2xl font-bold text-white mb-6">Alerts</h1>
         <EmptyState
-          icon="⚠️"
+          icon={<AlertTriangleIcon className="w-16 h-16" />}
           title="Failed to load alerts"
           message="There was an error loading your alert rules. Please try again."
         />
@@ -290,87 +291,76 @@ function AlertsPageContent() {
   return (
     <div className="p-4 md:p-6 pb-20 md:pb-6">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Alerts</h1>
+        <h1 className="text-2xl font-bold text-white">Alerts</h1>
         {/* Create New Alert Button - Desktop */}
         <button
-          className="hidden md:flex items-center gap-2 px-4 py-2 bg-accent text-primary rounded-lg font-medium hover:bg-accentDim transition-colors"
+          className="hidden md:flex items-center gap-2 px-4 py-2.5 bg-vettr-accent text-vettr-navy rounded-xl font-medium hover:bg-vettr-accent/90 transition-colors"
           onClick={() => setShowCreator(true)}
         >
-          <span className="text-xl">+</span>
+          <PlusIcon className="w-5 h-5" />
           Create Alert
         </button>
       </div>
 
       {/* Recent Triggers Section */}
       <section className="mb-8">
-        <h2 className="text-lg font-semibold mb-4">Recent Triggers</h2>
+        <h2 className="text-lg font-semibold text-white mb-4">Recent Triggers</h2>
         {mockRecentTriggers.length === 0 ? (
           <EmptyState
-            icon="🔕"
+            icon={<BellIcon className="w-16 h-16" />}
             title="No recent triggers"
             message="You haven't had any alert triggers recently."
           />
         ) : (
           <div className="space-y-3">
-            {mockRecentTriggers.slice(0, 5).map((trigger) => (
-              <div
-                key={trigger.id}
-                className="bg-primaryLight border border-border rounded-lg p-4 hover:bg-surfaceLight transition-colors"
-              >
-                <div className="flex items-start gap-3">
-                  <span className="text-2xl flex-shrink-0">
-                    {getAlertIcon(trigger.alert_type)}
-                  </span>
-                  <Link
-                    href={`/stocks/${trigger.ticker}`}
-                    className="flex-1 min-w-0"
-                  >
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-medium text-accent hover:underline">{trigger.ticker}</span>
-                      <span className="text-textSecondary">•</span>
-                      <span className="text-sm text-textSecondary">{trigger.alert_type}</span>
-                    </div>
-                    <p className="text-sm text-textSecondary">{trigger.message}</p>
-                  </Link>
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    <span className="text-xs text-textMuted">
-                      {formatRelativeTime(trigger.triggered_at)}
-                    </span>
-                    {/* Share Button */}
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleShareTrigger(trigger);
-                      }}
-                      className="p-1.5 rounded hover:bg-surface transition-colors"
-                      aria-label="Share alert"
-                      title="Share alert"
+            {mockRecentTriggers.slice(0, 5).map((trigger) => {
+              const { Icon, color } = getAlertIcon(trigger.alert_type);
+              return (
+                <div
+                  key={trigger.id}
+                  className="bg-vettr-card/50 border border-white/5 rounded-xl p-4 hover:bg-vettr-card/80 transition-colors"
+                >
+                  <div className="flex items-start gap-3">
+                    <Icon className={`w-5 h-5 flex-shrink-0 ${color}`} />
+                    <Link
+                      href={`/stocks/${trigger.ticker}`}
+                      className="flex-1 min-w-0"
                     >
-                      <svg
-                        className="w-4 h-4 text-textMuted hover:text-accent transition-colors"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-medium text-vettr-accent hover:underline font-mono">{trigger.ticker}</span>
+                        <span className="text-gray-400">•</span>
+                        <span className="text-sm text-gray-400">{trigger.alert_type}</span>
+                      </div>
+                      <p className="text-sm text-gray-300">{trigger.message}</p>
+                    </Link>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <span className="text-xs text-gray-500">
+                        {formatRelativeTime(trigger.triggered_at)}
+                      </span>
+                      {/* Share Button */}
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleShareTrigger(trigger);
+                        }}
+                        className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+                        aria-label="Share alert"
+                        title="Share alert"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
-                        />
-                      </svg>
-                    </button>
+                        <ShareIcon className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </section>
 
       {/* My Alert Rules Section */}
       <section>
-        <h2 className="text-lg font-semibold mb-4">My Alert Rules</h2>
+        <h2 className="text-lg font-semibold text-white mb-4">My Alert Rules</h2>
 
         {/* Filter Tabs */}
         <div className="flex gap-2 mb-4">
@@ -378,9 +368,9 @@ function AlertsPageContent() {
             <button
               key={filterType}
               onClick={() => setFilter(filterType)}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === filterType
-                ? 'bg-accent text-primary'
-                : 'bg-primaryLight text-textSecondary hover:bg-surfaceLight'
+              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${filter === filterType
+                ? 'bg-vettr-accent/10 border-vettr-accent/30 text-vettr-accent border'
+                : 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:bg-white/10 border'
                 }`}
             >
               {filterType}
@@ -400,7 +390,7 @@ function AlertsPageContent() {
         {/* Rules List */}
         {rules.length === 0 ? (
           <EmptyState
-            icon="🔔"
+            icon={<BellIcon className="w-16 h-16" />}
             title="No alert rules yet"
             message="Create your first alert rule to get notified about important stock events."
             actionLabel="Create Alert"
@@ -408,113 +398,90 @@ function AlertsPageContent() {
           />
         ) : filteredRules.length === 0 ? (
           <EmptyState
-            icon="🔍"
+            icon={<FilterIcon className="w-16 h-16" />}
             title="No matching rules"
             message="No alert rules match your current filters. Try adjusting your search or filter."
           />
         ) : (
           <div className="space-y-3">
-            {filteredRules.map((rule) => (
-              <div
-                key={rule.id}
-                className="bg-primaryLight border border-border rounded-lg p-4"
-              >
-                <div className="flex items-start gap-3">
-                  <span className="text-2xl flex-shrink-0">
-                    {getAlertIcon(rule.alert_type)}
-                  </span>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Link
-                        href={`/stocks/${rule.ticker}`}
-                        className="font-medium text-accent hover:underline"
-                      >
-                        {rule.ticker}
-                      </Link>
-                      <span className="text-textSecondary">•</span>
-                      <span className="text-sm text-textSecondary">{rule.alert_type}</span>
+            {filteredRules.map((rule) => {
+              const { Icon, color } = getAlertIcon(rule.alert_type);
+              return (
+                <div
+                  key={rule.id}
+                  className="bg-vettr-card/50 border border-white/5 rounded-xl p-4"
+                >
+                  <div className="flex items-start gap-3">
+                    <Icon className={`w-5 h-5 flex-shrink-0 ${color}`} />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Link
+                          href={`/stocks/${rule.ticker}`}
+                          className="font-medium text-vettr-accent hover:underline font-mono"
+                        >
+                          {rule.ticker}
+                        </Link>
+                        <span className="text-gray-400">•</span>
+                        <span className="text-sm text-gray-400">{rule.alert_type}</span>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2 text-sm text-gray-500">
+                        <span>Frequency: {rule.frequency}</span>
+                        {rule.condition && Object.keys(rule.condition).length > 0 && (
+                          <>
+                            <span>•</span>
+                            <span>Custom conditions</span>
+                          </>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex flex-wrap items-center gap-2 text-sm text-textMuted">
-                      <span>Frequency: {rule.frequency}</span>
-                      {rule.condition && Object.keys(rule.condition).length > 0 && (
-                        <>
-                          <span>•</span>
-                          <span>Custom conditions</span>
-                        </>
-                      )}
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      {/* Toggle Switch */}
+                      <button
+                        onClick={() => handleToggle(rule.id, rule.is_enabled)}
+                        disabled={togglingRuleId === rule.id}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-vettr-accent/30 ${rule.is_enabled ? 'bg-vettr-accent' : 'bg-white/10'
+                          } ${togglingRuleId === rule.id ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        title={rule.is_enabled ? 'Disable alert' : 'Enable alert'}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${rule.is_enabled ? 'translate-x-6' : 'translate-x-1'
+                            }`}
+                        />
+                      </button>
+
+                      {/* Edit Button */}
+                      <button
+                        onClick={() => handleEdit(rule)}
+                        className="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+                        title="Edit alert rule"
+                      >
+                        <EditIcon className="w-5 h-5" />
+                      </button>
+
+                      {/* Delete Button */}
+                      <button
+                        onClick={() => setDeleteConfirmId(rule.id)}
+                        className="p-2 text-gray-400 hover:text-red-400 hover:bg-white/5 rounded-lg transition-colors"
+                        title="Delete alert rule"
+                      >
+                        <TrashIcon className="w-5 h-5" />
+                      </button>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    {/* Toggle Switch */}
-                    <button
-                      onClick={() => handleToggle(rule.id, rule.is_enabled)}
-                      disabled={togglingRuleId === rule.id}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-primary ${rule.is_enabled ? 'bg-accent' : 'bg-border'
-                        } ${togglingRuleId === rule.id ? 'opacity-50 cursor-not-allowed' : ''}`}
-                      title={rule.is_enabled ? 'Disable alert' : 'Enable alert'}
-                    >
-                      <span
-                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${rule.is_enabled ? 'translate-x-6' : 'translate-x-1'
-                          }`}
-                      />
-                    </button>
-
-                    {/* Edit Button */}
-                    <button
-                      onClick={() => handleEdit(rule)}
-                      className="p-2 text-textMuted hover:text-accent transition-colors"
-                      title="Edit alert rule"
-                    >
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                        />
-                      </svg>
-                    </button>
-
-                    {/* Delete Button */}
-                    <button
-                      onClick={() => setDeleteConfirmId(rule.id)}
-                      className="p-2 text-textMuted hover:text-error transition-colors"
-                      title="Delete alert rule"
-                    >
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                        />
-                      </svg>
-                    </button>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </section>
 
       {/* Floating Action Button (Mobile) */}
       <button
-        className="md:hidden fixed bottom-20 right-4 w-14 h-14 bg-accent text-primary rounded-full shadow-lg flex items-center justify-center text-2xl font-bold hover:bg-accentDim transition-colors z-40"
+        className="md:hidden fixed bottom-20 right-4 w-14 h-14 bg-vettr-accent text-vettr-navy rounded-full shadow-lg flex items-center justify-center hover:bg-vettr-accent/90 transition-colors z-40"
         onClick={() => setShowCreator(true)}
         title="Create new alert"
       >
-        +
+        <PlusIcon className="w-6 h-6" />
       </button>
 
       {/* Delete Confirmation Modal */}
@@ -525,20 +492,20 @@ function AlertsPageContent() {
           title="Delete Alert Rule"
           size="sm"
         >
-          <div className="p-6">
-            <p className="text-textSecondary mb-6">
+          <div className="py-4">
+            <p className="text-gray-300 mb-6">
               Are you sure you want to delete this alert rule? This action cannot be undone.
             </p>
             <div className="flex gap-3 justify-end">
               <button
                 onClick={() => setDeleteConfirmId(null)}
-                className="px-4 py-2 bg-primaryLight text-textPrimary rounded-lg font-medium hover:bg-surfaceLight transition-colors"
+                className="px-4 py-2.5 bg-white/5 border border-white/10 text-white rounded-xl font-medium hover:bg-white/10 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={() => handleDelete(deleteConfirmId)}
-                className="px-4 py-2 bg-error text-white rounded-lg font-medium hover:bg-error/90 transition-colors"
+                className="px-4 py-2.5 bg-red-500 text-white rounded-xl font-medium hover:bg-red-500/90 transition-colors"
               >
                 Delete
               </button>
@@ -567,15 +534,15 @@ export default function AlertsPage() {
     <Suspense fallback={
       <div className="p-4 md:p-6 pb-20 md:pb-6">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">Alerts</h1>
-          <div className="h-10 w-32 bg-surface rounded-lg animate-pulse"></div>
+          <h1 className="text-2xl font-bold text-white">Alerts</h1>
+          <div className="h-10 w-32 bg-white/5 rounded-xl animate-pulse"></div>
         </div>
         <div className="space-y-6">
           <div>
-            <h2 className="text-lg font-semibold mb-4">Recent Triggers</h2>
+            <h2 className="text-lg font-semibold text-white mb-4">Recent Triggers</h2>
             <div className="space-y-3">
               {[1, 2, 3].map((i) => (
-                <SkeletonAlertTrigger key={i} />
+                <div key={i} className="bg-white/5 rounded-xl h-20 animate-pulse" />
               ))}
             </div>
           </div>
