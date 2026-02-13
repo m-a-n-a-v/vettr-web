@@ -1787,3 +1787,40 @@ Files modified:
 - **Previous work pays off**: V2-039 already added focus-visible rings to all interactive elements
 - **Comprehensive testing**: Use both keyboard-only navigation and screen readers to verify accessibility
 ---
+
+## V2-042: Add proper error boundary pages
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Redesigned 404 not-found.tsx page with V2 design system
+- Redesigned error.tsx page with proper SVG icons (AlertTriangleIcon instead of emoji)
+- Redesigned stock-specific not-found.tsx page with BarChartIcon
+- Added HomeIcon to icons library for navigation CTAs
+- Applied V2 design tokens consistently: bg-vettr-navy, text-vettr-accent, text-gray-400/500
+- Added subtle background gradients (green 8% opacity at top-right, blue 5% opacity at bottom-left)
+- Used proper SVG icons throughout (HomeIcon, GridIcon, SearchIcon, BarChartIcon, AlertTriangleIcon, RefreshIcon)
+- Implemented consistent button styling with rounded-xl borders and proper hover states
+- Error page shows error details in development mode only (bg-vettr-card/50 card)
+- All pages have centered layouts with max-w-md width
+- Removed all emoji icons (⚠️, 📊) and replaced with SVG components
+- All buttons use inline-flex with icon + text patterns
+- Quality checks passed: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/components/icons/index.tsx (added HomeIcon)
+- src/app/not-found.tsx (global 404 page)
+- src/app/error.tsx (global error boundary)
+- src/app/(main)/stocks/[ticker]/not-found.tsx (stock-specific 404)
+
+**Learnings for future iterations:**
+- Error boundary pages should match the same quality standards as regular pages
+- Background gradients add visual depth without interfering with layout (absolute positioning)
+- Using SVG icons instead of emojis ensures cross-platform consistency
+- Error pages should show helpful navigation CTAs (Go Home, Browse Stocks, Search)
+- Development mode error details should be visually distinct but readable
+- All error pages benefit from the same gradient background treatment for consistency
+- Icon + text button pattern is more professional than text-only buttons
+- Large icon (w-16 h-16) provides good visual hierarchy for error states
+- text-white/10 creates subtle large text effect (like the "404" display)
+---
