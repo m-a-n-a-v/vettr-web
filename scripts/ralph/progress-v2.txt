@@ -596,3 +596,45 @@ Files modified:
 - FlagIcon in detected flags list adds visual clarity alongside severity badges
 - CSS transition on SVG circle provides smooth animation without JavaScript overhead
 ---
+
+## V2-017: Redesign Filing Detail page
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Completely redesigned FilingTypeIcon component with colored SVG icons instead of emoji
+- Created four SVG icon components: MD&A (bar chart), Press Release (document), Financial Statements (dollar sign), Other (generic document)
+- Updated FilingTypeIcon colors to V2 design tokens: blue-400, vettr-accent, yellow-400, gray-400
+- Redesigned filing detail page header with V2 card styling (bg-vettr-card/50 border border-white/5 rounded-2xl)
+- Header now includes colored type icon, title (text-xl font-semibold), status badge, and share button with ShareIcon
+- Meta row displays ticker link, date filed, and material indicator badge inline
+- Material indicator badge appears in meta row when filing.is_material is true (yellow badge)
+- Redesigned summary section with V2 card styling (bg-vettr-card/30 border border-white/5 rounded-2xl p-6)
+- Summary text uses text-gray-300 leading-relaxed for better readability
+- Redesigned filing details grid with 2x2 layout of individual metric cards
+- Each detail card uses bg-white/[0.03] rounded-xl p-4 pattern for subtle card-in-card effect
+- Detail card labels: text-gray-500 text-xs uppercase tracking-wider
+- Updated status and material badges to use V2 tokens (vettr-accent/10, yellow-500/10)
+- Redesigned related stock card with V2 styling matching StockCard pattern
+- Stock card uses gradient initials avatar (bg-gradient-to-br from-vettr-accent/20 to-vettr-accent/5)
+- Stock card ticker in font-mono text-vettr-accent, company name in text-gray-400
+- Price change indicator uses ArrowUpIcon/ArrowDownIcon from icon library (not PriceChangeIndicator component)
+- Auto-mark as read functionality preserved with optimistic update pattern
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/components/ui/FilingTypeIcon.tsx
+- src/app/(main)/filings/[id]/page.tsx
+
+**Learnings for future iterations:**
+- Filing type icons work better as inline SVG components with proper stroke styling than emoji
+- SVG icons for filing types: chart bars (MD&A), document with lines (Press Release), dollar circle (Financial), generic document (Other)
+- Material indicator badge works better in the meta row alongside ticker and date (not in details grid)
+- Summary section should come before details grid for better content flow
+- Details grid with individual metric cards (bg-white/[0.03]) creates visual hierarchy within the larger card
+- Related stock card follows same pattern as StockCard component for consistency
+- Price change inline with arrow icons is more compact than full PriceChangeIndicator component
+- Gradient initials avatar matches executive cards pattern from V2-015
+- Status badges should be small (text-xs px-2.5 py-0.5) not medium-sized
+- All old design tokens replaced: bg-primary → bg-vettr-navy, bg-primaryLight → bg-vettr-card/50 or bg-vettr-card/30, text-textPrimary → text-white, text-textSecondary → text-gray-400, text-textMuted → text-gray-500, border-border → border-white/5, text-accent → text-vettr-accent, text-warning → text-yellow-400, bg-surface → bg-white/5
+---
