@@ -34,7 +34,7 @@ import VetrScoreComparison from '@/components/VetrScoreComparison';
 import VetrScoreTrend from '@/components/VetrScoreTrend';
 import { SkeletonStockDetailHeader, SkeletonVetrScoreSection, SkeletonCard, SkeletonFilingRow, SkeletonStockRow } from '@/components/ui/SkeletonLoader';
 import Breadcrumb from '@/components/ui/Breadcrumb';
-import { StarIcon, StarFilledIcon, ShareIcon, MoreHorizontalIcon, ArrowUpIcon, ArrowDownIcon, UsersIcon } from '@/components/icons';
+import { StarIcon, StarFilledIcon, ShareIcon, MoreHorizontalIcon, ArrowUpIcon, ArrowDownIcon, UsersIcon, FlagIcon, ShieldCheckIcon } from '@/components/icons';
 
 type Tab = 'overview' | 'pedigree' | 'red-flags';
 
@@ -943,7 +943,7 @@ export default function StockDetailPage() {
                           stroke="rgba(255,255,255,0.1)"
                           strokeWidth="12"
                         />
-                        {/* Progress circle */}
+                        {/* Progress circle - higher score = more red (inverted from VETTR score) */}
                         <circle
                           cx="80"
                           cy="80"
@@ -961,13 +961,13 @@ export default function StockDetailPage() {
                           strokeWidth="12"
                           strokeDasharray={`${(redFlags.overall_score / 100) * 439.8} 439.8`}
                           strokeLinecap="round"
+                          className="transition-all duration-1000"
                         />
                       </svg>
                       <div className="absolute inset-0 flex flex-col items-center justify-center">
                         <span className="text-4xl font-bold text-white tabular-nums">
                           {redFlags.overall_score}
                         </span>
-                        <span className="text-sm text-gray-500">Risk Score</span>
                       </div>
                     </div>
                     <p className="text-sm text-gray-500 mt-2">Red Flag Score</p>
@@ -1089,16 +1089,16 @@ export default function StockDetailPage() {
                         >
                           <div className="flex items-start justify-between gap-4">
                             <div className="flex items-start gap-3 flex-1">
-                              {/* Severity icon (colored dot) */}
-                              <div
-                                className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
+                              {/* Flag icon with severity color */}
+                              <FlagIcon
+                                className={`w-5 h-5 flex-shrink-0 ${
                                   flag.severity === 'Critical'
-                                    ? 'bg-red-400'
+                                    ? 'text-red-400'
                                     : flag.severity === 'High'
-                                    ? 'bg-orange-400'
+                                    ? 'text-orange-400'
                                     : flag.severity === 'Moderate'
-                                    ? 'bg-yellow-400'
-                                    : 'bg-gray-400'
+                                    ? 'text-yellow-400'
+                                    : 'text-gray-400'
                                 }`}
                               />
 
@@ -1166,7 +1166,7 @@ export default function StockDetailPage() {
                     </div>
                   ) : (
                     <EmptyState
-                      icon="✅"
+                      icon={<ShieldCheckIcon className="w-16 h-16 text-vettr-accent" />}
                       title="No red flags detected"
                       message="This stock currently has no red flags. Great news!"
                     />
