@@ -1,0 +1,899 @@
+{
+  "project": "VETTR Web App - V2 Redesign",
+  "phase": "Phase 2 - Professional Redesign & Auth Fix",
+  "branchName": "ralph/vettr-web-v2",
+  "description": "Complete professional redesign of VETTR web app. Fix disabled authentication, redesign UI to match vettr-marketing site quality (premium dark SaaS dashboard), improve desktop layouts, add proper data tables, polish all components, and ensure production-ready quality.",
+  "totalStories": 50,
+  "userStories": [
+    {
+      "id": "V2-001",
+      "title": "Fix global CSS, Tailwind config, and design tokens",
+      "description": "Overhaul tailwind.config.ts and globals.css to match vettr-marketing site quality. Add CSS custom properties for dynamic theming, Inter font from Google Fonts, smooth scrolling, selection styling, and consistent design tokens.",
+      "acceptanceCriteria": [
+        "Install @next/font or next/font for Inter font, apply as CSS variable --font-inter",
+        "tailwind.config.ts uses vettr-navy (#0D1B2A), vettr-dark (#1B2838), vettr-card (#1E3348), vettr-accent (#00E676), foreground (#E8EDF2) consistently",
+        "globals.css has smooth scrolling, ::selection styling (rgba(0,230,118,0.3)), antialiased text rendering",
+        "CSS custom properties defined: --color-accent, --color-surface, --color-border for runtime theming",
+        "Consistent border-radius token: rounded-2xl as default for cards, rounded-xl for buttons, rounded-lg for inputs",
+        "Remove all hardcoded hex color values from components - use Tailwind theme classes only",
+        "Add subtle background gradient utilities matching marketing site: radial-gradient with accent glow at 8% opacity",
+        "npm run build passes"
+      ],
+      "priority": 1,
+      "passes": false
+    },
+    {
+      "id": "V2-002",
+      "title": "Re-enable and fix authentication flow completely",
+      "description": "Fix the disabled ProtectedRoute, re-enable auth redirect in API client, and ensure login/signup/logout flow works end-to-end with the production backend.",
+      "acceptanceCriteria": [
+        "ProtectedRoute.tsx re-enabled: checks isAuthenticated from AuthContext, redirects to /login if false",
+        "api-client.ts auth redirect uncommented and working on 401 after refresh fails",
+        "AuthContext.tsx properly initializes from localStorage on mount (check for existing tokens)",
+        "Login page calls POST /auth/login, stores tokens, redirects to /pulse",
+        "Signup page calls POST /auth/signup, stores tokens, redirects to /pulse",
+        "Logout clears tokens from localStorage and redirects to /login",
+        "Token refresh on 401: calls POST /auth/refresh with refresh token, retries original request",
+        "If refresh fails (expired), clear tokens and redirect to /login",
+        "Loading state shown while checking auth on app mount (not flash of login page)",
+        "npm run build passes"
+      ],
+      "priority": 2,
+      "passes": false
+    },
+    {
+      "id": "V2-003",
+      "title": "Redesign login page - premium SaaS quality",
+      "description": "Completely redesign login page with split layout (branding left, form right on desktop), subtle background gradients, polished form fields, and professional typography.",
+      "acceptanceCriteria": [
+        "Desktop: split layout - left half with VETTR branding, tagline, subtle accent glow gradient background; right half with login form on dark card",
+        "Mobile: single column with VETTR logo at top, form card below",
+        "Form card uses bg-vettr-card/50 border border-white/5 rounded-2xl p-8",
+        "Input fields: bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-vettr-accent/50 focus:ring-1 focus:ring-vettr-accent/20 transition-all",
+        "Submit button: bg-vettr-accent text-vettr-navy font-semibold rounded-xl py-3 hover:bg-vettr-accent/90 transition-colors w-full",
+        "Error messages in text-red-400 text-sm with smooth fade-in",
+        "Loading spinner on submit button (replace text with spinner)",
+        "Link to signup: text-gray-400 hover:text-vettr-accent transition-colors",
+        "VETTR logo with accent first letter: <span class='text-vettr-accent'>V</span>ETTR",
+        "npm run build passes"
+      ],
+      "priority": 3,
+      "passes": false
+    },
+    {
+      "id": "V2-004",
+      "title": "Redesign signup page - matching login quality",
+      "description": "Redesign signup page with same split layout pattern as login, matching form styling.",
+      "acceptanceCriteria": [
+        "Same split layout as login page (branding left, form right)",
+        "Fields: display name, email, password, confirm password",
+        "Same input styling as login (bg-white/5 border-white/10 rounded-xl)",
+        "Password strength indicator bar below password field (red/yellow/green gradient)",
+        "Password match validation with inline error",
+        "Submit button matches login style",
+        "Link to login page",
+        "Loading and error states",
+        "npm run build passes"
+      ],
+      "priority": 4,
+      "passes": false
+    },
+    {
+      "id": "V2-005",
+      "title": "Redesign app shell - professional sidebar navigation",
+      "description": "Completely redesign the main layout with a premium sidebar navigation for desktop and polished bottom bar for mobile. Match the quality of tools like Linear, Vercel Dashboard, or Raycast.",
+      "acceptanceCriteria": [
+        "Desktop sidebar: fixed left, w-64 expanded / w-16 collapsed, bg-vettr-dark border-r border-white/5",
+        "Sidebar header: VETTR logo with accent V, collapse toggle button",
+        "Sidebar nav items: flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-all",
+        "Active nav item: text-white bg-white/5 with left accent border (border-l-2 border-vettr-accent) or bg-vettr-accent/10 text-vettr-accent",
+        "SVG icons for all nav items (not emoji) - use inline SVG with strokeWidth={1.5}",
+        "Sidebar footer: user avatar circle, name, tier badge, logout button",
+        "Mobile bottom bar: fixed bottom, bg-vettr-dark/95 backdrop-blur-lg border-t border-white/5, 5 icons with labels",
+        "Mobile active tab: text-vettr-accent with dot indicator above icon",
+        "Smooth collapse/expand animation on sidebar (200ms ease)",
+        "Main content area: ml-64 (expanded) or ml-16 (collapsed) on desktop, pb-20 on mobile",
+        "npm run build passes"
+      ],
+      "priority": 5,
+      "passes": false
+    },
+    {
+      "id": "V2-006",
+      "title": "Redesign top header bar",
+      "description": "Create a polished top header bar with page title, search shortcut, refresh button, and user dropdown.",
+      "acceptanceCriteria": [
+        "Header: sticky top-0 h-16 bg-vettr-navy/80 backdrop-blur-lg border-b border-white/5 z-40",
+        "Left: page title (text-lg font-semibold text-white)",
+        "Center-right: Cmd+K search pill (bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-gray-500 flex items-center gap-2) showing keyboard shortcut badge",
+        "Right: refresh button (icon only, text-gray-400 hover:text-white), notification bell, user avatar dropdown",
+        "User dropdown: bg-vettr-card border border-white/10 rounded-xl shadow-xl p-1, items with hover:bg-white/5 rounded-lg",
+        "Dropdown items: Profile, Settings, divider line, Sign Out (text-red-400)",
+        "Dropdown shows user email and tier badge at top",
+        "Mobile header: simplified - page title left, user avatar right",
+        "npm run build passes"
+      ],
+      "priority": 6,
+      "passes": false
+    },
+    {
+      "id": "V2-007",
+      "title": "Redesign StockCard component - premium card design",
+      "description": "Completely redesign the StockCard with the vettr-marketing card pattern: subtle transparency, minimal borders, hover glow effect, proper typography hierarchy.",
+      "acceptanceCriteria": [
+        "Card: bg-vettr-card/50 border border-white/5 rounded-2xl p-5 hover:border-vettr-accent/20 hover:bg-vettr-card/80 transition-all duration-300 cursor-pointer group",
+        "Header row: ticker (text-sm font-bold text-vettr-accent) + company name (text-sm text-gray-400 truncate) + favorite star icon (SVG not emoji)",
+        "Price row: price (text-2xl font-bold text-white) + change indicator (text-sm font-medium, green/red with arrow SVG)",
+        "Bottom row: sector chip (bg-white/5 text-xs text-gray-400 rounded-full px-2 py-0.5) + VETTR score badge",
+        "VETTR score: circular ring SVG (not just colored text), score number centered inside ring",
+        "Hover: subtle shadow-lg shadow-vettr-accent/5 glow effect",
+        "Favorite star: SVG icon, filled yellow when favorited, outline when not, with scale animation on click",
+        "Skeleton variant for loading state",
+        "npm run build passes"
+      ],
+      "priority": 7,
+      "passes": false
+    },
+    {
+      "id": "V2-008",
+      "title": "Redesign VetrScoreBadge with SVG ring visualization",
+      "description": "Replace the text-only score badge with a proper SVG circular progress ring that looks premium.",
+      "acceptanceCriteria": [
+        "SVG circle: track ring (stroke white/10), progress ring (stroke colored by score), score text centered",
+        "Colors from Tailwind theme: >=80 accent green, >=60 warning yellow, >=40 orange, <40 error red",
+        "Three sizes: sm (32px), md (48px), lg (64px) with proportional stroke widths",
+        "Animated on mount: ring fills from 0 to target score with smooth CSS transition (1s ease-out)",
+        "Score number uses tabular-nums font variant for consistent width",
+        "Optional label below ring (e.g., 'VETTR Score')",
+        "No hardcoded hex colors - all from Tailwind theme",
+        "npm run build passes"
+      ],
+      "priority": 8,
+      "passes": false
+    },
+    {
+      "id": "V2-009",
+      "title": "Redesign SearchInput and form inputs globally",
+      "description": "Create premium form inputs matching the marketing site style: subtle backgrounds, refined focus states, proper icons.",
+      "acceptanceCriteria": [
+        "SearchInput: bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 with search SVG icon left, clear X button right",
+        "Focus state: border-vettr-accent/40 ring-1 ring-vettr-accent/20 bg-white/[0.07] transition-all",
+        "Placeholder: text-gray-500 (not too bright, not too dim)",
+        "Debounce built-in: 300ms delay on onChange callback",
+        "SelectDropdown: same bg/border styling, custom chevron SVG icon, options dropdown with bg-vettr-card border-white/10 rounded-xl shadow-xl",
+        "Text inputs globally: consistent sizing py-2.5 px-4, text-sm, rounded-xl",
+        "Disabled state: opacity-50 cursor-not-allowed",
+        "All form inputs in the app use these consistent styles",
+        "npm run build passes"
+      ],
+      "priority": 9,
+      "passes": false
+    },
+    {
+      "id": "V2-010",
+      "title": "Redesign Modal component",
+      "description": "Create a premium modal with proper backdrop blur, slide-up animation, and consistent styling.",
+      "acceptanceCriteria": [
+        "Backdrop: bg-black/60 backdrop-blur-sm with fade-in animation",
+        "Modal card: bg-vettr-card border border-white/10 rounded-2xl shadow-2xl max-w-lg w-full mx-4",
+        "Header: px-6 pt-6 pb-0, title text-lg font-semibold text-white, close X button (text-gray-400 hover:text-white rounded-lg hover:bg-white/5 p-1)",
+        "Body: px-6 py-4",
+        "Footer (optional): px-6 pb-6 pt-0, flex justify-end gap-3",
+        "Animation: slide up from bottom + fade in (framer-motion or CSS), 200ms",
+        "Escape key closes, backdrop click closes",
+        "Focus trap inside modal",
+        "Size variants: sm (max-w-sm), md (max-w-lg), lg (max-w-2xl), xl (max-w-4xl)",
+        "npm run build passes"
+      ],
+      "priority": 10,
+      "passes": false
+    },
+    {
+      "id": "V2-011",
+      "title": "Redesign Toast notification system",
+      "description": "Create polished toast notifications with slide-in animations, proper icons, and auto-dismiss.",
+      "acceptanceCriteria": [
+        "Toast container: fixed top-4 right-4 z-50, stacks vertically with gap-2",
+        "Toast card: bg-vettr-card border border-white/10 rounded-xl px-4 py-3 shadow-xl min-w-[320px] flex items-start gap-3",
+        "Variants: success (green check icon + green left border), error (red X icon + red left border), warning (yellow triangle icon + yellow left border), info (blue info icon + blue left border)",
+        "Auto-dismiss after 4s with progress bar at bottom showing time remaining",
+        "Slide-in from right animation (framer-motion), slide-out on dismiss",
+        "Close button: text-gray-500 hover:text-white",
+        "Message: text-sm text-white, optional description in text-gray-400",
+        "Maximum 3 toasts visible, older ones pushed out",
+        "npm run build passes"
+      ],
+      "priority": 11,
+      "passes": false
+    },
+    {
+      "id": "V2-012",
+      "title": "Redesign Pulse (Dashboard) page - professional SaaS dashboard",
+      "description": "Complete redesign of the Pulse dashboard to look like a premium analytics dashboard (Linear/Vercel style). Proper metric cards, data-rich sections, polished charts.",
+      "acceptanceCriteria": [
+        "Page header: 'Market Pulse' title + last updated timestamp (text-sm text-gray-500) + refresh button",
+        "Metric cards row: 4 cards in grid (1 col mobile, 2 tablet, 4 desktop), each card: bg-vettr-card/50 border border-white/5 rounded-2xl p-5",
+        "Each metric card: label (text-xs text-gray-500 uppercase tracking-wider), value (text-2xl font-bold text-white), change indicator (text-sm, green/red with arrow)",
+        "Recent Filings section: proper data table on desktop (not card list), with columns: Type icon, Title, Ticker, Date, Material badge, Status",
+        "Table rows: hover:bg-white/[0.03] transition-colors, subtle border-b border-white/5",
+        "Top VETTR Scores: horizontal card row with VETTR score ring badges, ticker, name, score",
+        "Top Movers: compact list with green/red price changes, sorted by absolute change",
+        "Red Flag Summary: severity breakdown with colored dots (Critical=red, High=orange, Moderate=yellow, Low=gray)",
+        "All sections use consistent section headers: text-lg font-semibold text-white mb-4",
+        "Skeleton loading state matching exact layout shapes",
+        "npm run build passes"
+      ],
+      "priority": 12,
+      "passes": false
+    },
+    {
+      "id": "V2-013",
+      "title": "Redesign Stocks page - professional data table with filters",
+      "description": "Redesign the Stocks page as a proper data-driven table view (default on desktop) with professional filter bar, search, and sorting.",
+      "acceptanceCriteria": [
+        "Filter bar: flex row with SearchInput, sector dropdown, sort dropdown, asc/desc toggle, favorites toggle, view mode toggle (table/card) - all in a single row with bg-vettr-card/30 border border-white/5 rounded-2xl p-3 gap-3",
+        "Desktop default: data table with columns: Ticker, Company, Price, Change%, VETTR Score, Sector, Market Cap, Favorite",
+        "Table header: text-xs text-gray-500 uppercase tracking-wider, sticky, bg-vettr-dark/80 backdrop-blur-sm",
+        "Table rows: border-b border-white/5, hover:bg-white/[0.03] transition-colors, cursor-pointer",
+        "Sortable columns: click header to sort, show sort arrow indicator",
+        "Active sort column header in text-white (not gray)",
+        "VETTR Score in table: small SVG ring badge (sm size)",
+        "Price change: colored text with arrow (green up, red down)",
+        "Favorite star: SVG, click toggles without row navigation",
+        "Mobile: card grid layout (2 columns on small mobile, 1 on very small)",
+        "Pagination: 'Load More' button at bottom (bg-white/5 border border-white/10 rounded-xl hover:bg-white/10)",
+        "Result count: 'Showing 25 of 50 stocks' text-sm text-gray-500",
+        "npm run build passes"
+      ],
+      "priority": 13,
+      "passes": false
+    },
+    {
+      "id": "V2-014",
+      "title": "Redesign Stock Detail page - Overview tab",
+      "description": "Redesign stock detail as a premium analytics page with proper header, metrics grid, and chart.",
+      "acceptanceCriteria": [
+        "Breadcrumb: Stocks > {Ticker} - text-sm text-gray-500 links",
+        "Stock header: large area with company name (text-2xl font-bold), ticker badge (bg-vettr-accent/10 text-vettr-accent rounded-lg px-2 py-0.5 text-sm font-mono), exchange badge, sector chip",
+        "Price display: text-4xl font-bold text-white + change in colored text (text-lg) + change % in parentheses",
+        "Action buttons: favorite star SVG + share icon + more menu - all in icon button group (bg-white/5 rounded-xl p-2 hover:bg-white/10)",
+        "VETTR Score card: large SVG ring (lg size), component breakdown bars below it, each bar labeled",
+        "Score trend indicator: arrow + 'Improving/Stable/Declining' text next to score",
+        "Key Metrics grid: 2x2 on mobile, 4-column on desktop, each metric in subtle card (bg-white/[0.03] rounded-xl p-4)",
+        "VETTR Score history chart: Recharts line chart with proper dark theme (grid lines white/5, tooltip with bg-vettr-card)",
+        "Time range pills: 1M 3M 6M 12M 24M as pill buttons (bg-white/5 rounded-lg, active: bg-vettr-accent/10 text-vettr-accent)",
+        "Recent Filings: compact table showing last 5 filings",
+        "Peer Comparison section: horizontal bar chart of sector peers",
+        "Tab navigation: 3 tabs (Overview, Pedigree, Red Flags) with bottom border indicator (not colored background)",
+        "Active tab: text-white border-b-2 border-vettr-accent, inactive: text-gray-500 hover:text-gray-300",
+        "npm run build passes"
+      ],
+      "priority": 14,
+      "passes": false
+    },
+    {
+      "id": "V2-015",
+      "title": "Redesign Stock Detail - Pedigree (Executives) tab",
+      "description": "Redesign executive list with premium cards showing career quality indicators.",
+      "acceptanceCriteria": [
+        "Search + filter bar: same styling as Stocks page filter bar",
+        "Desktop: responsive grid of executive cards (2 cols tablet, 3 cols desktop)",
+        "Executive card: bg-vettr-card/50 border border-white/5 rounded-2xl p-5 hover:border-vettr-accent/20 transition-all",
+        "Card header: initials avatar (bg-gradient-to-br from-vettr-accent/20 to-vettr-accent/5 rounded-full w-12 h-12 flex items-center justify-center text-vettr-accent font-semibold) + name (font-semibold text-white) + title (text-sm text-gray-400)",
+        "Metrics row: tenure years, total experience, specialization badge (bg-white/5 rounded-full px-2 py-0.5 text-xs)",
+        "Tenure risk indicator: colored dot + label (green='Stable', yellow='Watch', red='Flight Risk')",
+        "Click card opens ExecutiveDetail modal",
+        "Empty state: professional empty state with icon and message",
+        "npm run build passes"
+      ],
+      "priority": 15,
+      "passes": false
+    },
+    {
+      "id": "V2-016",
+      "title": "Redesign Stock Detail - Red Flags tab",
+      "description": "Redesign red flags tab with premium visualization of risk scores and flag breakdown.",
+      "acceptanceCriteria": [
+        "Overall score: large circular SVG ring with score centered, color coded by severity",
+        "Score label below ring: 'Red Flag Score' text-sm text-gray-500",
+        "Flag breakdown: 5 horizontal progress bars in a vertical list, each with: label (text-sm text-gray-400), weight% (text-xs text-gray-500), progress bar (bg-white/5 rounded-full h-2, fill uses severity color), score value right-aligned",
+        "Detected flags list: each flag in a card (bg-white/[0.03] border border-white/5 rounded-xl p-4), with icon, name (font-medium text-white), severity badge (rounded-full px-2 py-0.5 text-xs), explanation (text-sm text-gray-400)",
+        "Severity colors: Critical=bg-red-500/10 text-red-400, High=bg-orange-500/10 text-orange-400, Moderate=bg-yellow-500/10 text-yellow-400, Low=bg-gray-500/10 text-gray-400",
+        "Acknowledge button on each flag: text-xs text-gray-500 hover:text-vettr-accent",
+        "Acknowledge All button: bg-white/5 border border-white/10 rounded-xl",
+        "Flag history timeline: vertical timeline with dates and flag entries",
+        "npm run build passes"
+      ],
+      "priority": 16,
+      "passes": false
+    },
+    {
+      "id": "V2-017",
+      "title": "Redesign Filing Detail page",
+      "description": "Redesign filing detail as a clean document-style view with related stock sidebar.",
+      "acceptanceCriteria": [
+        "Breadcrumb: Filings > {Title}",
+        "Filing header: type icon (colored SVG), title (text-xl font-semibold), status badge (Read/Unread)",
+        "Meta row: ticker link, date filed, material indicator badge",
+        "Summary section: bg-vettr-card/30 border border-white/5 rounded-2xl p-6, text-gray-300 leading-relaxed",
+        "Details grid: Type, Date Filed, Material (Yes/No with colored badge), Status - in 2x2 grid of subtle metric cards",
+        "Related Stock sidebar (desktop) or bottom card (mobile): stock card with price, change, VETTR score",
+        "Auto-mark as read on view",
+        "npm run build passes"
+      ],
+      "priority": 17,
+      "passes": false
+    },
+    {
+      "id": "V2-018",
+      "title": "Redesign Discovery page",
+      "description": "Redesign Discovery as a polished browse/explore interface with search, sector filters, and curated sections.",
+      "acceptanceCriteria": [
+        "Hero search: large search input at top (py-3 text-lg) with subtle glow focus effect",
+        "Sector filter pills: horizontal scroll of pills (bg-white/5 border border-white/10 rounded-full px-4 py-1.5 text-sm), active: bg-vettr-accent/10 border-vettr-accent/30 text-vettr-accent",
+        "Featured Stocks: horizontal scroll of StockCards (redesigned V2-007), with smooth CSS snap scrolling",
+        "Recent Filings: table on desktop, cards on mobile, matching Pulse page filing table style",
+        "Section headers: text-lg font-semibold text-white with 'View All' link (text-sm text-vettr-accent hover:text-vettr-accent/80)",
+        "Smooth section transitions",
+        "npm run build passes"
+      ],
+      "priority": 18,
+      "passes": false
+    },
+    {
+      "id": "V2-019",
+      "title": "Redesign Alerts page",
+      "description": "Redesign alerts page with professional rule management UI.",
+      "acceptanceCriteria": [
+        "Recent Triggers section: compact card list with icon, ticker link, alert type, timestamp (relative: '2h ago')",
+        "My Rules section: filter tabs (Active/Inactive/All) as pill buttons",
+        "Rule cards on mobile, table on desktop",
+        "Rule table columns: Stock, Type, Condition, Frequency, Status toggle, Actions (edit/delete icons)",
+        "Toggle switch: proper styled toggle (bg-white/10 when off, bg-vettr-accent when on, smooth transition)",
+        "Create new rule: prominent button (bg-vettr-accent text-vettr-navy rounded-xl px-4 py-2.5 font-medium)",
+        "Delete confirmation: modal with red-themed warning",
+        "Empty state: professional with bell icon and 'No alert rules yet' message + CTA button",
+        "npm run build passes"
+      ],
+      "priority": 19,
+      "passes": false
+    },
+    {
+      "id": "V2-020",
+      "title": "Redesign Alert Rule Creator modal",
+      "description": "Redesign the multi-step alert creator as a polished wizard in a large modal.",
+      "acceptanceCriteria": [
+        "Large modal (max-w-2xl)",
+        "Step indicator: horizontal dots with connecting lines, active step filled with accent color",
+        "Step 1 - Stock: search input with live results dropdown, selected stock shown as chip",
+        "Step 2 - Type: grid of type cards (bg-white/5 border border-white/10 rounded-xl p-4), selected: border-vettr-accent bg-vettr-accent/5",
+        "Step 3 - Condition: contextual form fields based on type selection",
+        "Step 4 - Frequency: radio buttons styled as cards",
+        "Step 5 - Review: summary of all selections in a clean list",
+        "Footer: Back + Next/Create buttons, disabled state when incomplete",
+        "Smooth step transitions (slide left/right)",
+        "npm run build passes"
+      ],
+      "priority": 20,
+      "passes": false
+    },
+    {
+      "id": "V2-021",
+      "title": "Redesign Profile page",
+      "description": "Redesign profile as a clean settings-style page with grouped sections.",
+      "acceptanceCriteria": [
+        "User header: large initials avatar (w-16 h-16 bg-gradient-to-br from-vettr-accent/20 to-vettr-accent/5 rounded-full), display name (text-xl font-semibold), email (text-gray-400), tier badge (bg-vettr-accent/10 text-vettr-accent rounded-full px-3 py-0.5 text-xs font-medium)",
+        "Account section: card with subscription info (plan, watchlist limit, stocks tracked)",
+        "Data section: card with favorites count, last sync, clear cache button",
+        "Help section: card with links to Glossary, FAQ (each as a row with icon + label + chevron right)",
+        "About section: version, Terms, Privacy, Contact (same row pattern)",
+        "Sign Out: text-red-400 hover:text-red-300 button at bottom, with confirmation modal",
+        "Each section grouped in bg-vettr-card/30 border border-white/5 rounded-2xl overflow-hidden",
+        "Section items separated by border-b border-white/5",
+        "npm run build passes"
+      ],
+      "priority": 21,
+      "passes": false
+    },
+    {
+      "id": "V2-022",
+      "title": "Redesign Settings page",
+      "description": "Redesign settings with grouped toggles and proper form styling.",
+      "acceptanceCriteria": [
+        "Back arrow + 'Settings' title in header",
+        "Notification section: grouped card with toggle rows",
+        "Each toggle row: icon (SVG, colored) + label (text-sm font-medium) + description (text-xs text-gray-500) + toggle switch right-aligned",
+        "Toggle switch: w-11 h-6 rounded-full, bg-white/10 off, bg-vettr-accent on, white circle thumb with transition",
+        "Alert Preferences: Red Flag (red icon), Financing (yellow), Drill Results (blue), Management (purple) toggles",
+        "Appearance section: theme selector (Dark/Light/System) as 3 option cards",
+        "Default sort: dropdown selector",
+        "Save indication: auto-save with subtle 'Saved' toast or checkmark animation",
+        "npm run build passes"
+      ],
+      "priority": 22,
+      "passes": false
+    },
+    {
+      "id": "V2-023",
+      "title": "Redesign Glossary page",
+      "description": "Redesign glossary as a clean, searchable reference page.",
+      "acceptanceCriteria": [
+        "Back arrow + 'Glossary' title",
+        "Search input at top to filter terms",
+        "Alphabetical section headers (A, B, C...) as sticky dividers",
+        "Each term: card row with term name (font-medium text-white) and definition (text-sm text-gray-400)",
+        "Expandable/collapsible with smooth height animation",
+        "Matching card style: bg-vettr-card/30 border border-white/5 rounded-xl",
+        "npm run build passes"
+      ],
+      "priority": 23,
+      "passes": false
+    },
+    {
+      "id": "V2-024",
+      "title": "Redesign FAQ page",
+      "description": "Redesign FAQ with professional accordion styling.",
+      "acceptanceCriteria": [
+        "Back arrow + 'FAQ' title",
+        "Search input to filter questions",
+        "Accordion items: border-b border-white/5, question row clickable with chevron rotation",
+        "Question: text-sm font-medium text-white",
+        "Answer: text-sm text-gray-400 leading-relaxed, with smooth height expansion animation",
+        "Chevron SVG rotates 180deg when open",
+        "npm run build passes"
+      ],
+      "priority": 24,
+      "passes": false
+    },
+    {
+      "id": "V2-025",
+      "title": "Redesign Quick Search overlay (Cmd+K)",
+      "description": "Redesign as a premium spotlight-style search overlay like Linear or Raycast.",
+      "acceptanceCriteria": [
+        "Overlay: centered, max-w-xl, bg-vettr-card border border-white/10 rounded-2xl shadow-2xl overflow-hidden",
+        "Backdrop: bg-black/60 backdrop-blur-sm",
+        "Search input: border-b border-white/5 px-5 py-4 text-lg bg-transparent, no border around input, focus: no ring",
+        "Search icon: text-gray-500 left of input",
+        "Results: scrollable list, max-h-80",
+        "Each result: px-5 py-3 flex items-center gap-3 hover:bg-white/5 cursor-pointer",
+        "Result: ticker (font-mono text-vettr-accent text-sm), company name (text-white), price + change right-aligned",
+        "Arrow key navigation: selected result gets bg-white/5 highlight",
+        "Enter navigates to selected stock",
+        "Empty state: 'No results found' centered gray text",
+        "Recent searches when input empty: 'Recent' header + list",
+        "Footer: keyboard hints (↑↓ Navigate, ↵ Open, Esc Close) in text-xs text-gray-600",
+        "npm run build passes"
+      ],
+      "priority": 25,
+      "passes": false
+    },
+    {
+      "id": "V2-026",
+      "title": "Redesign ExecutiveDetail modal",
+      "description": "Redesign executive detail as a polished profile modal.",
+      "acceptanceCriteria": [
+        "Large modal (max-w-2xl)",
+        "Header: large initials avatar (w-16 h-16 gradient), name (text-xl font-semibold), title, company",
+        "Metrics row: tenure, total experience, specialization - each in mini metric card",
+        "Career Timeline: vertical timeline with dots and connecting line (border-l-2 border-white/10), each entry has company, role, years",
+        "Education section if available",
+        "Tenure Assessment: colored badge with risk level explanation",
+        "Social links: LinkedIn/Twitter as icon buttons (bg-white/5 rounded-lg p-2 hover:bg-white/10)",
+        "Share button in header",
+        "npm run build passes"
+      ],
+      "priority": 26,
+      "passes": false
+    },
+    {
+      "id": "V2-027",
+      "title": "Redesign VetrScoreDetail modal",
+      "description": "Redesign VETTR score breakdown modal with premium visualization.",
+      "acceptanceCriteria": [
+        "Large modal with overall score prominently at top (large SVG ring, centered)",
+        "Component breakdown: 5 rows, each with label, visual bar (rounded-full h-2), score value",
+        "Bar colors match component (Pedigree=blue, Filing=purple, Red Flag=red, Growth=green, Governance=yellow)",
+        "Bonus/Penalty section: green +items, red -items",
+        "Methodology explanation at bottom in collapsible section",
+        "Professional spacing and typography throughout",
+        "npm run build passes"
+      ],
+      "priority": 27,
+      "passes": false
+    },
+    {
+      "id": "V2-028",
+      "title": "Redesign Onboarding flow",
+      "description": "Redesign onboarding as a polished full-screen walkthrough.",
+      "acceptanceCriteria": [
+        "Full-screen overlay with bg-vettr-navy/95 backdrop-blur-lg",
+        "Centered content card: max-w-lg",
+        "Each slide: icon/illustration at top (large SVG, colored), title (text-2xl font-bold), description (text-gray-400 text-center)",
+        "Progress dots at bottom: filled dot for current/completed, outline for remaining",
+        "Next/Previous buttons: styled consistently, Skip button: text-gray-500",
+        "Smooth horizontal slide transition between steps",
+        "Final slide: 'Get Started' CTA button in accent green",
+        "npm run build passes"
+      ],
+      "priority": 28,
+      "passes": false
+    },
+    {
+      "id": "V2-029",
+      "title": "Redesign FeedbackForm modal",
+      "description": "Redesign feedback form as a clean modal with proper form styling.",
+      "acceptanceCriteria": [
+        "Modal with category selector as card options (Bug/Feature/General)",
+        "Selected category: border-vettr-accent bg-vettr-accent/5",
+        "Message textarea: same input styling, min-h-[120px]",
+        "Optional email input",
+        "Submit button: accent green, loading state",
+        "Success state: checkmark animation + 'Thank you!' message",
+        "npm run build passes"
+      ],
+      "priority": 29,
+      "passes": false
+    },
+    {
+      "id": "V2-030",
+      "title": "Fix and polish dark/light mode toggle",
+      "description": "Fix ThemeContext to properly support dark/light/system modes. Remove forced dark mode. Implement light mode colors.",
+      "acceptanceCriteria": [
+        "ThemeContext reads preference from localStorage on mount (not hardcoded to dark)",
+        "Three mode options: Dark, Light, System",
+        "System mode uses prefers-color-scheme media query listener",
+        "Dark mode: existing navy/green palette",
+        "Light mode: white/gray backgrounds, dark text, same accent green, appropriate contrast",
+        "Light mode card backgrounds: bg-white border-gray-200",
+        "Light mode text: text-gray-900 primary, text-gray-600 secondary",
+        "Smooth transition between themes (transition-colors duration-200 on body)",
+        "Theme toggle in Settings page works correctly",
+        "All components adapt properly to both themes via Tailwind dark: prefix",
+        "npm run build passes"
+      ],
+      "priority": 30,
+      "passes": false
+    },
+    {
+      "id": "V2-031",
+      "title": "Replace all emoji icons with proper SVG icons",
+      "description": "Replace every emoji character used as an icon (★, ☆, →, ←, 🚩, etc.) with proper inline SVG icons for cross-browser consistency.",
+      "acceptanceCriteria": [
+        "Create src/components/icons/ directory with reusable SVG icon components",
+        "Icons needed: Star, StarFilled, ChevronRight, ChevronDown, ChevronLeft, ArrowUp, ArrowDown, Search, X, Bell, User, Settings, LogOut, Share, Refresh, Plus, Edit, Trash, Check, AlertTriangle, Flag, Filter, Grid, Table, ExternalLink, Menu, Pulse/ChartLine, Compass/Discovery",
+        "Each icon: SVG with viewBox, stroke='currentColor', strokeWidth={1.5}, w/h via className",
+        "Replace ALL emoji usage in Navigation, StockCard, VetrScoreBadge, Header, and all other components",
+        "Icons inherit color from parent text color",
+        "npm run build passes"
+      ],
+      "priority": 31,
+      "passes": false
+    },
+    {
+      "id": "V2-032",
+      "title": "Add proper loading/auth state on app mount",
+      "description": "Show a loading screen while checking auth state on app mount to prevent flash of login page for authenticated users.",
+      "acceptanceCriteria": [
+        "AuthContext has isLoading state that starts as true",
+        "On mount, check localStorage for tokens, validate with /users/me endpoint",
+        "While isLoading: show full-screen loading with VETTR logo and subtle pulse animation",
+        "Loading screen: bg-vettr-navy, centered VETTR logo (text-3xl font-bold), animated accent dot pulsing",
+        "If tokens valid: set user state, navigate to requested page",
+        "If tokens invalid/missing: redirect to /login",
+        "No flash of wrong page content during auth check",
+        "npm run build passes"
+      ],
+      "priority": 32,
+      "passes": false
+    },
+    {
+      "id": "V2-033",
+      "title": "Fix Recharts theme integration",
+      "description": "Fix all Recharts charts to use Tailwind theme colors via CSS variables instead of hardcoded hex values.",
+      "acceptanceCriteria": [
+        "VETTR Score History chart: line stroke uses CSS variable for accent green",
+        "Chart grid lines: stroke white/5 (not hardcoded hex)",
+        "Chart tooltip: bg-vettr-card border border-white/10 rounded-lg shadow-xl, text-white",
+        "Chart axis labels: fill text-gray-500 (not hardcoded)",
+        "Peer comparison bar chart: same theming",
+        "Chart responsive: uses ResponsiveContainer with 100% width",
+        "Chart area gradient fill below line: from accent/20 to transparent",
+        "Create src/lib/chart-theme.ts with reusable chart color/style constants from Tailwind theme",
+        "npm run build passes"
+      ],
+      "priority": 33,
+      "passes": false
+    },
+    {
+      "id": "V2-034",
+      "title": "Fix table sticky header interaction with page header",
+      "description": "Fix data tables so their sticky headers account for the fixed page header height.",
+      "acceptanceCriteria": [
+        "Stock detail tab navigation: sticky top-16 (accounts for h-16 header)",
+        "FilingTable sticky header: top calculated to account for header (top-16)",
+        "ExecutiveTable sticky header: same fix",
+        "Stocks page table header: sticky below filter bar",
+        "No double header visual stacking issues",
+        "Z-index layering correct: header z-50, tab nav z-30, table header z-20",
+        "npm run build passes"
+      ],
+      "priority": 34,
+      "passes": false
+    },
+    {
+      "id": "V2-035",
+      "title": "Add proper empty states across all pages",
+      "description": "Create polished empty states with relevant icons, messages, and CTAs for every data-driven view.",
+      "acceptanceCriteria": [
+        "EmptyState component redesigned: centered layout, SVG icon (64px, text-gray-600), title (text-lg font-medium text-gray-400), description (text-sm text-gray-500), optional CTA button",
+        "Stocks page empty (no matches): search icon + 'No stocks match your filters' + 'Clear filters' button",
+        "Alerts empty: bell icon + 'No alert rules yet' + 'Create your first alert' CTA",
+        "Filings empty: document icon + 'No filings found'",
+        "Executives empty: users icon + 'No executives found for this stock'",
+        "Red flags empty: shield-check icon + 'No red flags detected' (positive messaging with green tint)",
+        "Watchlist empty: star icon + 'No favorites yet' + 'Browse stocks' CTA",
+        "npm run build passes"
+      ],
+      "priority": 35,
+      "passes": false
+    },
+    {
+      "id": "V2-036",
+      "title": "Improve skeleton loading screens to match redesigned layouts",
+      "description": "Update all skeleton screens to match the new V2 page layouts exactly.",
+      "acceptanceCriteria": [
+        "Pulse skeleton: 4 metric card rectangles, table rows for filings, horizontal score card placeholders",
+        "Stocks skeleton: filter bar placeholder, table rows (matching column widths)",
+        "Stock Detail skeleton: breadcrumb line, header area, score ring placeholder, metrics grid, chart area",
+        "Discovery skeleton: large search bar, filter pills row, stock card grid, filing rows",
+        "Alerts skeleton: trigger card placeholders, rule row placeholders",
+        "Profile skeleton: avatar circle, name/email lines, section card placeholders",
+        "All skeletons use bg-white/5 rounded-xl with animate-pulse",
+        "Skeleton shapes closely match actual content shapes for seamless transition",
+        "npm run build passes"
+      ],
+      "priority": 36,
+      "passes": false
+    },
+    {
+      "id": "V2-037",
+      "title": "Fix responsive layout issues at all breakpoints",
+      "description": "Audit and fix layout issues at mobile (375px), tablet (768px), small desktop (1024px), and large desktop (1440px).",
+      "acceptanceCriteria": [
+        "375px: all content fits without horizontal scroll, bottom nav visible, single column layouts",
+        "768px: sidebar appears (collapsed by default), 2-column grids, tables scroll horizontally if needed",
+        "1024px: sidebar expanded, proper multi-column layouts, data tables fully visible",
+        "1440px: content max-width contained (max-w-7xl or similar), not stretched edge-to-edge",
+        "Stock detail tabs don't overflow on any viewport",
+        "Filter bars wrap properly on narrow viewports",
+        "Charts resize correctly at all breakpoints",
+        "Modals don't overflow viewport on mobile",
+        "npm run build passes"
+      ],
+      "priority": 37,
+      "passes": false
+    },
+    {
+      "id": "V2-038",
+      "title": "Add subtle background gradients and depth",
+      "description": "Add the marketing site's subtle background gradient technique to create visual depth across the app.",
+      "acceptanceCriteria": [
+        "Main layout: subtle radial gradient glow in top-right corner (rgba(0,230,118,0.04) green) and bottom-left (rgba(68,138,255,0.03) blue)",
+        "Gradients positioned absolutely behind content, do not interfere with layout",
+        "Login/signup pages: more pronounced gradient (0.08 opacity) for dramatic effect",
+        "Dashboard cards: subtle bottom gradient fade from transparent to bg-vettr-navy for depth",
+        "Sidebar: linear gradient from vettr-dark to slightly darker at bottom",
+        "Gradients respect dark/light mode",
+        "npm run build passes"
+      ],
+      "priority": 38,
+      "passes": false
+    },
+    {
+      "id": "V2-039",
+      "title": "Polish hover states and micro-interactions throughout",
+      "description": "Add consistent, polished hover states to all interactive elements following the marketing site patterns.",
+      "acceptanceCriteria": [
+        "All cards: hover:border-vettr-accent/20 hover:bg-vettr-card/80 transition-all duration-300",
+        "All links: hover:text-vettr-accent transition-colors",
+        "All icon buttons: hover:bg-white/5 rounded-lg transition-colors",
+        "Table rows: hover:bg-white/[0.03] transition-colors",
+        "Dropdown items: hover:bg-white/5 transition-colors",
+        "Sidebar nav items: hover:bg-white/5 hover:text-white transition-all",
+        "Button press: active:scale-[0.98] for tactile feedback",
+        "Focus rings: focus-visible:ring-2 focus-visible:ring-vettr-accent/30 focus-visible:outline-none on all focusable elements",
+        "No double hover effects (e.g., card hover + internal button hover conflicting)",
+        "npm run build passes"
+      ],
+      "priority": 39,
+      "passes": false
+    },
+    {
+      "id": "V2-040",
+      "title": "Fix Framer Motion animations for performance",
+      "description": "Review and optimize all Framer Motion animations. Ensure they use GPU-accelerated properties and respect prefers-reduced-motion.",
+      "acceptanceCriteria": [
+        "Page transitions: simple opacity fade (0.15s), not heavy slide animations",
+        "Modal: animate y from 10px to 0 + opacity (not full slide from bottom of screen)",
+        "Toast: animate x from 20px to 0 + opacity (slide from right)",
+        "Tab content: opacity fade only (no horizontal slide which causes layout shift)",
+        "Score ring: CSS transition on stroke-dashoffset (not framer-motion) for performance",
+        "All animations use transform and opacity only (GPU accelerated)",
+        "prefers-reduced-motion: opacity transitions only, no movement",
+        "Animation durations: 150-300ms max, no slow animations",
+        "npm run build passes"
+      ],
+      "priority": 40,
+      "passes": false
+    },
+    {
+      "id": "V2-041",
+      "title": "Fix accessibility issues",
+      "description": "Fix WCAG 2.1 AA compliance issues identified in the audit.",
+      "acceptanceCriteria": [
+        "All icon-only buttons have aria-label",
+        "Tab navigation (stock detail) has proper role='tablist', role='tab', aria-selected, keyboard arrow key navigation",
+        "Toggle switches have proper role='switch' and aria-checked",
+        "Color contrast: text-gray-400 on dark backgrounds meets 4.5:1 ratio (upgrade to text-gray-300 where needed)",
+        "Focus indicators visible: focus-visible:ring-2 on all interactive elements",
+        "Skip to main content link at top of page",
+        "Form inputs have visible labels or proper aria-label",
+        "Charts have aria-label describing the data",
+        "npm run build passes"
+      ],
+      "priority": 41,
+      "passes": false
+    },
+    {
+      "id": "V2-042",
+      "title": "Add proper error boundary pages",
+      "description": "Ensure error.tsx and not-found.tsx pages match the V2 design quality.",
+      "acceptanceCriteria": [
+        "404 page: centered content, large '404' text (text-6xl font-bold text-white/10), message, 'Go Home' button in accent green",
+        "Error page: centered, error icon (SVG), 'Something went wrong' title, description, 'Try Again' button + 'Go Home' link",
+        "Stock not-found: 'Stock not found' with ticker shown, 'Browse Stocks' CTA",
+        "Error boundary wraps (main) layout",
+        "All styled consistently with V2 design system",
+        "npm run build passes"
+      ],
+      "priority": 42,
+      "passes": false
+    },
+    {
+      "id": "V2-043",
+      "title": "Optimize API client with request deduplication and timeouts",
+      "description": "Fix API client issues: add request timeout, deduplication, and better error handling.",
+      "acceptanceCriteria": [
+        "Add 30-second fetch timeout using AbortController",
+        "Request deduplication: same URL+method within 100ms returns same promise",
+        "Better error messages: 'Unable to connect' for network errors, 'Server error' for 500s, 'Not found' for 404s",
+        "Rate limit retry: non-blocking (don't freeze UI), show toast with countdown",
+        "Token refresh: mutex to prevent multiple simultaneous refresh calls",
+        "Add request/response interceptor pattern for extensibility",
+        "npm run build passes"
+      ],
+      "priority": 43,
+      "passes": false
+    },
+    {
+      "id": "V2-044",
+      "title": "Add proper URL state management for all filterable pages",
+      "description": "Ensure search, sort, and filter state syncs with URL query params on all pages.",
+      "acceptanceCriteria": [
+        "Stocks page: ?q=, ?sort=, ?order=, ?favorites=, ?view= in URL",
+        "Discovery page: ?q=, ?sector= in URL",
+        "Alerts page: ?filter= in URL",
+        "Stock detail: ?tab= in URL (overview/pedigree/red-flags)",
+        "All URL params debounced (300ms for search, immediate for dropdowns)",
+        "Browser back/forward correctly restores filter state",
+        "Direct URL navigation with params works (bookmarkable)",
+        "npm run build passes"
+      ],
+      "priority": 44,
+      "passes": false
+    },
+    {
+      "id": "V2-045",
+      "title": "Add data export CSV functionality",
+      "description": "Add export buttons that download filtered data as CSV files.",
+      "acceptanceCriteria": [
+        "Stocks page: 'Export' button in filter bar, exports currently filtered/sorted stocks",
+        "CSV columns: Ticker, Company, Price, Change%, VETTR Score, Sector, Market Cap",
+        "Filename format: vettr-stocks-YYYY-MM-DD.csv",
+        "Uses client-side CSV generation (no server required)",
+        "Button shows download icon + 'Export' text",
+        "Toast notification: 'Downloaded vettr-stocks-2026-02-12.csv'",
+        "npm run build passes"
+      ],
+      "priority": 45,
+      "passes": false
+    },
+    {
+      "id": "V2-046",
+      "title": "Add print styles for stock detail page",
+      "description": "Add CSS print styles so stock detail prints as a clean report.",
+      "acceptanceCriteria": [
+        "@media print styles in globals.css",
+        "Hide: sidebar, header, bottom nav, action buttons, tab navigation",
+        "Show: stock info, VETTR score, metrics, filings, executives in clean layout",
+        "Remove dark backgrounds for printing (white background, dark text)",
+        "Print button on stock detail page (printer SVG icon)",
+        "Page breaks between major sections",
+        "npm run build passes"
+      ],
+      "priority": 46,
+      "passes": false
+    },
+    {
+      "id": "V2-047",
+      "title": "Configure Vercel deployment with environment variables",
+      "description": "Ensure vercel.json is configured correctly and environment variables are set for production.",
+      "acceptanceCriteria": [
+        "vercel.json exists with proper Next.js configuration",
+        "NEXT_PUBLIC_API_URL environment variable documented",
+        ".env.local.example updated with all required variables",
+        "Build output clean: no warnings about missing env vars",
+        "Image optimization configured for external domains if needed",
+        "Headers configured: X-Frame-Options, Content-Security-Policy basics",
+        "npm run build passes with zero warnings"
+      ],
+      "priority": 47,
+      "passes": false
+    },
+    {
+      "id": "V2-048",
+      "title": "Add Vercel Analytics and Speed Insights",
+      "description": "Integrate Vercel performance monitoring.",
+      "acceptanceCriteria": [
+        "@vercel/analytics installed and component added to root layout",
+        "@vercel/speed-insights installed and component added to root layout",
+        "Both render only in production (not dev)",
+        "npm run build passes"
+      ],
+      "priority": 48,
+      "passes": false
+    },
+    {
+      "id": "V2-049",
+      "title": "End-to-end verification of all pages and flows",
+      "description": "Verify every page renders correctly, all API connections work, auth flow works, and no console errors.",
+      "acceptanceCriteria": [
+        "Login flow: enter email/password, submit, redirects to /pulse with valid session",
+        "Signup flow: enter details, submit, redirects to /pulse",
+        "Pulse page: loads with real data from production API, all sections render",
+        "Discovery page: search works, sector filters work, stocks and filings load",
+        "Stocks page: table view renders, search filters, sort works, favorites toggle works",
+        "Stock detail: all 3 tabs render (Overview with chart, Pedigree with executives, Red Flags with scores)",
+        "Filing detail: renders with related stock, marks as read",
+        "Alerts: rules load, create/edit/toggle/delete work",
+        "Profile: user info displays, sign out works",
+        "Settings: toggles work, theme switch works",
+        "Quick search (Cmd+K): opens, searches, navigates",
+        "Responsive: test at 375px, 768px, 1024px, 1440px",
+        "No console errors on any page",
+        "npm run build passes with zero warnings"
+      ],
+      "priority": 49,
+      "passes": false
+    },
+    {
+      "id": "V2-050",
+      "title": "Final cleanup: remove dead code, fix lint, verify production build",
+      "description": "Final pass to ensure production-ready quality.",
+      "acceptanceCriteria": [
+        "npm run lint passes with zero warnings",
+        "npm run build passes with zero warnings",
+        "No unused imports or variables",
+        "No console.log statements (use proper error handling instead)",
+        "No TODO comments left unresolved",
+        "No 'any' TypeScript types",
+        "No hardcoded hex colors (all from Tailwind theme)",
+        "No emoji used as icons (all SVG)",
+        "Package.json name and version correct",
+        "README.md updated with V2 changes"
+      ],
+      "priority": 50,
+      "passes": false
+    }
+  ]
+}
