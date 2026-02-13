@@ -719,3 +719,52 @@ Files modified:
 - ShareIcon component provides consistency for share buttons across app
 - PlusIcon better than text "+" for create buttons and FAB
 ---
+
+## V2-020: Redesign Alert Rule Creator modal
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Completely redesigned AlertRuleCreator modal with premium V2 design system
+- Replaced emoji icons with proper SVG icon components (FlagIcon, dollar icon, users icon, chart icon, drill icon)
+- Updated ALERT_TYPES array to use IconComponent and iconColor instead of emoji strings
+- Redesigned step indicator: horizontal dots with connecting lines (active step has pulsing animation)
+- Active step dot uses bg-vettr-accent, inactive uses bg-white/10, connecting lines animate color
+- Modal backdrop: bg-black/60 backdrop-blur-sm for consistency with V2 modals
+- Modal card: bg-vettr-card border border-white/10 rounded-2xl shadow-2xl
+- Header: close button uses XIcon component with hover:bg-white/5 rounded-lg styling
+- Step content sections: added fade-in animation (animate-in fade-in duration-200) for smooth transitions
+- Stock search results: updated card styling to bg-white/5 border-white/10 rounded-xl with hover:border-vettr-accent/30
+- Ticker displays with font-mono text-vettr-accent for consistent monospace appearance
+- Alert type selection: grid of cards with colored SVG icons, hover:bg-vettr-accent/5 hover:border-vettr-accent
+- ChevronRightIcon added to type selection cards for visual affordance
+- Condition configuration: input and SelectDropdown styling updated to V2 tokens
+- Info cards for alert types without conditions: bg-white/5 border-white/10 rounded-xl
+- Frequency selection: cards styled with bg-vettr-accent/10 border-vettr-accent when selected
+- CheckCircleIcon replaces checkmark SVG for selected frequency
+- Review step: summary cards use bg-white/[0.03] border-white/10 rounded-xl (subtle card-in-card effect)
+- Section labels: text-xs text-gray-500 uppercase tracking-wider for consistent label styling
+- Info banner: bg-vettr-accent/10 border-vettr-accent/30 rounded-xl with proper V2 icon
+- Footer buttons: Back/Cancel in text-gray-400, Next/Create in bg-vettr-accent text-vettr-navy rounded-xl
+- Delete button: bg-red-500 text-white rounded-xl (not generic error token)
+- Delete confirmation modal: bg-vettr-card border-white/10 rounded-2xl with V2 button styling
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/components/AlertRuleCreator.tsx
+
+**Learnings for future iterations:**
+- Step indicators work better as horizontal dots (w-3 h-3) with connecting lines than numbered circles
+- Active step dot animation (animate-ping) provides visual feedback of current position
+- Each step content should have fade-in animation for smooth transitions between steps
+- Alert type icons as functional components (IconComponent) allow colored rendering with text-{color} classes
+- Type selection cards benefit from colored SVG icons (not emoji) for professional appearance
+- Review step should use subtle nested cards (bg-white/[0.03]) within main content area
+- Frequency selection works well as card-style radio buttons (not traditional radio inputs)
+- CheckCircleIcon provides better visual indication than checkmark path for selected state
+- Footer should remain sticky with bg-vettr-card (not transparent) for clear separation
+- Delete button should use bg-red-500 directly (not generic error token) for red-themed actions
+- All old design tokens replaced: bg-primaryLight → bg-vettr-card, text-textPrimary → text-white, text-textSecondary → text-gray-400, text-textMuted → text-gray-500, border-border → border-white/10, bg-surface → bg-white/5, bg-accent → bg-vettr-accent, text-accent → text-vettr-accent, bg-error → bg-red-500
+- Modal max-w-2xl provides good width for multi-step wizard without being too wide
+- Step transitions should be fade-only (not slide left/right) to avoid layout shift and complexity
+---
