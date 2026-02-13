@@ -2,9 +2,10 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import { SearchIcon, RefreshIcon, BellIcon, ChevronDownIcon } from '@/components/icons';
 
 // Map pathname to page title
 const getPageTitle = (pathname: string): string => {
@@ -39,22 +40,34 @@ const getUserInitials = (displayName: string): string => {
 const getTierBadgeColor = (tier: string): string => {
   switch (tier) {
     case 'premium':
-      return 'bg-accent text-primaryDark';
+      return 'bg-vettr-accent/10 text-vettr-accent';
     case 'pro':
-      return 'bg-warning text-primaryDark';
+      return 'bg-yellow-500/10 text-yellow-400';
     case 'free':
     default:
-      return 'bg-textMuted text-white';
+      return 'bg-white/10 text-gray-400';
   }
 };
 
 export function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   const { user, logout } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const pageTitle = getPageTitle(pathname || '');
+
+  // Handle refresh button click
+  const handleRefresh = () => {
+    window.location.reload();
+  };
+
+  // Handle Cmd+K search click
+  const handleSearchClick = () => {
+    // TODO: Open quick search modal (will be implemented in V2-025)
+    console.log('Quick search triggered');
+  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -85,10 +98,10 @@ export function Header() {
 
   return (
     <header className="fixed top-0 left-0 right-0 h-16 bg-vettr-navy/80 backdrop-blur-lg border-b border-white/5 z-40 md:ml-64">
-      <div className="h-full flex items-center justify-between px-4 md:px-6">
-        {/* Left: Mobile logo */}
-        <div className="flex items-center gap-4">
-          {/* Logo - visible on mobile, hidden on desktop (desktop has logo in sidebar) */}
+      <div className="h-full flex items-center justify-between px-4 md:px-6 gap-4">
+        {/* Left: Page title */}
+        <div className="flex items-center gap-4 flex-shrink-0">
+          {/* Mobile logo */}
           <Link
             href="/pulse"
             className="md:hidden font-bold text-xl"
@@ -96,94 +109,116 @@ export function Header() {
             <span className="text-vettr-accent">V</span>
             <span className="text-white">ETTR</span>
           </Link>
-          {/* Page title on desktop */}
+          {/* Desktop page title */}
           <h1 className="hidden md:block text-lg font-semibold text-white">
             {pageTitle}
           </h1>
         </div>
 
-        {/* Right: User menu */}
-        <div className="relative" ref={dropdownRef}>
+        {/* Center-right: Search shortcut (desktop only) */}
+        <button
+          onClick={handleSearchClick}
+          className="hidden lg:flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-gray-500 hover:bg-white/[0.07] hover:border-white/20 transition-all"
+        >
+          <SearchIcon className="w-4 h-4" />
+          <span>Quick search...</span>
+          <kbd className="ml-2 px-1.5 py-0.5 bg-white/10 border border-white/10 rounded text-xs font-medium text-gray-400">
+            ⌘K
+          </kbd>
+        </button>
+
+        {/* Right: Actions + User menu */}
+        <div className="flex items-center gap-2 md:gap-3">
+          {/* Refresh button */}
           <button
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-            aria-label="User menu"
-            aria-expanded={isDropdownOpen}
+            onClick={handleRefresh}
+            className="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+            aria-label="Refresh page"
           >
-            {/* User avatar */}
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-vettr-accent/20 to-vettr-accent/5 flex items-center justify-center text-vettr-accent font-semibold text-sm">
-              {userInitials}
-            </div>
-            {/* Dropdown arrow - desktop only */}
-            <svg
-              className={`hidden md:block w-4 h-4 text-gray-400 transition-transform ${
-                isDropdownOpen ? 'rotate-180' : ''
-              }`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
+            <RefreshIcon className="w-5 h-5" />
           </button>
 
-          {/* Dropdown menu */}
-          <AnimatePresence>
-            {isDropdownOpen && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
-                className="absolute right-0 mt-2 w-56 bg-vettr-card border border-white/10 rounded-xl shadow-xl overflow-hidden"
-              >
-                {/* User info header */}
-                <div className="px-4 py-3 border-b border-white/5">
-                  <p className="text-sm font-medium text-white">
-                    {user.display_name}
-                  </p>
-                  <p className="text-xs text-gray-400 mt-1">
-                    {user.email}
-                  </p>
-                  <span
-                    className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium mt-2 ${tierBadgeColor}`}
-                  >
-                    {user.tier.toUpperCase()}
-                  </span>
-                </div>
+          {/* Notification bell */}
+          <button
+            className="relative p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+            aria-label="Notifications"
+          >
+            <BellIcon className="w-5 h-5" />
+            {/* Notification badge (optional - can be dynamic later) */}
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-vettr-accent rounded-full" />
+          </button>
 
-                {/* Menu items */}
-                <div className="p-1">
-                  <Link
-                    href="/profile"
-                    onClick={() => setIsDropdownOpen(false)}
-                    className="block px-3 py-2 text-sm text-white hover:bg-white/5 rounded-lg transition-colors"
-                  >
-                    Profile
-                  </Link>
-                  <Link
-                    href="/profile/settings"
-                    onClick={() => setIsDropdownOpen(false)}
-                    className="block px-3 py-2 text-sm text-white hover:bg-white/5 rounded-lg transition-colors"
-                  >
-                    Settings
-                  </Link>
-                  <div className="h-px bg-white/5 my-1" />
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-white/5 rounded-lg transition-colors"
-                  >
-                    Sign Out
-                  </button>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {/* User avatar dropdown */}
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+              aria-label="User menu"
+              aria-expanded={isDropdownOpen}
+            >
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-vettr-accent/20 to-vettr-accent/5 flex items-center justify-center text-vettr-accent font-semibold text-sm">
+                {userInitials}
+              </div>
+              <ChevronDownIcon
+                className={`hidden md:block w-4 h-4 text-gray-400 transition-transform ${
+                  isDropdownOpen ? 'rotate-180' : ''
+                }`}
+              />
+            </button>
+
+            {/* Dropdown menu */}
+            <AnimatePresence>
+              {isDropdownOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute right-0 mt-2 w-56 bg-vettr-card border border-white/10 rounded-xl shadow-xl overflow-hidden"
+                >
+                  {/* User info header */}
+                  <div className="px-4 py-3 border-b border-white/5">
+                    <p className="text-sm font-medium text-white truncate">
+                      {user.display_name}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-1 truncate">
+                      {user.email}
+                    </p>
+                    <span
+                      className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium mt-2 ${tierBadgeColor}`}
+                    >
+                      {user.tier.toUpperCase()}
+                    </span>
+                  </div>
+
+                  {/* Menu items */}
+                  <div className="p-1">
+                    <Link
+                      href="/profile"
+                      onClick={() => setIsDropdownOpen(false)}
+                      className="block px-3 py-2 text-sm text-white hover:bg-white/5 rounded-lg transition-colors"
+                    >
+                      Profile
+                    </Link>
+                    <Link
+                      href="/profile/settings"
+                      onClick={() => setIsDropdownOpen(false)}
+                      className="block px-3 py-2 text-sm text-white hover:bg-white/5 rounded-lg transition-colors"
+                    >
+                      Settings
+                    </Link>
+                    <div className="h-px bg-white/5 my-1" />
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-white/5 rounded-lg transition-colors"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
       </div>
     </header>
