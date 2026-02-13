@@ -82,7 +82,43 @@ interface PendingRequest {
   timestamp: number;
 }
 const pendingRequests = new Map<string, PendingRequest>();
-const DEDUPLICATION_WINDOW_MS = 100;
+const DEDUPLICATION_WINDOW_MS = 2000; // 2s dedup window — prevents same request within 2s
+
+// ─── Global Request Throttler ───────────────────────────────────────────────
+// Spaces out concurrent API calls to avoid hitting rate limits.
+// Instead of firing 10 requests simultaneously, they are staggered.
+const MAX_CONCURRENT_REQUESTS = 4; // Max in-flight requests at once
+const REQUEST_STAGGER_MS = 150; // Minimum ms between request dispatches
+let activeRequestCount = 0;
+let lastRequestTime = 0;
+
+function acquireRequestSlot(): Promise<void> {
+  return new Promise<void>((resolve) => {
+    const tryAcquire = () => {
+      const now = Date.now();
+      const timeSinceLastRequest = now - lastRequestTime;
+
+      if (activeRequestCount < MAX_CONCURRENT_REQUESTS && timeSinceLastRequest >= REQUEST_STAGGER_MS) {
+        activeRequestCount++;
+        lastRequestTime = Date.now();
+        resolve();
+      } else {
+        // Wait for the stagger interval or for a slot to free up
+        const waitTime = Math.max(
+          REQUEST_STAGGER_MS - timeSinceLastRequest,
+          activeRequestCount >= MAX_CONCURRENT_REQUESTS ? 100 : 0
+        );
+        setTimeout(tryAcquire, Math.max(waitTime, 50));
+      }
+    };
+    tryAcquire();
+  });
+}
+
+function releaseRequestSlot(): void {
+  activeRequestCount = Math.max(0, activeRequestCount - 1);
+}
+// ─── End Global Request Throttler ───────────────────────────────────────────
 
 // Token refresh mutex to prevent multiple simultaneous refresh calls
 let refreshPromise: Promise<AuthTokens | null> | null = null;
@@ -176,21 +212,6 @@ async function refreshAccessToken(): Promise<AuthTokens | null> {
   })();
 
   return refreshPromise;
-}
-
-/**
- * Sleep for a specified number of milliseconds
- */
-function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-/**
- * Calculate exponential backoff delay
- */
-function getExponentialBackoffDelay(retryCount: number): number {
-  // Base delay: 2 seconds, doubles with each retry (2s, 4s)
-  return Math.min(2000 * Math.pow(2, retryCount), 10000); // Max 10 seconds
 }
 
 /**
@@ -329,6 +350,9 @@ export async function apiClient<T = unknown>(
       }
     }
 
+    // Acquire a throttle slot before making the request
+    await acquireRequestSlot();
+
     try {
       // Make the request with timeout
       const response = await fetchWithTimeout(url, {
@@ -359,47 +383,11 @@ export async function apiClient<T = unknown>(
         }
       }
 
-      // Handle 429 Too Many Requests - return error immediately, let SWR handle retry scheduling
-      // Only do 1 internal retry with a longer delay to avoid request storms
+      // Handle 429 Too Many Requests - return error immediately, NO internal retries
+      // SWR will handle retry scheduling at its own (slower) pace
       if (response.status === 429) {
-        if (requestOptions.retryCount! < 1) {
-          // Read Retry-After header (can be in seconds or HTTP date format)
-          const retryAfterHeader = response.headers.get('Retry-After');
-          let retryAfterMs = getExponentialBackoffDelay(requestOptions.retryCount!);
-
-          if (retryAfterHeader) {
-            // Check if it's a number (seconds) or a date
-            const retryAfterSeconds = parseInt(retryAfterHeader, 10);
-            if (!isNaN(retryAfterSeconds)) {
-              retryAfterMs = retryAfterSeconds * 1000;
-            } else {
-              // Try parsing as HTTP date
-              const retryAfterDate = new Date(retryAfterHeader);
-              if (!isNaN(retryAfterDate.getTime())) {
-                retryAfterMs = Math.max(0, retryAfterDate.getTime() - Date.now());
-              }
-            }
-          }
-
-          // Cap retry delay at 30s
-          retryAfterMs = Math.min(retryAfterMs, 30000);
-
-          console.warn(`[API] Rate limited (429). Single retry after ${Math.ceil(retryAfterMs / 1000)}s.`);
-
-          // Show toast notification with countdown (non-blocking)
-          showRateLimitToast(Math.ceil(retryAfterMs / 1000));
-
-          // Wait for the specified time
-          await sleep(retryAfterMs);
-
-          // Retry the request once
-          return apiClient<T>(endpoint, {
-            ...options,
-            retryCount: requestOptions.retryCount! + 1,
-          });
-        }
-
-        // Return error - SWR will handle further retry scheduling
+        console.warn(`[API] Rate limited (429) for ${url}. No retry — SWR will handle revalidation.`);
+        showRateLimitToast(5);
         return {
           success: false,
           error: {
@@ -465,6 +453,9 @@ export async function apiClient<T = unknown>(
           message: 'Unable to connect to server. Please check your internet connection.',
         },
       };
+    } finally {
+      // Always release the throttle slot when request completes
+      releaseRequestSlot();
     }
   })();
 
