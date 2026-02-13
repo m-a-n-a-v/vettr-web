@@ -1,11 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import { Stock } from '@/types/api';
 import VetrScoreBadge from './VetrScoreBadge';
 import SectorChip from './SectorChip';
 import PriceChangeIndicator from './PriceChangeIndicator';
+import { StarIcon, StarFilledIcon } from '@/components/icons';
 
 interface StockCardProps {
   stock: Stock;
@@ -30,87 +30,53 @@ export default function StockCard({
     }
   };
 
-  // Generate company initials from ticker or name
-  const getInitials = () => {
-    if (stock.ticker.length <= 3) {
-      return stock.ticker;
-    }
-    const words = stock.company_name.split(' ');
-    if (words.length >= 2) {
-      return (words[0][0] + words[1][0]).toUpperCase();
-    }
-    return stock.ticker.substring(0, 2);
-  };
-
   return (
     <Link href={`/stocks/${stock.ticker}`}>
-      <motion.div
-        className="relative bg-surface border border-border/50 rounded-2xl p-5 cursor-pointer group hover:border-accent/30 transition-colors duration-300"
-        whileHover={{ y: -4, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.2)' }}
-        transition={{ duration: 0.2, ease: 'easeOut' }}
-      >
-        {/* Favorite Star (if enabled) */}
-        {showFavorite && onFavoriteToggle && (
-          <button
-            onClick={handleFavoriteClick}
-            disabled={isTogglingFavorite}
-            className="absolute top-3 right-3 text-xl transition-all duration-200 hover:scale-110 z-10 disabled:opacity-50 disabled:cursor-not-allowed"
-            aria-label={isFavorite ? 'Remove from watchlist' : 'Add to watchlist'}
-          >
-            {isTogglingFavorite ? (
-              <span className="text-textMuted animate-pulse">⋯</span>
-            ) : isFavorite ? (
-              <span className="text-accent drop-shadow-sm">★</span>
-            ) : (
-              <span className="text-textMuted group-hover:text-textSecondary">☆</span>
-            )}
-          </button>
-        )}
-
-        {/* Company Initials Avatar */}
-        <div className="flex items-start gap-3 mb-3">
-          <div className="w-12 h-12 rounded-full bg-surface flex items-center justify-center text-accent font-bold flex-shrink-0">
-            {getInitials()}
-          </div>
+      <div className="relative bg-vettr-card/50 border border-white/5 rounded-2xl p-5 cursor-pointer group hover:border-vettr-accent/20 hover:bg-vettr-card/80 hover:shadow-lg hover:shadow-vettr-accent/5 transition-all duration-300">
+        {/* Header Row: Ticker, Company Name, Favorite Star */}
+        <div className="flex items-start justify-between gap-3 mb-4">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <h3 className="text-lg font-bold text-textPrimary truncate">
+              <h3 className="text-sm font-bold text-vettr-accent">
                 {stock.ticker}
               </h3>
-              <VetrScoreBadge score={stock.vetr_score} size="sm" />
+              {showFavorite && onFavoriteToggle && (
+                <button
+                  onClick={handleFavoriteClick}
+                  disabled={isTogglingFavorite}
+                  className="transition-all duration-200 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-label={isFavorite ? 'Remove from watchlist' : 'Add to watchlist'}
+                >
+                  {isTogglingFavorite ? (
+                    <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                  ) : isFavorite ? (
+                    <StarFilledIcon className="w-4 h-4 text-yellow-400" />
+                  ) : (
+                    <StarIcon className="w-4 h-4 text-gray-500 group-hover:text-gray-400" />
+                  )}
+                </button>
+              )}
             </div>
-            <p className="text-sm text-textSecondary truncate">{stock.company_name}</p>
+            <p className="text-sm text-gray-400 truncate">{stock.company_name}</p>
           </div>
         </div>
 
-        {/* Price and Change */}
-        <div className="mb-3">
+        {/* Price Row */}
+        <div className="mb-4">
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-bold text-textPrimary">
+            <span className="text-2xl font-bold text-white">
               ${stock.current_price.toFixed(2)}
             </span>
-            <PriceChangeIndicator change={stock.price_change_percent} />
+            <PriceChangeIndicator change={stock.price_change_percent} size="sm" />
           </div>
         </div>
 
-        {/* Sector and Exchange */}
-        <div className="flex items-center gap-2 flex-wrap">
+        {/* Bottom Row: Sector Chip + VETTR Score */}
+        <div className="flex items-center justify-between gap-2">
           <SectorChip sector={stock.sector} />
-          <span className="px-2 py-1 bg-surface text-textSecondary text-xs rounded">
-            {stock.exchange}
-          </span>
+          <VetrScoreBadge score={stock.vetr_score} size="sm" />
         </div>
-
-        {/* Market Cap (optional) */}
-        {stock.market_cap && (
-          <div className="mt-3 pt-3 border-t border-border">
-            <div className="text-xs text-textMuted">Market Cap</div>
-            <div className="text-sm text-textSecondary font-medium">
-              ${(stock.market_cap / 1000000).toFixed(1)}M
-            </div>
-          </div>
-        )}
-      </motion.div>
+      </div>
     </Link>
   );
 }

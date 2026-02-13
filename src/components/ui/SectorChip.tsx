@@ -42,11 +42,11 @@ export default function SectorChip({ sector, size = 'sm' }: SectorChipProps) {
     }
 
     // Default neutral color
-    return 'bg-accent/20 text-accent border-accent/30';
+    return 'bg-white/5 text-gray-400';
   };
 
   const sizeClasses = size === 'sm'
-    ? 'px-2 py-0.5 text-xs'
+    ? 'px-2.5 py-0.5 text-xs'
     : 'px-3 py-1 text-sm';
 
   const colorClasses = getSectorColor(sector);
@@ -56,7 +56,6 @@ export default function SectorChip({ sector, size = 'sm' }: SectorChipProps) {
       className={`
         ${sizeClasses}
         ${colorClasses}
-        border
         rounded-full
         font-medium
         inline-flex

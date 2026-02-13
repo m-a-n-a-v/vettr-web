@@ -43,24 +43,24 @@ export default function VetrScoreBadge({
   }, [score, shouldAnimate, count, rounded]);
   // Determine color based on score
   const getColor = () => {
-    if (score >= 80) return 'text-accent'; // Green for excellent
-    if (score >= 60) return 'text-yellow-500'; // Yellow for good
-    if (score >= 40) return 'text-warning'; // Amber for fair
-    return 'text-error'; // Red for poor
+    if (score >= 80) return 'text-vettr-accent'; // Green for excellent
+    if (score >= 60) return 'text-yellow-400'; // Yellow for good
+    if (score >= 40) return 'text-orange-400'; // Orange for fair
+    return 'text-red-400'; // Red for poor
   };
 
   const getBgColor = () => {
-    if (score >= 80) return 'bg-accent/10';
-    if (score >= 60) return 'bg-yellow-500/10';
-    if (score >= 40) return 'bg-warning/10';
-    return 'bg-error/10';
+    if (score >= 80) return 'bg-vettr-accent/10';
+    if (score >= 60) return 'bg-yellow-400/10';
+    if (score >= 40) return 'bg-orange-400/10';
+    return 'bg-red-400/10';
   };
 
   const getBorderColor = () => {
-    if (score >= 80) return 'border-accent/30';
-    if (score >= 60) return 'border-yellow-500/30';
-    if (score >= 40) return 'border-warning/30';
-    return 'border-error/30';
+    if (score >= 80) return 'border-vettr-accent/30';
+    if (score >= 60) return 'border-yellow-400/30';
+    if (score >= 40) return 'border-orange-400/30';
+    return 'border-red-400/30';
   };
 
   // Size configurations
@@ -113,7 +113,7 @@ export default function VetrScoreBadge({
     return (
       <div className="flex flex-col items-center gap-1">
         {badge}
-        <span className={`${config.label} text-textMuted font-medium`}>
+        <span className={`${config.label} text-gray-500 font-medium`}>
           VETTR Score
         </span>
       </div>

@@ -16,8 +16,8 @@ export default function PriceChangeIndicator({
 
   // Determine color based on change direction
   const getColor = () => {
-    if (isNeutral) return 'text-textSecondary';
-    return isPositive ? 'text-accent' : 'text-error';
+    if (isNeutral) return 'text-gray-400';
+    return isPositive ? 'text-vettr-accent' : 'text-red-400';
   };
 
   // Size configurations
