@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import SearchInput from '@/components/ui/SearchInput'
 import Breadcrumb from '@/components/ui/Breadcrumb'
+import { ChevronLeftIcon, ChevronDownIcon } from '@/components/icons'
 
 // Glossary terms with definitions
 interface GlossaryTerm {
@@ -193,37 +194,18 @@ export default function GlossaryPage() {
   const alphabeticalLetters = Object.keys(groupedTerms).sort()
 
   return (
-    <div className="min-h-screen bg-primary text-textPrimary pb-20 md:pb-6">
+    <div className="min-h-screen bg-vettr-navy text-white pb-20 md:pb-6">
       {/* Header */}
-      <div className="bg-primaryLight border-b border-border sticky top-0 z-20">
+      <div className="bg-vettr-dark border-b border-white/5 sticky top-16 z-20">
         <div className="max-w-4xl mx-auto px-4 py-4">
-          {/* Breadcrumb */}
-          <Breadcrumb
-            items={[
-              { label: 'Profile', href: '/profile' },
-              { label: 'Glossary' }
-            ]}
-          />
-
+          {/* Back button and Title */}
           <div className="flex items-center gap-4 mb-4">
             <button
               onClick={() => router.push('/profile')}
-              className="text-textSecondary hover:text-textPrimary transition-colors"
+              className="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
               aria-label="Back to Profile"
             >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
+              <ChevronLeftIcon className="w-5 h-5" />
             </button>
             <h1 className="text-2xl font-bold">Glossary</h1>
           </div>
@@ -241,7 +223,7 @@ export default function GlossaryPage() {
       {/* Content */}
       <div className="max-w-4xl mx-auto px-4 py-6">
         {/* Term Count */}
-        <div className="mb-6 text-sm text-textSecondary">
+        <div className="mb-6 text-sm text-gray-500">
           {filteredTerms.length} {filteredTerms.length === 1 ? 'term' : 'terms'}
           {searchQuery.trim() && ' found'}
         </div>
@@ -249,14 +231,26 @@ export default function GlossaryPage() {
         {/* No Results */}
         {filteredTerms.length === 0 && (
           <div className="text-center py-12">
-            <div className="text-4xl mb-4">📖</div>
-            <h3 className="text-lg font-semibold mb-2">No terms found</h3>
-            <p className="text-textSecondary mb-4">
+            <svg
+              className="w-16 h-16 mx-auto mb-4 text-gray-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+              />
+            </svg>
+            <h3 className="text-lg font-medium text-gray-400 mb-2">No terms found</h3>
+            <p className="text-gray-500 mb-4">
               Try a different search term or clear your search.
             </p>
             <button
               onClick={() => setSearchQuery('')}
-              className="text-accent hover:text-accentDim transition-colors"
+              className="text-vettr-accent hover:text-vettr-accent/80 transition-colors"
             >
               Clear Search
             </button>
@@ -266,12 +260,12 @@ export default function GlossaryPage() {
         {/* Grouped Terms */}
         {alphabeticalLetters.map((letter) => (
           <div key={letter} className="mb-8">
-            {/* Letter Header */}
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
-                <span className="text-accent font-bold text-lg">{letter}</span>
+            {/* Letter Header - sticky divider */}
+            <div className="flex items-center gap-3 mb-4 sticky top-36 bg-vettr-navy py-2 z-10">
+              <div className="w-10 h-10 rounded-full bg-vettr-accent/20 flex items-center justify-center">
+                <span className="text-vettr-accent font-bold text-lg">{letter}</span>
               </div>
-              <div className="flex-1 h-px bg-border" />
+              <div className="flex-1 h-px bg-white/5" />
             </div>
 
             {/* Terms in this letter group */}
@@ -282,46 +276,41 @@ export default function GlossaryPage() {
                 return (
                   <div
                     key={item.term}
-                    className="bg-primaryLight border border-border rounded-lg overflow-hidden transition-all hover:border-accent/30"
+                    className="bg-vettr-card/30 border border-white/5 rounded-xl overflow-hidden transition-all hover:border-vettr-accent/20"
                   >
                     {/* Term Header (clickable) */}
                     <button
                       onClick={() => toggleTerm(item.term)}
-                      className="w-full text-left px-4 py-3 flex items-center justify-between gap-3 hover:bg-surfaceLight transition-colors"
+                      className="w-full text-left px-4 py-3 flex items-center justify-between gap-3 hover:bg-white/5 transition-colors"
                     >
                       <div className="flex-1">
-                        <h3 className="font-semibold text-textPrimary mb-1">
+                        <h3 className="font-medium text-white mb-1">
                           {item.term}
                         </h3>
                         {item.category && (
-                          <span className="text-xs text-accent bg-accent/10 px-2 py-0.5 rounded-full">
+                          <span className="text-xs text-vettr-accent bg-vettr-accent/10 px-2 py-0.5 rounded-full">
                             {item.category}
                           </span>
                         )}
                       </div>
 
                       {/* Expand/Collapse Icon */}
-                      <svg
-                        className={`w-5 h-5 text-textSecondary transition-transform flex-shrink-0 ${
+                      <ChevronDownIcon
+                        className={`w-5 h-5 text-gray-500 transition-transform flex-shrink-0 ${
                           isExpanded ? 'rotate-180' : ''
                         }`}
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
+                      />
                     </button>
 
                     {/* Definition (expandable) */}
                     {isExpanded && (
-                      <div className="px-4 pb-4 pt-2 border-t border-border bg-primary/50">
-                        <p className="text-textSecondary leading-relaxed">
+                      <div
+                        className="px-4 pb-4 pt-2 border-t border-white/5 animate-in fade-in duration-200"
+                        style={{
+                          animation: 'slideDown 200ms ease-out'
+                        }}
+                      >
+                        <p className="text-sm text-gray-400 leading-relaxed">
                           {item.definition}
                         </p>
                       </div>
