@@ -1902,3 +1902,49 @@ Files modified:
 - **Tab-specific params**: Only include tab-specific params when that tab is active to avoid URL clutter
 - **Modals don't need URL state**: Modal state (selectedExecutive, selectedFlag) should remain local state
 - **Default values**: Document default values clearly (overview tab, 6M period, 'all' filter, 'title' sort)
+
+## V2-045: Add data export CSV functionality
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Created CSV export utility library at src/lib/csv-export.ts with three functions:
+  - convertStocksToCSV(): Converts Stock array to CSV format with proper escaping
+  - downloadCSV(): Creates blob and triggers browser download
+  - generateCSVFilename(): Generates filename with current date (vettr-stocks-YYYY-MM-DD.csv)
+- Added DownloadIcon SVG component to src/components/icons/index.tsx
+- Added Export button to Stocks page filter bar (desktop only, hidden on mobile)
+- Export button positioned after favorites toggle, before view mode toggle
+- Button styling: bg-white/5 border border-white/10 with download icon + "Export" text
+- Button disabled when no stocks are available (filteredStocks.length === 0)
+- handleExport function exports currently filtered and sorted stocks
+- Toast notification shows filename after successful download
+- CSV columns: Ticker, Company, Price, Change%, VETTR Score, Sector, Market Cap (in billions)
+- Company names properly escaped with double quotes for CSV compatibility
+- Market cap converted from raw value to billions with 2 decimal places
+- All price/change values show "N/A" when data is missing
+- Export works with all filter combinations: search, sort, favorites only
+- Client-side generation using Blob API and createObjectURL
+- Quality checks passed: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/lib/csv-export.ts (new file)
+- src/components/icons/index.tsx (added DownloadIcon)
+- src/app/(main)/stocks/page.tsx (added export functionality and button)
+- scripts/ralph/prd-v2.json (marked V2-045 as passes: true)
+
+**Learnings for future iterations:**
+- **CSV escaping**: Double quotes in company names must be escaped as "" for proper CSV format
+- **Blob API pattern**: Create blob with text/csv type, createObjectURL, attach to link, click, then revoke URL
+- **Temporary DOM elements**: Create link element, append to body, click, remove from body for clean downloads
+- **Date formatting**: Use padStart(2, '0') for consistent YYYY-MM-DD filename format
+- **Optional chaining safety**: Use ?. and ?? operators when accessing optional stock properties
+- **Market cap display**: Divide by 1 billion and use toFixed(2) for readable B (billions) format
+- **Desktop-only buttons**: Use hidden md:flex to show export button only on larger screens
+- **Button positioning**: Export button placed logically between data filters and view controls
+- **Disabled state**: Check filteredStocks.length to disable export when no data available
+- **Toast messaging**: Include filename in success toast for user confirmation
+- **Type imports**: Import Stock type from @/types/api for proper TypeScript typing
+- **CSV header format**: Use uppercase column names for professional appearance
+- **Error handling**: Wrap export logic in try-catch to show error toast if download fails
+---
