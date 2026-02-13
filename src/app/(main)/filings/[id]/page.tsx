@@ -73,7 +73,7 @@ export default function FilingDetailPage() {
       <div className="min-h-screen bg-vettr-navy p-4 md:p-6 pb-20 md:pb-6">
         <EmptyState
           title="Filing Not Found"
-          message="The filing you're looking for could not be found or has been removed."
+          description="The filing you're looking for could not be found or has been removed."
           actionLabel="Back to Discovery"
           onAction={() => router.push('/discovery')}
         />

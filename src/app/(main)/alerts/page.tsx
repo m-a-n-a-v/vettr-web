@@ -280,9 +280,9 @@ function AlertsPageContent() {
       <div className="p-4 md:p-6 pb-20 md:pb-6">
         <h1 className="text-2xl font-bold text-white mb-6">Alerts</h1>
         <EmptyState
-          icon={<AlertTriangleIcon className="w-16 h-16" />}
+          icon={<AlertTriangleIcon className="w-16 h-16 text-yellow-400" />}
           title="Failed to load alerts"
-          message="There was an error loading your alert rules. Please try again."
+          description="There was an error loading your alert rules. Please try again."
         />
       </div>
     );
@@ -307,9 +307,9 @@ function AlertsPageContent() {
         <h2 className="text-lg font-semibold text-white mb-4">Recent Triggers</h2>
         {mockRecentTriggers.length === 0 ? (
           <EmptyState
-            icon={<BellIcon className="w-16 h-16" />}
+            icon={<BellIcon className="w-16 h-16 text-gray-600" />}
             title="No recent triggers"
-            message="You haven't had any alert triggers recently."
+            description="You haven't had any alert triggers recently."
           />
         ) : (
           <div className="space-y-3">
@@ -390,17 +390,17 @@ function AlertsPageContent() {
         {/* Rules List */}
         {rules.length === 0 ? (
           <EmptyState
-            icon={<BellIcon className="w-16 h-16" />}
+            icon={<BellIcon className="w-16 h-16 text-gray-600" />}
             title="No alert rules yet"
-            message="Create your first alert rule to get notified about important stock events."
+            description="Create your first alert rule to get notified about important stock events."
             actionLabel="Create Alert"
             onAction={() => setShowCreator(true)}
           />
         ) : filteredRules.length === 0 ? (
           <EmptyState
-            icon={<FilterIcon className="w-16 h-16" />}
+            icon={<FilterIcon className="w-16 h-16 text-gray-600" />}
             title="No matching rules"
-            message="No alert rules match your current filters. Try adjusting your search or filter."
+            description="No alert rules match your current filters. Try adjusting your search or filter."
           />
         ) : (
           <div className="space-y-3">

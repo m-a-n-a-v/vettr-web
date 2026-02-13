@@ -623,7 +623,7 @@ export default function StockDetailPage() {
                   <EmptyState
                     icon={<BarChartIcon className="w-16 h-16 text-gray-600" />}
                     title="Not enough data"
-                    message="Score history will be displayed once sufficient data is available."
+                    description="Score history will be displayed once sufficient data is available."
                   />
                 </div>
               )}
@@ -736,7 +736,7 @@ export default function StockDetailPage() {
                 <EmptyState
                   icon={<DocumentIcon className="w-16 h-16 text-gray-600" />}
                   title="No filings found"
-                  message="This stock doesn't have any recent filings."
+                  description="This stock doesn't have any recent filings."
                 />
               )}
             </div>
@@ -880,7 +880,7 @@ export default function StockDetailPage() {
                 <EmptyState
                   icon={<UsersIcon className="w-16 h-16 text-gray-600" />}
                   title="No executives found"
-                  message={
+                  description={
                     executiveSearch || executiveTitleFilter !== 'all'
                       ? 'No executives match your search criteria. Try adjusting your filters.'
                       : 'This stock doesn\'t have any executive information available.'
@@ -1165,9 +1165,10 @@ export default function StockDetailPage() {
                     </div>
                   ) : (
                     <EmptyState
-                      icon={<ShieldCheckIcon className="w-16 h-16 text-vettr-accent" />}
+                      icon={<ShieldCheckIcon className="w-16 h-16 text-vettr-accent/80" />}
                       title="No red flags detected"
-                      message="This stock currently has no red flags. Great news!"
+                      description="This stock currently has no red flags. Great news!"
+                      variant="positive"
                     />
                   )}
                 </div>
@@ -1239,7 +1240,7 @@ export default function StockDetailPage() {
                     <EmptyState
                       icon={<BarChartIcon className="w-16 h-16 text-gray-600" />}
                       title="No history available"
-                      message="No historical red flag data is available for this stock."
+                      description="No historical red flag data is available for this stock."
                     />
                   )}
                 </div>
@@ -1248,7 +1249,7 @@ export default function StockDetailPage() {
               <EmptyState
                 icon={<FlagIcon className="w-16 h-16 text-red-400" />}
                 title="No red flag data"
-                message="Unable to load red flag analysis for this stock."
+                description="Unable to load red flag analysis for this stock."
               />
             )}
           </motion.div>

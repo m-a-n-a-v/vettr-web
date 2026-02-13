@@ -32,7 +32,7 @@ export default function VetrScoreComparison({ comparison, isLoading, currentTick
         <EmptyState
           icon={<BarChartIcon className="w-16 h-16 text-gray-600" />}
           title="No comparison data available"
-          message="Unable to load peer comparison data for this stock."
+          description="Unable to load peer comparison data for this stock."
         />
       </div>
     );

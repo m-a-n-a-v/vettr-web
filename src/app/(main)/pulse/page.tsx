@@ -172,7 +172,7 @@ export default function PulsePage() {
           <EmptyState
             icon={<AlertTriangleIcon className="w-16 h-16 text-yellow-400" />}
             title="Error loading market data"
-            message="Unable to fetch market overview. Please try again."
+            description="Unable to fetch market overview. Please try again."
           />
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -252,7 +252,7 @@ export default function PulsePage() {
           <EmptyState
             icon={<FlagIcon className="w-16 h-16 text-red-400" />}
             title="Error loading red flag trends"
-            message="Unable to fetch red flag trend data."
+            description="Unable to fetch red flag trend data."
           />
         ) : redFlagTrend ? (
           <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-6">
@@ -369,13 +369,13 @@ export default function PulsePage() {
           <EmptyState
             icon={<DocumentIcon className="w-16 h-16 text-yellow-400" />}
             title="Error loading filings"
-            message="Unable to fetch recent events."
+            description="Unable to fetch recent events."
           />
         ) : !filings || filings.length === 0 ? (
           <EmptyState
             icon={<DocumentIcon className="w-16 h-16 text-gray-600" />}
             title="No recent events"
-            message="No filings have been published recently."
+            description="No filings have been published recently."
           />
         ) : (
           <>
@@ -487,13 +487,13 @@ export default function PulsePage() {
           <EmptyState
             icon={<TrendingUpIcon className="w-16 h-16 text-yellow-400" />}
             title="Error loading movers"
-            message="Unable to fetch top movers data."
+            description="Unable to fetch top movers data."
           />
         ) : topMovers.length === 0 ? (
           <EmptyState
             icon={<TrendingUpIcon className="w-16 h-16 text-gray-600" />}
             title="No movers data"
-            message="Insufficient price data to show top movers."
+            description="Insufficient price data to show top movers."
           />
         ) : (
           <div className="space-y-2">
@@ -557,13 +557,13 @@ export default function PulsePage() {
           <EmptyState
             icon={<TrophyIcon className="w-16 h-16 text-yellow-400" />}
             title="Error loading top scores"
-            message="Unable to fetch top VETTR scores."
+            description="Unable to fetch top VETTR scores."
           />
         ) : topScores.length === 0 ? (
           <EmptyState
             icon={<TrophyIcon className="w-16 h-16 text-gray-600" />}
             title="No score data"
-            message="No stocks with VETTR scores available."
+            description="No stocks with VETTR scores available."
           />
         ) : (
           <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">

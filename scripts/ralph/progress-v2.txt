@@ -1350,3 +1350,85 @@ Files modified:
 - All border colors should use border-white/5 dark variant with light mode fallback
 - Sticky positioning works correctly with overflow containers when thead itself is sticky (not wrapper)
 ---
+
+## V2-035: Add proper empty states across all pages
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Redesigned EmptyState component to match V2 design specifications
+- Changed prop from 'message' to 'description' for consistency with PRD naming
+- Added 'variant' prop with 'default' and 'positive' options (positive for "no issues" states)
+- Icon size specification: w-16 h-16 (64px) for all empty state icons
+- Title: text-lg font-medium text-gray-400
+- Description: text-sm text-gray-500
+- Added light mode color variants with dark: prefix
+- Updated Stocks page empty states:
+  - Changed BarChartIcon to SearchIcon for "No stocks match your filters"
+  - Added proper text-gray-600 color to search icon
+  - Updated error state with AlertTriangleIcon text-yellow-400
+- Updated Alerts page empty states:
+  - "No alert rules yet" with BellIcon and CTA button
+  - "No recent triggers" with BellIcon
+  - "No matching rules" with FilterIcon
+  - Error state with AlertTriangleIcon
+- Updated Filing and Executive sections:
+  - "No filings found" with DocumentIcon text-gray-600
+  - "No executives found" with UsersIcon text-gray-600
+  - Both with contextual descriptions based on search/filter state
+- Updated Red Flags tab empty state:
+  - "No red flags detected" with ShieldCheckIcon text-vettr-accent/80
+  - Used variant="positive" for positive messaging (green tint)
+  - Added description: "This stock currently has no red flags. Great news!"
+  - Updated other red flag empty states: "Not enough data", "No history available", "No red flag data"
+- Updated Discovery page empty states:
+  - "No stocks found" with SearchIcon
+  - "No filings found" with DocumentIcon
+  - Error states with AlertTriangleIcon text-yellow-400
+- Updated Pulse page empty states (8 total):
+  - "Error loading market data", "Error loading red flag trends", "Error loading filings" with error icons
+  - "No recent events", "No movers data", "No score data" with neutral gray icons
+  - All error icons use text-yellow-400 or text-red-400
+  - All info icons use text-gray-600
+- Updated QuickSearch empty state (inline, not using component)
+- Updated VetrScoreComparison empty state:
+  - "No comparison data available" with BarChartIcon
+- Updated Filing Detail page empty state:
+  - "Filing Not Found" with actionLabel "Back to Discovery"
+- Watchlist empty state covered by Stocks page with favoritesOnly filter
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/components/ui/EmptyState.tsx
+- src/app/(main)/stocks/page.tsx
+- src/app/(main)/alerts/page.tsx
+- src/app/(main)/stocks/[ticker]/page.tsx
+- src/app/(main)/discovery/page.tsx
+- src/app/(main)/pulse/page.tsx
+- src/components/VetrScoreComparison.tsx
+- src/app/(main)/filings/[id]/page.tsx
+- scripts/ralph/prd-v2.json
+
+**Learnings for future iterations:**
+- EmptyState component interface changed: 'message' → 'description' prop for better clarity
+- EmptyState now requires 'title' as mandatory, 'description' as optional (matches design pattern)
+- Icon size standard: w-16 h-16 (64px) across all empty states for consistency
+- Empty state variants: 'default' for neutral/negative states, 'positive' for success/no-issues states
+- Positive variant adds text-vettr-accent/80 tint to icon for visual differentiation
+- All empty states must have consistent text sizing: title (text-lg), description (text-sm)
+- Icon colors follow pattern: error states (yellow-400/red-400), neutral states (gray-600), positive states (vettr-accent)
+- Empty states should include actionLabel + onAction for user guidance when applicable
+- Contextual descriptions: adjust messaging based on whether filters/search are active
+- Red flag empty states are positive: use ShieldCheckIcon with green tint, not negative messaging
+- Empty states on charts: "Not enough data" better than "No data" (implies data will come)
+- Error empty states should distinguish between load errors (retryable) vs no data (informational)
+- Light mode support: all color classes need dark: prefix variants for theme switching
+- Empty state in Stocks page shows when filtered/searched, helping users understand why list is empty
+- Search-related empty states use SearchIcon, not generic icons
+- Filing empty states use DocumentIcon, executive empty states use UsersIcon (semantic icons)
+- Pulse page has many empty states - each metric section needs both error and no-data states
+- Discovery page empty states account for sector filters and search in messaging
+- Empty state component is reusable across entire app - single source of truth for empty UI
+- TypeScript enforces prop interface: build errors caught all 'message' prop mismatches immediately
+- Watchlist functionality integrated into Stocks page, no separate watchlist page needed
+---

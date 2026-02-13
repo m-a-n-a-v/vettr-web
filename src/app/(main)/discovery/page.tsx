@@ -288,13 +288,13 @@ function DiscoveryPageContent() {
             <EmptyState
               icon={<AlertTriangleIcon className="w-16 h-16 text-yellow-400" />}
               title="Failed to load stocks"
-              message="Unable to fetch stocks. Please try again later."
+              description="Unable to fetch stocks. Please try again later."
             />
           ) : featuredStocks.length === 0 ? (
             <EmptyState
               icon={<SearchIcon className="w-16 h-16 text-gray-600" />}
               title="No stocks found"
-              message={
+              description={
                 searchQuery || selectedSector !== 'All'
                   ? 'Try adjusting your search or filter criteria.'
                   : 'No stocks available at this time.'
@@ -340,13 +340,13 @@ function DiscoveryPageContent() {
             <EmptyState
               icon={<AlertTriangleIcon className="w-16 h-16 text-yellow-400" />}
               title="Failed to load filings"
-              message="Unable to fetch recent filings. Please try again later."
+              description="Unable to fetch recent filings. Please try again later."
             />
           ) : filteredFilings.length === 0 ? (
             <EmptyState
               icon={<DocumentIcon className="w-16 h-16 text-gray-600" />}
               title="No filings found"
-              message={
+              description={
                 selectedSector !== 'All'
                   ? `No recent filings in ${selectedSector}.`
                   : 'No recent filings available.'

@@ -31,7 +31,8 @@ import {
   AlertTriangleIcon,
   BarChartIcon,
   ChevronUpIcon,
-  ChevronDownIcon
+  ChevronDownIcon,
+  SearchIcon
 } from '@/components/icons'
 import type { Stock } from '@/types/api'
 
@@ -321,7 +322,7 @@ function StocksPageContent() {
         <EmptyState
           icon={<AlertTriangleIcon className="w-16 h-16 text-yellow-400" />}
           title="Error loading stocks"
-          message="Unable to load stock data. Please try again later."
+          description="Unable to load stock data. Please try again later."
         />
       </div>
     )
@@ -403,9 +404,9 @@ function StocksPageContent() {
         </div>
 
         <EmptyState
-          icon={<BarChartIcon className="w-16 h-16 text-gray-600" />}
-          title="No stocks found"
-          message={
+          icon={<SearchIcon className="w-16 h-16 text-gray-600" />}
+          title="No stocks match your filters"
+          description={
             searchQuery || favoritesOnly
               ? 'Try adjusting your filters or search query.'
               : 'No stocks available at this time.'
