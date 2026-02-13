@@ -1622,3 +1622,31 @@ Files modified:
 - **Skeleton loader consistency**: Responsive width classes must match actual component width classes exactly
 - **Empty state responsiveness**: Icons and text scale appropriately, no fixed dimensions needed
 ---
+
+## V2-038: Add subtle background gradients and depth
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Added subtle dual radial gradients to main layout background (green top-right 0.04 opacity, blue bottom-left 0.03 opacity in dark mode)
+- Gradients are positioned absolutely behind content with pointer-events-none to prevent layout interference
+- Login and signup pages already had pronounced gradients (0.08 and 0.05 opacity) from V2-003 and V2-004
+- Added linear gradient to sidebar (from vettr-dark to vettr-dark/95 in dark mode, white to gray-50 in light mode)
+- All gradients respect dark/light mode with Tailwind dark: prefix using lower opacity in light mode
+- Main content has relative z-10 to ensure proper layering above gradient backgrounds
+- Quality checks passed: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/app/(main)/layout.tsx
+- src/components/Navigation.tsx
+
+**Learnings for future iterations:**
+- Background gradients should always be positioned absolutely and use pointer-events-none to avoid interfering with layout or click events
+- Dark mode gradients should be more prominent (0.03-0.04 opacity) while light mode should be more subtle (0.015-0.02 opacity)
+- Using inline Tailwind arbitrary values with dark: prefix allows fine-tuned control over gradients per theme
+- Linear gradients on the sidebar add subtle depth without being distracting
+- The gradient utilities in globals.css (.bg-gradient-accent, .bg-gradient-dual) provide reusable options but inline arbitrary values offer more flexibility for specific use cases
+- Login/signup pages were already properly styled with pronounced gradients, no changes needed
+- Dashboard cards already have proper bg-vettr-card/50 backgrounds; adding additional bottom gradients would be redundant and potentially too busy
+
+---
