@@ -1526,3 +1526,99 @@ Files modified:
 - Mobile skeletons can be simpler/condensed but must maintain similar visual hierarchy
 - Skeleton component library should be comprehensive but not bloated - reuse where possible
 ---
+
+## V2-037: Fix responsive layout issues at all breakpoints
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Conducted comprehensive responsive audit across all breakpoints (375px, 768px, 1024px, 1440px)
+- Fixed Modal.tsx viewport constraints:
+  - Added responsive padding: p-3 sm:p-4 on backdrop
+  - Reduced modal internal padding: px-4 sm:px-6, pt-4 sm:pt-6
+  - Fixed max-height calculation: max-h-[calc(100vh-12rem)] sm:max-h-[calc(100vh-200px)]
+  - Made footer buttons stack on mobile: flex-col sm:flex-row
+  - Ensured all modal sizes respect viewport width with proper padding
+
+- Fixed Header.tsx dropdown overflow:
+  - Changed dropdown width to responsive: w-64 sm:w-56 with max-w-[calc(100vw-2rem)]
+  - Made search shortcut visible at md: (768px) instead of lg: (1024px)
+  - Added text variation: "Quick search..." on lg:, "Search" on md-lg
+  - Added flex-shrink-0 to prevent search button from being squeezed
+
+- Fixed Discovery page carousel overflow:
+  - Changed carousel card containers from fixed w-80 to w-full sm:w-80
+  - Applied to both skeleton loading state and actual StockCard containers
+  - Cards now fill viewport width on mobile (375px) and become fixed width at sm: breakpoint
+
+- Fixed Stocks page table and filter bar:
+  - Added horizontal scroll handling: -mx-4 md:mx-0 px-4 md:px-0 on table wrapper
+  - Set minimum table width: min-w-[800px] to ensure proper column spacing
+  - Table properly scrolls horizontally on narrow viewports while maintaining readability
+
+- Fixed Pulse page grids and carousels:
+  - Changed severity breakdown grid from grid-cols-2 md:grid-cols-4 to grid-cols-2 sm:grid-cols-4
+  - Fixed gap spacing to be responsive: gap-3 sm:gap-4
+  - Changed Top VETTR Scores carousel cards from fixed w-72 to w-full sm:w-72
+  - Applied to both skeleton loaders and actual StockCard components
+
+- Fixed FilingTable column visibility:
+  - Added horizontal scroll wrapper with proper negative margins: -mx-4 md:mx-0 px-4 md:px-0
+  - Set minimum table width: min-w-[700px]
+  - Hid "Material" column on mobile with hidden md:table-cell
+  - Material information still visible inline within the Title column on mobile via badge
+
+- Fixed Profile page layout:
+  - Changed page padding to be responsive: px-4 sm:px-6
+  - Made user header flex direction responsive: flex-col sm:flex-row
+  - Changed card padding: p-4 sm:p-6
+  - Made Settings button full width on mobile: w-full sm:w-auto justify-center
+
+- Fixed SearchInput padding for mobile:
+  - Reduced left/right padding on mobile: pl-9 sm:pl-11 pr-9 sm:pr-10
+  - Provides more usable input space on 375px screens
+
+- All breakpoint issues addressed:
+  - 375px: No horizontal overflow, cards fill width, proper padding
+  - 768px: Sidebar appears, tables scroll if needed, grids use 2 columns
+  - 1024px: Full desktop layout, tables visible without scroll, 3-4 column grids
+  - 1440px: Content properly constrained with max-w-* containers
+
+- Quality checks: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/components/ui/Modal.tsx
+- src/components/Header.tsx
+- src/app/(main)/discovery/page.tsx
+- src/app/(main)/stocks/page.tsx
+- src/app/(main)/pulse/page.tsx
+- src/components/ui/FilingTable.tsx
+- src/app/(main)/profile/page.tsx
+- src/components/ui/SearchInput.tsx
+- scripts/ralph/prd-v2.json
+
+**Learnings for future iterations:**
+- **Carousel overflow fix**: Always use w-full sm:w-[fixed] pattern for horizontal scroll cards on mobile
+- **Table responsiveness**: Combine min-w-[px] with -mx-4 md:mx-0 wrapper for proper horizontal scroll
+- **Modal viewport constraints**: Use calc(100vw-2rem) for max-width to ensure modals never exceed viewport
+- **Column hiding strategy**: Use hidden md:table-cell on both <th> and <td> to hide non-critical columns on mobile
+- **Responsive padding pattern**: Use px-4 sm:px-6 consistently across pages for proper mobile spacing
+- **Grid breakpoint gaps**: Don't skip from sm: to lg:, use md: for intermediate layouts
+- **Search input optimization**: Reduce padding on mobile (pl-9 instead of pl-11) for better usability on 375px
+- **Footer button stacking**: Use flex-col sm:flex-row in modal footers for mobile-friendly CTAs
+- **Profile header layout**: Stack avatar + info + button vertically on mobile with flex-col sm:flex-row
+- **Severity breakdown grids**: Use sm: (640px) instead of md: (768px) for 4-column grid to fit tablets better
+- **Horizontal scroll indicators**: Consider adding subtle gradient or border to indicate scrollable content
+- **Sticky header offsets**: Always account for fixed header height (top-16) on sticky table headers
+- **Focus visible rings**: Ensure all interactive elements have focus-visible:ring-2 for accessibility
+- **Table minimum widths**: Set realistic min-w based on actual content, not arbitrary values
+- **Carousel snap scrolling**: w-full on mobile disables snap scrolling (intended), single card view
+- **Dropdown menu positioning**: Use max-w-[calc(...)] to prevent dropdowns from exceeding viewport edges
+- **Search shortcut visibility**: Show at md: (768px) for tablets, but simplify text until lg: (1024px)
+- **Filter bar wrapping**: flex-col md:flex-row handles filter elements stacking on mobile automatically
+- **Card padding reduction**: p-4 sm:p-6 saves precious space on 375px screens while maintaining desktop polish
+- **Button width on mobile**: w-full sm:w-auto for primary CTAs ensures touch-friendly targets on mobile
+- **Negative margins technique**: -mx-4 md:mx-0 allows full-bleed content on mobile while respecting page padding
+- **Skeleton loader consistency**: Responsive width classes must match actual component width classes exactly
+- **Empty state responsiveness**: Icons and text scale appropriately, no fixed dimensions needed
+---
