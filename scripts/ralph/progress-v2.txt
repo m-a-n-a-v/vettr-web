@@ -1,0 +1,84 @@
+# VETTR Web App V2 Redesign - Progress Log
+
+## Codebase Patterns
+
+### Key Architectural Decisions
+- Next.js 14+ App Router with route groups: `(auth)` and `(main)`
+- TypeScript strict mode enabled
+- Inter font loaded via next/font/google with CSS variable pattern
+- VETTR design tokens: vettr-navy, vettr-dark, vettr-card, vettr-accent, foreground
+- CSS custom properties for runtime theming: --color-accent, --color-surface, --color-border
+
+### Design System Tokens
+- Colors: vettr-navy (#0D1B2A), vettr-dark (#1B2838), vettr-card (#1E3348), vettr-accent (#00E676), foreground (#E8EDF2)
+- Border radius: rounded-lg (inputs), rounded-xl (buttons), rounded-2xl (cards)
+- Typography: Inter font with display: swap
+- Background gradients: bg-gradient-accent (4% opacity), bg-gradient-accent-strong (8% opacity), bg-gradient-dual (accent + blue)
+
+### Component Patterns to Follow
+- Cards: `bg-vettr-card/50 border border-white/5 rounded-2xl p-5 hover:border-vettr-accent/20 hover:bg-vettr-card/80 transition-all duration-300`
+- Inputs: `bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-gray-500 focus:border-vettr-accent/40 focus:ring-1 focus:ring-vettr-accent/20 transition-all`
+- Buttons (Primary): `bg-vettr-accent text-vettr-navy font-semibold rounded-xl px-4 py-2.5 hover:bg-vettr-accent/90 transition-colors`
+- Buttons (Secondary): `bg-white/5 border border-white/10 text-white rounded-xl px-4 py-2.5 hover:bg-white/10 transition-colors`
+
+---
+
+## V2-001: Fix global CSS, Tailwind config, and design tokens
+Status: ✅ COMPLETE
+Date: 2026-02-12
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Configured Inter font as CSS variable (--font-inter) using next/font/google with display: swap
+- Updated tailwind.config.ts with VETTR design tokens: vettr-navy, vettr-dark, vettr-card, vettr-accent, foreground
+- Added consistent border-radius tokens in Tailwind config
+- Added CSS custom properties in globals.css for runtime theming
+- Implemented smooth scrolling, antialiased text rendering
+- Added ::selection styling with rgba(0,230,118,0.3) background
+- Created subtle background gradient utilities: bg-gradient-accent, bg-gradient-accent-strong, bg-gradient-dual
+- Removed hardcoded hex colors from utility classes, replaced with CSS variables
+- Added typography scale in Tailwind config with proper line heights
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+Files modified:
+- tailwind.config.ts
+- src/app/globals.css
+- src/app/layout.tsx
+
+**Learnings for future iterations:**
+- Inter font was already imported but not using CSS variable pattern - updated to use variable for consistency
+- CSS custom properties allow runtime theming while Tailwind tokens provide compile-time consistency
+- Background gradient utilities should be positioned absolutely to avoid layout interference
+- Selection styling improves user experience with brand colors
+- Always run both build and lint before committing
+
+---
+
+## V2-002: Re-enable and fix authentication flow completely
+Status: ✅ COMPLETE
+Date: 2026-02-12
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Re-enabled ProtectedRoute component with proper authentication checks
+- ProtectedRoute now reads isAuthenticated and isLoading from AuthContext via useAuth hook
+- Added loading state display: VETTR logo with animated pulsing dots (no flash of login page)
+- Loading screen uses vettr-navy background with accent-colored logo and pulse animation
+- Re-enabled auth redirect in api-client.ts: redirects to /login on 401 after refresh fails
+- AuthContext already properly initializes from localStorage on mount and validates tokens with /users/me
+- Token refresh flow works: on 401, calls /auth/refresh, retries original request with new token
+- If refresh fails, clears tokens and redirects to /login
+- ProtectedRoute redirects to /login if not authenticated (after loading completes)
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/components/ProtectedRoute.tsx
+- src/lib/api-client.ts
+
+**Learnings for future iterations:**
+- The AuthContext was already well-implemented with token management and refresh logic
+- The api-client.ts had commented-out auth redirect that just needed to be uncommented
+- Loading state is critical to prevent flash of wrong page during auth check
+- Using useEffect with router.push for redirect is better than window.location for Next.js
+- Animated loading dots use staggered animation delays for smooth effect
+- Must return null after redirect to prevent rendering children during redirect
+
+---
