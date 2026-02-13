@@ -336,3 +336,36 @@ Files modified:
 - Other forms (FeedbackForm, AlertRuleCreator) will be updated in their respective stories (V2-029, V2-020)
 - Icon library usage keeps components consistent and maintainable
 ---
+
+## V2-010: Redesign Modal component
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Completely redesigned Modal component with premium V2 design system
+- Updated backdrop: bg-black/60 backdrop-blur-sm with fade-in animation (framer-motion)
+- Modal card: bg-vettr-card border border-white/10 rounded-2xl shadow-2xl
+- Header: px-6 pt-6 pb-0, title text-lg font-semibold text-white
+- Close button: XIcon from icon library, text-gray-400 hover:text-white, rounded-lg hover:bg-white/5 p-1
+- Body: px-6 py-4 with max-h-[calc(100vh-200px)] overflow-y-auto
+- Footer: px-6 pb-6 pt-0, flex justify-end gap-3 (optional, rendered when footer prop provided)
+- Animation: slide up from bottom (y: 10 → 0) + fade in, 200ms duration (reduced from 300ms)
+- Updated size variants: sm (max-w-sm), md (max-w-lg), lg (max-w-2xl), xl (max-w-4xl)
+- Focus trap, escape key, and backdrop click functionality preserved from original
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/components/ui/Modal.tsx
+
+**Learnings for future iterations:**
+- Modal animation should be subtle: y: 10 instead of y: 20 for less dramatic slide
+- Removed scale animation (scale: 0.95 → 1) for simpler, more performant animation
+- Duration reduced to 200ms for snappier feel (was 300ms)
+- Header border-b removed - cleaner look with just padding separation
+- Footer is optional prop, only renders when provided
+- Close button uses p-1 instead of p-1.5 for more compact appearance
+- XIcon component from icon library provides consistency across app
+- Size sm changed from max-w-md to max-w-sm per acceptance criteria
+- Focus-visible ring uses vettr-accent/30 to match V2 design system
+- All old design tokens replaced: bg-primaryLight → bg-vettr-card, border-border → border-white/10, text-textPrimary → text-white, text-textMuted → text-gray-400
+---

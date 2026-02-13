@@ -186,7 +186,7 @@
         "npm run build passes"
       ],
       "priority": 10,
-      "passes": false
+      "passes": true
     },
     {
       "id": "V2-011",
