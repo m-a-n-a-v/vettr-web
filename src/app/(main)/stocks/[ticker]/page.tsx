@@ -35,6 +35,7 @@ import VetrScoreTrend from '@/components/VetrScoreTrend';
 import { SkeletonStockDetailHeader, SkeletonVetrScoreSection, SkeletonCard, SkeletonFilingRow, SkeletonStockRow } from '@/components/ui/SkeletonLoader';
 import Breadcrumb from '@/components/ui/Breadcrumb';
 import { StarIcon, StarFilledIcon, ShareIcon, MoreHorizontalIcon, ArrowUpIcon, ArrowDownIcon, UsersIcon, FlagIcon, ShieldCheckIcon, BarChartIcon, DocumentIcon } from '@/components/icons';
+import { chartTheme, getTooltipStyle } from '@/lib/chart-theme';
 
 type Tab = 'overview' | 'pedigree' | 'red-flags';
 
@@ -575,29 +576,27 @@ export default function StockDetailPage() {
                       data={scoreHistory[0].history}
                       margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
                     >
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                      <CartesianGrid
+                        strokeDasharray={chartTheme.grid.strokeDasharray}
+                        stroke={chartTheme.grid.stroke}
+                      />
                       <XAxis
                         dataKey="date"
-                        stroke="rgba(255,255,255,0.2)"
-                        tick={{ fill: '#94a3b8', fontSize: 12 }}
+                        stroke={chartTheme.axis.stroke}
+                        tick={chartTheme.axis.tick}
                         tickFormatter={(value) => {
                           const date = new Date(value);
                           return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                         }}
                       />
                       <YAxis
-                        stroke="rgba(255,255,255,0.2)"
-                        tick={{ fill: '#94a3b8', fontSize: 12 }}
+                        stroke={chartTheme.axis.stroke}
+                        tick={chartTheme.axis.tick}
                         domain={[0, 100]}
                       />
                       <Tooltip
-                        contentStyle={{
-                          backgroundColor: '#1E3348',
-                          border: '1px solid rgba(255,255,255,0.1)',
-                          borderRadius: '12px',
-                          color: '#FFFFFF',
-                        }}
-                        labelStyle={{ color: '#94a3b8' }}
+                        contentStyle={getTooltipStyle()}
+                        labelStyle={{ color: chartTheme.text.secondary }}
                         formatter={(value: number | undefined) => [value?.toFixed(1) ?? 'N/A', 'Score']}
                         labelFormatter={(label) => {
                           const date = new Date(label);
@@ -611,9 +610,9 @@ export default function StockDetailPage() {
                       <Line
                         type="monotone"
                         dataKey="score"
-                        stroke="#00E676"
+                        stroke={chartTheme.colors.primary}
                         strokeWidth={2}
-                        dot={{ fill: '#00E676', r: 4 }}
+                        dot={{ fill: chartTheme.colors.primary, r: 4 }}
                         activeDot={{ r: 6 }}
                       />
                     </LineChart>
