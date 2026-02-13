@@ -1069,3 +1069,41 @@ Files modified:
 - Score color function updated to use V2 tokens: vettr-accent (80+), yellow-400 (60-79), orange-400 (40-59), red-400 (<40)
 - All old design tokens replaced: bg-primaryLight → bg-vettr-card, text-textPrimary → text-white, text-textSecondary/textMuted → text-gray-400/gray-500, border-border → border-white/5 or border-white/10, bg-surface → bg-white/5, bg-accent/error/warning → specific V2 colors
 ---
+
+## V2-028: Redesign Onboarding flow
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Completely redesigned Onboarding component with premium V2 design system
+- Updated to full-screen overlay with bg-vettr-navy/95 backdrop-blur-lg (no card, just centered content)
+- Added framer-motion import for AnimatePresence and motion components
+- Icons updated to larger size (w-20 h-20) with colored styling per slide (accent, blue, purple, yellow, red)
+- Updated SVG strokeWidth from 2 to 1.5 for consistency with V2 icon library
+- Removed Modal-style card wrapper - content now directly centered on backdrop
+- Slide content uses horizontal slide animation (x: 20 → 0) with AnimatePresence mode="wait"
+- Title updated to text-2xl font-bold text-white (removed md:text-3xl for consistency)
+- Description updated to text-gray-400 (V2 token) with max-w-md mx-auto
+- Progress dots redesigned: filled dots (bg-vettr-accent) for current, semi-filled (bg-vettr-accent/50) for completed, outline (bg-white/20) for remaining
+- Skip button updated to text-gray-500 hover:text-gray-300 for subtle appearance
+- Previous button updated to text-gray-400 hover:text-white with proper SVG arrow
+- Next and Get Started buttons updated to bg-vettr-accent hover:bg-vettr-accent/90 text-vettr-navy rounded-xl
+- Button padding increased to py-3 for better touch targets
+- Removed close button in top-right (not in V2-028 acceptance criteria)
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/components/Onboarding.tsx
+
+**Learnings for future iterations:**
+- Onboarding works better as full-screen overlay without card wrapper for immersive experience
+- Each slide icon should be colored differently for visual interest (not all same accent color)
+- Progress dots with three states (current, completed, remaining) provide better visual feedback
+- Horizontal slide transitions (x-axis) feel more natural for step-by-step flows than vertical
+- AnimatePresence mode="wait" ensures one slide exits before next enters (no overlap)
+- max-w-lg creates optimal width for onboarding content (not too wide, not too narrow)
+- Skip button should be subtle (text-gray-500) not prominent, since we want users to complete onboarding
+- framer-motion already installed and used in project - perfect for onboarding transitions
+- All old design tokens replaced: bg-primaryLight → removed (no card), text-textPrimary → text-white, text-textSecondary → text-gray-400, text-textMuted → text-gray-500, bg-accent → bg-vettr-accent, text-primaryDark → text-vettr-navy
+- Removed close button per acceptance criteria (user completes flow or skips, no X button)
+---
