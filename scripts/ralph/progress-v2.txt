@@ -1432,3 +1432,97 @@ Files modified:
 - TypeScript enforces prop interface: build errors caught all 'message' prop mismatches immediately
 - Watchlist functionality integrated into Stocks page, no separate watchlist page needed
 ---
+
+## V2-036: Improve skeleton loading screens to match redesigned layouts
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Completely overhauled SkeletonLoader.tsx component with V2-specific skeleton variants
+- Updated base skeleton styles to use V2 design tokens: bg-white/5, rounded-xl, animate-pulse
+- Created specialized skeleton components matching exact V2 layouts:
+  - SkeletonMetricCard: for Pulse page metric cards (bg-vettr-card/50 border border-white/5 rounded-2xl)
+  - SkeletonStockCard: matches redesigned StockCard with proper structure (ticker, price, sector, score)
+  - SkeletonFilingRow: table row skeleton with proper column structure for FilingTable
+  - SkeletonStockRow: table row skeleton for Stocks page with 8 columns
+  - SkeletonAlertRule: table row skeleton for Alerts page rules table
+  - SkeletonAlertTrigger: card skeleton for alert trigger notifications
+  - SkeletonStockDetailHeader: comprehensive header with breadcrumb, title, badges, action buttons
+  - SkeletonVetrScoreSection: score ring + component breakdown bars
+  - SkeletonChart: bar chart placeholder with 12 animated bars
+  - SkeletonFilterBar: filter bar for Stocks/Discovery pages
+  - SkeletonMetricCard: small metric cards (label + value)
+  - SkeletonUserHeader: profile header with avatar, name, tier badge
+  - SkeletonProfileSection: grouped card rows with borders
+
+- Updated Pulse page (/pulse/page.tsx):
+  - Market Overview: 4 SkeletonMetricCard in grid (matches actual metric cards exactly)
+  - Red Flag Summary: custom inline skeleton matching card structure with 2-column grid and severity breakdown
+  - Recent Filings: desktop table with SkeletonFilingRow + mobile cards (5 rows)
+  - Top Movers: 5 custom card skeletons matching mover card structure
+  - Top VETTR Scores: 3 SkeletonStockCard in horizontal scroll
+
+- Updated Stocks page (/stocks/page.tsx):
+  - Added SkeletonFilterBar for filter bar section
+  - Desktop: full table skeleton with proper thead structure and 25 SkeletonStockRow
+  - Mobile: 10 SkeletonStockCard in grid
+  - Result count skeleton preserved
+
+- Updated Stock Detail page (/stocks/[ticker]/page.tsx):
+  - SkeletonStockDetailHeader for breadcrumb + header section
+  - Tab navigation skeleton (3 tabs)
+  - Overview tab content: SkeletonVetrScoreSection + 4 SkeletonMetricCard grid + SkeletonChart + filing table with 5 SkeletonFilingRow
+  - Proper 3-column grid layout (1 col score, 2 col content) matching actual page
+
+- Updated Discovery page (/discovery/page.tsx):
+  - Featured Stocks: 4 SkeletonStockCard in horizontal scroll
+  - Recent Filings: desktop table with proper thead + 5 SkeletonFilingRow, mobile cards
+
+- Updated Alerts page (/alerts/page.tsx):
+  - Recent Triggers: 3 SkeletonAlertTrigger cards
+  - Alert Rules: desktop table with proper thead + 5 SkeletonAlertRule rows, mobile custom cards
+
+- Profile page: already had correct SkeletonUserHeader and SkeletonProfileSection - no changes needed
+
+- All skeletons now:
+  - Match exact shape of actual content (seamless transition when data loads)
+  - Use V2 color palette (bg-white/5, border-white/5, bg-vettr-card/50)
+  - Use V2 border radius (rounded-2xl for cards, rounded-xl for inputs/buttons)
+  - Include proper table structure where applicable (thead with column headers)
+  - Distinguish between desktop table view and mobile card view
+  - Use consistent animate-pulse animation
+
+- Quality checks: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/components/ui/SkeletonLoader.tsx
+- src/app/(main)/pulse/page.tsx
+- src/app/(main)/stocks/page.tsx
+- src/app/(main)/stocks/[ticker]/page.tsx
+- src/app/(main)/discovery/page.tsx
+- src/app/(main)/alerts/page.tsx
+- scripts/ralph/prd-v2.json
+
+**Learnings for future iterations:**
+- Skeleton screens MUST match exact layout structure of actual content for smooth loading experience
+- Table skeletons need full <table><thead><tbody> structure with proper column headers for context
+- Responsive skeletons: show desktop table skeleton + mobile card skeleton, hidden via md: breakpoint
+- SkeletonLoader base component changed from animate-shimmer bg-surface to animate-pulse bg-white/5 (V2 design)
+- All skeleton components should use V2 rounded-xl/rounded-2xl instead of old rounded-lg
+- Metric card skeletons need exact structure: label line (h-3 w-60%) + value line (h-8 w-40%)
+- Filing row skeletons need 6 columns: Type icon, Title, Ticker, Date, Material badge, Status badge
+- Stock row skeletons need 8 columns: Ticker, Company, Price, Change, Score, Sector, Market Cap, Favorite
+- Complex sections (Red Flag Summary) may need custom inline skeletons matching exact grid/layout
+- Horizontal scroll sections need flex-shrink-0 w-[size] containers around skeleton cards
+- Always import only the needed skeleton components to keep bundle size minimal
+- SkeletonStockCard structure must match V2 StockCard: header (ticker+company+star), price row, bottom (sector+score)
+- Chart skeletons: use bar heights with Math.random() * range + min for visual variety
+- Filter bar skeletons: show all filter elements (search, dropdowns, toggles) in proper flex layout
+- Stock detail header skeleton includes breadcrumb, title row with badges, price, and 3 action buttons
+- Profile section skeletons use border-b border-white/5 between rows (not separate cards)
+- Empty space between skeleton groups (space-y-6) matches actual content spacing
+- Pulse page has most complex skeleton requirements: 5 distinct section types with unique structures
+- Always verify skeleton import paths - some files import from same component, consolidate imports
+- Mobile skeletons can be simpler/condensed but must maintain similar visual hierarchy
+- Skeleton component library should be comprehensive but not bloated - reuse where possible
+---
