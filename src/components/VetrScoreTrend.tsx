@@ -52,7 +52,7 @@ export default function VetrScoreTrend({ trend }: VetrScoreTrendProps) {
   // Format momentum as percentage with sign
   const formatMomentum = (momentum: number) => {
     const sign = momentum >= 0 ? '+' : '';
-    return `${sign}${momentum.toFixed(1)}%`;
+    return `${sign}${(momentum ?? 0).toFixed(1)}%`;
   };
 
   return (
@@ -92,7 +92,7 @@ export default function VetrScoreTrend({ trend }: VetrScoreTrendProps) {
                   </div>
                   <div className="flex-1">
                     <div className={`font-medium ${change.change >= 0 ? 'text-accent' : 'text-error'}`}>
-                      {change.change >= 0 ? '+' : ''}{change.change.toFixed(1)} points
+                      {(change.change ?? 0) >= 0 ? '+' : ''}{(change.change ?? 0).toFixed(1)} points
                     </div>
                     <div className="text-textSecondary">{change.reason}</div>
                   </div>

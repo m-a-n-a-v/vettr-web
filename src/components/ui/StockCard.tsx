@@ -65,7 +65,7 @@ export default function StockCard({
         <div className="mb-4">
           <div className="flex items-baseline gap-2">
             <span className="text-2xl font-bold text-white">
-              ${stock.current_price.toFixed(2)}
+              ${(stock.current_price ?? 0).toFixed(2)}
             </span>
             <PriceChangeIndicator change={stock.price_change_percent} size="sm" />
           </div>

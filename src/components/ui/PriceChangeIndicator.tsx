@@ -11,8 +11,9 @@ export default function PriceChangeIndicator({
   size = 'md',
   showArrow = true
 }: PriceChangeIndicatorProps) {
-  const isPositive = change > 0;
-  const isNeutral = change === 0;
+  const safeChange = change ?? 0;
+  const isPositive = safeChange > 0;
+  const isNeutral = safeChange === 0;
 
   // Determine color based on change direction
   const getColor = () => {
@@ -31,7 +32,7 @@ export default function PriceChangeIndicator({
   const sizeClass = sizeClasses[size];
 
   // Format percentage with sign
-  const formattedChange = `${isPositive ? '+' : ''}${change.toFixed(2)}%`;
+  const formattedChange = `${isPositive ? '+' : ''}${safeChange.toFixed(2)}%`;
 
   // Arrow icons
   const Arrow = () => {

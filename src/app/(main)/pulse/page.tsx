@@ -291,17 +291,17 @@ export default function PulsePage() {
               <div>
                 <p className="text-sm text-gray-400 mb-2">Total Active Flags</p>
                 <div className="flex items-baseline gap-3">
-                  <p className="text-4xl font-bold text-white">{redFlagTrend.total_active_flags}</p>
-                  {redFlagTrend.change_30_days !== 0 && (
+                  <p className="text-4xl font-bold text-white">{redFlagTrend.total_active_flags ?? 0}</p>
+                  {(redFlagTrend.change_30_days ?? 0) !== 0 && (
                     <div className={`flex items-center gap-1 text-sm font-medium ${
-                      redFlagTrend.change_30_days > 0 ? 'text-red-400' : 'text-vettr-accent'
+                      (redFlagTrend.change_30_days ?? 0) > 0 ? 'text-red-400' : 'text-vettr-accent'
                     }`}>
-                      {redFlagTrend.change_30_days > 0 ? (
+                      {(redFlagTrend.change_30_days ?? 0) > 0 ? (
                         <ArrowUpIcon className="w-3 h-3" />
                       ) : (
                         <ArrowDownIcon className="w-3 h-3" />
                       )}
-                      <span>{Math.abs(redFlagTrend.change_30_days)}</span>
+                      <span>{Math.abs(redFlagTrend.change_30_days ?? 0)}</span>
                     </div>
                   )}
                 </div>
@@ -315,18 +315,18 @@ export default function PulsePage() {
                   <div className="flex-1 bg-white/5 rounded-full h-3 overflow-hidden">
                     <div
                       className={`h-full transition-all duration-500 ${
-                        redFlagTrend.change_30_days > 0 ? 'bg-red-400' : 'bg-vettr-accent'
+                        (redFlagTrend.change_30_days ?? 0) > 0 ? 'bg-red-400' : 'bg-vettr-accent'
                       }`}
                       style={{
-                        width: `${Math.min(Math.abs(redFlagTrend.change_30_days) / redFlagTrend.total_active_flags * 100, 100)}%`
+                        width: `${Math.min(Math.abs(redFlagTrend.change_30_days ?? 0) / Math.max(redFlagTrend.total_active_flags ?? 1, 1) * 100, 100)}%`
                       }}
                     />
                   </div>
                   <span className={`text-lg font-bold ${
-                    redFlagTrend.change_30_days > 0 ? 'text-red-400' :
-                    redFlagTrend.change_30_days < 0 ? 'text-vettr-accent' : 'text-gray-500'
+                    (redFlagTrend.change_30_days ?? 0) > 0 ? 'text-red-400' :
+                    (redFlagTrend.change_30_days ?? 0) < 0 ? 'text-vettr-accent' : 'text-gray-500'
                   }`}>
-                    {redFlagTrend.change_30_days > 0 ? '+' : ''}{redFlagTrend.change_30_days}
+                    {(redFlagTrend.change_30_days ?? 0) > 0 ? '+' : ''}{redFlagTrend.change_30_days ?? 0}
                   </span>
                 </div>
               </div>
@@ -342,7 +342,7 @@ export default function PulsePage() {
                     <div className="w-3 h-3 rounded-full bg-red-400" />
                     <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Critical</p>
                   </div>
-                  <p className="text-2xl font-bold text-red-400">{redFlagTrend.breakdown_by_severity.critical}</p>
+                  <p className="text-2xl font-bold text-red-400">{redFlagTrend.breakdown_by_severity?.critical ?? 0}</p>
                 </div>
 
                 {/* High */}
@@ -351,7 +351,7 @@ export default function PulsePage() {
                     <div className="w-3 h-3 rounded-full bg-orange-400" />
                     <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">High</p>
                   </div>
-                  <p className="text-2xl font-bold text-orange-400">{redFlagTrend.breakdown_by_severity.high}</p>
+                  <p className="text-2xl font-bold text-orange-400">{redFlagTrend.breakdown_by_severity?.high ?? 0}</p>
                 </div>
 
                 {/* Moderate */}
@@ -360,7 +360,7 @@ export default function PulsePage() {
                     <div className="w-3 h-3 rounded-full bg-yellow-400" />
                     <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Moderate</p>
                   </div>
-                  <p className="text-2xl font-bold text-yellow-400">{redFlagTrend.breakdown_by_severity.moderate}</p>
+                  <p className="text-2xl font-bold text-yellow-400">{redFlagTrend.breakdown_by_severity?.moderate ?? 0}</p>
                 </div>
 
                 {/* Low */}
@@ -369,7 +369,7 @@ export default function PulsePage() {
                     <div className="w-3 h-3 rounded-full bg-gray-400" />
                     <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Low</p>
                   </div>
-                  <p className="text-2xl font-bold text-gray-400">{redFlagTrend.breakdown_by_severity.low}</p>
+                  <p className="text-2xl font-bold text-gray-400">{redFlagTrend.breakdown_by_severity?.low ?? 0}</p>
                 </div>
               </div>
             </div>

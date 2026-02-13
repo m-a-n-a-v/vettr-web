@@ -17,7 +17,8 @@ export default function VetrScoreBadge({
   onClick,
   animate: shouldAnimate = true
 }: VetrScoreBadgeProps) {
-  const [animatedScore, setAnimatedScore] = useState(shouldAnimate ? 0 : score);
+  const safeScore = score ?? 0;
+  const [animatedScore, setAnimatedScore] = useState(shouldAnimate ? 0 : safeScore);
 
   useEffect(() => {
     if (shouldAnimate) {
@@ -31,7 +32,7 @@ export default function VetrScoreBadge({
 
         // Ease-out function
         const easeOut = 1 - Math.pow(1 - progress, 3);
-        const currentScore = Math.round(easeOut * score);
+        const currentScore = Math.round(easeOut * safeScore);
 
         setAnimatedScore(currentScore);
 
@@ -42,15 +43,15 @@ export default function VetrScoreBadge({
 
       requestAnimationFrame(animate);
     } else {
-      setAnimatedScore(score);
+      setAnimatedScore(safeScore);
     }
-  }, [score, shouldAnimate]);
+  }, [safeScore, shouldAnimate]);
 
   // Determine stroke color based on score (using Tailwind theme colors)
   const getStrokeColor = (): string => {
-    if (score >= 80) return '#00E676'; // vettr-accent
-    if (score >= 60) return '#FBBF24'; // yellow-400
-    if (score >= 40) return '#FB923C'; // orange-400
+    if (safeScore >= 80) return '#00E676'; // vettr-accent
+    if (safeScore >= 60) return '#FBBF24'; // yellow-400
+    if (safeScore >= 40) return '#FB923C'; // orange-400
     return '#F87171'; // red-400
   };
 
@@ -90,7 +91,7 @@ export default function VetrScoreBadge({
       className={`relative inline-flex items-center justify-center ${onClick ? 'cursor-pointer group' : ''}`}
       onClick={onClick}
       role={onClick ? 'button' : undefined}
-      aria-label={`VETTR Score: ${score}`}
+      aria-label={`VETTR Score: ${safeScore}`}
       style={{ width: config.size, height: config.size }}
     >
       <svg
