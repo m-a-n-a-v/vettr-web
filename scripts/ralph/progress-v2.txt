@@ -369,3 +369,43 @@ Files modified:
 - Focus-visible ring uses vettr-accent/30 to match V2 design system
 - All old design tokens replaced: bg-primaryLight → bg-vettr-card, border-border → border-white/10, text-textPrimary → text-white, text-textMuted → text-gray-400
 ---
+
+## V2-011: Redesign Toast notification system
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Completely redesigned Toast component with V2 design system
+- Added four new SVG icons to icon library: CheckCircleIcon, XCircleIcon, AlertTriangleIcon, InfoCircleIcon
+- Toast card: bg-vettr-card border border-white/10 rounded-xl shadow-xl min-w-[320px]
+- Implemented colored left border for each variant: success (vettr-accent), error (red-400), warning (yellow-400), info (blue-400)
+- Icons use proper SVG components from icon library, colored to match variant theme
+- Slide-in from right animation (x: 20 → 0) + fade in with 200ms duration
+- Slide-out to right (x: 20) + fade out on dismiss
+- Auto-dismiss after 4s (configurable, default changed from 5s to 4s)
+- Progress bar at bottom showing time remaining with colored fill matching variant
+- Progress bar updates every 50ms for smooth animation
+- Close button: XIcon component with text-gray-500 hover:text-white
+- Message: text-sm text-white, optional description in text-gray-400
+- Updated ToastContext to implement maximum 3 toasts logic - oldest toast removed when limit exceeded
+- ToastContainer uses flex flex-col gap-2 for proper stacking
+- Fixed TypeScript error by extracting duration to const inside useEffect
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/components/icons/index.tsx (added 4 new toast icons)
+- src/components/ui/Toast.tsx
+- src/contexts/ToastContext.tsx
+
+**Learnings for future iterations:**
+- Toast animation direction changed from y-axis (slide down) to x-axis (slide from right) per V2 acceptance criteria
+- Progress bar uses absolute positioning at bottom with bg-white/5 background and colored fill
+- Progress updates via setInterval (50ms) instead of CSS transition for smooth countdown
+- TypeScript requires extracting potentially undefined values to const inside closures for type narrowing
+- Maximum toast limit implemented in ToastContext.showToast using slice(-3) to keep most recent 3 toasts
+- Toast variants each have unique icon and color scheme: success=green, error=red, warning=yellow, info=blue
+- Border-l-2 creates colored left border accent for each toast variant
+- AnimatePresence mode="popLayout" allows smooth stacking animations when toasts appear/disappear
+- Optional description field added to ToastData interface for richer notifications
+- All old design tokens replaced: bg-accent/20 → use specific variant colors, text-textPrimary → text-white, text-textMuted → text-gray-500, border-accent → border-white/10
+---
