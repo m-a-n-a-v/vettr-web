@@ -988,3 +988,45 @@ Files modified:
 - Backdrop blur with bg-black/60 matches other V2 modals for consistency
 - All old design tokens replaced with V2 color palette
 ---
+
+## V2-026: Redesign ExecutiveDetail modal
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Completely redesigned ExecutiveDetail modal with premium V2 design system
+- Updated modal backdrop: bg-black/60 backdrop-blur-sm for consistency with other V2 modals
+- Updated modal card: bg-vettr-card border-white/10 rounded-2xl shadow-2xl max-w-2xl
+- Replaced inline SVG icons with ShareIcon and XIcon components from icon library
+- Header: text-xl font-semibold text-white with p-2 icon buttons (hover:bg-white/5)
+- Updated large avatar: w-16 h-16 bg-gradient-to-br from-vettr-accent/20 to-vettr-accent/5 rounded-full
+- Profile header: text-xl font-semibold for name, text-sm text-gray-400 for title and company
+- Ticker displayed with font-mono text-vettr-accent for monospace appearance
+- Redesigned metrics row as 2-column grid with mini metric cards (bg-white/[0.03] rounded-xl p-4)
+- Each metric card: uppercase label (text-xs text-gray-500), large value (text-lg font-bold text-white)
+- Career Timeline redesigned with vertical border-l-2 border-white/10, colored timeline dots
+- Current position dot uses bg-vettr-accent, past positions use bg-white/10 border-2 border-white/20
+- Timeline entries: text-white font-medium for title, text-gray-400 for company, text-gray-500 for dates
+- Education section: bg-vettr-card/30 rounded-2xl with checkmark icons (text-vettr-accent)
+- Social links updated to icon-only buttons: bg-white/5 rounded-lg p-2 hover:bg-white/10
+- Removed text labels from social links (LinkedIn/Twitter now icon-only per acceptance criteria)
+- Tenure Assessment: colored badge with risk level (Stable=vettr-accent, Watch=yellow-400, Flight Risk=red-400)
+- Added colored dot indicator to tenure assessment header matching risk color
+- Updated tenure risk description text to text-sm leading-relaxed
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/components/ExecutiveDetail.tsx
+
+**Learnings for future iterations:**
+- ExecutiveDetail modal follows same max-w-2xl size as other large modals (AlertRuleCreator, etc.)
+- Avatar size reduced from w-24 h-24 to w-16 h-16 per V2-026 acceptance criteria
+- Metrics work better as dedicated mini cards in grid layout than inline flex rows
+- Career timeline with border-l-2 creates cleaner vertical line than individual connectors between dots
+- Timeline dots positioned with absolute -left-[9px] to center on border line
+- Social links should be icon-only buttons (not buttons with labels) per acceptance criteria
+- Tenure assessment uses colored border-2 and matching text color for each risk level
+- All old design tokens replaced: bg-primary → bg-black/60, bg-primaryLight → bg-vettr-card, text-textPrimary → text-white, text-textSecondary → text-gray-400, text-textMuted → text-gray-500, border-border → border-white/5 or border-white/10, bg-surface → bg-white/5 or bg-vettr-card/30, text-accent → text-vettr-accent, bg-accent → bg-vettr-accent, text-warning → text-yellow-400, text-error → text-red-400
+- Modal header uses px-6 py-4 (not px-6 pt-6 pb-0) for better spacing balance
+- Specialization badge moved above metrics row (not inline with stats) for cleaner layout
+---
