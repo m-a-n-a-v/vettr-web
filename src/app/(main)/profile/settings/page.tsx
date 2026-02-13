@@ -140,8 +140,11 @@ export default function SettingsPage() {
               </div>
             </div>
             <button
+              role="switch"
+              aria-checked={notificationsEnabled}
+              aria-label="Enable notifications"
               onClick={() => setNotificationsEnabled(!notificationsEnabled)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus-visible:ring-2 focus-visible:ring-vettr-accent/30 focus-visible:outline-none ${
                 notificationsEnabled ? 'bg-vettr-accent' : 'bg-white/10'
               }`}
             >
@@ -171,8 +174,11 @@ export default function SettingsPage() {
               </div>
             </div>
             <button
+              role="switch"
+              aria-checked={alertRedFlag}
+              aria-label="Red flag alerts"
               onClick={() => setAlertRedFlag(!alertRedFlag)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus-visible:ring-2 focus-visible:ring-vettr-accent/30 focus-visible:outline-none ${
                 alertRedFlag ? 'bg-vettr-accent' : 'bg-white/10'
               }`}
             >
@@ -194,8 +200,11 @@ export default function SettingsPage() {
               </div>
             </div>
             <button
+              role="switch"
+              aria-checked={alertFinancing}
+              aria-label="Financing alerts"
               onClick={() => setAlertFinancing(!alertFinancing)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus-visible:ring-2 focus-visible:ring-vettr-accent/30 focus-visible:outline-none ${
                 alertFinancing ? 'bg-vettr-accent' : 'bg-white/10'
               }`}
             >
@@ -217,8 +226,11 @@ export default function SettingsPage() {
               </div>
             </div>
             <button
+              role="switch"
+              aria-checked={alertDrillResult}
+              aria-label="Drill result alerts"
               onClick={() => setAlertDrillResult(!alertDrillResult)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus-visible:ring-2 focus-visible:ring-vettr-accent/30 focus-visible:outline-none ${
                 alertDrillResult ? 'bg-vettr-accent' : 'bg-white/10'
               }`}
             >
@@ -240,8 +252,11 @@ export default function SettingsPage() {
               </div>
             </div>
             <button
+              role="switch"
+              aria-checked={alertManagementChange}
+              aria-label="Management change alerts"
               onClick={() => setAlertManagementChange(!alertManagementChange)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus-visible:ring-2 focus-visible:ring-vettr-accent/30 focus-visible:outline-none ${
                 alertManagementChange ? 'bg-vettr-accent' : 'bg-white/10'
               }`}
             >

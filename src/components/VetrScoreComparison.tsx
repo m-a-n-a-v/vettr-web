@@ -128,7 +128,7 @@ export default function VetrScoreComparison({ comparison, isLoading, currentTick
       </div>
 
       {/* Bar Chart */}
-      <div className="h-80 mb-4">
+      <div className="h-80 mb-4" role="img" aria-label={`Bar chart comparing VETTR scores across ${comparison.sector} sector peers`}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={chartData}

@@ -467,6 +467,9 @@ function AlertsPageContent() {
                     <div className="flex items-center gap-2 flex-shrink-0">
                       {/* Toggle Switch */}
                       <button
+                        role="switch"
+                        aria-checked={rule.is_enabled}
+                        aria-label={rule.is_enabled ? 'Disable alert' : 'Enable alert'}
                         onClick={() => handleToggle(rule.id, rule.is_enabled)}
                         disabled={togglingRuleId === rule.id}
                         className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-vettr-accent/30 ${rule.is_enabled ? 'bg-vettr-accent' : 'bg-white/10'

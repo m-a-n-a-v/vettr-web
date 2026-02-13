@@ -165,6 +165,7 @@ export default function QuickSearch({ isOpen, onClose }: QuickSearchProps) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search stocks by ticker or name..."
+            aria-label="Search stocks by ticker or name"
             className="flex-1 bg-transparent border-none outline-none text-white placeholder-gray-500 text-lg focus:ring-0"
             autoComplete="off"
           />

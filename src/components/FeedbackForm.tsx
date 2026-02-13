@@ -122,6 +122,7 @@ export default function FeedbackForm({ isOpen, onClose }: FeedbackFormProps) {
                 onClick={onClose}
                 className="p-1 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
                 disabled={isSubmitting}
+                aria-label="Close feedback form"
               >
                 <XIcon className="w-5 h-5" />
               </button>
@@ -164,6 +165,8 @@ export default function FeedbackForm({ isOpen, onClose }: FeedbackFormProps) {
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Tell us what's on your mind..."
                   rows={5}
+                  required
+                  aria-required="true"
                   className="w-full min-h-[120px] bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder-gray-500 focus:border-vettr-accent/40 focus:ring-1 focus:ring-vettr-accent/20 transition-all resize-none"
                   disabled={isSubmitting}
                 />

@@ -62,6 +62,7 @@ export default function SearchInput({
         placeholder={placeholder}
         disabled={disabled}
         autoFocus={autoFocus}
+        aria-label="Search"
         className={`
           w-full pl-9 sm:pl-11 pr-9 sm:pr-10 py-2.5 rounded-xl text-sm
           bg-white/5 border border-white/10

@@ -96,6 +96,42 @@ export default function StockDetailPage() {
   const isInWatchlist = watchlist.some(item => item.ticker === ticker);
   const isTogglingFavorite = isAdding || isRemoving;
 
+  // Handle keyboard navigation for tabs
+  const handleTabKeyDown = (event: React.KeyboardEvent, tab: Tab) => {
+    const tabs: Tab[] = ['overview', 'pedigree', 'red-flags'];
+    const currentIndex = tabs.indexOf(tab);
+
+    if (event.key === 'ArrowRight') {
+      event.preventDefault();
+      const nextIndex = (currentIndex + 1) % tabs.length;
+      setActiveTab(tabs[nextIndex]);
+      // Focus the next tab button
+      setTimeout(() => {
+        document.getElementById(`${tabs[nextIndex]}-tab`)?.focus();
+      }, 0);
+    } else if (event.key === 'ArrowLeft') {
+      event.preventDefault();
+      const prevIndex = currentIndex === 0 ? tabs.length - 1 : currentIndex - 1;
+      setActiveTab(tabs[prevIndex]);
+      // Focus the previous tab button
+      setTimeout(() => {
+        document.getElementById(`${tabs[prevIndex]}-tab`)?.focus();
+      }, 0);
+    } else if (event.key === 'Home') {
+      event.preventDefault();
+      setActiveTab(tabs[0]);
+      setTimeout(() => {
+        document.getElementById(`${tabs[0]}-tab`)?.focus();
+      }, 0);
+    } else if (event.key === 'End') {
+      event.preventDefault();
+      setActiveTab(tabs[tabs.length - 1]);
+      setTimeout(() => {
+        document.getElementById(`${tabs[tabs.length - 1]}-tab`)?.focus();
+      }, 0);
+    }
+  };
+
   // Filter and sort executives
   const filteredAndSortedExecutives = useMemo(() => {
     let result = [...executives];
@@ -409,7 +445,9 @@ export default function StockDetailPage() {
             aria-selected={activeTab === 'overview'}
             aria-controls="overview-panel"
             id="overview-tab"
+            tabIndex={activeTab === 'overview' ? 0 : -1}
             onClick={() => setActiveTab('overview')}
+            onKeyDown={(e) => handleTabKeyDown(e, 'overview')}
             className={`px-1 py-3 font-medium text-sm transition-colors border-b-2 ${
               activeTab === 'overview'
                 ? 'text-white border-vettr-accent'
@@ -423,7 +461,9 @@ export default function StockDetailPage() {
             aria-selected={activeTab === 'pedigree'}
             aria-controls="pedigree-panel"
             id="pedigree-tab"
+            tabIndex={activeTab === 'pedigree' ? 0 : -1}
             onClick={() => setActiveTab('pedigree')}
+            onKeyDown={(e) => handleTabKeyDown(e, 'pedigree')}
             className={`px-1 py-3 font-medium text-sm transition-colors border-b-2 ${
               activeTab === 'pedigree'
                 ? 'text-white border-vettr-accent'
@@ -437,7 +477,9 @@ export default function StockDetailPage() {
             aria-selected={activeTab === 'red-flags'}
             aria-controls="red-flags-panel"
             id="red-flags-tab"
+            tabIndex={activeTab === 'red-flags' ? 0 : -1}
             onClick={() => setActiveTab('red-flags')}
+            onKeyDown={(e) => handleTabKeyDown(e, 'red-flags')}
             className={`px-1 py-3 font-medium text-sm transition-colors border-b-2 ${
               activeTab === 'red-flags'
                 ? 'text-white border-vettr-accent'
@@ -601,7 +643,7 @@ export default function StockDetailPage() {
                   <LoadingSpinner size="lg" color="white" />
                 </div>
               ) : scoreHistory.length > 0 && scoreHistory[0]?.history && scoreHistory[0].history.length >= 2 ? (
-                <div className="h-64">
+                <div className="h-64" role="img" aria-label="VETTR Score history chart showing score trends over time">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart
                       data={scoreHistory[0].history}
