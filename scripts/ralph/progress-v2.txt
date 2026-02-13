@@ -1231,3 +1231,34 @@ Files modified:
 - No emoji characters should remain in the UI - all replaced with professional SVG icons
 ---
 
+## V2-032: Add proper loading/auth state on app mount
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Verified AuthContext implementation has isLoading state that starts as true (already implemented in V2-002)
+- AuthContext properly checks localStorage for tokens on mount and validates with /users/me endpoint
+- ProtectedRoute component shows full-screen loading with VETTR logo and animated pulsing dots while isLoading is true
+- Loading screen uses bg-vettr-navy background with centered VETTR logo (text-3xl font-bold)
+- Three animated accent dots with staggered animation delays (0ms, 150ms, 300ms) create smooth pulsing effect
+- If tokens are valid: sets user state and renders requested page
+- If tokens are invalid/missing: redirects to /login after loading completes
+- No flash of login page or wrong content during auth check - loading screen displays immediately
+- Implementation prevents FOUC (Flash of Unstyled Content) by showing loading state before any route rendering
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+Files verified:
+- src/contexts/AuthContext.tsx (already has isLoading state and token validation logic from V2-002)
+- src/components/ProtectedRoute.tsx (already has loading screen implementation from V2-002)
+
+**Learnings for future iterations:**
+- This story was already fully implemented in V2-002 when authentication was re-enabled
+- The loading state pattern prevents flash of wrong page by showing loading screen immediately on mount
+- ProtectedRoute correctly waits for isLoading to become false before making authentication decision
+- Staggered animation delays on pulsing dots (0ms, 150ms, 300ms) create professional loading animation
+- Loading screen must be shown in ProtectedRoute (not root layout) to avoid blocking unauthenticated pages (login/signup)
+- isLoading state in AuthContext ensures consistent loading behavior across all protected routes
+- No additional changes were needed - implementation from V2-002 already met all V2-032 acceptance criteria
+- Quality verification confirmed no regressions: build and lint both pass successfully
+---
+
