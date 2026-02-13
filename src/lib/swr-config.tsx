@@ -30,7 +30,7 @@ export function SWRProvider({ children }: SWRProviderProps) {
         errorRetryCount: 3,
         errorRetryInterval: 5000,
         shouldRetryOnError: true,
-        onErrorRetry: (error: any, key, config, revalidate, { retryCount }) => {
+        onErrorRetry: (error: { status?: number; code?: string }, key, config, revalidate, { retryCount }) => {
           // Never retry on 404
           if (error.status === 404) return;
 
