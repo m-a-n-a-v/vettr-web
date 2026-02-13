@@ -1824,3 +1824,44 @@ Files modified:
 - Large icon (w-16 h-16) provides good visual hierarchy for error states
 - text-white/10 creates subtle large text effect (like the "404" display)
 ---
+
+## V2-043: Optimize API client with request deduplication and timeouts
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Added 30-second request timeout using AbortController with proper cleanup
+- Implemented request deduplication: same URL+method within 100ms returns the same promise instance
+- Token refresh mutex: Prevents multiple simultaneous refresh calls by storing and reusing the refresh promise
+- Enhanced error messages: Specific messages for 400/401/403/404/408/429/500/502/503/504 status codes
+- Network errors: "Unable to connect to server. Please check your internet connection."
+- Timeout errors: "Request timeout. Please try again."
+- Server errors: "Server error. Our team has been notified."
+- Not found errors: "Not found. The requested resource does not exist."
+- Rate limiting: Already had non-blocking retry with toast, maintained that pattern
+- Added request/response interceptor pattern for extensibility
+  - requestInterceptors array runs before each request, can modify URL and options
+  - responseInterceptors array runs after each successful response, can modify response data
+  - interceptors.addRequestInterceptor() and interceptors.addResponseInterceptor() return cleanup functions
+  - interceptors.clearRequestInterceptors() and interceptors.clearResponseInterceptors() for bulk cleanup
+- Deduplication cache automatically cleans up entries after 100ms window
+- All error paths properly handled with user-friendly messages
+- Quality checks: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/lib/api-client.ts
+
+**Learnings for future iterations:**
+- **Request deduplication**: Map-based cache with timestamp prevents duplicate in-flight requests for the same URL+method
+- **AbortController pattern**: Create controller, set timeout to abort, clear timeout on completion, catch AbortError
+- **Mutex pattern**: Store promise in module-level variable, check if exists before creating new one, clear in finally block
+- **Interceptor pattern**: Array-based storage with push/splice for add/remove, return cleanup function for ease of use
+- **Error message mapping**: Switch statement on status code provides much better UX than generic error messages
+- **JSON parse errors**: Wrap response.json() in try-catch to handle non-JSON responses gracefully
+- **Cache cleanup**: Use setTimeout with original timestamp check to prevent race conditions in cache deletion
+- **Type safety**: Use proper TypeScript types for interceptors with generics for response type preservation
+- **Non-blocking rate limit**: Existing implementation already used toast events and sleep, just maintained that
+- **Timeout configuration**: Default 30s is appropriate for most API calls, but allow override via options
+- **Deduplication window**: 100ms is short enough to not impact perceived performance but long enough to catch duplicates
+- **Promise reuse**: Deduplication cache stores the actual promise object, not just a flag, so all callers get the same result
+---
