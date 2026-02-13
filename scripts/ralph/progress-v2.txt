@@ -678,3 +678,44 @@ Files modified:
 - All old design tokens replaced: bg-primary → bg-vettr-navy, bg-primaryLight → bg-vettr-card/30 or bg-vettr-card/50, text-textPrimary → text-white, text-textSecondary → text-gray-400, text-textMuted → text-gray-500, border-border → border-white/5, text-accent → text-vettr-accent, text-warning → text-yellow-400
 - FilingTable is reusable component used in both Discovery and Pulse pages - V2 updates apply everywhere
 ---
+
+## V2-019: Redesign Alerts page
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Completely redesigned Alerts page with premium V2 design system
+- Added EditIcon, TrashIcon, and PlusIcon to icon library
+- Updated Recent Triggers section with V2 card styling (bg-vettr-card/50 border-white/5 rounded-xl)
+- Replaced emoji icons with proper SVG icons from icon library (FlagIcon for red flags, BellIcon for alerts)
+- Recent trigger cards show alert type icon with colored styling (red-400, yellow-400, purple-400, blue-400)
+- Updated My Rules section with pill-style filter tabs (rounded-full with active state: bg-vettr-accent/10 border-vettr-accent/30)
+- Filter tabs styled as pills: active uses accent color with border, inactive is subtle with hover states
+- Rule cards redesigned with V2 styling: bg-vettr-card/50 border-white/5 rounded-xl
+- Toggle switch updated to V2 design: bg-vettr-accent when on, bg-white/10 when off, white circle thumb
+- Edit and delete buttons use icon components (EditIcon, TrashIcon) with proper hover states
+- Empty states updated to use SVG icons instead of emoji: BellIcon (no rules), FilterIcon (no matches)
+- Delete confirmation modal styled with V2 tokens: red-themed delete button, proper modal styling
+- Create Alert button uses PlusIcon and bg-vettr-accent text-vettr-navy rounded-xl styling
+- Floating action button (mobile) uses PlusIcon SVG instead of text "+"
+- Updated skeleton loading with V2 design tokens (bg-white/5 rounded-xl)
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/components/icons/index.tsx (added EditIcon, TrashIcon, PlusIcon)
+- src/app/(main)/alerts/page.tsx
+
+**Learnings for future iterations:**
+- Filter tabs work better as pill buttons (rounded-full) with border for active state
+- Alert type icons should be colored SVG components, not emoji, for consistency
+- Toggle switch should use bg-white/10 (not bg-border) when off for V2 design
+- Each alert type can have its own colored icon for visual distinction (red flag=red-400, financing=yellow-400, etc.)
+- Edit and trash buttons should use hover:bg-white/5 for subtle hover effect
+- Empty states should use large SVG icons (w-16 h-16) instead of emoji
+- Delete confirmation modal should have red-themed delete button (bg-red-500) not generic error color
+- Recent triggers and rules should use same card pattern (bg-vettr-card/50 border-white/5 rounded-xl)
+- Ticker should use font-mono for monospace appearance in alert cards
+- All old design tokens replaced: bg-primary → bg-vettr-navy, bg-primaryLight → bg-vettr-card/50, text-textPrimary → text-white, text-textSecondary → text-gray-400, text-textMuted → text-gray-500, border-border → border-white/5, text-accent → text-vettr-accent, bg-accent → bg-vettr-accent, text-error → text-red-400
+- ShareIcon component provides consistency for share buttons across app
+- PlusIcon better than text "+" for create buttons and FAB
+---
