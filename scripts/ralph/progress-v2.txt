@@ -1948,3 +1948,40 @@ Files modified:
 - **CSV header format**: Use uppercase column names for professional appearance
 - **Error handling**: Wrap export logic in try-catch to show error toast if download fails
 ---
+
+## V2-046: Add print styles for stock detail page
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Added comprehensive @media print styles to globals.css
+- Print styles hide navigation elements (sidebar, header, bottom nav, breadcrumb, tab navigation)
+- Print styles hide interactive elements (action buttons, favorite/share/print buttons, dropdowns)
+- Removed dark backgrounds for printing: all backgrounds white, text colors black/gray
+- Added PrinterIcon to icon component library
+- Added print button to stock detail page action buttons group
+- Print button triggers window.print() on click
+- Added print-specific classes: print-avoid-break for sections, print-page-break for major sections
+- Page breaks configured between major sections for clean multi-page printing
+- Tables optimized for print with proper borders and spacing
+- SVG charts and badges styled appropriately for print
+- All animations and transitions disabled in print mode
+- Light mode color palette applied for print readability
+
+Files modified:
+- src/app/globals.css (added @media print styles)
+- src/components/icons/index.tsx (added PrinterIcon)
+- src/app/(main)/stocks/[ticker]/page.tsx (added print button, print classes)
+
+**Learnings for future iterations:**
+- Print styles require comprehensive overrides to convert dark theme to light print-friendly output
+- Important to hide all interactive elements (buttons, navigation) in print mode
+- Use print-avoid-break class on sections to prevent awkward page breaks
+- Use print-page-break class strategically to create clean page breaks between major content sections
+- Tables need explicit border and background styles for print (inherit doesn't work well)
+- SVG elements need max-width: 100% to ensure they fit on printed page
+- All shadows, animations, and hover effects must be disabled for print
+- Fixed positioning must be converted to static positioning for print
+- Breadcrumbs and navigation can be hidden for cleaner professional report appearance
+- window.print() is the simple, browser-native way to trigger print dialog
+---
