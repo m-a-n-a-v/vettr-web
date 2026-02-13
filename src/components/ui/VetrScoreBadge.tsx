@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
 
 interface VetrScoreBadgeProps {
   score: number;
@@ -16,104 +15,126 @@ export default function VetrScoreBadge({
   size = 'md',
   showLabel = false,
   onClick,
-  animate: shouldAnimate = false
+  animate: shouldAnimate = true
 }: VetrScoreBadgeProps) {
-  const [displayScore, setDisplayScore] = useState(shouldAnimate ? 0 : score);
-  const count = useMotionValue(shouldAnimate ? 0 : score);
-  const rounded = useTransform(count, Math.round);
+  const [animatedScore, setAnimatedScore] = useState(shouldAnimate ? 0 : score);
 
   useEffect(() => {
     if (shouldAnimate) {
-      const animation = animate(count, score, {
-        duration: 1.5,
-        ease: 'easeOut',
-      });
+      // Animate from 0 to score over 1s
+      const startTime = Date.now();
+      const duration = 1000; // 1s
 
-      const unsubscribe = rounded.on('change', (latest) => {
-        setDisplayScore(latest);
-      });
+      const animate = () => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
 
-      return () => {
-        animation.stop();
-        unsubscribe();
+        // Ease-out function
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+        const currentScore = Math.round(easeOut * score);
+
+        setAnimatedScore(currentScore);
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        }
       };
+
+      requestAnimationFrame(animate);
     } else {
-      setDisplayScore(score);
+      setAnimatedScore(score);
     }
-  }, [score, shouldAnimate, count, rounded]);
-  // Determine color based on score
-  const getColor = () => {
-    if (score >= 80) return 'text-vettr-accent'; // Green for excellent
-    if (score >= 60) return 'text-yellow-400'; // Yellow for good
-    if (score >= 40) return 'text-orange-400'; // Orange for fair
-    return 'text-red-400'; // Red for poor
-  };
+  }, [score, shouldAnimate]);
 
-  const getBgColor = () => {
-    if (score >= 80) return 'bg-vettr-accent/10';
-    if (score >= 60) return 'bg-yellow-400/10';
-    if (score >= 40) return 'bg-orange-400/10';
-    return 'bg-red-400/10';
-  };
-
-  const getBorderColor = () => {
-    if (score >= 80) return 'border-vettr-accent/30';
-    if (score >= 60) return 'border-yellow-400/30';
-    if (score >= 40) return 'border-orange-400/30';
-    return 'border-red-400/30';
+  // Determine stroke color based on score (using Tailwind theme colors)
+  const getStrokeColor = (): string => {
+    if (score >= 80) return '#00E676'; // vettr-accent
+    if (score >= 60) return '#FBBF24'; // yellow-400
+    if (score >= 40) return '#FB923C'; // orange-400
+    return '#F87171'; // red-400
   };
 
   // Size configurations
   const sizeConfig = {
     sm: {
-      container: 'w-8 h-8 text-xs',
-      text: 'text-xs',
-      label: 'text-xs'
+      size: 32,
+      strokeWidth: 2,
+      fontSize: 'text-xs',
+      labelSize: 'text-xs'
     },
     md: {
-      container: 'w-12 h-12 text-sm',
-      text: 'text-sm',
-      label: 'text-sm'
+      size: 48,
+      strokeWidth: 3,
+      fontSize: 'text-sm',
+      labelSize: 'text-sm'
     },
     lg: {
-      container: 'w-20 h-20 text-2xl',
-      text: 'text-2xl',
-      label: 'text-base'
+      size: 64,
+      strokeWidth: 4,
+      fontSize: 'text-xl',
+      labelSize: 'text-base'
     }
   };
 
   const config = sizeConfig[size];
-  const colorClass = getColor();
-  const bgColorClass = getBgColor();
-  const borderColorClass = getBorderColor();
+  const strokeColor = getStrokeColor();
+
+  // SVG circle calculations
+  const center = config.size / 2;
+  const radius = center - config.strokeWidth;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDashoffset = circumference - (animatedScore / 100) * circumference;
 
   const badge = (
-    <motion.div
-      className={`
-        ${config.container}
-        ${bgColorClass}
-        border-2 ${borderColorClass}
-        rounded-full
-        flex items-center justify-center
-        font-bold
-        ${colorClass}
-        ${onClick ? 'cursor-pointer' : ''}
-      `}
+    <div
+      className={`relative inline-flex items-center justify-center ${onClick ? 'cursor-pointer group' : ''}`}
       onClick={onClick}
       role={onClick ? 'button' : undefined}
       aria-label={`VETTR Score: ${score}`}
-      whileHover={onClick ? { scale: 1.05 } : undefined}
-      transition={{ duration: 0.2 }}
+      style={{ width: config.size, height: config.size }}
     >
-      {displayScore}
-    </motion.div>
+      <svg
+        width={config.size}
+        height={config.size}
+        className="transform -rotate-90"
+      >
+        {/* Track ring (background) */}
+        <circle
+          cx={center}
+          cy={center}
+          r={radius}
+          fill="none"
+          stroke="rgba(255, 255, 255, 0.1)"
+          strokeWidth={config.strokeWidth}
+        />
+
+        {/* Progress ring */}
+        <circle
+          cx={center}
+          cy={center}
+          r={radius}
+          fill="none"
+          stroke={strokeColor}
+          strokeWidth={config.strokeWidth}
+          strokeDasharray={circumference}
+          strokeDashoffset={strokeDashoffset}
+          strokeLinecap="round"
+          className="transition-all duration-1000 ease-out"
+        />
+      </svg>
+
+      {/* Score number centered */}
+      <div className={`absolute inset-0 flex items-center justify-center ${config.fontSize} font-bold text-white tabular-nums`}>
+        {animatedScore}
+      </div>
+    </div>
   );
 
   if (showLabel) {
     return (
-      <div className="flex flex-col items-center gap-1">
+      <div className="flex flex-col items-center gap-2">
         {badge}
-        <span className={`${config.label} text-gray-500 font-medium`}>
+        <span className={`${config.labelSize} text-gray-500 font-medium`}>
           VETTR Score
         </span>
       </div>
