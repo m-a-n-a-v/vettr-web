@@ -114,3 +114,34 @@ Files modified:
 - All old color classes (bg-primary, text-textPrimary, etc.) replaced with new design tokens
 
 ---
+## V2-004: Redesign signup page - matching login quality
+Status: ✅ COMPLETE
+Date: 2026-02-12
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Completely redesigned signup page with premium split layout matching login page
+- Desktop: left side shows VETTR branding with tagline; right side has signup form
+- Mobile: single column layout with logo at top, form card below
+- Implemented same subtle background gradients as login (8% opacity green, 5% blue)
+- Form card uses bg-vettr-card/50 border border-white/5 rounded-2xl p-8
+- Input fields: bg-white/5 border border-white/10 rounded-xl with proper focus states
+- Password strength indicator with 5-level bar (red/yellow/green gradient based on strength)
+- Password match validation with inline SVG checkmark/X icon and colored text
+- Submit button: bg-vettr-accent text-vettr-navy with loading spinner
+- VETTR logo styled with accent-colored first letter
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/app/(auth)/signup/page.tsx
+
+**Learnings for future iterations:**
+- Split layout pattern from login page works perfectly for signup as well
+- Password strength indicator uses 5 bars (0-4 levels) with color coding: red (0-1), yellow (2), green (3-4)
+- Password match indicator shows real-time validation with SVG icons (checkmark/X)
+- Reordered fields to have displayName first, then email, then password fields (better UX flow)
+- All old design tokens (bg-primary, text-accent, bg-error, bg-warning, etc.) replaced with V2 tokens
+- Focus states use vettr-accent/50 for border and vettr-accent/20 for ring
+- Loading state preserves button size by keeping both SVG spinner and text inline
+- Background gradients positioned absolutely to not interfere with layout
+---
+
