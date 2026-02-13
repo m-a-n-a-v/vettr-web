@@ -532,3 +532,35 @@ Files modified:
 - Must close both tab content div AND max-w-6xl container div before closing min-h-screen parent
 - Skeleton loading updated to match new V2 card styling (bg-white/5 rounded-xl)
 ---
+
+## V2-015: Redesign Stock Detail - Pedigree (Executives) tab
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Reviewed existing Pedigree tab implementation - found it already matches V2-015 requirements
+- Updated EmptyState component with V2 design tokens: text-gray-400 for title, text-gray-500 for message, text-gray-600 for icons
+- Updated EmptyState button styling: bg-vettr-accent text-vettr-navy rounded-xl with proper focus states
+- Added UsersIcon (multiple people icon) to icon library at src/components/icons/index.tsx
+- Updated Pedigree tab empty state to use UsersIcon SVG instead of emoji "👔"
+- Executive cards already had proper V2 styling: bg-vettr-card/50, gradient initials avatars, tenure risk indicators, metrics row, specialization badges
+- Search and filter bar already implemented with V2 card styling (bg-vettr-card/30 border border-white/5 rounded-2xl)
+- Desktop grid already responsive (grid-cols-1 md:grid-cols-2 lg:grid-cols-3)
+- Click card to open ExecutiveDetail modal already implemented
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/components/ui/EmptyState.tsx
+- src/components/icons/index.tsx
+- src/app/(main)/stocks/[ticker]/page.tsx
+
+**Learnings for future iterations:**
+- The Pedigree tab was already implemented in V2-014 and matched almost all V2-015 requirements
+- EmptyState component supports React.ReactNode for icon prop, making it easy to pass SVG components
+- Old design tokens in EmptyState: text-textPrimary → text-gray-400, text-textSecondary → text-gray-500, text-textMuted → text-gray-600
+- Button styling updated from bg-accent to bg-vettr-accent with proper V2 tokens
+- UsersIcon is the standard icon for "multiple people" / executives empty state
+- Icon size for empty states should be w-16 h-16 per V2 design system
+- Existing implementation quality was high - just needed minor V2 token updates
+- Always check existing code first before assuming implementation is needed from scratch
+---
