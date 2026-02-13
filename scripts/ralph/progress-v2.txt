@@ -486,3 +486,49 @@ Files modified:
 - Card view grid: grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 for responsive columns
 - All old design tokens replaced: bg-surface → bg-white/5, text-textPrimary → text-white, text-textSecondary → text-gray-400, text-textMuted → text-gray-500, border-border → border-white/5
 ---
+
+## V2-014: Redesign Stock Detail page - Overview tab
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Completely redesigned stock detail page header with V2 design system
+- Stock header: ticker badge with vettr-accent/10 background, company name, exchange and sector chips
+- Action buttons grouped in bg-white/5 rounded-xl container with star, share, and more menu icons
+- Price display: text-4xl font-bold with ArrowUpIcon/ArrowDownIcon and colored percentage change
+- Tab navigation redesigned with bottom border indicator (text-white border-b-2 border-vettr-accent for active)
+- VETTR Score section: large SVG ring (lg size) with trend indicator (Improving/Stable/Declining)
+- Added component breakdown bars below score ring (Pedigree, Filing Velocity, Red Flag, Growth, Governance)
+- Each breakdown bar shows label, value, and colored progress bar with smooth 1s animation
+- Key Metrics grid: 4 metric cards in bg-white/[0.03] rounded-xl individual cards
+- Score History chart updated with V2 tokens (white/5 grid lines, vettr-card tooltip)
+- Time range pills: bg-white/5 rounded-lg, active state: bg-vettr-accent/10 text-vettr-accent
+- Recent Filings converted to data table on desktop with Type, Title, Date, Status columns
+- Peer Comparison section using VetrScoreComparison component
+- Pedigree tab: responsive card grid (1/2/3 columns) with gradient initials avatars
+- Executive cards: bg-vettr-card/50 with hover:border-vettr-accent/20 effect
+- Red Flags tab: large circular score ring with colored severity levels
+- Flag breakdown bars with weight percentages displayed (30%, 25%, 20%, 15%, 10%)
+- Detected flags list with colored severity dots and badges
+- Flag history timeline with vertical line and colored timeline dots
+- Flag detail modal redesigned with V2 styling (bg-vettr-card border-white/10 rounded-2xl)
+- Added ShareIcon and MoreHorizontalIcon to icon library
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/app/(main)/stocks/[ticker]/page.tsx
+- src/components/icons/index.tsx
+
+**Learnings for future iterations:**
+- Tab navigation should use subtle bottom border indicator, not colored backgrounds per V2 design
+- VETTR Score API has components: pedigree, filing_velocity, red_flag, growth, governance (not filing_quality or red_flag_score)
+- VetrScoreTrend direction values are 'Improving', 'Stable', 'Declining' (not 'up' or 'down')
+- Component breakdown bars work better below the score ring than as a separate section
+- Executive cards in grid layout (not table) provide better visual hierarchy on Pedigree tab
+- Red Flag severity colors: Critical=red-400, High=orange-400, Moderate=yellow-400, Low=gray-400
+- Timeline visualization uses vertical border-l with absolute positioned colored dots
+- Flag breakdown bars should show weight percentages for transparency
+- Recent filings table columns: Type (icon), Title (with unread dot + material badge), Date, Status
+- Must close both tab content div AND max-w-6xl container div before closing min-h-screen parent
+- Skeleton loading updated to match new V2 card styling (bg-white/5 rounded-xl)
+---
