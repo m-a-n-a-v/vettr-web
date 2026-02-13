@@ -239,7 +239,7 @@ export async function apiClient<T = unknown>(
     }
 
     // Handle 429 Too Many Requests - rate limiting
-    if (response.status === 429 && retryCount < 3) {
+    if (response.status === 429 && retryCount < 5) {
       // Read Retry-After header (can be in seconds or HTTP date format)
       const retryAfterHeader = response.headers.get('Retry-After');
       let retryAfterMs = getExponentialBackoffDelay(retryCount);
@@ -258,8 +258,10 @@ export async function apiClient<T = unknown>(
         }
       }
 
-      // Cap retry delay at 30 seconds for better UX
-      retryAfterMs = Math.min(retryAfterMs, 30000);
+      // Cap retry delay at 2 minutes (120s) to prevent indefinite hangs, but allow for longer waits
+      retryAfterMs = Math.min(retryAfterMs, 120000);
+
+      console.warn(`[API] Rate limited (429). Retrying after ${Math.ceil(retryAfterMs / 1000)}s. Attempt ${retryCount + 1}/5`);
 
       // Show toast notification
       showRateLimitToast(Math.ceil(retryAfterMs / 1000));

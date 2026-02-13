@@ -39,7 +39,10 @@ async function fetchStocks(url: string): Promise<PaginatedResponse<Stock>> {
   const response = await api.get<PaginatedResponse<Stock>>(url);
 
   if (!response.success || !response.data) {
-    throw new Error(response.error?.message || 'Failed to fetch stocks');
+    const error = new Error(response.error?.message || 'Failed to fetch stocks') as any;
+    error.code = response.error?.code;
+    error.status = response.error?.code === 'RATE_LIMIT_EXCEEDED' ? 429 : 500;
+    throw error;
   }
 
   return response.data;
@@ -78,11 +81,11 @@ export function useStocks(options: UseStocksOptions = {}): UseStocksResult {
     stocks: data?.items || [],
     pagination: data?.pagination
       ? {
-          total: data.pagination.total,
-          limit: data.pagination.limit,
-          offset: data.pagination.offset,
-          hasMore: data.pagination.has_more,
-        }
+        total: data.pagination.total,
+        limit: data.pagination.limit,
+        offset: data.pagination.offset,
+        hasMore: data.pagination.has_more,
+      }
       : null,
     isLoading,
     isError: !!error,

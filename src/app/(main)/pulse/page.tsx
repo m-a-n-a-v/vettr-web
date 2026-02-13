@@ -15,6 +15,7 @@ import { SkeletonCard, SkeletonStockCard } from '@/components/ui/SkeletonLoader'
 import EmptyState from '@/components/ui/EmptyState'
 import RefreshButton from '@/components/ui/RefreshButton'
 import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator'
+import { ArrowUpIcon, ArrowDownIcon } from '@/components/icons'
 import Link from 'next/link'
 import { useState, useEffect, useMemo, useCallback } from 'react'
 
@@ -132,11 +133,18 @@ export default function PulsePage() {
       />
 
       {/* Header */}
-      <div className="mb-6">
+      <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-textPrimary mb-2">Pulse</h1>
-            <p className="text-textSecondary">Market overview and recent activity</p>
+            <h1 className="text-2xl font-bold text-white mb-1">Market Pulse</h1>
+            <p className="text-sm text-gray-500">
+              Last updated: {lastRefreshed ? lastRefreshed.toLocaleString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit'
+              }) : 'Never'}
+            </p>
           </div>
           {/* Desktop refresh button */}
           <div className="hidden md:block">
@@ -149,21 +157,9 @@ export default function PulsePage() {
         </div>
       </div>
 
-      {/* Last Refreshed Banner */}
-      <div className="mb-6 px-4 py-2 bg-surface rounded-lg border border-border">
-        <p className="text-sm text-textSecondary">
-          Last refreshed: {lastRefreshed ? lastRefreshed.toLocaleString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            hour: 'numeric',
-            minute: '2-digit'
-          }) : 'Never'}
-        </p>
-      </div>
-
       {/* Market Overview Section */}
       <section className="mb-8">
-        <h2 className="text-xl font-bold text-textPrimary mb-4">Market Overview</h2>
+        <h2 className="text-lg font-semibold text-white mb-4">Market Overview</h2>
 
         {isLoadingStocks ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -181,65 +177,75 @@ export default function PulsePage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Stocks Tracked */}
-            <div className="bg-primaryLight p-5 rounded-lg border border-border">
-              <p className="text-textSecondary text-sm mb-1">Stocks Tracked</p>
-              <p className="text-3xl font-bold text-textPrimary">{stocksTracked}</p>
+            <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5">
+              <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Stocks Tracked</p>
+              <p className="text-2xl font-bold text-white">{stocksTracked}</p>
             </div>
 
             {/* Avg VETTR Score */}
-            <div className="bg-primaryLight p-5 rounded-lg border border-border">
-              <p className="text-textSecondary text-sm mb-1">Avg VETTR Score</p>
+            <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5">
+              <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Avg VETTR Score</p>
               <div className="flex items-center gap-3">
-                <p className="text-3xl font-bold text-textPrimary">{avgVetrScore}</p>
+                <p className="text-2xl font-bold text-white">{avgVetrScore}</p>
                 <VetrScoreBadge score={avgVetrScore} size="sm" />
               </div>
             </div>
 
             {/* Top Gainer */}
-            <div className="bg-primaryLight p-5 rounded-lg border border-border">
-              <p className="text-textSecondary text-sm mb-1">Top Gainer</p>
+            <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5">
+              <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Top Gainer</p>
               {topGainer ? (
                 <div>
                   <Link
                     href={`/stocks/${topGainer.ticker}`}
-                    className="text-lg font-bold text-textPrimary hover:text-accent transition-colors"
+                    className="text-lg font-bold text-white hover:text-vettr-accent transition-colors"
                   >
                     {topGainer.ticker}
                   </Link>
-                  <PriceChangeIndicator change={topGainer.price_change_percent || 0} size="sm" />
+                  <div className="flex items-center gap-1 mt-1">
+                    <ArrowUpIcon className="w-3 h-3 text-vettr-accent" />
+                    <span className="text-sm font-medium text-vettr-accent">
+                      {Math.abs(topGainer.price_change_percent || 0).toFixed(2)}%
+                    </span>
+                  </div>
                 </div>
               ) : (
-                <p className="text-textMuted">N/A</p>
+                <p className="text-gray-500">N/A</p>
               )}
             </div>
 
             {/* Top Loser */}
-            <div className="bg-primaryLight p-5 rounded-lg border border-border">
-              <p className="text-textSecondary text-sm mb-1">Top Loser</p>
+            <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5">
+              <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Top Loser</p>
               {topLoser && topLoser.price_change_percent !== topGainer?.price_change_percent ? (
                 <div>
                   <Link
                     href={`/stocks/${topLoser.ticker}`}
-                    className="text-lg font-bold text-textPrimary hover:text-accent transition-colors"
+                    className="text-lg font-bold text-white hover:text-vettr-accent transition-colors"
                   >
                     {topLoser.ticker}
                   </Link>
-                  <PriceChangeIndicator change={topLoser.price_change_percent || 0} size="sm" />
+                  <div className="flex items-center gap-1 mt-1">
+                    <ArrowDownIcon className="w-3 h-3 text-red-400" />
+                    <span className="text-sm font-medium text-red-400">
+                      {Math.abs(topLoser.price_change_percent || 0).toFixed(2)}%
+                    </span>
+                  </div>
                 </div>
               ) : (
-                <p className="text-textMuted">N/A</p>
+                <p className="text-gray-500">N/A</p>
               )}
             </div>
           </div>
         )}
       </section>
 
-      {/* Red Flag Trends Section */}
+      {/* Red Flag Summary Section */}
       <section className="mb-8">
-        <h2 className="text-xl font-bold text-textPrimary mb-4">Red Flag Trends</h2>
+        <h2 className="text-lg font-semibold text-white mb-4">Red Flag Summary</h2>
 
         {isLoadingRedFlagTrend ? (
-          <div className="bg-primaryLight p-6 rounded-lg border border-border">
+          <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-6">
             <SkeletonCard />
           </div>
         ) : redFlagTrendError ? (
@@ -249,34 +255,38 @@ export default function PulsePage() {
             message="Unable to fetch red flag trend data."
           />
         ) : redFlagTrend ? (
-          <div className="bg-primaryLight p-6 rounded-lg border border-border">
+          <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-6">
             {/* Summary Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
               {/* Total Active Flags */}
               <div>
-                <p className="text-textSecondary text-sm mb-2">Total Active Flags</p>
+                <p className="text-sm text-gray-400 mb-2">Total Active Flags</p>
                 <div className="flex items-baseline gap-3">
-                  <p className="text-4xl font-bold text-textPrimary">{redFlagTrend.total_active_flags}</p>
+                  <p className="text-4xl font-bold text-white">{redFlagTrend.total_active_flags}</p>
                   {redFlagTrend.change_30_days !== 0 && (
                     <div className={`flex items-center gap-1 text-sm font-medium ${
-                      redFlagTrend.change_30_days > 0 ? 'text-error' : 'text-accent'
+                      redFlagTrend.change_30_days > 0 ? 'text-red-400' : 'text-vettr-accent'
                     }`}>
-                      <span>{redFlagTrend.change_30_days > 0 ? '↑' : '↓'}</span>
+                      {redFlagTrend.change_30_days > 0 ? (
+                        <ArrowUpIcon className="w-3 h-3" />
+                      ) : (
+                        <ArrowDownIcon className="w-3 h-3" />
+                      )}
                       <span>{Math.abs(redFlagTrend.change_30_days)}</span>
                     </div>
                   )}
                 </div>
-                <p className="text-xs text-textMuted mt-1">Last 30 days</p>
+                <p className="text-xs text-gray-500 mt-1">Last 30 days</p>
               </div>
 
               {/* 30-Day Change Visualization */}
               <div>
-                <p className="text-textSecondary text-sm mb-2">30-Day Change</p>
+                <p className="text-sm text-gray-400 mb-2">30-Day Change</p>
                 <div className="flex items-center gap-3">
-                  <div className="flex-1 bg-surface rounded-full h-3 overflow-hidden">
+                  <div className="flex-1 bg-white/5 rounded-full h-3 overflow-hidden">
                     <div
                       className={`h-full transition-all duration-500 ${
-                        redFlagTrend.change_30_days > 0 ? 'bg-error' : 'bg-accent'
+                        redFlagTrend.change_30_days > 0 ? 'bg-red-400' : 'bg-vettr-accent'
                       }`}
                       style={{
                         width: `${Math.min(Math.abs(redFlagTrend.change_30_days) / redFlagTrend.total_active_flags * 100, 100)}%`
@@ -284,8 +294,8 @@ export default function PulsePage() {
                     />
                   </div>
                   <span className={`text-lg font-bold ${
-                    redFlagTrend.change_30_days > 0 ? 'text-error' :
-                    redFlagTrend.change_30_days < 0 ? 'text-accent' : 'text-textMuted'
+                    redFlagTrend.change_30_days > 0 ? 'text-red-400' :
+                    redFlagTrend.change_30_days < 0 ? 'text-vettr-accent' : 'text-gray-500'
                   }`}>
                     {redFlagTrend.change_30_days > 0 ? '+' : ''}{redFlagTrend.change_30_days}
                   </span>
@@ -295,42 +305,42 @@ export default function PulsePage() {
 
             {/* Severity Breakdown */}
             <div>
-              <p className="text-textSecondary text-sm mb-3">Breakdown by Severity</p>
+              <p className="text-sm text-gray-400 mb-3">Breakdown by Severity</p>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {/* Critical */}
-                <div className="bg-surface p-4 rounded-lg border border-error/30">
+                <div className="bg-white/[0.03] rounded-xl p-4 border border-white/5">
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="w-3 h-3 rounded-full bg-error" />
-                    <p className="text-xs font-medium text-textSecondary uppercase tracking-wide">Critical</p>
+                    <div className="w-3 h-3 rounded-full bg-red-400" />
+                    <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Critical</p>
                   </div>
-                  <p className="text-2xl font-bold text-error">{redFlagTrend.breakdown_by_severity.critical}</p>
+                  <p className="text-2xl font-bold text-red-400">{redFlagTrend.breakdown_by_severity.critical}</p>
                 </div>
 
                 {/* High */}
-                <div className="bg-surface p-4 rounded-lg border border-warning/30">
+                <div className="bg-white/[0.03] rounded-xl p-4 border border-white/5">
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="w-3 h-3 rounded-full bg-warning" />
-                    <p className="text-xs font-medium text-textSecondary uppercase tracking-wide">High</p>
+                    <div className="w-3 h-3 rounded-full bg-orange-400" />
+                    <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">High</p>
                   </div>
-                  <p className="text-2xl font-bold text-warning">{redFlagTrend.breakdown_by_severity.high}</p>
+                  <p className="text-2xl font-bold text-orange-400">{redFlagTrend.breakdown_by_severity.high}</p>
                 </div>
 
                 {/* Moderate */}
-                <div className="bg-surface p-4 rounded-lg border border-yellow-500/30">
+                <div className="bg-white/[0.03] rounded-xl p-4 border border-white/5">
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                    <p className="text-xs font-medium text-textSecondary uppercase tracking-wide">Moderate</p>
+                    <div className="w-3 h-3 rounded-full bg-yellow-400" />
+                    <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Moderate</p>
                   </div>
-                  <p className="text-2xl font-bold text-yellow-500">{redFlagTrend.breakdown_by_severity.moderate}</p>
+                  <p className="text-2xl font-bold text-yellow-400">{redFlagTrend.breakdown_by_severity.moderate}</p>
                 </div>
 
                 {/* Low */}
-                <div className="bg-surface p-4 rounded-lg border border-blue-400/30">
+                <div className="bg-white/[0.03] rounded-xl p-4 border border-white/5">
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="w-3 h-3 rounded-full bg-blue-400" />
-                    <p className="text-xs font-medium text-textSecondary uppercase tracking-wide">Low</p>
+                    <div className="w-3 h-3 rounded-full bg-gray-400" />
+                    <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Low</p>
                   </div>
-                  <p className="text-2xl font-bold text-blue-400">{redFlagTrend.breakdown_by_severity.low}</p>
+                  <p className="text-2xl font-bold text-gray-400">{redFlagTrend.breakdown_by_severity.low}</p>
                 </div>
               </div>
             </div>
@@ -338,132 +348,198 @@ export default function PulsePage() {
         ) : null}
       </section>
 
-      {/* Two-column layout for desktop */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-        {/* Recent Events Section */}
-        <section>
-          <div className="flex items-center gap-3 mb-4">
-            <h2 className="text-xl font-bold text-textPrimary">Recent Events</h2>
-            {filings && filings.length > 0 && (
-              <span className="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs font-medium rounded border border-blue-500/30">
-                {filings.filter(f => !f.is_read).length} unread
-              </span>
-            )}
-          </div>
+      {/* Recent Filings Section */}
+      <section className="mb-8">
+        <div className="flex items-center gap-3 mb-4">
+          <h2 className="text-lg font-semibold text-white">Recent Filings</h2>
+          {filings && filings.length > 0 && (
+            <span className="px-2.5 py-0.5 bg-blue-500/10 text-blue-400 text-xs font-medium rounded-full">
+              {filings.filter(f => !f.is_read).length} unread
+            </span>
+          )}
+        </div>
 
-          {isLoadingFilings ? (
-            <div className="space-y-3">
-              <SkeletonCard />
-              <SkeletonCard />
-              <SkeletonCard />
+        {isLoadingFilings ? (
+          <div className="space-y-3">
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+          </div>
+        ) : filingsError ? (
+          <EmptyState
+            icon="📄"
+            title="Error loading filings"
+            message="Unable to fetch recent events."
+          />
+        ) : !filings || filings.length === 0 ? (
+          <EmptyState
+            icon="📄"
+            title="No recent events"
+            message="No filings have been published recently."
+          />
+        ) : (
+          <>
+            {/* Desktop Table */}
+            <div className="hidden md:block bg-vettr-card/50 border border-white/5 rounded-2xl overflow-hidden">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-white/5">
+                    <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Type</th>
+                    <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Title</th>
+                    <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Ticker</th>
+                    <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Date</th>
+                    <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Material</th>
+                    <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filings.map((filing) => (
+                    <tr
+                      key={filing.id}
+                      onClick={() => window.location.href = `/filings/${filing.id}`}
+                      className="border-b border-white/5 hover:bg-white/[0.03] transition-colors cursor-pointer"
+                    >
+                      <td className="px-4 py-3">
+                        <FilingTypeIcon type={filing.type} size="sm" />
+                      </td>
+                      <td className="px-4 py-3 text-sm text-white max-w-md truncate">
+                        {filing.title}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="text-sm font-medium text-vettr-accent">{filing.ticker}</span>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-400">
+                        {new Date(filing.date_filed).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      </td>
+                      <td className="px-4 py-3">
+                        {filing.is_material ? (
+                          <span className="px-2 py-0.5 bg-yellow-500/10 text-yellow-400 text-xs font-medium rounded-full">
+                            Yes
+                          </span>
+                        ) : (
+                          <span className="text-xs text-gray-500">No</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        {!filing.is_read ? (
+                          <span className="px-2 py-0.5 bg-blue-500/10 text-blue-400 text-xs font-medium rounded-full">
+                            Unread
+                          </span>
+                        ) : (
+                          <span className="text-xs text-gray-500">Read</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          ) : filingsError ? (
-            <EmptyState
-              icon="📄"
-              title="Error loading filings"
-              message="Unable to fetch recent events."
-            />
-          ) : !filings || filings.length === 0 ? (
-            <EmptyState
-              icon="📄"
-              title="No recent events"
-              message="No filings have been published recently."
-            />
-          ) : (
-            <div className="space-y-3">
+
+            {/* Mobile Cards */}
+            <div className="md:hidden space-y-3">
               {filings.map((filing) => (
                 <Link
                   key={filing.id}
                   href={`/filings/${filing.id}`}
-                  className="block bg-primaryLight p-4 rounded-lg border border-border hover:border-accent transition-all group"
+                  className="block bg-vettr-card/50 border border-white/5 rounded-2xl p-4 hover:border-vettr-accent/20 hover:bg-vettr-card/80 transition-all"
                 >
                   <div className="flex items-start gap-3">
-                    {/* Unread indicator (blue dot) */}
                     {!filing.is_read && (
-                      <div className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0 mt-2" />
+                      <div className="w-2 h-2 rounded-full bg-blue-400 flex-shrink-0 mt-2" />
                     )}
                     <FilingTypeIcon type={filing.type} size="md" />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2 mb-1">
-                        <h3 className="font-semibold text-textPrimary group-hover:text-accent transition-colors truncate">
+                        <h3 className="font-semibold text-white truncate">
                           {filing.title}
                         </h3>
                         {filing.is_material && (
-                          <span className="flex-shrink-0 px-2 py-0.5 bg-warning/20 text-warning text-xs rounded border border-warning/30">
+                          <span className="flex-shrink-0 px-2 py-0.5 bg-yellow-500/10 text-yellow-400 text-xs rounded-full">
                             Material
                           </span>
                         )}
                       </div>
-                      <div className="flex items-center gap-3 text-sm text-textSecondary">
-                        <span className="font-medium text-accent">{filing.ticker}</span>
+                      <div className="flex items-center gap-3 text-sm text-gray-400">
+                        <span className="font-medium text-vettr-accent">{filing.ticker}</span>
                         <span>•</span>
-                        <span>{new Date(filing.date_filed).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                        <span>{new Date(filing.date_filed).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                       </div>
                     </div>
                   </div>
                 </Link>
               ))}
             </div>
-          )}
-        </section>
+          </>
+        )}
+      </section>
 
-        {/* Top Movers Section */}
-        <section>
-          <h2 className="text-xl font-bold text-textPrimary mb-4">Top Movers</h2>
+      {/* Top Movers Section */}
+      <section className="mb-8">
+        <h2 className="text-lg font-semibold text-white mb-4">Top Movers</h2>
 
-          {isLoadingStocks ? (
-            <div className="space-y-3">
-              <SkeletonCard />
-              <SkeletonCard />
-              <SkeletonCard />
-            </div>
-          ) : stocksError ? (
-            <EmptyState
-              icon="📈"
-              title="Error loading movers"
-              message="Unable to fetch top movers data."
-            />
-          ) : topMovers.length === 0 ? (
-            <EmptyState
-              icon="📈"
-              title="No movers data"
-              message="Insufficient price data to show top movers."
-            />
-          ) : (
-            <div className="space-y-3">
-              {topMovers.map((stock) => (
-                <Link
-                  key={stock.ticker}
-                  href={`/stocks/${stock.ticker}`}
-                  className="block bg-primaryLight p-4 rounded-lg border border-border hover:border-accent transition-all group"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-1">
-                        <span className="text-lg font-bold text-textPrimary group-hover:text-accent transition-colors">
-                          {stock.ticker}
-                        </span>
-                        <VetrScoreBadge score={stock.vetr_score || 0} size="sm" />
-                      </div>
-                      <p className="text-sm text-textSecondary truncate">{stock.company_name}</p>
+        {isLoadingStocks ? (
+          <div className="space-y-3">
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+          </div>
+        ) : stocksError ? (
+          <EmptyState
+            icon="📈"
+            title="Error loading movers"
+            message="Unable to fetch top movers data."
+          />
+        ) : topMovers.length === 0 ? (
+          <EmptyState
+            icon="📈"
+            title="No movers data"
+            message="Insufficient price data to show top movers."
+          />
+        ) : (
+          <div className="space-y-2">
+            {topMovers.map((stock) => (
+              <Link
+                key={stock.ticker}
+                href={`/stocks/${stock.ticker}`}
+                className="block bg-vettr-card/50 border border-white/5 rounded-2xl p-4 hover:border-vettr-accent/20 hover:bg-vettr-card/80 transition-all group"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-1">
+                      <span className="text-base font-bold text-white group-hover:text-vettr-accent transition-colors">
+                        {stock.ticker}
+                      </span>
+                      <VetrScoreBadge score={stock.vetr_score || 0} size="sm" />
                     </div>
-                    <div className="text-right ml-4">
-                      <p className="text-lg font-semibold text-textPrimary">
-                        ${stock.current_price?.toFixed(2) || 'N/A'}
-                      </p>
-                      <PriceChangeIndicator change={stock.price_change_percent || 0} size="sm" />
+                    <p className="text-sm text-gray-400 truncate">{stock.company_name}</p>
+                  </div>
+                  <div className="text-right ml-4">
+                    <p className="text-base font-semibold text-white">
+                      ${stock.current_price?.toFixed(2) || 'N/A'}
+                    </p>
+                    <div className={`flex items-center justify-end gap-1 mt-1 ${
+                      (stock.price_change_percent || 0) >= 0 ? 'text-vettr-accent' : 'text-red-400'
+                    }`}>
+                      {(stock.price_change_percent || 0) >= 0 ? (
+                        <ArrowUpIcon className="w-3 h-3" />
+                      ) : (
+                        <ArrowDownIcon className="w-3 h-3" />
+                      )}
+                      <span className="text-sm font-medium">
+                        {Math.abs(stock.price_change_percent || 0).toFixed(2)}%
+                      </span>
                     </div>
                   </div>
-                </Link>
-              ))}
-            </div>
-          )}
-        </section>
-      </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
 
       {/* Top VETTR Scores Section */}
-      <section>
-        <h2 className="text-xl font-bold text-textPrimary mb-4">Top VETTR Scores</h2>
+      <section className="mb-8">
+        <h2 className="text-lg font-semibold text-white mb-4">Top VETTR Scores</h2>
 
         {isLoadingStocks ? (
           <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
@@ -490,9 +566,9 @@ export default function PulsePage() {
             message="No stocks with VETTR scores available."
           />
         ) : (
-          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">
             {topScores.map((stock) => (
-              <div key={stock.ticker} className="flex-shrink-0 w-72">
+              <div key={stock.ticker} className="flex-shrink-0 w-72 snap-start">
                 <StockCard
                   stock={stock}
                   showFavorite={true}

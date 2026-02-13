@@ -44,7 +44,10 @@ export function useFilings(params: UseFilingsParams = {}): UseFilingsReturn {
   const fetcher = async (url: string): Promise<PaginatedResponse<Filing>> => {
     const response = await api.get<PaginatedResponse<Filing>>(url);
     if (!response.success || !response.data) {
-      throw new Error(response.error?.message || 'Failed to fetch filings');
+      const error = new Error(response.error?.message || 'Failed to fetch filings') as any;
+      error.code = response.error?.code;
+      error.status = response.error?.code === 'RATE_LIMIT_EXCEEDED' ? 429 : 500;
+      throw error;
     }
     return response.data;
   };
@@ -61,11 +64,11 @@ export function useFilings(params: UseFilingsParams = {}): UseFilingsReturn {
     filings: data?.items || [],
     pagination: data?.pagination
       ? {
-          total: data.pagination.total,
-          limit: data.pagination.limit,
-          offset: data.pagination.offset,
-          hasMore: data.pagination.has_more,
-        }
+        total: data.pagination.total,
+        limit: data.pagination.limit,
+        offset: data.pagination.offset,
+        hasMore: data.pagination.has_more,
+      }
       : null,
     isLoading,
     error: error || null,

@@ -27,9 +27,22 @@ export function SWRProvider({ children }: SWRProviderProps) {
         revalidateIfStale: true, // Revalidate if data is stale
 
         // Error retry settings
-        errorRetryCount: 3, // Retry failed requests up to 3 times
-        errorRetryInterval: 5000, // Wait 5s between retries
-        shouldRetryOnError: true, // Enable automatic retry on error
+        errorRetryCount: 3,
+        errorRetryInterval: 5000,
+        shouldRetryOnError: true,
+        onErrorRetry: (error: any, key, config, revalidate, { retryCount }) => {
+          // Never retry on 404
+          if (error.status === 404) return;
+
+          // Never retry on Rate Limit (handled by api-client)
+          if (error.status === 429 || error.code === 'RATE_LIMIT_EXCEEDED') return;
+
+          // Only retry up to 3 times
+          if (retryCount >= 3) return;
+
+          // Retry after 5 seconds
+          setTimeout(() => revalidate({ retryCount }), 5000);
+        },
 
         // Cache time settings
         // Data is considered fresh for 60s, stale for 5 minutes before being garbage collected
