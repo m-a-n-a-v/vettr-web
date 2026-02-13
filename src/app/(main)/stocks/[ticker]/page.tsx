@@ -372,7 +372,7 @@ export default function StockDetailPage() {
         </div>
 
         {/* Tab navigation */}
-        <div className="flex gap-6 border-b border-white/5 mb-6" role="tablist" aria-label="Stock information tabs">
+        <div className="sticky top-16 z-30 bg-vettr-navy dark:bg-vettr-navy bg-lightBg py-3 -mx-6 px-6 flex gap-6 border-b border-white/5 mb-6" role="tablist" aria-label="Stock information tabs">
           <button
             role="tab"
             aria-selected={activeTab === 'overview'}

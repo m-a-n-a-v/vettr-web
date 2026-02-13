@@ -98,7 +98,7 @@ export function Header() {
   const tierBadgeColor = getTierBadgeColor(user.tier);
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-16 bg-white/80 dark:bg-vettr-navy/80 backdrop-blur-lg border-b border-gray-200 dark:border-white/5 z-40 md:ml-64 transition-colors duration-200">
+    <header className="fixed top-0 left-0 right-0 h-16 bg-white/80 dark:bg-vettr-navy/80 backdrop-blur-lg border-b border-gray-200 dark:border-white/5 z-50 md:ml-64 transition-colors duration-200">
       <div className="h-full flex items-center justify-between px-4 md:px-6 gap-4">
         {/* Left: Page title */}
         <div className="flex items-center gap-4 flex-shrink-0">

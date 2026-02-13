@@ -524,8 +524,8 @@ function StocksPageContent() {
         // Table view - Desktop only (>= 768px)
         <div className="hidden md:block overflow-x-auto">
           <table className="w-full">
-            <thead>
-              <tr className="border-b border-white/5">
+            <thead className="sticky top-16 z-20 bg-vettr-navy dark:bg-vettr-navy bg-lightBg backdrop-blur-sm">
+              <tr className="border-b border-white/5 dark:border-white/5 border-gray-200">
                 <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">
                   <button
                     onClick={() => handleColumnSort('company_name')}

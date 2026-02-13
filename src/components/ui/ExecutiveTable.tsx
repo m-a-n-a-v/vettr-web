@@ -64,18 +64,18 @@ export default function ExecutiveTable({ executives, onExecutiveClick }: Executi
   const SortIndicator = ({ field }: { field: SortField }) => {
     if (sortField !== field) {
       return (
-        <svg className="w-4 h-4 text-textMuted opacity-0 group-hover:opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-4 h-4 text-gray-500 opacity-0 group-hover:opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
         </svg>
       );
     }
 
     return sortDirection === 'asc' ? (
-      <svg className="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="w-4 h-4 text-vettr-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
       </svg>
     ) : (
-      <svg className="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="w-4 h-4 text-vettr-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
       </svg>
     );
@@ -84,12 +84,12 @@ export default function ExecutiveTable({ executives, onExecutiveClick }: Executi
   return (
     <div className="overflow-x-auto">
       <table className="w-full border-collapse" role="table" aria-label="Executive team members">
-        <thead>
-          <tr role="row" className="border-b border-border">
+        <thead className="sticky top-16 z-20 bg-vettr-navy dark:bg-vettr-navy bg-lightBg backdrop-blur-sm">
+          <tr role="row" className="border-b border-white/5 dark:border-white/5 border-gray-200">
             <th
               role="columnheader"
               aria-sort={sortField === 'name' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
-              className="px-4 py-3 text-left text-sm font-semibold text-textSecondary hover:text-textPrimary cursor-pointer group"
+              className="px-4 py-3 text-left text-xs text-gray-500 dark:text-gray-500 text-gray-600 uppercase tracking-wider font-medium hover:text-white dark:hover:text-white hover:text-gray-900 cursor-pointer group"
               onClick={() => handleSort('name')}
             >
               <div className="flex items-center gap-2">
@@ -100,7 +100,7 @@ export default function ExecutiveTable({ executives, onExecutiveClick }: Executi
             <th
               role="columnheader"
               aria-sort={sortField === 'title' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
-              className="px-4 py-3 text-left text-sm font-semibold text-textSecondary hover:text-textPrimary cursor-pointer group"
+              className="px-4 py-3 text-left text-xs text-gray-500 dark:text-gray-500 text-gray-600 uppercase tracking-wider font-medium hover:text-white dark:hover:text-white hover:text-gray-900 cursor-pointer group"
               onClick={() => handleSort('title')}
             >
               <div className="flex items-center gap-2">
@@ -111,7 +111,7 @@ export default function ExecutiveTable({ executives, onExecutiveClick }: Executi
             <th
               role="columnheader"
               aria-sort={sortField === 'tenure' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
-              className="px-4 py-3 text-center text-sm font-semibold text-textSecondary hover:text-textPrimary cursor-pointer group"
+              className="px-4 py-3 text-center text-xs text-gray-500 dark:text-gray-500 text-gray-600 uppercase tracking-wider font-medium hover:text-white dark:hover:text-white hover:text-gray-900 cursor-pointer group"
               onClick={() => handleSort('tenure')}
             >
               <div className="flex items-center justify-center gap-2">
@@ -122,7 +122,7 @@ export default function ExecutiveTable({ executives, onExecutiveClick }: Executi
             <th
               role="columnheader"
               aria-sort={sortField === 'experience' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
-              className="px-4 py-3 text-center text-sm font-semibold text-textSecondary hover:text-textPrimary cursor-pointer group"
+              className="px-4 py-3 text-center text-xs text-gray-500 dark:text-gray-500 text-gray-600 uppercase tracking-wider font-medium hover:text-white dark:hover:text-white hover:text-gray-900 cursor-pointer group"
               onClick={() => handleSort('experience')}
             >
               <div className="flex items-center justify-center gap-2">
@@ -133,7 +133,7 @@ export default function ExecutiveTable({ executives, onExecutiveClick }: Executi
             <th
               role="columnheader"
               aria-sort={sortField === 'specialization' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
-              className="px-4 py-3 text-left text-sm font-semibold text-textSecondary hover:text-textPrimary cursor-pointer group"
+              className="px-4 py-3 text-left text-xs text-gray-500 dark:text-gray-500 text-gray-600 uppercase tracking-wider font-medium hover:text-white dark:hover:text-white hover:text-gray-900 cursor-pointer group"
               onClick={() => handleSort('specialization')}
             >
               <div className="flex items-center gap-2">
@@ -144,7 +144,7 @@ export default function ExecutiveTable({ executives, onExecutiveClick }: Executi
             <th
               role="columnheader"
               aria-sort={sortField === 'risk' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
-              className="px-4 py-3 text-center text-sm font-semibold text-textSecondary hover:text-textPrimary cursor-pointer group"
+              className="px-4 py-3 text-center text-xs text-gray-500 dark:text-gray-500 text-gray-600 uppercase tracking-wider font-medium hover:text-white dark:hover:text-white hover:text-gray-900 cursor-pointer group"
               onClick={() => handleSort('risk')}
             >
               <div className="flex items-center justify-center gap-2">
@@ -159,14 +159,14 @@ export default function ExecutiveTable({ executives, onExecutiveClick }: Executi
             <tr
               key={executive.id}
               role="row"
-              className="border-b border-border/50 hover:bg-surface/50 transition-colors cursor-pointer"
+              className="border-b border-white/5 dark:border-white/5 border-gray-200 hover:bg-white/[0.03] dark:hover:bg-white/[0.03] hover:bg-gray-50 transition-colors cursor-pointer"
               onClick={() => onExecutiveClick?.(executive)}
             >
               <td role="cell" className="px-4 py-4">
                 <div className="flex items-center gap-3">
                   {/* Initials Avatar */}
-                  <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0">
-                    <span className="text-accent font-bold text-sm">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-vettr-accent/20 to-vettr-accent/5 flex items-center justify-center flex-shrink-0">
+                    <span className="text-vettr-accent font-bold text-sm">
                       {executive.name
                         .split(' ')
                         .map(n => n[0])
@@ -175,43 +175,43 @@ export default function ExecutiveTable({ executives, onExecutiveClick }: Executi
                         .toUpperCase()}
                     </span>
                   </div>
-                  <span className="text-sm text-textPrimary font-semibold">
+                  <span className="text-sm text-white dark:text-white text-gray-900 font-semibold">
                     {executive.name}
                   </span>
                 </div>
               </td>
               <td role="cell" className="px-4 py-4">
-                <span className="text-sm text-textSecondary">
+                <span className="text-sm text-gray-400 dark:text-gray-400 text-gray-600">
                   {executive.title}
                 </span>
               </td>
               <td role="cell" className="px-4 py-4 text-center">
-                <span className="text-sm text-textPrimary font-medium">
+                <span className="text-sm text-white dark:text-white text-gray-900 font-medium">
                   {executive.years_at_company} {executive.years_at_company === 1 ? 'year' : 'years'}
                 </span>
               </td>
               <td role="cell" className="px-4 py-4 text-center">
-                <span className="text-sm text-textPrimary font-medium">
+                <span className="text-sm text-white dark:text-white text-gray-900 font-medium">
                   {executive.total_experience_years} {executive.total_experience_years === 1 ? 'year' : 'years'}
                 </span>
               </td>
               <td role="cell" className="px-4 py-4">
                 {executive.specialization ? (
-                  <span className="inline-block px-2 py-1 rounded bg-primary text-accent text-xs font-medium">
+                  <span className="inline-block px-2 py-1 rounded bg-vettr-accent/10 text-vettr-accent text-xs font-medium">
                     {executive.specialization}
                   </span>
                 ) : (
-                  <span className="text-sm text-textMuted">-</span>
+                  <span className="text-sm text-gray-500">-</span>
                 )}
               </td>
               <td role="cell" className="px-4 py-4 text-center">
                 <span
                   className={`inline-block px-2 py-1 rounded text-xs font-medium ${
                     executive.tenure_risk === 'Stable'
-                      ? 'bg-accent/20 text-accent'
+                      ? 'bg-vettr-accent/10 text-vettr-accent'
                       : executive.tenure_risk === 'Watch'
-                      ? 'bg-warning/20 text-warning'
-                      : 'bg-error/20 text-error'
+                      ? 'bg-yellow-400/10 text-yellow-400'
+                      : 'bg-red-400/10 text-red-400'
                   }`}
                 >
                   {executive.tenure_risk}
