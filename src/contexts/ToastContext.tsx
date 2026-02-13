@@ -25,7 +25,7 @@ interface ToastProviderProps {
 export function ToastProvider({ children, position = 'top-right' }: ToastProviderProps) {
   const [toasts, setToasts] = useState<ToastData[]>([]);
 
-  const showToast = useCallback((message: string, type: ToastType = 'info', duration: number = 5000) => {
+  const showToast = useCallback((message: string, type: ToastType = 'info', duration: number = 4000) => {
     const id = `toast-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const newToast: ToastData = {
       id,
@@ -34,7 +34,14 @@ export function ToastProvider({ children, position = 'top-right' }: ToastProvide
       duration,
     };
 
-    setToasts((prev) => [...prev, newToast]);
+    setToasts((prev) => {
+      // Maximum 3 toasts visible - remove oldest if we exceed limit
+      const updated = [...prev, newToast];
+      if (updated.length > 3) {
+        return updated.slice(-3);
+      }
+      return updated;
+    });
   }, []);
 
   const dismissToast = useCallback((id: string) => {
