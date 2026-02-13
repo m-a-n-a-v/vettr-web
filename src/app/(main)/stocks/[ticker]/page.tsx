@@ -54,7 +54,7 @@ import VetrScoreComparison from '@/components/VetrScoreComparison';
 import VetrScoreTrend from '@/components/VetrScoreTrend';
 import { SkeletonStockDetailHeader, SkeletonVetrScoreSection, SkeletonChart, SkeletonFilingRow, SkeletonMetricCard } from '@/components/ui/SkeletonLoader';
 import Breadcrumb from '@/components/ui/Breadcrumb';
-import { StarIcon, StarFilledIcon, ShareIcon, MoreHorizontalIcon, ArrowUpIcon, ArrowDownIcon, UsersIcon, FlagIcon, ShieldCheckIcon, BarChartIcon, DocumentIcon } from '@/components/icons';
+import { StarIcon, StarFilledIcon, ShareIcon, MoreHorizontalIcon, ArrowUpIcon, ArrowDownIcon, UsersIcon, FlagIcon, ShieldCheckIcon, BarChartIcon, DocumentIcon, PrinterIcon } from '@/components/icons';
 import { chartTheme, getTooltipStyle } from '@/lib/chart-theme';
 
 type Tab = 'overview' | 'pedigree' | 'red-flags';
@@ -241,6 +241,10 @@ function StockDetailContent() {
     }
   };
 
+  const handlePrint = () => {
+    window.print();
+  };
+
   const handleAcknowledgeFlag = async (flagId: string) => {
     setAcknowledgingFlagId(flagId);
 
@@ -399,7 +403,7 @@ function StockDetailContent() {
         />
 
         {/* Stock Header */}
-        <div className="mb-6 mt-6">
+        <div className="mb-6 mt-6 stock-header-print print-avoid-break">
           <div className="flex items-start justify-between mb-4">
             {/* Title and badges */}
             <div className="flex-1">
@@ -439,6 +443,13 @@ function StockDetailContent() {
                 aria-label="Share stock"
               >
                 <ShareIcon className="w-5 h-5" />
+              </button>
+              <button
+                onClick={handlePrint}
+                className="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors print-hide"
+                aria-label="Print stock report"
+              >
+                <PrinterIcon className="w-5 h-5" />
               </button>
               <button
                 className="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
@@ -544,7 +555,7 @@ function StockDetailContent() {
               className="space-y-6"
             >
             {/* VETTR Score section */}
-            <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-6">
+            <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-6 print-avoid-break">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-semibold text-white">VETTR Score</h2>
                 {trend && (
@@ -741,7 +752,7 @@ function StockDetailContent() {
             </div>
 
             {/* Key Metrics grid */}
-            <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-6">
+            <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-6 print-avoid-break print-page-break">
               <h2 className="text-lg font-semibold text-white mb-4">Key Metrics</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="bg-white/[0.03] rounded-xl p-4">
@@ -777,7 +788,7 @@ function StockDetailContent() {
             />
 
             {/* Recent Filings */}
-            <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-6">
+            <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-6 print-avoid-break">
               <h2 className="text-lg font-semibold text-white mb-4">Recent Filings</h2>
               {filingsLoading ? (
                 <div className="space-y-3">

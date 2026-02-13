@@ -210,4 +210,170 @@ body {
       transition-duration: 0.01ms !important;
     }
   }
+
+  /* Print styles for stock detail page */
+  @media print {
+    /* Remove all backgrounds, use white for print */
+    body {
+      background: white !important;
+      color: black !important;
+    }
+
+    /* Hide navigation elements */
+    nav,
+    [role="navigation"],
+    aside,
+    .sidebar,
+    header[class*="sticky"],
+    footer,
+    [class*="bottom-nav"],
+    [class*="mobile-nav"] {
+      display: none !important;
+    }
+
+    /* Hide interactive elements */
+    button[aria-label*="favorite"],
+    button[aria-label*="Share"],
+    button[aria-label*="More"],
+    button[aria-label*="Print"],
+    [role="tablist"],
+    button[class*="print-hide"] {
+      display: none !important;
+    }
+
+    /* Hide breadcrumb for cleaner print */
+    nav[aria-label*="Breadcrumb"] {
+      display: none !important;
+    }
+
+    /* Content container adjustments */
+    .max-w-6xl,
+    .container {
+      max-width: 100% !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+
+    /* Remove dark backgrounds from cards */
+    [class*="bg-vettr"],
+    [class*="border-white"] {
+      background: white !important;
+      border: 1px solid #e5e7eb !important;
+    }
+
+    /* Text color overrides for print */
+    h1, h2, h3, h4, h5, h6,
+    [class*="text-white"],
+    [class*="text-gray-300"],
+    [class*="text-gray-400"] {
+      color: #000 !important;
+    }
+
+    [class*="text-gray-500"],
+    [class*="text-gray-600"] {
+      color: #6b7280 !important;
+    }
+
+    /* Keep accent colors but make them print-friendly */
+    [class*="text-vettr-accent"],
+    [class*="text-green"] {
+      color: #059669 !important;
+    }
+
+    [class*="text-red"] {
+      color: #dc2626 !important;
+    }
+
+    [class*="text-yellow"] {
+      color: #d97706 !important;
+    }
+
+    [class*="text-blue"] {
+      color: #2563eb !important;
+    }
+
+    /* Page breaks between major sections */
+    .print-page-break {
+      page-break-after: always;
+      break-after: page;
+    }
+
+    .print-avoid-break {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    /* Stock header styling for print */
+    .stock-header-print {
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #000;
+    }
+
+    /* Make charts and SVGs print-friendly */
+    svg {
+      max-width: 100% !important;
+    }
+
+    /* Ensure tables print well */
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      page-break-inside: avoid;
+    }
+
+    th, td {
+      border: 1px solid #d1d5db !important;
+      padding: 0.5rem !important;
+      color: #000 !important;
+    }
+
+    th {
+      background-color: #f3f4f6 !important;
+      font-weight: 600 !important;
+    }
+
+    /* Hide hover effects in print */
+    *:hover {
+      background: inherit !important;
+      border-color: inherit !important;
+    }
+
+    /* Remove shadows and effects */
+    * {
+      box-shadow: none !important;
+      text-shadow: none !important;
+    }
+
+    /* Optimize for print */
+    a[href]:after {
+      content: none !important;
+    }
+
+    /* Make badges visible in print */
+    [class*="badge"],
+    [class*="chip"],
+    span[class*="rounded-full"] {
+      border: 1px solid #d1d5db !important;
+      padding: 0.125rem 0.5rem !important;
+      background: white !important;
+    }
+
+    /* Hide modal overlays and dropdowns in print */
+    [class*="fixed"],
+    [class*="absolute"][class*="z-"] {
+      position: static !important;
+    }
+
+    /* Force visibility of important content */
+    [class*="opacity-"] {
+      opacity: 1 !important;
+    }
+
+    /* Remove animations */
+    * {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
 }
