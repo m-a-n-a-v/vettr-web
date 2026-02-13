@@ -20,6 +20,17 @@ import EmptyState from '@/components/ui/EmptyState'
 import { SkeletonStockRow } from '@/components/ui/SkeletonLoader'
 import RefreshButton from '@/components/ui/RefreshButton'
 import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator'
+import StockCard from '@/components/ui/StockCard'
+import {
+  StarIcon,
+  StarFilledIcon,
+  TableIcon,
+  GridIcon,
+  ArrowUpIcon,
+  ArrowDownIcon,
+  ChevronUpIcon,
+  ChevronDownIcon
+} from '@/components/icons'
 import type { Stock } from '@/types/api'
 
 type SortOption = 'vetr_score' | 'current_price' | 'price_change_percent' | 'company_name' | 'sector'
@@ -36,7 +47,7 @@ function StocksPageContent() {
   const [sortBy, setSortBy] = useState<SortOption>((searchParams.get('sort') as SortOption) || 'vetr_score')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>((searchParams.get('order') as 'asc' | 'desc') || 'desc')
   const [favoritesOnly, setFavoritesOnly] = useState(searchParams.get('favorites') === 'true')
-  const [viewMode, setViewMode] = useState<ViewMode>('card')
+  const [viewMode, setViewMode] = useState<ViewMode>('table') // Default to table on desktop
   const [isClient, setIsClient] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const [offset, setOffset] = useState(0)
@@ -272,26 +283,23 @@ function StocksPageContent() {
     return (
       <div className="p-4 md:p-6 pb-20 md:pb-6">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">Stocks</h1>
-          <div className="h-10 w-10 bg-surface rounded-lg animate-pulse hidden md:block"></div>
+          <h1 className="text-2xl font-bold text-white">Stocks</h1>
+          <div className="h-10 w-10 bg-white/5 rounded-lg animate-pulse hidden md:block"></div>
         </div>
 
         {/* Filters skeleton */}
-        <div className="mb-6 space-y-4">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="h-12 flex-1 bg-surface rounded-lg animate-pulse"></div>
-            <div className="h-12 w-full md:w-48 bg-surface rounded-lg animate-pulse"></div>
-            <div className="h-12 w-12 bg-surface rounded-lg animate-pulse"></div>
-            <div className="h-12 w-12 bg-surface rounded-lg animate-pulse"></div>
-          </div>
-          <div className="flex items-center justify-between">
-            <div className="h-6 w-24 bg-surface rounded animate-pulse"></div>
-            <div className="flex gap-2">
-              <div className="h-8 w-8 bg-surface rounded animate-pulse"></div>
-              <div className="h-8 w-8 bg-surface rounded animate-pulse"></div>
-            </div>
+        <div className="mb-6 bg-vettr-card/30 border border-white/5 rounded-2xl p-3">
+          <div className="flex flex-col md:flex-row gap-3">
+            <div className="h-10 flex-1 bg-white/5 rounded-xl animate-pulse"></div>
+            <div className="h-10 w-full md:w-48 bg-white/5 rounded-xl animate-pulse"></div>
+            <div className="h-10 w-10 bg-white/5 rounded-xl animate-pulse"></div>
+            <div className="h-10 w-10 bg-white/5 rounded-xl animate-pulse"></div>
+            <div className="h-10 w-10 bg-white/5 rounded-xl animate-pulse"></div>
           </div>
         </div>
+
+        {/* Result count skeleton */}
+        <div className="mb-4 h-5 w-32 bg-white/5 rounded animate-pulse"></div>
 
         {/* Stock list skeleton */}
         <div className="space-y-3">
@@ -307,7 +315,7 @@ function StocksPageContent() {
   if (stocksError) {
     return (
       <div className="p-4 md:p-6 pb-20 md:pb-6">
-        <h1 className="text-2xl font-bold mb-6">Stocks</h1>
+        <h1 className="text-2xl font-bold text-white mb-6">Stocks</h1>
         <EmptyState
           icon="⚠️"
           title="Error loading stocks"
@@ -321,67 +329,75 @@ function StocksPageContent() {
   if (filteredStocks.length === 0) {
     return (
       <div className="p-4 md:p-6 pb-20 md:pb-6">
-        <h1 className="text-2xl font-bold mb-6">Stocks</h1>
+        <h1 className="text-2xl font-bold text-white mb-6">Stocks</h1>
 
-        {/* Filters */}
-        <div className="mb-6 flex flex-col md:flex-row gap-4">
-          <SearchInput
-            value={searchQuery}
-            onChange={setSearchQuery}
-            placeholder="Search by ticker or company name..."
-            className="flex-1"
-          />
+        {/* Filter bar */}
+        <div className="mb-6 bg-vettr-card/30 border border-white/5 rounded-2xl p-3">
+          <div className="flex flex-col md:flex-row gap-3">
+            <SearchInput
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="Search by ticker or company name..."
+              className="flex-1"
+            />
 
-          <SelectDropdown
-            value={sortBy}
-            onChange={handleSortChange}
-            options={[
-              { value: 'vetr_score', label: 'VETTR Score' },
-              { value: 'current_price', label: 'Price' },
-              { value: 'price_change_percent', label: 'Price Change %' },
-              { value: 'company_name', label: 'Name' },
-              { value: 'sector', label: 'Sector' },
-            ]}
-            className="w-full md:w-48"
-          />
+            <SelectDropdown
+              value={sortBy}
+              onChange={handleSortChange}
+              options={[
+                { value: 'vetr_score', label: 'VETTR Score' },
+                { value: 'current_price', label: 'Price' },
+                { value: 'price_change_percent', label: 'Price Change %' },
+                { value: 'company_name', label: 'Name' },
+                { value: 'sector', label: 'Sector' },
+              ]}
+              className="w-full md:w-48"
+            />
 
-          <button
-            onClick={toggleSortOrder}
-            className="flex items-center justify-center px-4 py-2 bg-primaryLight text-textPrimary rounded-lg hover:bg-surfaceLight transition-colors"
-            title={sortOrder === 'asc' ? 'Ascending' : 'Descending'}
-          >
-            {sortOrder === 'asc' ? '↑' : '↓'}
-          </button>
+            <button
+              onClick={toggleSortOrder}
+              className="flex items-center justify-center w-10 h-10 bg-white/5 border border-white/10 text-white rounded-xl hover:bg-white/10 transition-colors"
+              title={sortOrder === 'asc' ? 'Ascending' : 'Descending'}
+              aria-label={sortOrder === 'asc' ? 'Sort ascending' : 'Sort descending'}
+            >
+              {sortOrder === 'asc' ? (
+                <ChevronUpIcon className="w-5 h-5" />
+              ) : (
+                <ChevronDownIcon className="w-5 h-5" />
+              )}
+            </button>
 
-          <button
-            onClick={toggleFavoritesOnly}
-            className={`flex items-center justify-center px-4 py-2 rounded-lg transition-colors ${favoritesOnly
-              ? 'bg-accent text-primary'
-              : 'bg-primaryLight text-textSecondary hover:bg-surfaceLight'
+            <button
+              onClick={toggleFavoritesOnly}
+              className={`flex items-center justify-center w-10 h-10 rounded-xl transition-colors border ${
+                favoritesOnly
+                  ? 'bg-vettr-accent/10 text-vettr-accent border-vettr-accent/30'
+                  : 'bg-white/5 text-gray-400 border-white/10 hover:bg-white/10 hover:text-white'
               }`}
-            title="Favorites Only"
-          >
-            ★
-          </button>
+              title="Favorites Only"
+              aria-label="Toggle favorites filter"
+            >
+              {favoritesOnly ? (
+                <StarFilledIcon className="w-5 h-5" />
+              ) : (
+                <StarIcon className="w-5 h-5" />
+              )}
+            </button>
 
-          {/* View toggle - Only shown on desktop (>= 1024px) */}
-          <button
-            onClick={toggleViewMode}
-            className="hidden lg:flex items-center justify-center px-4 py-2 bg-primaryLight text-textPrimary rounded-lg hover:bg-surfaceLight transition-colors"
-            title={viewMode === 'card' ? 'Switch to Table View' : 'Switch to Card View'}
-          >
-            {viewMode === 'card' ? (
-              // Table icon
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M5 4a3 3 0 00-3 3v6a3 3 0 003 3h10a3 3 0 003-3V7a3 3 0 00-3-3H5zm-1 9v-1h5v2H5a1 1 0 01-1-1zm7 1h4a1 1 0 001-1v-1h-5v2zm0-4h5V8h-5v2zM9 8H4v2h5V8z" clipRule="evenodd" />
-              </svg>
-            ) : (
-              // Grid/card icon
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M3 4a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 12a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H4a1 1 0 01-1-1v-4zM11 4a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V4zM11 12a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
-              </svg>
-            )}
-          </button>
+            {/* View toggle - Only shown on desktop (>= 1024px) */}
+            <button
+              onClick={toggleViewMode}
+              className="hidden lg:flex items-center justify-center w-10 h-10 bg-white/5 border border-white/10 text-white rounded-xl hover:bg-white/10 transition-colors"
+              title={viewMode === 'card' ? 'Switch to Table View' : 'Switch to Card View'}
+              aria-label={viewMode === 'card' ? 'Switch to table view' : 'Switch to card view'}
+            >
+              {viewMode === 'card' ? (
+                <TableIcon className="w-5 h-5" />
+              ) : (
+                <GridIcon className="w-5 h-5" />
+              )}
+            </button>
+          </div>
         </div>
 
         <EmptyState
@@ -416,7 +432,7 @@ function StocksPageContent() {
       />
 
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Stocks</h1>
+        <h1 className="text-2xl font-bold text-white">Stocks</h1>
         {/* Desktop refresh button */}
         <div className="hidden md:block">
           <RefreshButton
@@ -427,149 +443,194 @@ function StocksPageContent() {
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="mb-6 flex flex-col md:flex-row gap-4">
-        <SearchInput
-          value={searchQuery}
-          onChange={setSearchQuery}
-          placeholder="Search by ticker or company name..."
-          className="flex-1"
-        />
+      {/* Filter bar - single row design */}
+      <div className="mb-6 bg-vettr-card/30 border border-white/5 rounded-2xl p-3">
+        <div className="flex flex-col md:flex-row gap-3">
+          <SearchInput
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Search by ticker or company name..."
+            className="flex-1"
+          />
 
-        <SelectDropdown
-          value={sortBy}
-          onChange={handleSortChange}
-          options={[
-            { value: 'vetr_score', label: 'VETTR Score' },
-            { value: 'current_price', label: 'Price' },
-            { value: 'price_change_percent', label: 'Price Change %' },
-            { value: 'company_name', label: 'Name' },
-            { value: 'sector', label: 'Sector' },
-          ]}
-          className="w-full md:w-48"
-        />
+          <SelectDropdown
+            value={sortBy}
+            onChange={handleSortChange}
+            options={[
+              { value: 'vetr_score', label: 'VETTR Score' },
+              { value: 'current_price', label: 'Price' },
+              { value: 'price_change_percent', label: 'Price Change %' },
+              { value: 'company_name', label: 'Name' },
+              { value: 'sector', label: 'Sector' },
+            ]}
+            className="w-full md:w-48"
+          />
 
-        <div className="flex gap-2">
           <button
             onClick={toggleSortOrder}
-            className="flex items-center justify-center w-10 h-10 bg-surface border border-border/50 text-textPrimary rounded-xl hover:border-accent/50 transition-colors"
+            className="flex items-center justify-center w-10 h-10 bg-white/5 border border-white/10 text-white rounded-xl hover:bg-white/10 transition-colors"
             title={sortOrder === 'asc' ? 'Ascending' : 'Descending'}
+            aria-label={sortOrder === 'asc' ? 'Sort ascending' : 'Sort descending'}
           >
-            {sortOrder === 'asc' ? '↑' : '↓'}
+            {sortOrder === 'asc' ? (
+              <ChevronUpIcon className="w-5 h-5" />
+            ) : (
+              <ChevronDownIcon className="w-5 h-5" />
+            )}
           </button>
 
           <button
             onClick={toggleFavoritesOnly}
-            className={`flex items-center justify-center w-10 h-10 rounded-xl transition-colors border ${favoritesOnly
-              ? 'bg-accent text-primary border-accent shadow-[0_0_10px_rgba(0,230,118,0.3)]'
-              : 'bg-surface text-textSecondary border-border/50 hover:border-accent/50 hover:text-white'
-              }`}
+            className={`flex items-center justify-center w-10 h-10 rounded-xl transition-colors border ${
+              favoritesOnly
+                ? 'bg-vettr-accent/10 text-vettr-accent border-vettr-accent/30'
+                : 'bg-white/5 text-gray-400 border-white/10 hover:bg-white/10 hover:text-white'
+            }`}
             title="Favorites Only"
+            aria-label="Toggle favorites filter"
           >
-            ★
+            {favoritesOnly ? (
+              <StarFilledIcon className="w-5 h-5" />
+            ) : (
+              <StarIcon className="w-5 h-5" />
+            )}
           </button>
 
           {/* View toggle - Only shown on desktop (>= 1024px) */}
           <button
             onClick={toggleViewMode}
-            className="hidden lg:flex items-center justify-center w-10 h-10 bg-surface border border-border/50 text-textPrimary rounded-xl hover:border-accent/50 transition-colors"
+            className="hidden lg:flex items-center justify-center w-10 h-10 bg-white/5 border border-white/10 text-white rounded-xl hover:bg-white/10 transition-colors"
             title={viewMode === 'card' ? 'Switch to Table View' : 'Switch to Card View'}
+            aria-label={viewMode === 'card' ? 'Switch to table view' : 'Switch to card view'}
           >
             {viewMode === 'card' ? (
-              // Table icon
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M5 4a3 3 0 00-3 3v6a3 3 0 003 3h10a3 3 0 003-3V7a3 3 0 00-3-3H5zm-1 9v-1h5v2H5a1 1 0 01-1-1zm7 1h4a1 1 0 001-1v-1h-5v2zm0-4h5V8h-5v2zM9 8H4v2h5V8z" clipRule="evenodd" />
-              </svg>
+              <TableIcon className="w-5 h-5" />
             ) : (
-              // Grid/card icon
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M3 4a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 12a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H4a1 1 0 01-1-1v-4zM11 4a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V4zM11 12a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
-              </svg>
+              <GridIcon className="w-5 h-5" />
             )}
           </button>
         </div>
       </div>
 
       {/* Stock count */}
-      <div className="mb-4 text-textSecondary">
-        {filteredStocks.length} {filteredStocks.length === 1 ? 'stock' : 'stocks'}
+      <div className="mb-4 text-sm text-gray-500">
+        Showing {filteredStocks.length} of {pagination?.total || filteredStocks.length} stocks
       </div>
 
-      {/* Stock list - Responsive: Card view on mobile/tablet, Card or Table on desktop */}
-      {viewMode === 'table' ? (
-        // Table view - Desktop only (>= 1024px)
-        <div className="hidden lg:block overflow-x-auto">
+      {/* Stock list - Responsive: Card view on mobile, Card or Table on desktop */}
+      {viewMode === 'table' && !isMobile ? (
+        // Table view - Desktop only (>= 768px)
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-border">
-                <th className="text-left py-3 px-4">
+              <tr className="border-b border-white/5">
+                <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">
                   <button
                     onClick={() => handleColumnSort('company_name')}
-                    className="flex items-center gap-2 text-textSecondary hover:text-textPrimary transition-colors font-semibold"
+                    className={`flex items-center gap-2 transition-colors ${
+                      sortBy === 'company_name' ? 'text-white' : 'hover:text-gray-300'
+                    }`}
                   >
                     Ticker
                     {sortBy === 'company_name' && (
-                      <span>{sortOrder === 'asc' ? '↑' : '↓'}</span>
+                      sortOrder === 'asc' ? (
+                        <ChevronUpIcon className="w-3 h-3" />
+                      ) : (
+                        <ChevronDownIcon className="w-3 h-3" />
+                      )
                     )}
                   </button>
                 </th>
-                <th className="text-left py-3 px-4">
+                <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">
                   <button
                     onClick={() => handleColumnSort('company_name')}
-                    className="flex items-center gap-2 text-textSecondary hover:text-textPrimary transition-colors font-semibold"
+                    className={`flex items-center gap-2 transition-colors ${
+                      sortBy === 'company_name' ? 'text-white' : 'hover:text-gray-300'
+                    }`}
                   >
-                    Name
+                    Company
                     {sortBy === 'company_name' && (
-                      <span>{sortOrder === 'asc' ? '↑' : '↓'}</span>
+                      sortOrder === 'asc' ? (
+                        <ChevronUpIcon className="w-3 h-3" />
+                      ) : (
+                        <ChevronDownIcon className="w-3 h-3" />
+                      )
                     )}
                   </button>
                 </th>
-                <th className="text-right py-3 px-4">
+                <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-right">
                   <button
                     onClick={() => handleColumnSort('current_price')}
-                    className="flex items-center gap-2 ml-auto text-textSecondary hover:text-textPrimary transition-colors font-semibold"
+                    className={`flex items-center gap-2 ml-auto transition-colors ${
+                      sortBy === 'current_price' ? 'text-white' : 'hover:text-gray-300'
+                    }`}
                   >
                     Price
                     {sortBy === 'current_price' && (
-                      <span>{sortOrder === 'asc' ? '↑' : '↓'}</span>
+                      sortOrder === 'asc' ? (
+                        <ChevronUpIcon className="w-3 h-3" />
+                      ) : (
+                        <ChevronDownIcon className="w-3 h-3" />
+                      )
                     )}
                   </button>
                 </th>
-                <th className="text-right py-3 px-4">
+                <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-right">
                   <button
                     onClick={() => handleColumnSort('price_change_percent')}
-                    className="flex items-center gap-2 ml-auto text-textSecondary hover:text-textPrimary transition-colors font-semibold"
+                    className={`flex items-center gap-2 ml-auto transition-colors ${
+                      sortBy === 'price_change_percent' ? 'text-white' : 'hover:text-gray-300'
+                    }`}
                   >
-                    Change%
+                    Change
                     {sortBy === 'price_change_percent' && (
-                      <span>{sortOrder === 'asc' ? '↑' : '↓'}</span>
+                      sortOrder === 'asc' ? (
+                        <ChevronUpIcon className="w-3 h-3" />
+                      ) : (
+                        <ChevronDownIcon className="w-3 h-3" />
+                      )
                     )}
                   </button>
                 </th>
-                <th className="text-center py-3 px-4">
+                <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-center">
                   <button
                     onClick={() => handleColumnSort('vetr_score')}
-                    className="flex items-center gap-2 mx-auto text-textSecondary hover:text-textPrimary transition-colors font-semibold"
+                    className={`flex items-center gap-2 mx-auto transition-colors ${
+                      sortBy === 'vetr_score' ? 'text-white' : 'hover:text-gray-300'
+                    }`}
                   >
                     VETTR Score
                     {sortBy === 'vetr_score' && (
-                      <span>{sortOrder === 'asc' ? '↑' : '↓'}</span>
+                      sortOrder === 'asc' ? (
+                        <ChevronUpIcon className="w-3 h-3" />
+                      ) : (
+                        <ChevronDownIcon className="w-3 h-3" />
+                      )
                     )}
                   </button>
                 </th>
-                <th className="text-left py-3 px-4">
+                <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">
                   <button
                     onClick={() => handleColumnSort('sector')}
-                    className="flex items-center gap-2 text-textSecondary hover:text-textPrimary transition-colors font-semibold"
+                    className={`flex items-center gap-2 transition-colors ${
+                      sortBy === 'sector' ? 'text-white' : 'hover:text-gray-300'
+                    }`}
                   >
                     Sector
                     {sortBy === 'sector' && (
-                      <span>{sortOrder === 'asc' ? '↑' : '↓'}</span>
+                      sortOrder === 'asc' ? (
+                        <ChevronUpIcon className="w-3 h-3" />
+                      ) : (
+                        <ChevronDownIcon className="w-3 h-3" />
+                      )
                     )}
                   </button>
                 </th>
-                <th className="text-right py-3 px-4">
-                  <span className="text-textSecondary font-semibold">Market Cap</span>
+                <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-right">
+                  Market Cap
+                </th>
+                <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-center">
+                  Favorite
                 </th>
               </tr>
             </thead>
@@ -577,54 +638,70 @@ function StocksPageContent() {
               {filteredStocks.map(stock => (
                 <tr
                   key={stock.ticker}
-                  className="border-b border-border hover:bg-primaryLight transition-colors group cursor-pointer"
+                  className="border-b border-white/5 hover:bg-white/[0.03] transition-colors cursor-pointer group"
                   onClick={() => window.location.href = `/stocks/${stock.ticker}`}
                 >
-                  <td className="py-4 px-4">
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={(e) => handleFavoriteToggle(stock.ticker, e)}
-                        disabled={isAdding || isRemoving}
-                        className="text-lg transition-all duration-200 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
-                        aria-label={favoritedTickers.has(stock.ticker) ? 'Remove from watchlist' : 'Add to watchlist'}
-                      >
-                        {isAdding || isRemoving ? (
-                          <span className="text-textMuted animate-pulse">⋯</span>
-                        ) : favoritedTickers.has(stock.ticker) ? (
-                          <span className="text-accent drop-shadow-sm">★</span>
-                        ) : (
-                          <span className="text-textMuted group-hover:text-textSecondary">☆</span>
-                        )}
-                      </button>
-                      <span className="font-bold text-textPrimary">{stock.ticker}</span>
-                    </div>
+                  <td className="px-4 py-3">
+                    <span className="font-mono text-sm font-bold text-vettr-accent">{stock.ticker}</span>
                   </td>
-                  <td className="py-4 px-4">
-                    <span className="text-textPrimary">{stock.company_name}</span>
+                  <td className="px-4 py-3">
+                    <span className="text-sm text-white">{stock.company_name}</span>
                   </td>
-                  <td className="py-4 px-4 text-right">
-                    <span className="font-semibold text-textPrimary">
+                  <td className="px-4 py-3 text-right">
+                    <span className="text-sm font-semibold text-white">
                       ${stock.current_price?.toFixed(2) || 'N/A'}
                     </span>
                   </td>
-                  <td className="py-4 px-4 text-right">
-                    <PriceChangeIndicator
-                      change={stock.price_change_percent || 0}
-                      size="sm"
-                    />
+                  <td className="px-4 py-3 text-right">
+                    <div className="flex items-center justify-end gap-1">
+                      {stock.price_change_percent !== undefined && stock.price_change_percent !== null ? (
+                        <>
+                          {stock.price_change_percent >= 0 ? (
+                            <ArrowUpIcon className="w-3 h-3 text-vettr-accent" />
+                          ) : (
+                            <ArrowDownIcon className="w-3 h-3 text-red-400" />
+                          )}
+                          <span className={`text-sm font-medium ${
+                            stock.price_change_percent >= 0 ? 'text-vettr-accent' : 'text-red-400'
+                          }`}>
+                            {Math.abs(stock.price_change_percent).toFixed(2)}%
+                          </span>
+                        </>
+                      ) : (
+                        <span className="text-sm text-gray-500">N/A</span>
+                      )}
+                    </div>
                   </td>
-                  <td className="py-4 px-4">
+                  <td className="px-4 py-3">
                     <div className="flex justify-center">
                       <VetrScoreBadge score={stock.vetr_score || 0} size="sm" />
                     </div>
                   </td>
-                  <td className="py-4 px-4">
-                    <span className="text-textSecondary">{stock.sector || 'N/A'}</span>
+                  <td className="px-4 py-3">
+                    <span className="text-sm text-gray-400">{stock.sector || 'N/A'}</span>
                   </td>
-                  <td className="py-4 px-4 text-right">
-                    <span className="text-textSecondary">
-                      {stock.market_cap ? `$${(stock.market_cap / 1000000).toFixed(1)}M` : 'N/A'}
+                  <td className="px-4 py-3 text-right">
+                    <span className="text-sm text-gray-400">
+                      {stock.market_cap ? `$${(stock.market_cap / 1_000_000_000).toFixed(1)}B` : 'N/A'}
                     </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex justify-center">
+                      <button
+                        onClick={(e) => handleFavoriteToggle(stock.ticker, e)}
+                        disabled={isAdding || isRemoving}
+                        className="text-gray-400 hover:text-yellow-400 hover:scale-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        aria-label={favoritedTickers.has(stock.ticker) ? 'Remove from watchlist' : 'Add to watchlist'}
+                      >
+                        {isAdding || isRemoving ? (
+                          <LoadingSpinner size="sm" />
+                        ) : favoritedTickers.has(stock.ticker) ? (
+                          <StarFilledIcon className="w-5 h-5 text-yellow-400" />
+                        ) : (
+                          <StarIcon className="w-5 h-5" />
+                        )}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -632,82 +709,29 @@ function StocksPageContent() {
           </table>
         </div>
       ) : (
-        // Card view - All screen sizes
-        <div className="space-y-3">
+        // Card view - Mobile always, desktop when viewMode is 'card'
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredStocks.map(stock => (
-            <Link
+            <StockCard
               key={stock.ticker}
-              href={`/stocks/${stock.ticker}`}
-              className="block bg-primaryLight rounded-lg p-4 hover:bg-surfaceLight transition-colors relative group"
-            >
-              <div className="flex items-center gap-4">
-                {/* Company initials avatar */}
-                <div className="flex-shrink-0 w-12 h-12 bg-surface rounded-full flex items-center justify-center text-accent font-bold text-lg">
-                  {stock.company_name
-                    .split(' ')
-                    .map(word => word[0])
-                    .slice(0, 2)
-                    .join('')
-                    .toUpperCase()}
-                </div>
-
-                {/* Stock info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-bold text-textPrimary">
-                      {stock.ticker}
-                    </span>
-                    <button
-                      onClick={(e) => handleFavoriteToggle(stock.ticker, e)}
-                      disabled={isAdding || isRemoving}
-                      className="text-lg transition-all duration-200 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
-                      aria-label={favoritedTickers.has(stock.ticker) ? 'Remove from watchlist' : 'Add to watchlist'}
-                    >
-                      {isAdding || isRemoving ? (
-                        <span className="text-textMuted animate-pulse">⋯</span>
-                      ) : favoritedTickers.has(stock.ticker) ? (
-                        <span className="text-accent drop-shadow-sm">★</span>
-                      ) : (
-                        <span className="text-textMuted group-hover:text-textSecondary">☆</span>
-                      )}
-                    </button>
-                  </div>
-                  <div className="text-sm text-textSecondary truncate">
-                    {stock.company_name}
-                  </div>
-                </div>
-
-                {/* Price info - Hidden on mobile, shown on tablet+ */}
-                <div className="hidden sm:flex flex-col items-end gap-1">
-                  <div className="font-semibold text-textPrimary">
-                    ${stock.current_price?.toFixed(2) || 'N/A'}
-                  </div>
-                  <PriceChangeIndicator
-                    change={stock.price_change_percent || 0}
-                    size="sm"
-                  />
-                </div>
-
-                {/* VETTR Score */}
-                <div className="flex-shrink-0">
-                  <VetrScoreBadge score={stock.vetr_score || 0} size="sm" />
-                </div>
-              </div>
-
-              {/* Mobile-only: Price info below */}
-              <div className="sm:hidden mt-3 pt-3 border-t border-border flex justify-between items-center">
-                <div>
-                  <div className="text-xs text-textMuted mb-1">Price</div>
-                  <div className="font-semibold text-textPrimary">
-                    ${stock.current_price?.toFixed(2) || 'N/A'}
-                  </div>
-                </div>
-                <PriceChangeIndicator
-                  change={stock.price_change_percent || 0}
-                  size="sm"
-                />
-              </div>
-            </Link>
+              stock={stock}
+              isFavorite={favoritedTickers.has(stock.ticker)}
+              onFavoriteToggle={async (ticker) => {
+                try {
+                  const isFavorite = favoritedTickers.has(ticker)
+                  if (isFavorite) {
+                    await removeFromWatchlist(ticker)
+                    showToast('Removed from watchlist', 'success')
+                  } else {
+                    await addToWatchlist(ticker)
+                    showToast('Added to watchlist', 'success')
+                  }
+                } catch (error) {
+                  showToast('Failed to update watchlist', 'error')
+                }
+              }}
+              isTogglingFavorite={isAdding || isRemoving}
+            />
           ))}
         </div>
       )}
@@ -719,36 +743,26 @@ function StocksPageContent() {
           <button
             onClick={loadMoreStocks}
             disabled={isLoadingMore || stocksLoading}
-            className="hidden md:flex items-center gap-2 px-6 py-3 bg-primaryLight text-textPrimary rounded-lg hover:bg-surfaceLight transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-white/5 border border-white/10 text-white rounded-xl px-6 py-3 hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
             {isLoadingMore || stocksLoading ? (
               <>
                 <LoadingSpinner size="sm" />
-                <span>Loading more stocks...</span>
+                <span>Loading more...</span>
               </>
             ) : (
               <>
                 <span>Load More</span>
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
+                <ChevronDownIcon className="w-4 h-4" />
               </>
             )}
           </button>
-
-          {/* Mobile: Loading indicator for infinite scroll */}
-          {(isLoadingMore || stocksLoading) && (
-            <div className="md:hidden flex items-center gap-2 text-textSecondary">
-              <LoadingSpinner size="sm" />
-              <span>Loading more stocks...</span>
-            </div>
-          )}
         </div>
       )}
 
       {/* No more stocks indicator */}
       {pagination && !pagination.hasMore && filteredStocks.length > 0 && (
-        <div className="mt-6 text-center text-textMuted">
+        <div className="mt-6 text-center text-sm text-gray-500">
           All stocks loaded ({pagination.total} total)
         </div>
       )}
@@ -761,10 +775,10 @@ export default function StocksPage() {
   return (
     <Suspense fallback={
       <div className="p-4 md:p-6 pb-20 md:pb-6">
-        <h1 className="text-2xl font-bold mb-6">Stocks</h1>
+        <h1 className="text-2xl font-bold text-white mb-6">Stocks</h1>
         <div className="space-y-4">
           {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="h-24 bg-surface rounded-lg animate-pulse"></div>
+            <div key={i} className="h-24 bg-white/5 rounded-xl animate-pulse"></div>
           ))}
         </div>
       </div>

@@ -154,6 +154,24 @@ export function ChevronDownIcon({ className = 'w-5 h-5', ...props }: IconProps) 
   );
 }
 
+// Chevron Up Icon
+export function ChevronUpIcon({ className = 'w-5 h-5', ...props }: IconProps) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <path d="M18 15l-6-6-6 6" />
+    </svg>
+  );
+}
+
 // Log Out Icon
 export function LogOutIcon({ className = 'w-5 h-5', ...props }: IconProps) {
   return (
@@ -418,6 +436,45 @@ export function ArrowDownIcon({ className = 'w-5 h-5', ...props }: IconProps) {
     >
       <line x1="12" y1="5" x2="12" y2="19" />
       <polyline points="19 12 12 19 5 12" />
+    </svg>
+  );
+}
+
+// Table Icon
+export function TableIcon({ className = 'w-5 h-5', ...props }: IconProps) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <rect x="3" y="3" width="18" height="18" rx="2" />
+      <line x1="3" y1="9" x2="21" y2="9" />
+      <line x1="3" y1="15" x2="21" y2="15" />
+      <line x1="9" y1="9" x2="9" y2="21" />
+    </svg>
+  );
+}
+
+// Filter Icon
+export function FilterIcon({ className = 'w-5 h-5', ...props }: IconProps) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
     </svg>
   );
 }
