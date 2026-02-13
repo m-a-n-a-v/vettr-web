@@ -1,6 +1,9 @@
 'use client'
 
-import { useState, useMemo, useEffect, useCallback, useRef } from 'react'
+// Disable static generation due to useSearchParams()
+export const dynamic = 'force-dynamic';
+
+import { useState, useMemo, useEffect, useCallback, useRef, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useStocks } from '@/hooks/useStocks'
@@ -24,7 +27,7 @@ type ViewMode = 'card' | 'table'
 
 const STOCKS_PER_PAGE = 25
 
-export default function StocksPage() {
+function StocksPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -352,11 +355,10 @@ export default function StocksPage() {
 
           <button
             onClick={toggleFavoritesOnly}
-            className={`flex items-center justify-center px-4 py-2 rounded-lg transition-colors ${
-              favoritesOnly
-                ? 'bg-accent text-primary'
-                : 'bg-primaryLight text-textSecondary hover:bg-surfaceLight'
-            }`}
+            className={`flex items-center justify-center px-4 py-2 rounded-lg transition-colors ${favoritesOnly
+              ? 'bg-accent text-primary'
+              : 'bg-primaryLight text-textSecondary hover:bg-surfaceLight'
+              }`}
             title="Favorites Only"
           >
             ★
@@ -394,9 +396,9 @@ export default function StocksPage() {
           onAction={
             searchQuery || favoritesOnly
               ? () => {
-                  setSearchQuery('')
-                  setFavoritesOnly(false)
-                }
+                setSearchQuery('')
+                setFavoritesOnly(false)
+              }
               : undefined
           }
         />
@@ -447,44 +449,45 @@ export default function StocksPage() {
           className="w-full md:w-48"
         />
 
-        <button
-          onClick={toggleSortOrder}
-          className="flex items-center justify-center px-4 py-2 bg-primaryLight text-textPrimary rounded-lg hover:bg-surfaceLight transition-colors"
-          title={sortOrder === 'asc' ? 'Ascending' : 'Descending'}
-        >
-          {sortOrder === 'asc' ? '↑' : '↓'}
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={toggleSortOrder}
+            className="flex items-center justify-center w-10 h-10 bg-surface border border-border/50 text-textPrimary rounded-xl hover:border-accent/50 transition-colors"
+            title={sortOrder === 'asc' ? 'Ascending' : 'Descending'}
+          >
+            {sortOrder === 'asc' ? '↑' : '↓'}
+          </button>
 
-        <button
-          onClick={toggleFavoritesOnly}
-          className={`flex items-center justify-center px-4 py-2 rounded-lg transition-colors ${
-            favoritesOnly
-              ? 'bg-accent text-primary'
-              : 'bg-primaryLight text-textSecondary hover:bg-surfaceLight'
-          }`}
-          title="Favorites Only"
-        >
-          ★
-        </button>
+          <button
+            onClick={toggleFavoritesOnly}
+            className={`flex items-center justify-center w-10 h-10 rounded-xl transition-colors border ${favoritesOnly
+              ? 'bg-accent text-primary border-accent shadow-[0_0_10px_rgba(0,230,118,0.3)]'
+              : 'bg-surface text-textSecondary border-border/50 hover:border-accent/50 hover:text-white'
+              }`}
+            title="Favorites Only"
+          >
+            ★
+          </button>
 
-        {/* View toggle - Only shown on desktop (>= 1024px) */}
-        <button
-          onClick={toggleViewMode}
-          className="hidden lg:flex items-center justify-center px-4 py-2 bg-primaryLight text-textPrimary rounded-lg hover:bg-surfaceLight transition-colors"
-          title={viewMode === 'card' ? 'Switch to Table View' : 'Switch to Card View'}
-        >
-          {viewMode === 'card' ? (
-            // Table icon
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M5 4a3 3 0 00-3 3v6a3 3 0 003 3h10a3 3 0 003-3V7a3 3 0 00-3-3H5zm-1 9v-1h5v2H5a1 1 0 01-1-1zm7 1h4a1 1 0 001-1v-1h-5v2zm0-4h5V8h-5v2zM9 8H4v2h5V8z" clipRule="evenodd" />
-            </svg>
-          ) : (
-            // Grid/card icon
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M3 4a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 12a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H4a1 1 0 01-1-1v-4zM11 4a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V4zM11 12a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
-            </svg>
-          )}
-        </button>
+          {/* View toggle - Only shown on desktop (>= 1024px) */}
+          <button
+            onClick={toggleViewMode}
+            className="hidden lg:flex items-center justify-center w-10 h-10 bg-surface border border-border/50 text-textPrimary rounded-xl hover:border-accent/50 transition-colors"
+            title={viewMode === 'card' ? 'Switch to Table View' : 'Switch to Card View'}
+          >
+            {viewMode === 'card' ? (
+              // Table icon
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M5 4a3 3 0 00-3 3v6a3 3 0 003 3h10a3 3 0 003-3V7a3 3 0 00-3-3H5zm-1 9v-1h5v2H5a1 1 0 01-1-1zm7 1h4a1 1 0 001-1v-1h-5v2zm0-4h5V8h-5v2zM9 8H4v2h5V8z" clipRule="evenodd" />
+              </svg>
+            ) : (
+              // Grid/card icon
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M3 4a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 12a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H4a1 1 0 01-1-1v-4zM11 4a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V4zM11 12a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
+              </svg>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Stock count */}
@@ -751,4 +754,22 @@ export default function StocksPage() {
       )}
     </div>
   )
+}
+
+// Wrap in Suspense to fix Next.js build error with useSearchParams
+export default function StocksPage() {
+  return (
+    <Suspense fallback={
+      <div className="p-4 md:p-6 pb-20 md:pb-6">
+        <h1 className="text-2xl font-bold mb-6">Stocks</h1>
+        <div className="space-y-4">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="h-24 bg-surface rounded-lg animate-pulse"></div>
+          ))}
+        </div>
+      </div>
+    }>
+      <StocksPageContent />
+    </Suspense>
+  );
 }

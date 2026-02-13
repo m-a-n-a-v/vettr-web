@@ -1,6 +1,9 @@
 'use client';
 
-import { useState, useMemo, useEffect, useCallback } from 'react';
+// Disable static generation due to useSearchParams()
+export const dynamic = 'force-dynamic';
+
+import { useState, useMemo, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useStocks } from '@/hooks/useStocks';
 import { useFilings } from '@/hooks/useFilings';
@@ -10,6 +13,7 @@ import { useRefresh } from '@/hooks/useRefresh';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import SearchInput from '@/components/ui/SearchInput';
 import StockCard from '@/components/ui/StockCard';
+import Button from '@/components/ui/Button';
 import FilingTypeIcon from '@/components/ui/FilingTypeIcon';
 import FilingTable from '@/components/ui/FilingTable';
 import EmptyState from '@/components/ui/EmptyState';
@@ -28,7 +32,7 @@ import type { Filing, FilingType } from '@/types/api';
  * - Featured stocks carousel (horizontal scroll)
  * - Recent filings list
  */
-export default function DiscoveryPage() {
+function DiscoveryPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -232,25 +236,26 @@ export default function DiscoveryPage() {
 
         {/* Sector Filter Chips */}
         <div>
-          <h2 className="text-sm font-semibold text-textSecondary uppercase tracking-wide mb-3">
+          <h2 className="text-sm font-bold text-textSecondary uppercase tracking-wider mb-4 pl-1">
             Filter by Sector
           </h2>
           <div className="flex flex-wrap gap-2">
             {sectors.map((sector) => (
-              <button
+              <Button
                 key={sector}
                 onClick={() => handleSectorClick(sector)}
+                variant={selectedSector === sector ? 'primary' : 'secondary'}
+                size="sm"
                 className={`
-                  px-4 py-2 rounded-full text-sm font-medium transition-all duration-200
-                  ${
-                    selectedSector === sector
-                      ? 'bg-accent text-primary shadow-lg scale-105'
-                      : 'bg-primaryLight text-textSecondary hover:bg-surface hover:text-textPrimary'
+                  rounded-full transition-all duration-300
+                  ${selectedSector === sector
+                    ? 'shadow-[0_0_15px_rgba(0,230,118,0.4)]'
+                    : 'hover:border-accent/50 hover:text-white'
                   }
                 `}
               >
                 {sector}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -429,5 +434,28 @@ function FilingRow({ filing }: FilingRowProps) {
         </div>
       </div>
     </a>
+  );
+}
+
+// Wrap in Suspense to fix Next.js build error with useSearchParams
+export default function DiscoveryPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-primary pb-20 md:pb-6">
+        <div className="bg-primaryLight border-b border-border px-4 py-6 md:px-6">
+          <h1 className="text-2xl font-bold text-textPrimary">Discovery</h1>
+        </div>
+        <div className="px-4 py-6 md:px-6">
+          <div className="h-10 bg-surface rounded-lg animate-pulse mb-6"></div>
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-32 bg-surface rounded-lg animate-pulse"></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    }>
+      <DiscoveryPageContent />
+    </Suspense>
   );
 }

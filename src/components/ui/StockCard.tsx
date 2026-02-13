@@ -45,8 +45,8 @@ export default function StockCard({
   return (
     <Link href={`/stocks/${stock.ticker}`}>
       <motion.div
-        className="relative bg-primaryLight border border-border rounded-lg p-4 cursor-pointer group"
-        whileHover={{ y: -4, boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)' }}
+        className="relative bg-surface border border-border/50 rounded-2xl p-5 cursor-pointer group hover:border-accent/30 transition-colors duration-300"
+        whileHover={{ y: -4, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.2)' }}
         transition={{ duration: 0.2, ease: 'easeOut' }}
       >
         {/* Favorite Star (if enabled) */}

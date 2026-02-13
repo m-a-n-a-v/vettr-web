@@ -1,6 +1,9 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+// Disable static generation due to useSearchParams()
+export const dynamic = 'force-dynamic';
+
+import { useState, useMemo, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAlertRules } from '@/hooks/useAlertRules';
@@ -42,7 +45,7 @@ const mockRecentTriggers = [
 
 type FilterType = 'All' | 'Active' | 'Inactive';
 
-export default function AlertsPage() {
+function AlertsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -375,11 +378,10 @@ export default function AlertsPage() {
             <button
               key={filterType}
               onClick={() => setFilter(filterType)}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                filter === filterType
-                  ? 'bg-accent text-primary'
-                  : 'bg-primaryLight text-textSecondary hover:bg-surfaceLight'
-              }`}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === filterType
+                ? 'bg-accent text-primary'
+                : 'bg-primaryLight text-textSecondary hover:bg-surfaceLight'
+                }`}
             >
               {filterType}
             </button>
@@ -447,15 +449,13 @@ export default function AlertsPage() {
                     <button
                       onClick={() => handleToggle(rule.id, rule.is_enabled)}
                       disabled={togglingRuleId === rule.id}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-primary ${
-                        rule.is_enabled ? 'bg-accent' : 'bg-border'
-                      } ${togglingRuleId === rule.id ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-primary ${rule.is_enabled ? 'bg-accent' : 'bg-border'
+                        } ${togglingRuleId === rule.id ? 'opacity-50 cursor-not-allowed' : ''}`}
                       title={rule.is_enabled ? 'Disable alert' : 'Enable alert'}
                     >
                       <span
-                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                          rule.is_enabled ? 'translate-x-6' : 'translate-x-1'
-                        }`}
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${rule.is_enabled ? 'translate-x-6' : 'translate-x-1'
+                          }`}
                       />
                     </button>
 
@@ -560,3 +560,30 @@ export default function AlertsPage() {
     </div>
   );
 }
+
+// Wrap in Suspense to fix Next.js build error with useSearchParams
+export default function AlertsPage() {
+  return (
+    <Suspense fallback={
+      <div className="p-4 md:p-6 pb-20 md:pb-6">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold">Alerts</h1>
+          <div className="h-10 w-32 bg-surface rounded-lg animate-pulse"></div>
+        </div>
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-lg font-semibold mb-4">Recent Triggers</h2>
+            <div className="space-y-3">
+              {[1, 2, 3].map((i) => (
+                <SkeletonAlertTrigger key={i} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    }>
+      <AlertsPageContent />
+    </Suspense>
+  );
+}
+
