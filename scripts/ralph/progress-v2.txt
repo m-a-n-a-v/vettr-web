@@ -446,3 +446,43 @@ Files modified:
 - Last updated timestamp integrated into header is cleaner than separate banner below header
 - All old design tokens replaced: text-textPrimary → text-white, text-textSecondary → text-gray-400, text-textMuted → text-gray-500, bg-primaryLight → bg-vettr-card/50, border-border → border-white/5, text-accent → text-vettr-accent, text-error → text-red-400, text-warning → text-orange-400
 ---
+
+## V2-013: Redesign Stocks page - professional data table with filters
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Completely redesigned Stocks page with premium V2 design system
+- Added TableIcon, FilterIcon, and ChevronUpIcon to icon library
+- Implemented professional filter bar in single row layout: bg-vettr-card/30 border border-white/5 rounded-2xl p-3 gap-3
+- Desktop default view is now data table (not card view)
+- Table with 8 columns: Ticker (font-mono text-vettr-accent), Company, Price, Change (with SVG arrows), VETTR Score (sm ring badge), Sector, Market Cap, Favorite
+- Table header: text-xs text-gray-500 uppercase tracking-wider with sortable columns
+- Active sort column header shows in text-white with chevron icon indicator
+- Table rows: border-b border-white/5 hover:bg-white/[0.03] transition-colors cursor-pointer
+- Favorite star column: StarIcon/StarFilledIcon with yellow-400 color, click toggles without row navigation
+- Price change displays with ArrowUpIcon (green) / ArrowDownIcon (red) + colored percentage
+- Mobile view: card grid using StockCard component (from V2-007)
+- Filter bar buttons use SVG icons instead of emoji: ChevronUpIcon/ChevronDownIcon for sort order, StarIcon/StarFilledIcon for favorites toggle, TableIcon/GridIcon for view toggle
+- Result count: "Showing X of Y stocks" in text-sm text-gray-500
+- Load More button: bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 with ChevronDownIcon
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/components/icons/index.tsx (added TableIcon, FilterIcon, ChevronUpIcon)
+- src/app/(main)/stocks/page.tsx
+
+**Learnings for future iterations:**
+- Filter bar with single-row design (bg-vettr-card/30) creates cleaner professional appearance vs two-row layout
+- Desktop table should be default view (not card view) for data-driven pages like stocks list
+- Sort indicators should use small chevron icons (w-3 h-3) for table headers, not full-size arrows
+- Active sort column header should be text-white to stand out from gray inactive headers
+- Favorite column should be separate (not inline with ticker) for easier clicking in table
+- Price change indicator inline with SVG arrow icons is more compact than PriceChangeIndicator component
+- StockCard component expects onFavoriteToggle callback with (ticker: string) => Promise<void> signature
+- Mobile always uses card view, desktop can toggle between table/card with localStorage preference
+- Market cap display: format as billions with (value / 1_000_000_000).toFixed(1) + 'B'
+- Table click navigation uses window.location.href for tr elements (Next.js Link doesn't work well on table rows)
+- Card view grid: grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 for responsive columns
+- All old design tokens replaced: bg-surface → bg-white/5, text-textPrimary → text-white, text-textSecondary → text-gray-400, text-textMuted → text-gray-500, border-border → border-white/5
+---
