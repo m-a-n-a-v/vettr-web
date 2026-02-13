@@ -16,11 +16,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<Theme>('dark');
   const [resolvedTheme, setResolvedTheme] = useState<'dark' | 'light'>('dark');
 
-  // Force dark mode for Navy theme
+  // Initialize theme from localStorage on mount
   useEffect(() => {
-    setThemeState('dark');
-    setResolvedTheme('dark');
-    document.documentElement.classList.add('dark');
+    const savedTheme = localStorage.getItem('vettr_theme') as Theme | null;
+    if (savedTheme && (savedTheme === 'dark' || savedTheme === 'light' || savedTheme === 'system')) {
+      setThemeState(savedTheme);
+    }
   }, []);
 
   // Handle theme changes

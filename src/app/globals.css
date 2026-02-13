@@ -18,9 +18,8 @@
   --font-inter: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-/* Light theme colors - optional, currently disabled to enforce Navy theme */
-/*
-html.light {
+/* Light theme colors */
+html:not(.dark) {
   --foreground-rgb: 15, 23, 42;
   --background-start-rgb: 248, 250, 252;
   --background-end-rgb: 248, 250, 252;
@@ -28,7 +27,6 @@ html.light {
   --color-surface: #FFFFFF;
   --color-border: #E2E8F0;
 }
-*/
 
 /* Base styles */
 * {
@@ -52,6 +50,7 @@ body {
     rgb(var(--background-end-rgb))
   );
   min-height: 100vh;
+  transition: color 200ms ease-in-out, background 200ms ease-in-out;
 }
 
 /* Selection styling */

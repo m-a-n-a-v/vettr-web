@@ -98,7 +98,7 @@ export function Header() {
   const tierBadgeColor = getTierBadgeColor(user.tier);
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-16 bg-vettr-navy/80 backdrop-blur-lg border-b border-white/5 z-40 md:ml-64">
+    <header className="fixed top-0 left-0 right-0 h-16 bg-white/80 dark:bg-vettr-navy/80 backdrop-blur-lg border-b border-gray-200 dark:border-white/5 z-40 md:ml-64 transition-colors duration-200">
       <div className="h-full flex items-center justify-between px-4 md:px-6 gap-4">
         {/* Left: Page title */}
         <div className="flex items-center gap-4 flex-shrink-0">
@@ -108,10 +108,10 @@ export function Header() {
             className="md:hidden font-bold text-xl"
           >
             <span className="text-vettr-accent">V</span>
-            <span className="text-white">ETTR</span>
+            <span className="text-gray-900 dark:text-white">ETTR</span>
           </Link>
           {/* Desktop page title */}
-          <h1 className="hidden md:block text-lg font-semibold text-white">
+          <h1 className="hidden md:block text-lg font-semibold text-gray-900 dark:text-white">
             {pageTitle}
           </h1>
         </div>
@@ -119,11 +119,11 @@ export function Header() {
         {/* Center-right: Search shortcut (desktop only) */}
         <button
           onClick={handleSearchClick}
-          className="hidden lg:flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-gray-500 hover:bg-white/[0.07] hover:border-white/20 transition-all"
+          className="hidden lg:flex items-center gap-2 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-1.5 text-sm text-gray-500 hover:bg-gray-200 dark:hover:bg-white/[0.07] hover:border-gray-300 dark:hover:border-white/20 transition-all"
         >
           <SearchIcon className="w-4 h-4" />
           <span>Quick search...</span>
-          <kbd className="ml-2 px-1.5 py-0.5 bg-white/10 border border-white/10 rounded text-xs font-medium text-gray-400">
+          <kbd className="ml-2 px-1.5 py-0.5 bg-white dark:bg-white/10 border border-gray-300 dark:border-white/10 rounded text-xs font-medium text-gray-600 dark:text-gray-400">
             ⌘K
           </kbd>
         </button>
@@ -133,7 +133,7 @@ export function Header() {
           {/* Refresh button */}
           <button
             onClick={handleRefresh}
-            className="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+            className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors"
             aria-label="Refresh page"
           >
             <RefreshIcon className="w-5 h-5" />
@@ -141,7 +141,7 @@ export function Header() {
 
           {/* Notification bell */}
           <button
-            className="relative p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+            className="relative p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors"
             aria-label="Notifications"
           >
             <BellIcon className="w-5 h-5" />
@@ -175,14 +175,14 @@ export function Header() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.15 }}
-                  className="absolute right-0 mt-2 w-56 bg-vettr-card border border-white/10 rounded-xl shadow-xl overflow-hidden"
+                  className="absolute right-0 mt-2 w-56 bg-white dark:bg-vettr-card border border-gray-200 dark:border-white/10 rounded-xl shadow-xl overflow-hidden"
                 >
                   {/* User info header */}
-                  <div className="px-4 py-3 border-b border-white/5">
-                    <p className="text-sm font-medium text-white truncate">
+                  <div className="px-4 py-3 border-b border-gray-200 dark:border-white/5">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                       {user.display_name}
                     </p>
-                    <p className="text-xs text-gray-400 mt-1 truncate">
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 truncate">
                       {user.email}
                     </p>
                     <span
@@ -197,21 +197,21 @@ export function Header() {
                     <Link
                       href="/profile"
                       onClick={() => setIsDropdownOpen(false)}
-                      className="block px-3 py-2 text-sm text-white hover:bg-white/5 rounded-lg transition-colors"
+                      className="block px-3 py-2 text-sm text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors"
                     >
                       Profile
                     </Link>
                     <Link
                       href="/profile/settings"
                       onClick={() => setIsDropdownOpen(false)}
-                      className="block px-3 py-2 text-sm text-white hover:bg-white/5 rounded-lg transition-colors"
+                      className="block px-3 py-2 text-sm text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors"
                     >
                       Settings
                     </Link>
-                    <div className="h-px bg-white/5 my-1" />
+                    <div className="h-px bg-gray-200 dark:bg-white/5 my-1" />
                     <button
                       onClick={handleLogout}
-                      className="w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-white/5 rounded-lg transition-colors"
+                      className="w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors"
                     >
                       Sign Out
                     </button>

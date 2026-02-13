@@ -74,14 +74,14 @@ export function Navigation() {
         className={`
           hidden md:flex md:flex-col
           fixed left-0 top-0 h-screen
-          bg-vettr-dark border-r border-white/5
+          bg-white dark:bg-vettr-dark border-r border-gray-200 dark:border-white/5
           transition-all duration-200 ease-in-out
           ${isSidebarCollapsed ? 'w-16' : 'w-64'}
           z-40
         `}
       >
         {/* Sidebar Header - Logo + Collapse Button */}
-        <div className="h-16 flex items-center justify-between px-4 border-b border-white/5">
+        <div className="h-16 flex items-center justify-between px-4 border-b border-gray-200 dark:border-white/5">
           <h1
             className={`
               font-bold text-xl
@@ -90,7 +90,7 @@ export function Navigation() {
             `}
           >
             <span className="text-vettr-accent">V</span>
-            <span className="text-white">ETTR</span>
+            <span className="text-gray-900 dark:text-white">ETTR</span>
           </h1>
           <button
             onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
@@ -123,7 +123,7 @@ export function Navigation() {
                       ${
                         active
                           ? 'text-vettr-accent bg-vettr-accent/10'
-                          : 'text-gray-400 hover:text-white hover:bg-white/5'
+                          : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5'
                       }
                       ${isSidebarCollapsed ? 'justify-center' : ''}
                     `}
@@ -146,7 +146,7 @@ export function Navigation() {
 
         {/* Sidebar Footer - User Info + Logout */}
         {user && (
-          <div className="border-t border-white/5 p-3">
+          <div className="border-t border-gray-200 dark:border-white/5 p-3">
             {!isSidebarCollapsed ? (
               <div className="space-y-3">
                 {/* User Info */}
@@ -155,7 +155,7 @@ export function Navigation() {
                     {userInitials}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-white truncate">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                       {user.display_name}
                     </p>
                     <span className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium mt-1 ${tierBadgeColor}`}>
@@ -166,7 +166,7 @@ export function Navigation() {
                 {/* Logout Button */}
                 <button
                   onClick={handleLogout}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-all"
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition-all"
                 >
                   <LogOutIcon className="w-5 h-5" aria-hidden="true" />
                   <span>Sign Out</span>
@@ -175,7 +175,7 @@ export function Navigation() {
             ) : (
               <button
                 onClick={handleLogout}
-                className="w-full flex items-center justify-center p-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all"
+                className="w-full flex items-center justify-center p-2.5 rounded-xl text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition-all"
                 aria-label="Sign out"
               >
                 <LogOutIcon className="w-5 h-5" aria-hidden="true" />
@@ -190,7 +190,7 @@ export function Navigation() {
         className="
           md:hidden
           fixed bottom-0 left-0 right-0
-          bg-vettr-dark/95 backdrop-blur-lg border-t border-white/5
+          bg-white/95 dark:bg-vettr-dark/95 backdrop-blur-lg border-t border-gray-200 dark:border-white/5
           z-50
         "
         aria-label="Main navigation"
@@ -208,7 +208,7 @@ export function Navigation() {
                   className={`
                     flex flex-col items-center justify-center h-full gap-1
                     transition-colors duration-200 relative
-                    ${active ? 'text-vettr-accent' : 'text-gray-400'}
+                    ${active ? 'text-vettr-accent' : 'text-gray-600 dark:text-gray-400'}
                   `}
                 >
                   {/* Active dot indicator */}
