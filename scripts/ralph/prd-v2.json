@@ -893,7 +893,7 @@
         "README.md updated with V2 changes"
       ],
       "priority": 50,
-      "passes": false
+      "passes": true
     }
   ]
 }
