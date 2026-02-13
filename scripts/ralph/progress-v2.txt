@@ -1262,3 +1262,43 @@ Files verified:
 - Quality verification confirmed no regressions: build and lint both pass successfully
 ---
 
+
+## V2-033: Fix Recharts theme integration
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Created src/lib/chart-theme.ts with comprehensive chart theming constants from Tailwind colors
+- Defined chartTheme object with grid, axis, tooltip, colors, gradients, and text configurations
+- Added helper functions: getScoreColor, getComponentColor, getTooltipStyle
+- Fixed VETTR Score History LineChart in stock detail page to use chartTheme constants
+- Replaced hardcoded hex colors (#00E676, #94a3b8, #1E3348, rgba values) with theme constants
+- Updated LineChart: grid stroke, axis stroke/tick colors, tooltip style, line stroke all use chartTheme
+- Fixed VetrScoreComparison BarChart component with V2 design tokens
+- Updated CartesianGrid, XAxis, YAxis to use chartTheme.grid and chartTheme.axis
+- Fixed CustomTooltip styling: bg-vettr-card border-white/10 rounded-xl shadow-xl
+- Updated bar colors to use chartTheme.colors.barPrimary and barSecondary (no hardcoded hex)
+- Fixed ReferenceLine to use chartTheme.colors.referenceLine (yellow-400)
+- Updated all old design tokens in VetrScoreComparison: bg-primaryLight → bg-vettr-card/50, text-textPrimary → text-white, text-textSecondary → text-gray-400, border-border → border-white/5
+- Updated metric cards and legend to use V2 tokens (bg-white/[0.03], text-gray-400, etc.)
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/lib/chart-theme.ts (created)
+- src/app/(main)/stocks/[ticker]/page.tsx
+- src/components/VetrScoreComparison.tsx
+- scripts/ralph/prd-v2.json
+
+**Learnings for future iterations:**
+- Centralized chart theme configuration (chart-theme.ts) makes it easy to maintain consistent styling across all charts
+- chartTheme object provides single source of truth for all Recharts styling: grid, axis, tooltip, colors
+- Helper functions (getScoreColor, getComponentColor) ensure consistent color application based on data values
+- Recharts components accept theme constants directly: stroke={chartTheme.axis.stroke}, tick={chartTheme.axis.tick}
+- ContentStyle prop on Tooltip can use object spread from getTooltipStyle() for DRY code
+- VetrScoreComparison had many old design tokens that needed updating alongside chart fixes
+- Chart colors should come from Tailwind theme via chart-theme.ts, not inline hex values
+- ResponsiveContainer with 100% width ensures charts adapt to container size
+- Bar chart Cell components can reference chartTheme.colors for dynamic fill colors
+- ReferenceLine stroke and label fill should use chartTheme constants for consistency
+- All old design tokens replaced: bg-primaryLight/surface → bg-vettr-card/bg-white/[0.03], text-textPrimary/textSecondary/textMuted → text-white/gray-400/gray-500, border-border → border-white/5, text-accent/error → text-vettr-accent/red-400
+---
