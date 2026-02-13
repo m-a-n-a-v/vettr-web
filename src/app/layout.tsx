@@ -6,6 +6,8 @@ import { SWRProvider } from '@/lib/swr-config'
 import { ToastProvider } from '@/contexts/ToastContext'
 import { ThemeProvider } from '@/contexts/ThemeContext'
 import OfflineBanner from '@/components/ui/OfflineBanner'
+import { Analytics } from '@vercel/analytics/react'
+import { SpeedInsights } from '@vercel/speed-insights/react'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -97,6 +99,12 @@ export default function RootLayout({
             </AuthProvider>
           </SWRProvider>
         </ThemeProvider>
+        {process.env.NODE_ENV === 'production' && (
+          <>
+            <Analytics />
+            <SpeedInsights />
+          </>
+        )}
       </body>
     </html>
   )
