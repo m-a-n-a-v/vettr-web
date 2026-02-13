@@ -32,9 +32,11 @@ import {
   BarChartIcon,
   ChevronUpIcon,
   ChevronDownIcon,
-  SearchIcon
+  SearchIcon,
+  DownloadIcon
 } from '@/components/icons'
 import type { Stock } from '@/types/api'
+import { convertStocksToCSV, downloadCSV, generateCSVFilename } from '@/lib/csv-export'
 
 type SortOption = 'vetr_score' | 'current_price' | 'price_change_percent' | 'company_name' | 'sector'
 type ViewMode = 'card' | 'table'
@@ -281,6 +283,25 @@ function StocksPageContent() {
     }
   }
 
+  // Handle CSV export
+  const handleExport = () => {
+    try {
+      // Convert filtered stocks to CSV
+      const csvContent = convertStocksToCSV(filteredStocks)
+
+      // Generate filename with current date
+      const filename = generateCSVFilename('vettr-stocks')
+
+      // Trigger download
+      downloadCSV(csvContent, filename)
+
+      // Show success toast
+      showToast(`Downloaded ${filename}`, 'success')
+    } catch (error) {
+      showToast('Failed to export data', 'error')
+    }
+  }
+
   // Loading state
   if (stocksLoading || watchlistLoading) {
     return (
@@ -402,6 +423,18 @@ function StocksPageContent() {
               )}
             </button>
 
+            {/* Export button - Only shown on desktop */}
+            <button
+              onClick={handleExport}
+              disabled={filteredStocks.length === 0}
+              className="hidden md:flex items-center gap-2 px-4 h-10 bg-white/5 border border-white/10 text-white rounded-xl hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Export to CSV"
+              aria-label="Export filtered stocks to CSV"
+            >
+              <DownloadIcon className="w-4 h-4" />
+              <span className="text-sm font-medium">Export</span>
+            </button>
+
             {/* View toggle - Only shown on desktop (>= 1024px) */}
             <button
               onClick={toggleViewMode}
@@ -512,6 +545,18 @@ function StocksPageContent() {
             ) : (
               <StarIcon className="w-5 h-5" />
             )}
+          </button>
+
+          {/* Export button - Only shown on desktop */}
+          <button
+            onClick={handleExport}
+            disabled={filteredStocks.length === 0}
+            className="hidden md:flex items-center gap-2 px-4 h-10 bg-white/5 border border-white/10 text-white rounded-xl hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Export to CSV"
+            aria-label="Export filtered stocks to CSV"
+          >
+            <DownloadIcon className="w-4 h-4" />
+            <span className="text-sm font-medium">Export</span>
           </button>
 
           {/* View toggle - Only shown on desktop (>= 1024px) */}
