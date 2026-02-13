@@ -564,3 +564,35 @@ Files modified:
 - Existing implementation quality was high - just needed minor V2 token updates
 - Always check existing code first before assuming implementation is needed from scratch
 ---
+
+## V2-016: Redesign Stock Detail - Red Flags tab
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Reviewed existing Red Flags tab implementation from V2-014 - found most requirements already implemented
+- Removed duplicate "Risk Score" label from inside SVG ring, kept only "Red Flag Score" label below ring
+- Added CSS transition-all duration-1000 to progress circle for smooth animation on mount
+- Created FlagIcon component in icons library with proper SVG flag design
+- Created ShieldCheckIcon component for "no red flags" empty state
+- Updated detected flags to use FlagIcon component with severity-based coloring instead of just colored dot
+- Updated empty state from emoji (✅) to ShieldCheckIcon with vettr-accent green color for positive messaging
+- All severity colors match V2 requirements: Critical=red-400, High=orange-400, Moderate=yellow-400, Low=gray-400
+- Flag breakdown bars with weight percentages (30%, 25%, 20%, 15%, 10%) already correctly implemented
+- Flag history timeline with vertical line and colored dots already correctly implemented
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/components/icons/index.tsx (added FlagIcon, ShieldCheckIcon)
+- src/app/(main)/stocks/[ticker]/page.tsx
+
+**Learnings for future iterations:**
+- Most of V2-016 was already implemented in V2-014 when the Red Flags tab was first created
+- SVG flag icon provides better visual consistency than colored dots alone
+- ShieldCheckIcon with green color creates positive messaging for "no flags detected" empty state
+- Red flag score ring colors are correctly inverted from VETTR score (higher score = redder, not greener)
+- Always check existing implementations before starting work - may just need refinements
+- Score label should appear once below the ring, not duplicated inside the SVG
+- FlagIcon in detected flags list adds visual clarity alongside severity badges
+- CSS transition on SVG circle provides smooth animation without JavaScript overhead
+---
