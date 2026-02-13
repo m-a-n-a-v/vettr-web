@@ -1030,3 +1030,42 @@ Files modified:
 - Modal header uses px-6 py-4 (not px-6 pt-6 pb-0) for better spacing balance
 - Specialization badge moved above metrics row (not inline with stats) for cleaner layout
 ---
+
+## V2-027: Redesign VetrScoreDetail modal
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Completely redesigned VetrScoreDetail modal with premium V2 design system
+- Replaced old design tokens with V2 tokens: bg-vettr-card, border-white/10, text-white, text-gray-400
+- Updated modal header: text-xl font-semibold with XIcon component from icon library
+- Implemented large SVG ring at top using VetrScoreBadge component (size="lg" showLabel)
+- Updated component breakdown section with proper color-coded progress bars
+- Component bar colors per acceptance criteria: Pedigree=blue-400, Filing Velocity=purple-400, Red Flag=red-400, Growth=vettr-accent, Governance=yellow-400
+- Bar styling: bg-white/5 track with rounded-full h-2, smooth 1s transition animation
+- Redesigned Bonus/Penalty section with "Adjustments" header and grid layout
+- Bonus card: bg-vettr-accent/10 border-vettr-accent/30 with green accent
+- Penalty card: bg-red-400/10 border-red-400/30 with red accent
+- Implemented collapsible Scoring Methodology section with ChevronDownIcon
+- Methodology section shows/hides with fade-in animation
+- Component descriptions displayed in individual cards (bg-white/[0.03] rounded-xl)
+- Added useState hook for showMethodology toggle state
+- Updated Score Ratings legend with V2 color tokens (vettr-accent, yellow-400, orange-400, red-400)
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/components/VetrScoreDetail.tsx
+- scripts/ralph/prd-v2.json
+
+**Learnings for future iterations:**
+- VetrScoreBadge component with size="lg" creates perfect large ring for modal header
+- Collapsible sections work better with button wrapper around header + ChevronDownIcon rotation
+- Component-specific colors should be defined in helper function (getComponentColor) for consistency
+- Methodology descriptions stored in component array allow reuse in both breakdown and methodology sections
+- Adjustments section (bonus/penalty) works better with "Adjustments" header than generic "Bonus & Penalty"
+- showLabel prop on VetrScoreBadge displays "VETTR Score" label below ring
+- animate-in fade-in duration-200 provides smooth expansion for collapsible content
+- Individual methodology cards (bg-white/[0.03]) create subtle card-in-card effect within modal
+- Score color function updated to use V2 tokens: vettr-accent (80+), yellow-400 (60-79), orange-400 (40-59), red-400 (<40)
+- All old design tokens replaced: bg-primaryLight → bg-vettr-card, text-textPrimary → text-white, text-textSecondary/textMuted → text-gray-400/gray-500, border-border → border-white/5 or border-white/10, bg-surface → bg-white/5, bg-accent/error/warning → specific V2 colors
+---
