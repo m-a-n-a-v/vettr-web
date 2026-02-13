@@ -54,7 +54,6 @@ export default function LoginPage() {
       // Redirect will happen via useEffect when isAuthenticated changes
       router.push('/pulse');
     } catch (err) {
-      console.error('Login error:', err);
       setError(
         err instanceof Error
           ? err.message
@@ -66,129 +65,160 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-primary px-4 py-12">
-      <div className="w-full max-w-md">
-        {/* Logo/Branding */}
-        <div className="mb-8 text-center">
-          <h1 className="text-4xl font-bold text-accent">VETTR</h1>
-          <p className="mt-2 text-textSecondary">
-            Canadian Small-Cap Stock Analysis
-          </p>
-        </div>
+    <div className="flex min-h-screen bg-vettr-navy">
+      {/* Background gradient - subtle accent glow */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(0,230,118,0.08)_0%,_transparent_50%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_rgba(68,138,255,0.05)_0%,_transparent_50%)]" />
 
-        {/* Login Card */}
-        <div className="rounded-lg bg-primaryLight p-8 shadow-xl">
-          <h2 className="mb-6 text-2xl font-bold text-textPrimary">
-            Sign In
-          </h2>
-
-          {/* Error Message */}
-          {error && (
-            <div id="login-error" role="alert" className="mb-4 rounded-md bg-error/10 border border-error/30 p-3 text-sm text-error">
-              {error}
-            </div>
-          )}
-
-          {/* Login Form */}
-          <form onSubmit={handleSubmit} className="space-y-5" aria-describedby={error ? "login-error" : undefined}>
-            {/* Email Field */}
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-textPrimary mb-2"
-              >
-                Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-md bg-surface border border-border px-4 py-2.5 text-textPrimary placeholder-textMuted focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all"
-                placeholder="you@example.com"
-                disabled={isLoading}
-                autoComplete="email"
-                aria-invalid={error ? "true" : "false"}
-                aria-describedby={error ? "login-error" : undefined}
-              />
-            </div>
-
-            {/* Password Field */}
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-textPrimary mb-2"
-              >
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-md bg-surface border border-border px-4 py-2.5 text-textPrimary placeholder-textMuted focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all"
-                placeholder="Enter your password"
-                disabled={isLoading}
-                autoComplete="current-password"
-                aria-invalid={error ? "true" : "false"}
-                aria-describedby={error ? "login-error" : undefined}
-              />
-            </div>
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full rounded-md bg-accent hover:bg-accentDim text-primary font-semibold py-3 px-4 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-            >
-              {isLoading ? (
-                <>
-                  <svg
-                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-primary"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    />
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    />
-                  </svg>
-                  Signing in...
-                </>
-              ) : (
-                'Sign In'
-              )}
-            </button>
-          </form>
-
-          {/* Signup Link */}
-          <div className="mt-6 text-center">
-            <p className="text-sm text-textSecondary">
-              Don&apos;t have an account?{' '}
-              <Link
-                href="/signup"
-                className="text-accent hover:text-accentDim font-semibold transition-colors"
-              >
-                Sign Up
-              </Link>
+      {/* Desktop: Split layout */}
+      <div className="relative z-10 flex w-full flex-col lg:flex-row">
+        {/* Left side - Branding (desktop only) */}
+        <div className="hidden lg:flex lg:w-1/2 lg:flex-col lg:items-center lg:justify-center lg:px-12">
+          <div className="max-w-md">
+            <h1 className="text-5xl font-bold text-white">
+              <span className="text-vettr-accent">V</span>ETTR
+            </h1>
+            <p className="mt-4 text-xl text-gray-300">
+              Canadian Small-Cap Stock Analysis
+            </p>
+            <p className="mt-6 text-gray-400 leading-relaxed">
+              Gain insight into emerging Canadian companies with our comprehensive analysis platform.
             </p>
           </div>
         </div>
 
-        {/* Footer */}
-        <p className="mt-8 text-center text-xs text-textMuted">
-          By signing in, you agree to our Terms of Service and Privacy Policy
-        </p>
+        {/* Right side - Form */}
+        <div className="flex w-full items-center justify-center px-4 py-12 lg:w-1/2 lg:px-12">
+          <div className="w-full max-w-md">
+            {/* Mobile logo */}
+            <div className="mb-8 text-center lg:hidden">
+              <h1 className="text-4xl font-bold text-white">
+                <span className="text-vettr-accent">V</span>ETTR
+              </h1>
+              <p className="mt-2 text-gray-400">
+                Canadian Small-Cap Stock Analysis
+              </p>
+            </div>
+
+            {/* Login Card */}
+            <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-8">
+              <h2 className="mb-6 text-2xl font-bold text-white">
+                Sign In
+              </h2>
+
+              {/* Error Message */}
+              {error && (
+                <div
+                  id="login-error"
+                  role="alert"
+                  className="mb-4 rounded-xl bg-red-500/10 border border-red-500/30 p-3 text-sm text-red-400 animate-in fade-in duration-200"
+                >
+                  {error}
+                </div>
+              )}
+
+              {/* Login Form */}
+              <form onSubmit={handleSubmit} className="space-y-5" aria-describedby={error ? 'login-error' : undefined}>
+                {/* Email Field */}
+                <div>
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-white mb-2"
+                  >
+                    Email
+                  </label>
+                  <input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-500 focus:border-vettr-accent/50 focus:ring-1 focus:ring-vettr-accent/20 transition-all"
+                    placeholder="you@example.com"
+                    disabled={isLoading}
+                    autoComplete="email"
+                    aria-invalid={error ? 'true' : 'false'}
+                    aria-describedby={error ? 'login-error' : undefined}
+                  />
+                </div>
+
+                {/* Password Field */}
+                <div>
+                  <label
+                    htmlFor="password"
+                    className="block text-sm font-medium text-white mb-2"
+                  >
+                    Password
+                  </label>
+                  <input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-500 focus:border-vettr-accent/50 focus:ring-1 focus:ring-vettr-accent/20 transition-all"
+                    placeholder="Enter your password"
+                    disabled={isLoading}
+                    autoComplete="current-password"
+                    aria-invalid={error ? 'true' : 'false'}
+                    aria-describedby={error ? 'login-error' : undefined}
+                  />
+                </div>
+
+                {/* Submit Button */}
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full bg-vettr-accent text-vettr-navy font-semibold rounded-xl py-3 hover:bg-vettr-accent/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                >
+                  {isLoading ? (
+                    <>
+                      <svg
+                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-vettr-navy"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        />
+                      </svg>
+                      Signing in...
+                    </>
+                  ) : (
+                    'Sign In'
+                  )}
+                </button>
+              </form>
+
+              {/* Signup Link */}
+              <div className="mt-6 text-center">
+                <p className="text-sm text-gray-400">
+                  Don&apos;t have an account?{' '}
+                  <Link
+                    href="/signup"
+                    className="text-gray-400 hover:text-vettr-accent transition-colors font-medium"
+                  >
+                    Sign Up
+                  </Link>
+                </p>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <p className="mt-8 text-center text-xs text-gray-500">
+              By signing in, you agree to our Terms of Service and Privacy Policy
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
