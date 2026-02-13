@@ -1,41 +1,49 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
+/**
+ * ProtectedRoute Component
+ *
+ * Protects routes by checking authentication status and redirecting to login
+ * if the user is not authenticated. Shows a loading state while checking auth.
+ */
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
-  const pathname = usePathname();
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      // Store the current path to redirect back after login
-      if (typeof window !== 'undefined') {
-        sessionStorage.setItem('redirectAfterLogin', pathname);
-      }
       router.push('/login');
     }
-  }, [isAuthenticated, isLoading, router, pathname]);
+  }, [isLoading, isAuthenticated, router]);
 
-  // Show loading state while checking auth
+  // Show loading state while checking authentication
   if (isLoading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-primary">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-accent border-t-transparent"></div>
-          <p className="text-textSecondary">Loading...</p>
+      <div className="min-h-screen bg-vettr-navy flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-3xl font-bold mb-4">
+            <span className="text-vettr-accent">V</span>
+            <span className="text-white">ETTR</span>
+          </div>
+          <div className="flex items-center justify-center gap-1">
+            <div className="w-2 h-2 bg-vettr-accent rounded-full animate-pulse" style={{ animationDelay: '0ms' }} />
+            <div className="w-2 h-2 bg-vettr-accent rounded-full animate-pulse" style={{ animationDelay: '150ms' }} />
+            <div className="w-2 h-2 bg-vettr-accent rounded-full animate-pulse" style={{ animationDelay: '300ms' }} />
+          </div>
         </div>
       </div>
     );
   }
 
-  // Show nothing while redirecting
+  // Don't render children if not authenticated (will redirect)
   if (!isAuthenticated) {
     return null;
   }
