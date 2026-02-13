@@ -838,7 +838,7 @@
         "npm run build passes with zero warnings"
       ],
       "priority": 47,
-      "passes": false
+      "passes": true
     },
     {
       "id": "V2-048",

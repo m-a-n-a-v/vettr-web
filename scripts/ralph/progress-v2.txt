@@ -1985,3 +1985,47 @@ Files modified:
 - Breadcrumbs and navigation can be hidden for cleaner professional report appearance
 - window.print() is the simple, browser-native way to trigger print dialog
 ---
+
+## V2-047: Configure Vercel deployment with environment variables
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Created comprehensive vercel.json with proper Next.js framework configuration
+- Added security headers: X-Frame-Options (DENY), X-Content-Type-Options (nosniff), X-XSS-Protection, Referrer-Policy, Permissions-Policy
+- Configured Content-Security-Policy with allowed sources for scripts, styles, fonts, images, and API connections
+- Added cache control headers for static assets (_next/static, fonts, images) with max-age=31536000
+- Added cache control for API routes with no-store, must-revalidate
+- Configured environment variable reference for NEXT_PUBLIC_API_URL using Vercel secrets pattern
+- Updated .env.local.example with comprehensive documentation including:
+  - API configuration section with production and development URLs
+  - Build configuration notes
+  - Analytics & monitoring section for Vercel Analytics and Speed Insights
+  - Feature flags section for PWA and debug options
+  - Best practices and security notes
+- Updated next.config.js with image optimization configuration:
+  - Added remotePatterns for *.vercel.app and *.githubusercontent.com domains
+  - Configured image formats: AVIF and WebP for optimal performance
+  - Added standard deviceSizes and imageSizes for responsive images
+  - Added environment variable validation in env block
+- Verified build: npm run build passes with zero warnings ✓
+- Verified lint: npm run lint passes with zero warnings ✓
+- Committed all changes with proper message format
+
+Files modified:
+- vercel.json (created)
+- .env.local.example
+- next.config.js
+
+**Learnings for future iterations:**
+- Vercel.json headers apply security best practices including CSP, frame options, and cache control
+- CSP must allow 'unsafe-eval' and 'unsafe-inline' for Next.js development features and Vercel Analytics
+- Image remotePatterns use wildcard subdomains (**.vercel.app) for flexibility
+- Environment variables in Vercel use @ prefix for secrets (e.g., @vettr-api-url)
+- Cache headers should be immutable for static assets with long max-age
+- API routes should have no-store cache control to prevent sensitive data caching
+- .env.local.example should be comprehensive documentation, not just variable names
+- Image optimization supports AVIF format for best compression with WebP fallback
+- next-pwa already handles PWA configuration, so vercel.json focuses on security and caching
+
+---
