@@ -898,3 +898,46 @@ Files modified:
 - Removed Breadcrumb component as it wasn't in V2-023 acceptance criteria (back button + title pattern used instead)
 - Category badges inline below term name create cleaner layout than separate chips
 ---
+
+## V2-024: Redesign FAQ page
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Completely redesigned FAQ page with premium V2 design system
+- Replaced inline back arrow SVG with ChevronLeftIcon from icon library
+- Replaced inline chevron SVG with ChevronDownIcon from icon library
+- Updated back button styling: p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg
+- Updated header with V2 tokens: bg-vettr-dark border-b border-white/5 sticky top-16
+- Removed Breadcrumb component (following V2-023 pattern for consistent header design)
+- Replaced emoji question mark icon (❓) in empty state with proper SVG question mark icon
+- Updated empty state text colors: text-gray-400 for title, text-gray-500 for description
+- Redesigned accordion items as border-separated rows with border-b border-white/5
+- Accordion container has outer border-b border-white/5 wrapping all items in category
+- Question header button: text-left px-4 py-4 hover:bg-white/[0.03] transition-colors
+- Question text: text-sm font-medium text-white (not font-semibold per acceptance criteria)
+- ChevronDownIcon positioned at right with rotate-180 transform when expanded
+- Chevron color: text-gray-400 for subtle appearance
+- Answer section with animate-in fade-in duration-200 animation for smooth expansion
+- Answer text: text-sm text-gray-400 leading-relaxed
+- Category headers: text-lg font-semibold text-white with h-px bg-white/5 divider line
+- Updated question count display: text-sm text-gray-500
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/app/(main)/profile/faq/page.tsx
+
+**Learnings for future iterations:**
+- FAQ accordion works better with border-separated rows (not individual cards) per V2 design
+- Accordion pattern: container with border-b wrapping all items, each item has border-b except last
+- Question text should be font-medium (not font-semibold) per V2 typography hierarchy
+- ChevronDownIcon from icon library provides consistency with other accordion components
+- Empty state question mark icon: circle with question mark inside (similar to help/info icon)
+- Answer expansion should use fade-in animation (not height animation) for simplicity
+- Category headers follow same pattern as Glossary page (text-lg font-semibold with divider line)
+- Hover state on accordion rows: hover:bg-white/[0.03] for subtle feedback
+- ChevronDownIcon color should be text-gray-400 (not white) for subtle appearance
+- All old design tokens replaced: bg-primary → bg-vettr-navy, bg-primaryLight → bg-vettr-dark, text-textPrimary → text-white, text-textSecondary → text-gray-400 or text-gray-500, border-border → border-white/5, text-accent → text-vettr-accent, bg-surfaceLight → hover:bg-white/[0.03]
+- Removed Breadcrumb component following V2-023 pattern (back arrow + title is cleaner)
+- Sticky header positioned at top-16 to account for main header height
+---
