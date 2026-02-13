@@ -1302,3 +1302,51 @@ Files modified:
 - ReferenceLine stroke and label fill should use chartTheme constants for consistency
 - All old design tokens replaced: bg-primaryLight/surface → bg-vettr-card/bg-white/[0.03], text-textPrimary/textSecondary/textMuted → text-white/gray-400/gray-500, border-border → border-white/5, text-accent/error → text-vettr-accent/red-400
 ---
+
+## V2-034: Fix table sticky header interaction with page header
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Fixed stock detail tab navigation to be sticky with top-16 z-30 accounting for h-16 header
+- Tab navigation has bg-vettr-navy background to prevent content showing through when scrolling
+- Updated FilingTable with sticky thead: top-16 z-20 bg-vettr-navy backdrop-blur-sm
+- Updated ExecutiveTable with sticky thead: top-16 z-20 bg-vettr-navy backdrop-blur-sm
+- Updated Stocks page table with sticky thead: top-16 z-20 bg-vettr-navy backdrop-blur-sm
+- Updated Header component z-index from z-40 to z-50 for proper layering hierarchy
+- Fixed ExecutiveTable to use V2 design tokens throughout:
+  - Sort indicators: text-gray-500 → text-vettr-accent when active
+  - Header cells: text-xs text-gray-500 uppercase tracking-wider (matching V2 table pattern)
+  - Body cells: text-white, text-gray-400, text-gray-500 (V2 tokens)
+  - Initials avatar: bg-gradient-to-br from-vettr-accent/20 to-vettr-accent/5 (matching V2 pattern)
+  - Tenure risk badges: bg-vettr-accent/10 text-vettr-accent, bg-yellow-400/10 text-yellow-400, bg-red-400/10 text-red-400
+  - Borders: border-white/5 (V2 token)
+  - Hover states: hover:bg-white/[0.03] (V2 token)
+- Z-index layering hierarchy: header z-50 > tab nav z-30 > table headers z-20
+- All sticky headers properly account for h-16 header height using top-16
+- Added light mode support with dark: prefix and light mode color variants
+- No double header visual stacking issues
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/app/(main)/stocks/[ticker]/page.tsx
+- src/components/ui/FilingTable.tsx
+- src/components/ui/ExecutiveTable.tsx
+- src/app/(main)/stocks/page.tsx
+- src/components/Header.tsx
+- scripts/ralph/prd-v2.json
+
+**Learnings for future iterations:**
+- Sticky headers need explicit background color (not transparent) to prevent content showing through
+- Proper z-index layering is critical: page header (z-50) > section headers/tabs (z-30) > table headers (z-20)
+- Tab navigation needs negative horizontal margin (-mx-6) and matching positive padding (px-6) to extend background to edges
+- Tab navigation needs small vertical padding (py-3) to create visual separation from content
+- backdrop-blur-sm on table headers creates premium glassmorphism effect
+- All sticky elements must account for fixed header height using top-16 (h-16 = 4rem = 64px)
+- ExecutiveTable had many old design tokens that needed updating to V2 palette
+- Light mode colors require dark: prefix pattern for all color classes
+- ExecutiveTable header cells should match FilingTable pattern: text-xs uppercase tracking-wider
+- Initials avatar gradient pattern (from-vettr-accent/20 to-vettr-accent/5) matches stock detail cards
+- All border colors should use border-white/5 dark variant with light mode fallback
+- Sticky positioning works correctly with overflow containers when thead itself is sticky (not wrapper)
+---
