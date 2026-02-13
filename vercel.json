@@ -60,7 +60,7 @@
       ]
     },
     {
-      "source": "/(.*)\\.(?:jpg|jpeg|gif|png|svg|ico|webp)",
+      "source": "/:path*.:ext(jpg|jpeg|gif|png|svg|ico|webp)",
       "headers": [
         {
           "key": "Cache-Control",
@@ -76,6 +76,6 @@
     }
   ],
   "env": {
-    "NEXT_PUBLIC_API_URL": "@vettr-api-url"
+    "NEXT_PUBLIC_API_URL": "https://vettr-backend.vercel.app/v1"
   }
 }
