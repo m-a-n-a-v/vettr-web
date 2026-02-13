@@ -409,3 +409,40 @@ Files modified:
 - Optional description field added to ToastData interface for richer notifications
 - All old design tokens replaced: bg-accent/20 → use specific variant colors, text-textPrimary → text-white, text-textMuted → text-gray-500, border-accent → border-white/10
 ---
+
+## V2-012: Redesign Pulse (Dashboard) page - professional SaaS dashboard
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Completely redesigned Pulse page header with "Market Pulse" title and last updated timestamp in V2 design tokens
+- Updated all metric cards with V2 styling: bg-vettr-card/50 border border-white/5 rounded-2xl p-5
+- Metric cards use uppercase labels (text-xs text-gray-500 uppercase tracking-wider), text-2xl font-bold values
+- Added ArrowUpIcon and ArrowDownIcon to icon library for change indicators
+- Top Gainer and Top Loser cards now use SVG arrow icons with colored text (vettr-accent for up, red-400 for down)
+- Redesigned Red Flag Summary section with V2 tokens, updated severity breakdown cards
+- Severity breakdown: Critical=red-400, High=orange-400, Moderate=yellow-400, Low=gray-400 (updated from old warning/error tokens)
+- Recent Filings converted to proper data table on desktop with columns: Type, Title, Ticker, Date, Material, Status
+- Table has sticky header, hover:bg-white/[0.03] on rows, border-b border-white/5 separators
+- Mobile filings display as cards with V2 card styling
+- Top Movers section updated with V2 styling: compact list with arrow icons and colored percentages
+- Top VETTR Scores section: horizontal scroll with snap-x snap-mandatory for smooth scrolling
+- All sections use consistent headers: text-lg font-semibold text-white mb-4
+- Removed two-column layout wrapper, all sections now full-width for cleaner desktop layout
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/components/icons/index.tsx (added ArrowUpIcon, ArrowDownIcon)
+- src/app/(main)/pulse/page.tsx
+
+**Learnings for future iterations:**
+- Data tables on desktop create more professional appearance for list data vs cards
+- Table onClick with window.location.href works for row navigation (Next.js Link doesn't work well on tr elements)
+- Severity colors updated to match V2 palette: red-400, orange-400, yellow-400 instead of old error/warning tokens
+- Desktop tables should be hidden md:block with separate mobile card view using md:hidden
+- Table columns should use text-sm for content, text-xs uppercase tracking-wider for headers
+- Horizontal scroll sections benefit from snap-x snap-mandatory CSS for better UX
+- Arrow icons work better than PriceChangeIndicator component for simple up/down indicators in metric cards
+- Last updated timestamp integrated into header is cleaner than separate banner below header
+- All old design tokens replaced: text-textPrimary → text-white, text-textSecondary → text-gray-400, text-textMuted → text-gray-500, bg-primaryLight → bg-vettr-card/50, border-border → border-white/5, text-accent → text-vettr-accent, text-error → text-red-400, text-warning → text-orange-400
+---
