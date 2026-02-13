@@ -1188,3 +1188,46 @@ Files modified:
 - Settings page theme toggle (V2-022) already had perfect UI with visual previews - just needed ThemeContext fix
 - Most work was adding dark: prefix to existing color classes rather than redesigning components
 ---
+## V2-031: Replace all emoji icons with proper SVG icons
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Added new SVG icon components to src/components/icons/index.tsx:
+  - ArrowRightIcon: right arrow for "View All" links
+  - BarChartIcon: bar chart for data/analytics empty states
+  - DocumentIcon: file/document icon for filings empty states
+  - TrendingUpIcon: trending chart for movers/market data
+  - TrophyIcon: trophy/award icon for top scores
+- Replaced all emoji usage in EmptyState components across the entire app
+- Discovery page: replaced arrow emoji (→) in "View All" links with ArrowRightIcon SVG component
+- Discovery page: replaced ⚠️, 🔍, 📄 with AlertTriangleIcon, SearchIcon, DocumentIcon
+- Pulse page: replaced 🚩, ⚠️, 📄, 📈, 🏆 with FlagIcon, AlertTriangleIcon, DocumentIcon, TrendingUpIcon, TrophyIcon
+- Stocks page: replaced ⚠️, 📊 with AlertTriangleIcon, BarChartIcon
+- Stock Detail page: replaced 🚩, 📊, 📄 with FlagIcon, BarChartIcon, DocumentIcon
+- VetrScoreComparison component: replaced 📊 with BarChartIcon
+- All SVG icons follow consistent pattern: strokeWidth={1.5}, inherit currentColor, w/h via className
+- All icons now render consistently across all browsers (no emoji rendering differences)
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/components/icons/index.tsx (added 5 new icon components)
+- src/app/(main)/discovery/page.tsx
+- src/app/(main)/pulse/page.tsx
+- src/app/(main)/stocks/page.tsx
+- src/app/(main)/stocks/[ticker]/page.tsx
+- src/components/VetrScoreComparison.tsx
+
+**Learnings for future iterations:**
+- All emoji icons in the codebase have now been replaced with proper SVG components
+- ArrowRightIcon for directional links creates more professional appearance than → text character
+- EmptyState component accepts both string emoji and ReactNode icon prop - using ReactNode with SVG components
+- Icon size for empty states should consistently be w-16 h-16 per V2 design system
+- Icon colors should match context: yellow-400 for errors/warnings, gray-600 for neutral empty states, red-400 for red flags, etc.
+- SVG icons provide cross-browser consistency (emoji rendering varies by OS/browser)
+- All icons in the library now follow consistent pattern: strokeWidth={1.5}, inherit currentColor
+- "View All" links work better with inline ArrowRightIcon in flex layout (gap-1) than emoji arrow
+- Icon library at src/components/icons/ is now comprehensive with 30+ icons covering all app needs
+- No emoji characters should remain in the UI - all replaced with professional SVG icons
+---
+
