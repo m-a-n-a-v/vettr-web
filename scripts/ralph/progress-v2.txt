@@ -1145,3 +1145,46 @@ Files modified:
 - Category type updated to 'Bug' | 'Feature' | 'General' (simpler than 'Bug Report' | 'Feature Request' | 'General Feedback')
 ---
 
+
+## V2-030: Fix and polish dark/light mode toggle
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Fixed ThemeContext to read theme preference from localStorage on mount (removed forced dark mode)
+- Removed hardcoded theme initialization that forced dark mode on every mount
+- Enabled light theme CSS variables in globals.css (uncommented and updated selector to html:not(.dark))
+- Added smooth transitions: transition-colors duration-200 on body element for theme switching
+- Updated main layout to use light mode colors: bg-lightBg dark:bg-vettr-navy with transitions
+- Updated Navigation component (desktop sidebar and mobile bottom bar) with light mode colors
+- Sidebar: bg-white dark:bg-vettr-dark, border-gray-200 dark:border-white/5
+- Nav items: text-gray-600 dark:text-gray-400 with hover states for both themes
+- Updated Header component with light mode colors: bg-white/80 dark:bg-vettr-navy/80
+- Search pill, refresh button, notification bell: proper light/dark variants
+- User dropdown: bg-white dark:bg-vettr-card with light mode text colors
+- Theme toggle in Settings page already implemented (V2-022) with three option cards: Dark, Light, System
+- System mode already uses prefers-color-scheme media query listener (existing in ThemeContext)
+- Light mode: white/gray backgrounds (lightBg, white), dark text (gray-900, gray-600), accent green preserved
+- All components use Tailwind dark: prefix for proper theme adaptation
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/contexts/ThemeContext.tsx
+- src/app/globals.css
+- src/app/(main)/layout.tsx
+- src/components/Navigation.tsx
+- src/components/Header.tsx
+- scripts/ralph/prd-v2.json
+
+**Learnings for future iterations:**
+- ThemeContext system mode listener already existed - just needed to remove forced dark mode override
+- Light theme CSS variables need html:not(.dark) selector (not html.light) for Tailwind dark mode class strategy
+- All color classes need both light and dark variants: bg-white dark:bg-vettr-navy, text-gray-900 dark:text-white
+- transition-colors duration-200 provides smooth theme switching without jarring color changes
+- Tailwind dark mode strategy (class-based) requires dark: prefix on all colors that should differ between themes
+- Light mode card backgrounds should use bg-white (not bg-lightSurface) and border-gray-200 (not border-lightBorder)
+- Navigation hover states need separate colors for light/dark: hover:bg-gray-100 dark:hover:bg-white/5
+- Header backdrop uses /80 opacity for glassmorphism effect in both themes
+- Settings page theme toggle (V2-022) already had perfect UI with visual previews - just needed ThemeContext fix
+- Most work was adding dark: prefix to existing color classes rather than redesigning components
+---

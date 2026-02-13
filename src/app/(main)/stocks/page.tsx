@@ -28,6 +28,8 @@ import {
   GridIcon,
   ArrowUpIcon,
   ArrowDownIcon,
+  AlertTriangleIcon,
+  BarChartIcon,
   ChevronUpIcon,
   ChevronDownIcon
 } from '@/components/icons'
@@ -317,7 +319,7 @@ function StocksPageContent() {
       <div className="p-4 md:p-6 pb-20 md:pb-6">
         <h1 className="text-2xl font-bold text-white mb-6">Stocks</h1>
         <EmptyState
-          icon="⚠️"
+          icon={<AlertTriangleIcon className="w-16 h-16 text-yellow-400" />}
           title="Error loading stocks"
           message="Unable to load stock data. Please try again later."
         />
@@ -401,7 +403,7 @@ function StocksPageContent() {
         </div>
 
         <EmptyState
-          icon="📊"
+          icon={<BarChartIcon className="w-16 h-16 text-gray-600" />}
           title="No stocks found"
           message={
             searchQuery || favoritesOnly

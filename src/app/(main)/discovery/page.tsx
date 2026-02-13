@@ -21,6 +21,7 @@ import { SkeletonStockCard, SkeletonCard } from '@/components/ui/SkeletonLoader'
 import RefreshButton from '@/components/ui/RefreshButton';
 import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator';
 import type { Filing, FilingType } from '@/types/api';
+import { ArrowRightIcon, AlertTriangleIcon, SearchIcon, DocumentIcon } from '@/components/icons';
 
 /**
  * Discovery Page
@@ -268,9 +269,9 @@ function DiscoveryPageContent() {
             <h2 className="text-lg font-semibold text-white">Featured Stocks</h2>
             <button
               onClick={() => router.push('/stocks')}
-              className="text-sm text-vettr-accent hover:text-vettr-accent/80 transition-colors"
+              className="flex items-center gap-1 text-sm text-vettr-accent hover:text-vettr-accent/80 transition-colors"
             >
-              View All →
+              View All <ArrowRightIcon className="w-4 h-4" />
             </button>
           </div>
 
@@ -285,13 +286,13 @@ function DiscoveryPageContent() {
             </div>
           ) : isErrorStocks ? (
             <EmptyState
-              icon="⚠️"
+              icon={<AlertTriangleIcon className="w-16 h-16 text-yellow-400" />}
               title="Failed to load stocks"
               message="Unable to fetch stocks. Please try again later."
             />
           ) : featuredStocks.length === 0 ? (
             <EmptyState
-              icon="🔍"
+              icon={<SearchIcon className="w-16 h-16 text-gray-600" />}
               title="No stocks found"
               message={
                 searchQuery || selectedSector !== 'All'
@@ -337,13 +338,13 @@ function DiscoveryPageContent() {
             </div>
           ) : filingsError ? (
             <EmptyState
-              icon="⚠️"
+              icon={<AlertTriangleIcon className="w-16 h-16 text-yellow-400" />}
               title="Failed to load filings"
               message="Unable to fetch recent filings. Please try again later."
             />
           ) : filteredFilings.length === 0 ? (
             <EmptyState
-              icon="📄"
+              icon={<DocumentIcon className="w-16 h-16 text-gray-600" />}
               title="No filings found"
               message={
                 selectedSector !== 'All'

@@ -4,6 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import type { VetrScoreComparison as VetrScoreComparisonType } from '@/types/api';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import EmptyState from '@/components/ui/EmptyState';
+import { BarChartIcon } from '@/components/icons';
 
 interface VetrScoreComparisonProps {
   comparison: VetrScoreComparisonType | null;
@@ -28,7 +29,7 @@ export default function VetrScoreComparison({ comparison, isLoading, currentTick
       <div className="bg-primaryLight rounded-lg p-6 border border-border">
         <h2 className="text-xl font-bold text-textPrimary mb-4">Sector Comparison</h2>
         <EmptyState
-          icon="📊"
+          icon={<BarChartIcon className="w-16 h-16 text-gray-600" />}
           title="No comparison data available"
           message="Unable to load peer comparison data for this stock."
         />

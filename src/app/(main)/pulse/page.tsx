@@ -15,7 +15,7 @@ import { SkeletonCard, SkeletonStockCard } from '@/components/ui/SkeletonLoader'
 import EmptyState from '@/components/ui/EmptyState'
 import RefreshButton from '@/components/ui/RefreshButton'
 import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator'
-import { ArrowUpIcon, ArrowDownIcon } from '@/components/icons'
+import { ArrowUpIcon, ArrowDownIcon, FlagIcon, AlertTriangleIcon, DocumentIcon, TrendingUpIcon, TrophyIcon } from '@/components/icons'
 import Link from 'next/link'
 import { useState, useEffect, useMemo, useCallback } from 'react'
 
@@ -170,7 +170,7 @@ export default function PulsePage() {
           </div>
         ) : stocksError ? (
           <EmptyState
-            icon="⚠️"
+            icon={<AlertTriangleIcon className="w-16 h-16 text-yellow-400" />}
             title="Error loading market data"
             message="Unable to fetch market overview. Please try again."
           />
@@ -250,7 +250,7 @@ export default function PulsePage() {
           </div>
         ) : redFlagTrendError ? (
           <EmptyState
-            icon="🚩"
+            icon={<FlagIcon className="w-16 h-16 text-red-400" />}
             title="Error loading red flag trends"
             message="Unable to fetch red flag trend data."
           />
@@ -367,13 +367,13 @@ export default function PulsePage() {
           </div>
         ) : filingsError ? (
           <EmptyState
-            icon="📄"
+            icon={<DocumentIcon className="w-16 h-16 text-yellow-400" />}
             title="Error loading filings"
             message="Unable to fetch recent events."
           />
         ) : !filings || filings.length === 0 ? (
           <EmptyState
-            icon="📄"
+            icon={<DocumentIcon className="w-16 h-16 text-gray-600" />}
             title="No recent events"
             message="No filings have been published recently."
           />
@@ -485,13 +485,13 @@ export default function PulsePage() {
           </div>
         ) : stocksError ? (
           <EmptyState
-            icon="📈"
+            icon={<TrendingUpIcon className="w-16 h-16 text-yellow-400" />}
             title="Error loading movers"
             message="Unable to fetch top movers data."
           />
         ) : topMovers.length === 0 ? (
           <EmptyState
-            icon="📈"
+            icon={<TrendingUpIcon className="w-16 h-16 text-gray-600" />}
             title="No movers data"
             message="Insufficient price data to show top movers."
           />
@@ -555,13 +555,13 @@ export default function PulsePage() {
           </div>
         ) : stocksError ? (
           <EmptyState
-            icon="🏆"
+            icon={<TrophyIcon className="w-16 h-16 text-yellow-400" />}
             title="Error loading top scores"
             message="Unable to fetch top VETTR scores."
           />
         ) : topScores.length === 0 ? (
           <EmptyState
-            icon="🏆"
+            icon={<TrophyIcon className="w-16 h-16 text-gray-600" />}
             title="No score data"
             message="No stocks with VETTR scores available."
           />

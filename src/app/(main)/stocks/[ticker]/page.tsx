@@ -34,7 +34,7 @@ import VetrScoreComparison from '@/components/VetrScoreComparison';
 import VetrScoreTrend from '@/components/VetrScoreTrend';
 import { SkeletonStockDetailHeader, SkeletonVetrScoreSection, SkeletonCard, SkeletonFilingRow, SkeletonStockRow } from '@/components/ui/SkeletonLoader';
 import Breadcrumb from '@/components/ui/Breadcrumb';
-import { StarIcon, StarFilledIcon, ShareIcon, MoreHorizontalIcon, ArrowUpIcon, ArrowDownIcon, UsersIcon, FlagIcon, ShieldCheckIcon } from '@/components/icons';
+import { StarIcon, StarFilledIcon, ShareIcon, MoreHorizontalIcon, ArrowUpIcon, ArrowDownIcon, UsersIcon, FlagIcon, ShieldCheckIcon, BarChartIcon, DocumentIcon } from '@/components/icons';
 
 type Tab = 'overview' | 'pedigree' | 'red-flags';
 
@@ -622,7 +622,7 @@ export default function StockDetailPage() {
               ) : (
                 <div className="h-64 flex items-center justify-center">
                   <EmptyState
-                    icon="📊"
+                    icon={<BarChartIcon className="w-16 h-16 text-gray-600" />}
                     title="Not enough data"
                     message="Score history will be displayed once sufficient data is available."
                   />
@@ -735,7 +735,7 @@ export default function StockDetailPage() {
                 </div>
               ) : (
                 <EmptyState
-                  icon="📄"
+                  icon={<DocumentIcon className="w-16 h-16 text-gray-600" />}
                   title="No filings found"
                   message="This stock doesn't have any recent filings."
                 />
@@ -1238,7 +1238,7 @@ export default function StockDetailPage() {
                     </div>
                   ) : (
                     <EmptyState
-                      icon="📊"
+                      icon={<BarChartIcon className="w-16 h-16 text-gray-600" />}
                       title="No history available"
                       message="No historical red flag data is available for this stock."
                     />
@@ -1247,7 +1247,7 @@ export default function StockDetailPage() {
               </>
             ) : (
               <EmptyState
-                icon="🚩"
+                icon={<FlagIcon className="w-16 h-16 text-red-400" />}
                 title="No red flag data"
                 message="Unable to load red flag analysis for this stock."
               />
