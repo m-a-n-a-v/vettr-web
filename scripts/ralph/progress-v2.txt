@@ -1689,3 +1689,51 @@ Files modified:
 - All quality checks passed: npm run build ✓, npm run lint ✓
 
 ---
+
+## V2-040: Fix Framer Motion animations for performance
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Optimized all Framer Motion animations for performance and accessibility
+- PageTransition: Changed from y:10 slide (0.3s) to opacity-only fade (0.15s) for better performance
+- Modal: Kept y:10 animation (0.2s) but added prefers-reduced-motion support
+- Toast: Kept x:20 animation (0.2s) but added prefers-reduced-motion support
+- Onboarding: Changed from y:20 and x:20/-20 slide animations to opacity-only for performance
+- OfflineBanner: Changed from heavy y:-100 slide (0.3s) to opacity-only (0.2s)
+- Stock detail tabs: Changed from x:-20/20 horizontal slide (0.3s) to opacity-only fade (0.15s) - eliminates layout shift
+- Header dropdown: Added prefers-reduced-motion support to y:-10 animation
+- Created reusable usePrefersReducedMotion hook in Toast.tsx for consistency
+- VetrScoreBadge already uses CSS transition (not Framer Motion) - no changes needed
+- Button.tsx whileTap scale is GPU-accelerated - no changes needed
+- All animations now respect prefers-reduced-motion media query (opacity only, no movement, 0 duration)
+- All animation durations reduced to 150-200ms max (from 300ms)
+- Quality checks passed: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/components/ui/PageTransition.tsx
+- src/components/ui/Modal.tsx
+- src/components/ui/Toast.tsx
+- src/components/Onboarding.tsx
+- src/components/ui/OfflineBanner.tsx
+- src/app/(main)/stocks/[ticker]/page.tsx
+- src/components/Header.tsx
+- scripts/ralph/prd-v2.json
+
+**Learnings for future iterations:**
+- **GPU-accelerated properties**: Only transform and opacity are GPU-accelerated; avoid animating width, height, margin, padding, top/left/right/bottom
+- **Layout shift prevention**: Horizontal slide animations (x) in tab content cause layout shift; use opacity-only for tab transitions
+- **Reduced motion**: Always check window.matchMedia('(prefers-reduced-motion: reduce)') and disable movement animations
+- **Animation duration sweet spot**: 150-200ms feels snappy without being jarring; 300ms+ feels sluggish
+- **Page transitions**: Simple opacity fade is smoother than y-axis slide for full-page transitions
+- **Modal/dropdown animations**: Small y movements (10px) are acceptable but should respect reduced motion
+- **Toast animations**: Horizontal slide (x:20) from right feels natural and doesn't cause layout shift
+- **Onboarding slides**: Opacity-only transitions between slides are smooth and performant
+- **CSS transitions vs Framer Motion**: For simple animations like SVG circles, CSS transitions are more performant
+- **Reusable hooks**: Extract prefers-reduced-motion check into a custom hook for consistency across components
+- **AnimatePresence mode**: Use mode="wait" for tab content to ensure smooth transitions without overlap
+- **Transition easing**: 'easeOut' is better for exits/dismissals; 'easeInOut' can feel sluggish
+- **Performance impact**: Heavy slide animations (y:-100, large x/y values) cause jank on lower-end devices
+- **Accessibility first**: Reduced motion is not just nice-to-have - it's critical for users with vestibular disorders
+
+---
