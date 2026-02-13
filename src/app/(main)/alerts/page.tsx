@@ -55,7 +55,7 @@ function AlertsPageContent() {
 
   // Initialize state from URL params
   const [filter, setFilter] = useState<FilterType>((searchParams.get('filter') as FilterType) || 'All');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
   const [isClient, setIsClient] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [togglingRuleId, setTogglingRuleId] = useState<string | null>(null);
@@ -67,19 +67,20 @@ function AlertsPageContent() {
     setIsClient(true);
   }, []);
 
-  // Update URL when filter changes
+  // Update URL when filter or search query changes
   useEffect(() => {
     if (!isClient) return;
 
     const params = new URLSearchParams();
 
     if (filter !== 'All') params.set('filter', filter);
+    if (searchQuery) params.set('search', searchQuery);
 
     const queryString = params.toString();
     const newUrl = queryString ? `/alerts?${queryString}` : '/alerts';
 
     router.replace(newUrl, { scroll: false });
-  }, [filter, isClient, router]);
+  }, [filter, searchQuery, isClient, router]);
 
   // Filter rules based on active/inactive filter and search query
   const filteredRules = useMemo(() => {

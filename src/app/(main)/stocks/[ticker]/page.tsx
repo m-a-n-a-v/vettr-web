@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -58,17 +59,22 @@ import { chartTheme, getTooltipStyle } from '@/lib/chart-theme';
 
 type Tab = 'overview' | 'pedigree' | 'red-flags';
 
-export default function StockDetailPage() {
+function StockDetailContent() {
   const params = useParams();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const ticker = params.ticker as string;
-  const [activeTab, setActiveTab] = useState<Tab>('overview');
+
+  // Initialize state from URL params
+  const [activeTab, setActiveTab] = useState<Tab>((searchParams.get('tab') as Tab) || 'overview');
   const { showToast } = useToast();
   const prefersReducedMotion = usePrefersReducedMotion();
+  const [isClient, setIsClient] = useState(false);
 
-  // Pedigree tab state
-  const [executiveSearch, setExecutiveSearch] = useState('');
-  const [executiveTitleFilter, setExecutiveTitleFilter] = useState('all');
-  const [executiveSortBy, setExecutiveSortBy] = useState<'title' | 'tenure' | 'experience' | 'specialization'>('title');
+  // Pedigree tab state - initialize from URL
+  const [executiveSearch, setExecutiveSearch] = useState(searchParams.get('execSearch') || '');
+  const [executiveTitleFilter, setExecutiveTitleFilter] = useState(searchParams.get('execTitle') || 'all');
+  const [executiveSortBy, setExecutiveSortBy] = useState<'title' | 'tenure' | 'experience' | 'specialization'>((searchParams.get('execSort') as any) || 'title');
   const [selectedExecutive, setSelectedExecutive] = useState<Executive | null>(null);
 
   // Red Flags tab state
@@ -79,8 +85,13 @@ export default function StockDetailPage() {
   // Score detail modal state
   const [showScoreDetail, setShowScoreDetail] = useState(false);
 
-  // Score history chart state
-  const [scoreHistoryPeriod, setScoreHistoryPeriod] = useState('6M');
+  // Score history chart state - initialize from URL
+  const [scoreHistoryPeriod, setScoreHistoryPeriod] = useState(searchParams.get('period') || '6M');
+
+  // Set client flag on mount
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const { stock, isLoading: stockLoading, error: stockError } = useStock(ticker);
   const { score, isLoading: scoreLoading } = useVetrScore({ ticker });
@@ -131,6 +142,33 @@ export default function StockDetailPage() {
       }, 0);
     }
   };
+
+  // Sync state to URL query parameters
+  useEffect(() => {
+    if (!isClient) return;
+
+    const params = new URLSearchParams();
+
+    // Add tab if not default
+    if (activeTab !== 'overview') params.set('tab', activeTab);
+
+    // Add executive filters if on pedigree tab and not defaults
+    if (activeTab === 'pedigree') {
+      if (executiveSearch) params.set('execSearch', executiveSearch);
+      if (executiveTitleFilter !== 'all') params.set('execTitle', executiveTitleFilter);
+      if (executiveSortBy !== 'title') params.set('execSort', executiveSortBy);
+    }
+
+    // Add score history period if not default
+    if (activeTab === 'overview' && scoreHistoryPeriod !== '6M') {
+      params.set('period', scoreHistoryPeriod);
+    }
+
+    const queryString = params.toString();
+    const newUrl = queryString ? `/stocks/${ticker}?${queryString}` : `/stocks/${ticker}`;
+
+    router.replace(newUrl, { scroll: false });
+  }, [activeTab, executiveSearch, executiveTitleFilter, executiveSortBy, scoreHistoryPeriod, isClient, router, ticker]);
 
   // Filter and sort executives
   const filteredAndSortedExecutives = useMemo(() => {
@@ -1450,5 +1488,22 @@ export default function StockDetailPage() {
         </div>
       )}
     </div>
+  );
+}
+
+// Wrap in Suspense for useSearchParams compatibility
+export default function StockDetailPage() {
+  return (
+    <Suspense fallback={
+      <div className="p-4 md:p-6 pb-20 md:pb-6">
+        <div className="h-10 bg-white/5 rounded-xl animate-pulse mb-6 w-48"></div>
+        <div className="space-y-6">
+          <div className="h-32 bg-white/5 rounded-2xl animate-pulse"></div>
+          <div className="h-64 bg-white/5 rounded-2xl animate-pulse"></div>
+        </div>
+      </div>
+    }>
+      <StockDetailContent />
+    </Suspense>
   );
 }
