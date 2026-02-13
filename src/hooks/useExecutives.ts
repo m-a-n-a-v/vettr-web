@@ -66,8 +66,7 @@ export function useExecutives(
     PaginatedResponse<Executive>,
     Error
   >(key, fetcher, {
-    revalidateOnFocus: true,
-    dedupingInterval: 5000,
+    dedupingInterval: 60000, // Cache executives list for 60s
   });
 
   return {

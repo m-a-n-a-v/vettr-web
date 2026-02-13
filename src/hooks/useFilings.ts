@@ -56,8 +56,7 @@ export function useFilings(params: UseFilingsParams = {}): UseFilingsReturn {
     PaginatedResponse<Filing>,
     Error
   >(key, fetcher, {
-    revalidateOnFocus: true,
-    dedupingInterval: 5000,
+    dedupingInterval: 60000, // Cache filings for 60s — filings don't change frequently
   });
 
   return {

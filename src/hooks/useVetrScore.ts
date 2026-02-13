@@ -36,8 +36,7 @@ export function useVetrScore({
       return response.data;
     },
     {
-      revalidateOnFocus: true,
-      dedupingInterval: 30000, // Cache for 30 seconds
+      dedupingInterval: 60000, // Cache VETTR score for 60s
     }
   );
 

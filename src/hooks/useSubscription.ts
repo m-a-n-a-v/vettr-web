@@ -26,8 +26,7 @@ export function useSubscription(): UseSubscriptionReturn {
       return response.data;
     },
     {
-      revalidateOnFocus: true,
-      dedupingInterval: 60000, // Cache for 60 seconds (subscription data changes infrequently)
+      dedupingInterval: 300000, // Cache for 5 min — subscription data changes very infrequently
     }
   );
 

@@ -37,8 +37,7 @@ export function useWatchlist(): UseWatchlistReturn {
     PaginatedResponse<Stock>,
     Error
   >('/watchlist', fetcher, {
-    revalidateOnFocus: true,
-    dedupingInterval: 3000,
+    dedupingInterval: 30000, // Cache watchlist for 30s — only changes on user action
   });
 
   const watchlist = data?.items || [];

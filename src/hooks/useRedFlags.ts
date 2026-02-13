@@ -36,8 +36,7 @@ export function useRedFlags({
       return response.data;
     },
     {
-      revalidateOnFocus: true,
-      dedupingInterval: 30000, // Cache for 30 seconds
+      dedupingInterval: 60000, // Cache red flags for 60s
     }
   );
 

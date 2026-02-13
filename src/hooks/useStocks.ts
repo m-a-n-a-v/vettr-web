@@ -71,9 +71,7 @@ export function useStocks(options: UseStocksOptions = {}): UseStocksResult {
     endpoint,
     fetchStocks,
     {
-      revalidateOnFocus: true,
-      revalidateOnReconnect: true,
-      dedupingInterval: 5000, // Prevent duplicate requests within 5s
+      dedupingInterval: 60000, // Cache stock list for 60s — stock data doesn't change frequently
     }
   );
 

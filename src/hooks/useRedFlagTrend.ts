@@ -26,8 +26,7 @@ export function useRedFlagTrend(): UseRedFlagTrendReturn {
       return response.data;
     },
     {
-      revalidateOnFocus: true,
-      dedupingInterval: 60000, // Cache for 60 seconds (less frequent than stock-specific data)
+      dedupingInterval: 120000, // Cache red flag trends for 2 min — aggregate data changes infrequently
     }
   );
 

@@ -189,8 +189,8 @@ function sleep(ms: number): Promise<void> {
  * Calculate exponential backoff delay
  */
 function getExponentialBackoffDelay(retryCount: number): number {
-  // Base delay: 1 second, doubles with each retry (1s, 2s, 4s)
-  return Math.min(1000 * Math.pow(2, retryCount), 8000); // Max 8 seconds
+  // Base delay: 2 seconds, doubles with each retry (2s, 4s)
+  return Math.min(2000 * Math.pow(2, retryCount), 10000); // Max 10 seconds
 }
 
 /**
@@ -359,46 +359,47 @@ export async function apiClient<T = unknown>(
         }
       }
 
-      // Handle 429 Too Many Requests - rate limiting with non-blocking retry
-      if (response.status === 429 && requestOptions.retryCount! < 5) {
-        // Read Retry-After header (can be in seconds or HTTP date format)
-        const retryAfterHeader = response.headers.get('Retry-After');
-        let retryAfterMs = getExponentialBackoffDelay(requestOptions.retryCount!);
+      // Handle 429 Too Many Requests - return error immediately, let SWR handle retry scheduling
+      // Only do 1 internal retry with a longer delay to avoid request storms
+      if (response.status === 429) {
+        if (requestOptions.retryCount! < 1) {
+          // Read Retry-After header (can be in seconds or HTTP date format)
+          const retryAfterHeader = response.headers.get('Retry-After');
+          let retryAfterMs = getExponentialBackoffDelay(requestOptions.retryCount!);
 
-        if (retryAfterHeader) {
-          // Check if it's a number (seconds) or a date
-          const retryAfterSeconds = parseInt(retryAfterHeader, 10);
-          if (!isNaN(retryAfterSeconds)) {
-            retryAfterMs = retryAfterSeconds * 1000;
-          } else {
-            // Try parsing as HTTP date
-            const retryAfterDate = new Date(retryAfterHeader);
-            if (!isNaN(retryAfterDate.getTime())) {
-              retryAfterMs = Math.max(0, retryAfterDate.getTime() - Date.now());
+          if (retryAfterHeader) {
+            // Check if it's a number (seconds) or a date
+            const retryAfterSeconds = parseInt(retryAfterHeader, 10);
+            if (!isNaN(retryAfterSeconds)) {
+              retryAfterMs = retryAfterSeconds * 1000;
+            } else {
+              // Try parsing as HTTP date
+              const retryAfterDate = new Date(retryAfterHeader);
+              if (!isNaN(retryAfterDate.getTime())) {
+                retryAfterMs = Math.max(0, retryAfterDate.getTime() - Date.now());
+              }
             }
           }
+
+          // Cap retry delay at 30s
+          retryAfterMs = Math.min(retryAfterMs, 30000);
+
+          console.warn(`[API] Rate limited (429). Single retry after ${Math.ceil(retryAfterMs / 1000)}s.`);
+
+          // Show toast notification with countdown (non-blocking)
+          showRateLimitToast(Math.ceil(retryAfterMs / 1000));
+
+          // Wait for the specified time
+          await sleep(retryAfterMs);
+
+          // Retry the request once
+          return apiClient<T>(endpoint, {
+            ...options,
+            retryCount: requestOptions.retryCount! + 1,
+          });
         }
 
-        // Cap retry delay at 2 minutes (120s) to prevent indefinite hangs
-        retryAfterMs = Math.min(retryAfterMs, 120000);
-
-        console.warn(`[API] Rate limited (429). Retrying after ${Math.ceil(retryAfterMs / 1000)}s. Attempt ${requestOptions.retryCount! + 1}/5`);
-
-        // Show toast notification with countdown (non-blocking)
-        showRateLimitToast(Math.ceil(retryAfterMs / 1000));
-
-        // Wait for the specified time
-        await sleep(retryAfterMs);
-
-        // Retry the request
-        return apiClient<T>(endpoint, {
-          ...options,
-          retryCount: requestOptions.retryCount! + 1,
-        });
-      }
-
-      // If we've exhausted retries on 429, return error
-      if (response.status === 429) {
+        // Return error - SWR will handle further retry scheduling
         return {
           success: false,
           error: {

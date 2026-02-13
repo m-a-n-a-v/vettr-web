@@ -54,8 +54,7 @@ export function useRedFlagHistory({
       return response.data;
     },
     {
-      revalidateOnFocus: true,
-      dedupingInterval: 60000, // Cache for 60 seconds (historical data changes less frequently)
+      dedupingInterval: 120000, // Cache for 2 min — historical data rarely changes
     }
   );
 

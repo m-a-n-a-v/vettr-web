@@ -17,31 +17,34 @@ export function SWRProvider({ children }: SWRProviderProps) {
   return (
     <SWRConfig
       value={{
-        // Cache settings
-        dedupingInterval: 5000, // Prevent duplicate requests within 5s
-        focusThrottleInterval: 10000, // Throttle revalidation on focus (10s)
+        // Cache settings — generous deduplication to stay within 60 req/min rate limit
+        dedupingInterval: 30000, // Prevent duplicate requests within 30s
+        focusThrottleInterval: 60000, // Throttle revalidation on focus to once per 60s
 
-        // Revalidation settings
-        revalidateOnFocus: true, // Revalidate when window regains focus
-        revalidateOnReconnect: true, // Revalidate when network reconnects
+        // Revalidation settings — conservative to avoid rate limiting
+        revalidateOnFocus: false, // Disabled globally — pages can opt-in per-hook if needed
+        revalidateOnReconnect: true, // Revalidate when network reconnects (rare event)
         revalidateIfStale: true, // Revalidate if data is stale
 
-        // Error retry settings
-        errorRetryCount: 3,
-        errorRetryInterval: 5000,
+        // Error retry settings — conservative to avoid compounding 429s
+        errorRetryCount: 2,
+        errorRetryInterval: 10000, // 10s between retries
         shouldRetryOnError: true,
         onErrorRetry: (error: { status?: number; code?: string }, key, config, revalidate, { retryCount }) => {
           // Never retry on 404
           if (error.status === 404) return;
 
-          // Never retry on Rate Limit (handled by api-client)
+          // Never retry on Rate Limit — wait for user to manually refresh or next scheduled revalidation
           if (error.status === 429 || error.code === 'RATE_LIMIT_EXCEEDED') return;
 
-          // Only retry up to 3 times
-          if (retryCount >= 3) return;
+          // Never retry on auth errors
+          if (error.status === 401 || error.status === 403) return;
 
-          // Retry after 5 seconds
-          setTimeout(() => revalidate({ retryCount }), 5000);
+          // Only retry up to 2 times
+          if (retryCount >= 2) return;
+
+          // Retry with increasing delay (10s, 20s)
+          setTimeout(() => revalidate({ retryCount }), 10000 * (retryCount + 1));
         },
 
         // Cache time settings

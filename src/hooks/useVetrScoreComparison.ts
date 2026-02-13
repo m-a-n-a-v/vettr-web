@@ -36,8 +36,7 @@ export function useVetrScoreComparison({
       return response.data;
     },
     {
-      revalidateOnFocus: true,
-      dedupingInterval: 60000, // Cache for 60 seconds
+      dedupingInterval: 120000, // Cache for 2 min — peer data rarely changes
     }
   );
 

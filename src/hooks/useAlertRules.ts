@@ -40,8 +40,7 @@ export function useAlertRules(): UseAlertRulesReturn {
       return response.data;
     },
     {
-      revalidateOnFocus: true,
-      dedupingInterval: 10000, // Cache for 10 seconds
+      dedupingInterval: 30000, // Cache for 30s
     }
   );
 

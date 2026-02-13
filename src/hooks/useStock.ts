@@ -45,9 +45,7 @@ export function useStock(ticker: string | null, shouldFetch: boolean = true): Us
     shouldFetch && endpoint ? endpoint : null,
     fetchStock,
     {
-      revalidateOnFocus: true,
-      revalidateOnReconnect: true,
-      dedupingInterval: 5000, // Prevent duplicate requests within 5s
+      dedupingInterval: 30000, // Cache individual stock for 30s
     }
   );
 
