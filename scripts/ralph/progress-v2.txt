@@ -82,3 +82,35 @@ Files modified:
 - Must return null after redirect to prevent rendering children during redirect
 
 ---
+## V2-003: Redesign login page - premium SaaS quality
+Status: ✅ COMPLETE
+Date: 2026-02-12
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Completely redesigned login page with professional split layout
+- Desktop: left side shows VETTR branding with tagline and description; right side has login form
+- Mobile: single column layout with logo at top, form card below
+- Implemented subtle background gradients with accent glow (8% opacity green at top-right, 5% blue at bottom-left)
+- Form card uses bg-vettr-card/50 border border-white/5 rounded-2xl p-8 matching design system
+- Input fields: bg-white/5 border border-white/10 rounded-xl with proper focus states (border-vettr-accent/50, ring-vettr-accent/20)
+- Submit button: bg-vettr-accent text-vettr-navy font-semibold with hover:bg-vettr-accent/90
+- Error messages: text-red-400 with fade-in animation (animate-in)
+- Loading spinner on submit button preserves layout with inline SVG
+- VETTR logo styled with accent-colored first letter: <span className="text-vettr-accent">V</span>ETTR
+- Signup link: text-gray-400 hover:text-vettr-accent transition-colors
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/app/(auth)/login/page.tsx
+
+**Learnings for future iterations:**
+- Split layout achieved with flex-col lg:flex-row on parent container
+- Background gradients positioned absolutely with z-index management (gradients behind content)
+- Desktop-only branding section uses hidden lg:flex for responsive behavior
+- Mobile logo duplicated with lg:hidden to maintain mobile-first approach
+- Focus states updated to use vettr-accent colors instead of generic accent
+- Error fade-in uses animate-in class which should be available from Tailwind
+- Loading state preserves button size by keeping both SVG and text inline
+- All old color classes (bg-primary, text-textPrimary, etc.) replaced with new design tokens
+
+---
