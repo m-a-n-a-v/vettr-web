@@ -1737,3 +1737,53 @@ Files modified:
 - **Accessibility first**: Reduced motion is not just nice-to-have - it's critical for users with vestibular disorders
 
 ---
+
+## V2-041: Fix accessibility issues
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Fixed icon-only buttons: Added aria-label to FeedbackForm close button (AlertRuleCreator already had it)
+- Enhanced tab navigation on stock detail page:
+  - Added keyboard arrow key navigation (ArrowLeft/ArrowRight, Home, End)
+  - Added tabIndex={activeTab === tab ? 0 : -1} for proper focus management
+  - Already had proper role='tablist', role='tab', aria-selected, aria-controls, aria-labelledby
+- Fixed toggle switches with proper ARIA attributes:
+  - Settings page: Added role='switch', aria-checked, aria-label to all 5 toggle switches
+  - Alerts page: Added role='switch', aria-checked, aria-label to alert rule toggles
+  - All toggles already had focus-visible rings from V2-039
+- Color contrast: Already addressed in previous stories (V2-039), focus indicators in place
+- Skip to main content link: Already implemented in (main)/layout.tsx with sr-only and focus:not-sr-only pattern
+- Form input labels:
+  - Added aria-label="Search" to SearchInput component
+  - Added aria-label="Search stocks by ticker or name" to QuickSearch input
+  - Added aria-required="true" to FeedbackForm message textarea
+  - Login and Signup pages already had excellent accessibility (aria-invalid, aria-describedby, proper labels)
+- Charts: Added role="img" and descriptive aria-labels to:
+  - Stock detail VETTR Score history chart
+  - VetrScoreComparison bar chart
+- Quality checks: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/components/FeedbackForm.tsx
+- src/app/(main)/stocks/[ticker]/page.tsx
+- src/app/(main)/profile/settings/page.tsx
+- src/app/(main)/alerts/page.tsx
+- src/components/ui/SearchInput.tsx
+- src/components/QuickSearch.tsx
+- src/components/VetrScoreComparison.tsx
+- scripts/ralph/prd-v2.json
+
+**Learnings for future iterations:**
+- **Icon-only buttons**: Always add aria-label to buttons that contain only SVG icons without text
+- **Tab navigation keyboard support**: Use ArrowLeft/Right for tab switching, tabIndex={active ? 0 : -1} for focus management
+- **Toggle switch ARIA pattern**: role='switch' + aria-checked={boolean} + aria-label for accessibility
+- **Skip to main content**: Use sr-only + focus:not-sr-only pattern for keyboard-only visibility
+- **Form accessibility**: aria-label on inputs without visible labels, aria-required on required fields
+- **Chart accessibility**: Wrap chart containers with role="img" and descriptive aria-label
+- **Focus management in tabs**: Use setTimeout(() => element.focus(), 0) after state updates for reliable focus
+- **WCAG compliance**: Most accessibility issues can be prevented by using semantic HTML and proper ARIA attributes from the start
+- **Existing accessibility**: Login/Signup pages were excellent examples with aria-invalid and aria-describedby patterns
+- **Previous work pays off**: V2-039 already added focus-visible rings to all interactive elements
+- **Comprehensive testing**: Use both keyboard-only navigation and screen readers to verify accessibility
+---
