@@ -638,3 +638,43 @@ Files modified:
 - Status badges should be small (text-xs px-2.5 py-0.5) not medium-sized
 - All old design tokens replaced: bg-primary → bg-vettr-navy, bg-primaryLight → bg-vettr-card/50 or bg-vettr-card/30, text-textPrimary → text-white, text-textSecondary → text-gray-400, text-textMuted → text-gray-500, border-border → border-white/5, text-accent → text-vettr-accent, text-warning → text-yellow-400, bg-surface → bg-white/5
 ---
+
+## V2-018: Redesign Discovery page
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Completely redesigned Discovery page with premium V2 design system
+- Updated page header with V2 card styling (bg-vettr-card/30 border-white/5)
+- Redesigned hero search bar with larger py-3 text-lg styling and subtle glow focus effect (shadow-lg shadow-vettr-accent/5)
+- Updated sector filter pills to horizontal scrolling pills with V2 styling
+- Active sector pill: bg-vettr-accent/10 border-vettr-accent/30 text-vettr-accent
+- Inactive sector pill: bg-white/5 border-white/10 text-gray-400 with hover states
+- Added "View All →" links to Featured Stocks and Recent Filings section headers
+- Featured Stocks section uses smooth CSS snap scrolling (snap-x snap-mandatory, snap-start on cards)
+- Updated FilingTable component with V2 design tokens for consistency across app
+- Table header: text-xs text-gray-500 uppercase tracking-wider with hover:text-white
+- Table rows: border-b border-white/5 hover:bg-white/[0.03] cursor-pointer
+- Material badge moved inline with title in table (not separate column)
+- Updated FilingRow component for mobile cards with V2 styling
+- Mobile filing cards: bg-vettr-card/50 border-white/5 rounded-2xl with hover effects
+- Updated Suspense fallback skeleton to match V2 design (bg-white/5 rounded-xl)
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/app/(main)/discovery/page.tsx
+- src/components/ui/FilingTable.tsx
+
+**Learnings for future iterations:**
+- Hero search bar should be centered (max-w-2xl mx-auto) for better desktop layout
+- Search input className prop allows passing additional classes for py-3 text-lg styling
+- Sector filter pills work better in horizontal scroll container (flex gap-2 overflow-x-auto scrollbar-hide)
+- CSS snap scrolling (snap-x snap-mandatory) creates smooth horizontal scroll for featured stock cards
+- FilingTable Material badge works better inline with title (not as separate column) - saves space
+- Table row onClick with window.location.href allows entire row to be clickable
+- Ticker link needs onClick stopPropagation to prevent row click when clicking ticker
+- "View All →" links create natural navigation from sections to full pages
+- Section headers follow consistent pattern: text-lg font-semibold text-white with action link in text-vettr-accent
+- All old design tokens replaced: bg-primary → bg-vettr-navy, bg-primaryLight → bg-vettr-card/30 or bg-vettr-card/50, text-textPrimary → text-white, text-textSecondary → text-gray-400, text-textMuted → text-gray-500, border-border → border-white/5, text-accent → text-vettr-accent, text-warning → text-yellow-400
+- FilingTable is reusable component used in both Discovery and Pulse pages - V2 updates apply everywhere
+---
