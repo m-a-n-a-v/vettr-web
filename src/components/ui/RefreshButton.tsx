@@ -25,6 +25,8 @@ export default function RefreshButton({
         flex items-center justify-center gap-2 px-4 py-2 rounded-lg
         bg-primaryLight text-textPrimary border border-border
         hover:bg-surfaceLight hover:border-accent/30
+        focus:outline-none focus-visible:ring-2 focus-visible:ring-vettr-accent/30
+        active:scale-[0.98]
         disabled:opacity-50 disabled:cursor-not-allowed
         transition-all duration-200
         ${className}

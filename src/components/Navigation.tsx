@@ -94,7 +94,7 @@ export function Navigation() {
           </h1>
           <button
             onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-            className="text-gray-400 hover:text-white hover:bg-white/5 rounded-lg p-1.5 transition-colors"
+            className="text-gray-400 hover:text-white hover:bg-white/5 rounded-lg p-1.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-vettr-accent/30 active:scale-95"
             aria-label={isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
             {isSidebarCollapsed ? (
@@ -166,7 +166,7 @@ export function Navigation() {
                 {/* Logout Button */}
                 <button
                   onClick={handleLogout}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition-all"
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-vettr-accent/30 active:scale-[0.98]"
                 >
                   <LogOutIcon className="w-5 h-5" aria-hidden="true" />
                   <span>Sign Out</span>
@@ -175,7 +175,7 @@ export function Navigation() {
             ) : (
               <button
                 onClick={handleLogout}
-                className="w-full flex items-center justify-center p-2.5 rounded-xl text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition-all"
+                className="w-full flex items-center justify-center p-2.5 rounded-xl text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-vettr-accent/30 active:scale-95"
                 aria-label="Sign out"
               >
                 <LogOutIcon className="w-5 h-5" aria-hidden="true" />

@@ -20,7 +20,7 @@ export default function Button({
     disabled,
     ...props
 }: ButtonProps) {
-    const baseStyles = 'inline-flex items-center justify-center font-bold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed';
+    const baseStyles = 'inline-flex items-center justify-center font-bold transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-vettr-accent/30 disabled:opacity-50 disabled:cursor-not-allowed';
 
     const variants = {
         primary: 'bg-accent text-primary hover:bg-accentDim shadow-[0_0_15px_rgba(0,230,118,0.3)] hover:shadow-[0_0_20px_rgba(0,230,118,0.5)]',

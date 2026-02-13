@@ -44,7 +44,7 @@ export default function StockCard({
                 <button
                   onClick={handleFavoriteClick}
                   disabled={isTogglingFavorite}
-                  className="transition-all duration-200 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="transition-all duration-200 hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-vettr-accent/30 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
                   aria-label={isFavorite ? 'Remove from watchlist' : 'Add to watchlist'}
                 >
                   {isTogglingFavorite ? (

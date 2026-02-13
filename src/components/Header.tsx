@@ -119,7 +119,7 @@ export function Header() {
         {/* Center-right: Search shortcut (desktop only) */}
         <button
           onClick={handleSearchClick}
-          className="hidden md:flex items-center gap-2 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-1.5 text-sm text-gray-500 hover:bg-gray-200 dark:hover:bg-white/[0.07] hover:border-gray-300 dark:hover:border-white/20 transition-all flex-shrink-0"
+          className="hidden md:flex items-center gap-2 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-1.5 text-sm text-gray-500 hover:bg-gray-200 dark:hover:bg-white/[0.07] hover:border-gray-300 dark:hover:border-white/20 transition-all flex-shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-vettr-accent/30 active:scale-[0.98]"
         >
           <SearchIcon className="w-4 h-4" />
           <span className="hidden lg:inline">Quick search...</span>
@@ -134,7 +134,7 @@ export function Header() {
           {/* Refresh button */}
           <button
             onClick={handleRefresh}
-            className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors"
+            className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-vettr-accent/30 active:scale-95"
             aria-label="Refresh page"
           >
             <RefreshIcon className="w-5 h-5" />
@@ -142,7 +142,7 @@ export function Header() {
 
           {/* Notification bell */}
           <button
-            className="relative p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors"
+            className="relative p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-vettr-accent/30 active:scale-95"
             aria-label="Notifications"
           >
             <BellIcon className="w-5 h-5" />
@@ -154,7 +154,7 @@ export function Header() {
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+              className="flex items-center gap-2 hover:opacity-80 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-vettr-accent/30 rounded-full active:scale-95"
               aria-label="User menu"
               aria-expanded={isDropdownOpen}
             >
@@ -198,21 +198,21 @@ export function Header() {
                     <Link
                       href="/profile"
                       onClick={() => setIsDropdownOpen(false)}
-                      className="block px-3 py-2 text-sm text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors"
+                      className="block px-3 py-2 text-sm text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-vettr-accent/30"
                     >
                       Profile
                     </Link>
                     <Link
                       href="/profile/settings"
                       onClick={() => setIsDropdownOpen(false)}
-                      className="block px-3 py-2 text-sm text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors"
+                      className="block px-3 py-2 text-sm text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-vettr-accent/30"
                     >
                       Settings
                     </Link>
                     <div className="h-px bg-gray-200 dark:bg-white/5 my-1" />
                     <button
                       onClick={handleLogout}
-                      className="w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors"
+                      className="w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-vettr-accent/30 active:scale-[0.98]"
                     >
                       Sign Out
                     </button>
