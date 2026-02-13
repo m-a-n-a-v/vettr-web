@@ -145,3 +145,84 @@ Files modified:
 - Background gradients positioned absolutely to not interfere with layout
 ---
 
+## V2-005: Redesign app shell - professional sidebar navigation
+Status: ✅ COMPLETE
+Date: 2026-02-12
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Created comprehensive SVG icon component library in src/components/icons/index.tsx
+- Icons include: PulseIcon, CompassIcon, GridIcon, BellIcon, UserIcon, ChevronLeft/Right/Down, LogOutIcon, SettingsIcon, SearchIcon, RefreshIcon, MenuIcon, XIcon
+- All icons use strokeWidth={1.5} and inherit currentColor for proper theming
+- Completely redesigned Navigation component with professional sidebar
+- Desktop sidebar: fixed left, w-64 expanded / w-16 collapsed, bg-vettr-dark, border-r border-white/5
+- Sidebar header: VETTR logo with accent V, collapse toggle button with proper SVG icons
+- Navigation items: flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
+- Active nav item: text-vettr-accent bg-vettr-accent/10
+- Inactive nav item: text-gray-400 hover:text-white hover:bg-white/5
+- Sidebar footer: user avatar (gradient circle), display name, tier badge, logout button
+- Collapsed sidebar shows icon-only logout button
+- Mobile bottom bar: bg-vettr-dark/95 backdrop-blur-lg border-t border-white/5
+- Mobile active tab: text-vettr-accent with dot indicator above icon
+- Smooth collapse/expand animation (200ms ease-in-out)
+- Updated main layout: bg-vettr-navy, md:ml-64, pt-16, pb-20 md:pb-0
+- Updated Header component to match V2 design: bg-vettr-navy/80 backdrop-blur-lg, border-b border-white/5
+- Header dropdown menu: bg-vettr-card border-white/10 rounded-xl with user info and links
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/components/icons/index.tsx (created)
+- src/components/Navigation.tsx
+- src/components/Header.tsx
+- src/app/(main)/layout.tsx
+
+**Learnings for future iterations:**
+- SVG icon components should use React.ComponentType<{ className?: string }> type for flexibility
+- Sidebar collapse state should hide/show elements with opacity and width transitions
+- User initials should be extracted from display name (first + last letter)
+- Tier badges should have different colors: premium=vettr-accent, pro=yellow, free=gray
+- Mobile bottom bar needs backdrop-blur-lg for premium glass effect
+- Active dot indicator on mobile nav uses absolute positioning at top
+- Sidebar should extend full height (h-screen) and have its own z-index layer
+- Main content ml-64 on desktop accounts for sidebar width
+- Header needs md:ml-64 to align with sidebar on desktop
+- User avatar gradient: from-vettr-accent/20 to-vettr-accent/5 for subtle effect
+- Dropdown menu needs AnimatePresence for smooth exit animations
+- All emoji icons successfully replaced with SVG components
+---
+
+## V2-006: Redesign top header bar
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Completely redesigned Header component with premium SaaS dashboard quality
+- Added Cmd+K search pill in center-right (desktop only): bg-white/5 border border-white/10 rounded-lg with keyboard shortcut badge
+- Added refresh button with RefreshIcon (icon only, hover states)
+- Added notification bell icon with small accent dot indicator (for future notifications)
+- Improved user dropdown styling with proper tier badge colors (premium=accent green, pro=yellow, free=gray)
+- Updated tier badge helper to use V2 design tokens
+- Mobile header simplified: VETTR logo left, action buttons + user avatar right
+- Desktop header: page title left, search pill center-right, actions + user right
+- Search pill includes SearchIcon, placeholder text, and styled kbd tag for ⌘K
+- Refresh and bell buttons: p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg
+- User dropdown maintains consistent bg-vettr-card border border-white/10 rounded-xl styling
+- Added truncate classes to user info in dropdown to prevent overflow
+- Updated animation duration from 0.2s to 0.15s for snappier feel
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/components/Header.tsx
+
+**Learnings for future iterations:**
+- Search pill hidden on mobile/tablet (lg:flex) to save space, only visible on large desktop
+- kbd element styled with bg-white/10 border border-white/10 for native keyboard shortcut appearance
+- Notification bell has relative positioning with absolute badge indicator (top-1.5 right-1.5)
+- Search click handler prepared for future V2-025 quick search modal integration
+- Refresh uses window.location.reload() for simple full page refresh
+- Icon-only buttons need consistent sizing (p-2) and hover states (hover:bg-white/5)
+- Gap spacing between actions uses gap-2 on mobile, gap-3 on desktop for better breathing room
+- ChevronDownIcon now imported from icons library instead of inline SVG
+- Router imported from next/navigation for future navigation features
+- Tier badge colors updated to match V2 design system (accent/10 backgrounds with matching text colors)
+---
+
