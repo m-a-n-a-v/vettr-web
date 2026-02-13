@@ -1865,3 +1865,40 @@ Files modified:
 - **Deduplication window**: 100ms is short enough to not impact perceived performance but long enough to catch duplicates
 - **Promise reuse**: Deduplication cache stores the actual promise object, not just a flag, so all callers get the same result
 ---
+---
+
+## V2-044: Add proper URL state management for all filterable pages
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Added comprehensive URL query parameter synchronization across all filterable pages
+- Alerts page: Added search query (?search=) to URL params alongside existing filter param
+- Stock detail page: Added tab (?tab=), executive filters (?execSearch=, ?execTitle=, ?execSort=), and score history period (?period=) to URL
+- All URL params initialize state on mount from useSearchParams
+- URL updates use router.replace() with scroll: false to avoid history bloat and preserve user scroll position
+- Only non-default values are added to URL to keep URLs clean (e.g., default tab 'overview' is omitted)
+- Wrapped Stock detail page in Suspense for useSearchParams compatibility with Next.js 14+ build system
+- All state properly updates URL via useEffect with dependencies on state changes
+- Browser back/forward navigation correctly restores filter state
+- Direct URL navigation with params works (bookmarkable URLs can be shared)
+- Quality checks passed: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/app/(main)/alerts/page.tsx (added search query to URL state sync)
+- src/app/(main)/stocks/[ticker]/page.tsx (added tab, executive filters, score period to URL)
+
+**Learnings for future iterations:**
+- **URL state pattern**: Use `useSearchParams()` to read initial state, `useRouter()` to update, wrap in Suspense
+- **Initialize from URL**: Always initialize useState with searchParams.get('paramName') || defaultValue
+- **Sync effect pattern**: Use useEffect with state dependencies, only sync when isClient is true
+- **Clean URLs**: Only add non-default values to URL params to keep URLs readable and shareable
+- **router.replace() not push()**: Using replace() avoids polluting browser history with every filter change
+- **scroll: false**: Important to prevent page jump when URL updates from filter changes
+- **Suspense requirement**: Next.js 14+ requires Suspense wrapper for components using useSearchParams
+- **Type safety**: Cast searchParams.get() results to proper types (e.g., 'tab' as Tab) for TypeScript safety
+- **Dependencies array**: Include isClient, router, and ticker in useEffect dependencies for proper re-synchronization
+- **Debouncing consideration**: SearchInput component already has built-in debouncing, so URL sync happens after debounce
+- **Tab-specific params**: Only include tab-specific params when that tab is active to avoid URL clutter
+- **Modals don't need URL state**: Modal state (selectedExecutive, selectedFlag) should remain local state
+- **Default values**: Document default values clearly (overview tab, 6M period, 'all' filter, 'title' sort)
