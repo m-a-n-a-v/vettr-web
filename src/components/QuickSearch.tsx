@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useStockSearch } from '@/hooks/useStockSearch';
 import type { StockSearchResult } from '@/types/api';
+import { SearchIcon } from '@/components/icons';
 
 const MAX_RECENT_SEARCHES = 5;
 const RECENT_SEARCHES_KEY = 'vettr_recent_searches';
@@ -144,36 +145,18 @@ export default function QuickSearch({ isOpen, onClose }: QuickSearchProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center pt-20 p-4 animate-fadeIn"
+      className="fixed inset-0 z-50 flex items-start justify-center pt-20 p-4"
       onClick={handleBackdropClick}
     >
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
 
       {/* Search Modal */}
-      <div
-        className="
-          relative w-full max-w-2xl bg-primaryLight rounded-xl
-          border border-border shadow-2xl
-          animate-slideUp
-        "
-      >
+      <div className="relative w-full max-w-xl bg-vettr-card border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
         {/* Search Input */}
-        <div className="flex items-center px-4 py-3 border-b border-border">
+        <div className="flex items-center border-b border-white/5 px-5 py-4">
           {/* Search Icon */}
-          <svg
-            className="w-5 h-5 text-textMuted mr-3"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-          </svg>
+          <SearchIcon className="w-5 h-5 text-gray-500 mr-3 flex-shrink-0" />
 
           {/* Input */}
           <input
@@ -182,96 +165,49 @@ export default function QuickSearch({ isOpen, onClose }: QuickSearchProps) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search stocks by ticker or name..."
-            className="
-              flex-1 bg-transparent border-none outline-none
-              text-textPrimary placeholder-textMuted
-              text-base
-            "
+            className="flex-1 bg-transparent border-none outline-none text-white placeholder-gray-500 text-lg focus:ring-0"
             autoComplete="off"
           />
 
           {/* Loading indicator */}
           {(isLoading || isSearching) && (
-            <div className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+            <div className="w-4 h-4 border-2 border-vettr-accent border-t-transparent rounded-full animate-spin ml-3" />
           )}
-
-          {/* Keyboard shortcut hint */}
-          <div className="ml-3 text-xs text-textMuted hidden sm:block">
-            <kbd className="px-2 py-1 bg-surface rounded border border-border">Esc</kbd>
-          </div>
         </div>
 
         {/* Results */}
-        <div className="max-h-[400px] overflow-y-auto">
+        <div className="max-h-80 overflow-y-auto">
           {showRecentSearches && (
-            <div className="px-4 py-2 text-xs text-textMuted font-medium">
-              Recent searches
+            <div className="px-5 py-2 text-xs text-gray-500 font-medium uppercase tracking-wider">
+              Recent
             </div>
           )}
 
           {displayItems.length > 0 && (
-            <ul className="py-2">
+            <ul>
               {displayItems.map((stock, index) => (
                 <li key={stock.ticker}>
                   <button
                     type="button"
                     onClick={() => handleSelectStock(stock)}
                     onMouseEnter={() => setSelectedIndex(index)}
-                    className={`
-                      w-full flex items-center justify-between px-4 py-3
-                      transition-colors duration-150
-                      ${
-                        index === selectedIndex
-                          ? 'bg-surface'
-                          : 'hover:bg-surface/50'
-                      }
-                    `}
+                    className={`w-full flex items-center gap-3 px-5 py-3 transition-colors cursor-pointer ${
+                      index === selectedIndex ? 'bg-white/5' : 'hover:bg-white/5'
+                    }`}
                   >
-                    {/* Left side: Stock info */}
-                    <div className="flex items-center space-x-3">
-                      {/* Ticker badge */}
-                      <div className="flex items-center justify-center w-10 h-10 bg-primaryDark rounded-lg border border-border">
-                        <span className="text-sm font-bold text-textPrimary">
-                          {stock.ticker.substring(0, 2)}
-                        </span>
+                    {/* Ticker and company name */}
+                    <div className="flex-1 min-w-0 text-left">
+                      <div className="font-mono text-vettr-accent text-sm font-semibold">
+                        {stock.ticker}
                       </div>
-
-                      {/* Ticker and name */}
-                      <div className="text-left">
-                        <div className="text-sm font-semibold text-textPrimary">
-                          {stock.ticker}
-                        </div>
-                        <div className="text-xs text-textSecondary truncate max-w-xs">
-                          {stock.company_name}
-                        </div>
-                      </div>
+                      <div className="text-white text-sm truncate">{stock.company_name}</div>
                     </div>
 
-                    {/* Right side: Score and metadata */}
-                    <div className="flex items-center space-x-3">
-                      {/* Sector chip */}
-                      <span className="hidden sm:inline-block px-2 py-1 text-xs bg-surface rounded border border-border text-textSecondary">
-                        {stock.sector}
-                      </span>
-
-                      {/* VETTR Score badge */}
-                      {stock.vetr_score !== undefined && (
-                        <div
-                          className={`
-                            flex items-center justify-center w-10 h-10 rounded-full
-                            text-xs font-bold
-                            ${
-                              stock.vetr_score >= 80
-                                ? 'bg-accent/20 text-accent'
-                                : stock.vetr_score >= 60
-                                ? 'bg-yellow-500/20 text-yellow-500'
-                                : stock.vetr_score >= 40
-                                ? 'bg-warning/20 text-warning'
-                                : 'bg-error/20 text-error'
-                            }
-                          `}
-                        >
-                          {Math.round(stock.vetr_score)}
+                    {/* Price */}
+                    <div className="text-right flex-shrink-0">
+                      {stock.current_price !== undefined && (
+                        <div className="text-white text-sm font-medium">
+                          ${stock.current_price.toFixed(2)}
                         </div>
                       )}
                     </div>
@@ -283,64 +219,32 @@ export default function QuickSearch({ isOpen, onClose }: QuickSearchProps) {
 
           {/* Empty state */}
           {showEmptyState && (
-            <div className="px-4 py-8 text-center">
-              <svg
-                className="w-12 h-12 mx-auto text-textMuted mb-3"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <p className="text-textMuted text-sm">
-                No stocks found matching &quot;{query}&quot;
-              </p>
+            <div className="px-5 py-8 text-center">
+              <p className="text-gray-400 text-sm">No results found</p>
             </div>
           )}
 
           {/* No recent searches */}
           {!query.trim() && recentSearches.length === 0 && (
-            <div className="px-4 py-8 text-center">
-              <svg
-                className="w-12 h-12 mx-auto text-textMuted mb-3"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-              <p className="text-textMuted text-sm">
-                Start typing to search for stocks
-              </p>
+            <div className="px-5 py-8 text-center">
+              <p className="text-gray-400 text-sm">Start typing to search for stocks</p>
             </div>
           )}
         </div>
 
-        {/* Footer */}
-        <div className="px-4 py-3 border-t border-border flex items-center justify-between text-xs text-textMuted">
-          <div className="flex items-center space-x-4">
-            <span className="flex items-center space-x-1">
-              <kbd className="px-1.5 py-0.5 bg-surface rounded border border-border">↑</kbd>
-              <kbd className="px-1.5 py-0.5 bg-surface rounded border border-border">↓</kbd>
-              <span className="ml-1">Navigate</span>
-            </span>
-            <span className="flex items-center space-x-1">
-              <kbd className="px-1.5 py-0.5 bg-surface rounded border border-border">Enter</kbd>
-              <span className="ml-1">Select</span>
-            </span>
-          </div>
-          <span className="flex items-center space-x-1">
-            <kbd className="px-1.5 py-0.5 bg-surface rounded border border-border">Esc</kbd>
+        {/* Footer with keyboard hints */}
+        <div className="px-5 py-3 border-t border-white/5 flex items-center justify-center gap-4 text-xs text-gray-600">
+          <span className="flex items-center gap-1">
+            <kbd className="px-1.5 py-0.5 bg-white/5 border border-white/10 rounded text-xs">↑</kbd>
+            <kbd className="px-1.5 py-0.5 bg-white/5 border border-white/10 rounded text-xs">↓</kbd>
+            <span className="ml-1">Navigate</span>
+          </span>
+          <span className="flex items-center gap-1">
+            <kbd className="px-1.5 py-0.5 bg-white/5 border border-white/10 rounded text-xs">↵</kbd>
+            <span className="ml-1">Open</span>
+          </span>
+          <span className="flex items-center gap-1">
+            <kbd className="px-1.5 py-0.5 bg-white/5 border border-white/10 rounded text-xs">Esc</kbd>
             <span className="ml-1">Close</span>
           </span>
         </div>

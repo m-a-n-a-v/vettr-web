@@ -8,17 +8,14 @@ import Onboarding from '@/components/Onboarding';
 import KeyboardShortcutsModal from '@/components/KeyboardShortcutsModal';
 import QuickSearch from '@/components/QuickSearch';
 import { useAuth } from '@/contexts/AuthContext';
+import { QuickSearchProvider, useQuickSearch } from '@/contexts/QuickSearchContext';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 
-export default function MainLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+function MainLayoutContent({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
+  const { isOpen: showQuickSearch, openQuickSearch, closeQuickSearch } = useQuickSearch();
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showKeyboardShortcutsModal, setShowKeyboardShortcutsModal] = useState(false);
-  const [showQuickSearch, setShowQuickSearch] = useState(false);
 
   useEffect(() => {
     // Check if user has seen onboarding before
@@ -40,7 +37,7 @@ export default function MainLayout({
 
   // Initialize keyboard shortcuts
   useKeyboardShortcuts({
-    onOpenQuickSearch: () => setShowQuickSearch(true),
+    onOpenQuickSearch: openQuickSearch,
     onOpenHelp: () => setShowKeyboardShortcutsModal(true),
     onCloseModal: () => {
       // Close any open modals
@@ -48,7 +45,7 @@ export default function MainLayout({
         setShowKeyboardShortcutsModal(false);
       }
       if (showQuickSearch) {
-        setShowQuickSearch(false);
+        closeQuickSearch();
       }
     },
     enabled: isAuthenticated,
@@ -78,11 +75,16 @@ export default function MainLayout({
           onClose={() => setShowKeyboardShortcutsModal(false)}
         />
         {/* Quick search overlay */}
-        <QuickSearch
-          isOpen={showQuickSearch}
-          onClose={() => setShowQuickSearch(false)}
-        />
+        <QuickSearch isOpen={showQuickSearch} onClose={closeQuickSearch} />
       </div>
     </ProtectedRoute>
+  );
+}
+
+export default function MainLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <QuickSearchProvider>
+      <MainLayoutContent>{children}</MainLayoutContent>
+    </QuickSearchProvider>
   );
 }

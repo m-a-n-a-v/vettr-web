@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { useQuickSearch } from '@/contexts/QuickSearchContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SearchIcon, RefreshIcon, BellIcon, ChevronDownIcon } from '@/components/icons';
 
@@ -53,6 +54,7 @@ export function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
+  const { openQuickSearch } = useQuickSearch();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -65,8 +67,7 @@ export function Header() {
 
   // Handle Cmd+K search click
   const handleSearchClick = () => {
-    // TODO: Open quick search modal (will be implemented in V2-025)
-    console.log('Quick search triggered');
+    openQuickSearch();
   };
 
   // Close dropdown when clicking outside
