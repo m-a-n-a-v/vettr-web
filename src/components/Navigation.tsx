@@ -3,28 +3,69 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import {
+  PulseIcon,
+  CompassIcon,
+  GridIcon,
+  BellIcon,
+  UserIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  LogOutIcon,
+} from '@/components/icons';
 
 interface NavItem {
   label: string;
   href: string;
-  icon: string; // Using text icons for now, can be replaced with SVG/Icon library later
+  icon: React.ComponentType<{ className?: string }>;
 }
 
 const navItems: NavItem[] = [
-  { label: 'Pulse', href: '/pulse', icon: '📈' },
-  { label: 'Discovery', href: '/discovery', icon: '🔍' },
-  { label: 'Stocks', href: '/stocks', icon: '📋' },
-  { label: 'Alerts', href: '/alerts', icon: '🔔' },
-  { label: 'Profile', href: '/profile', icon: '👤' },
+  { label: 'Pulse', href: '/pulse', icon: PulseIcon },
+  { label: 'Discovery', href: '/discovery', icon: CompassIcon },
+  { label: 'Stocks', href: '/stocks', icon: GridIcon },
+  { label: 'Alerts', href: '/alerts', icon: BellIcon },
+  { label: 'Profile', href: '/profile', icon: UserIcon },
 ];
+
+// Helper to get user initials
+const getUserInitials = (displayName: string): string => {
+  const parts = displayName.trim().split(' ');
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+  return displayName.substring(0, 2).toUpperCase();
+};
+
+// Helper to format tier badge
+const getTierBadgeColor = (tier: string): string => {
+  switch (tier) {
+    case 'premium':
+      return 'bg-vettr-accent/10 text-vettr-accent';
+    case 'pro':
+      return 'bg-yellow-500/10 text-yellow-400';
+    case 'free':
+    default:
+      return 'bg-gray-500/10 text-gray-400';
+  }
+};
 
 export function Navigation() {
   const pathname = usePathname();
+  const { user, logout } = useAuth();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   const isActive = (href: string) => {
     return pathname === href || pathname?.startsWith(href + '/');
   };
+
+  const handleLogout = async () => {
+    await logout();
+  };
+
+  const userInitials = user ? getUserInitials(user.display_name) : 'U';
+  const tierBadgeColor = user ? getTierBadgeColor(user.tier) : 'bg-gray-500/10 text-gray-400';
 
   return (
     <>
@@ -32,38 +73,44 @@ export function Navigation() {
       <aside
         className={`
           hidden md:flex md:flex-col
-          fixed left-0 top-16 h-[calc(100vh-4rem)]
-          bg-primaryDark border-r border-border
-          transition-all duration-300 ease-in-out
-          ${isSidebarCollapsed ? 'w-20' : 'w-64'}
+          fixed left-0 top-0 h-screen
+          bg-vettr-dark border-r border-white/5
+          transition-all duration-200 ease-in-out
+          ${isSidebarCollapsed ? 'w-16' : 'w-64'}
           z-40
         `}
       >
-        {/* Logo/Header - Now shows collapse button */}
-        <div className="h-12 flex items-center justify-between px-6 border-b border-border">
+        {/* Sidebar Header - Logo + Collapse Button */}
+        <div className="h-16 flex items-center justify-between px-4 border-b border-white/5">
           <h1
             className={`
-              font-bold text-lg text-accent
-              transition-opacity duration-300
-              ${isSidebarCollapsed ? 'opacity-0 w-0' : 'opacity-100'}
+              font-bold text-xl
+              transition-opacity duration-200
+              ${isSidebarCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'}
             `}
           >
-            VETTR
+            <span className="text-vettr-accent">V</span>
+            <span className="text-white">ETTR</span>
           </h1>
           <button
             onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-            className="text-textSecondary hover:text-textPrimary transition-colors"
+            className="text-gray-400 hover:text-white hover:bg-white/5 rounded-lg p-1.5 transition-colors"
             aria-label={isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
-            {isSidebarCollapsed ? '→' : '←'}
+            {isSidebarCollapsed ? (
+              <ChevronRightIcon className="w-5 h-5" />
+            ) : (
+              <ChevronLeftIcon className="w-5 h-5" />
+            )}
           </button>
         </div>
 
         {/* Navigation Items */}
-        <nav className="flex-1 py-6" aria-label="Main navigation">
-          <ul className="space-y-2 px-3">
+        <nav className="flex-1 py-6 overflow-y-auto" aria-label="Main navigation">
+          <ul className="space-y-1 px-3">
             {navItems.map((item) => {
               const active = isActive(item.href);
+              const IconComponent = item.icon;
               return (
                 <li key={item.href}>
                   <Link
@@ -71,23 +118,20 @@ export function Navigation() {
                     aria-label={item.label}
                     aria-current={active ? 'page' : undefined}
                     className={`
-                      flex items-center gap-4 px-4 py-3 rounded-lg
+                      flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
                       transition-all duration-200
                       ${
                         active
-                          ? 'bg-accent/10 text-accent border-l-4 border-accent'
-                          : 'text-textSecondary hover:bg-surfaceLight hover:text-textPrimary'
+                          ? 'text-vettr-accent bg-vettr-accent/10'
+                          : 'text-gray-400 hover:text-white hover:bg-white/5'
                       }
                       ${isSidebarCollapsed ? 'justify-center' : ''}
                     `}
                   >
-                    <span className="text-2xl" aria-hidden="true">
-                      {item.icon}
-                    </span>
+                    <IconComponent className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
                     <span
                       className={`
-                        font-medium
-                        transition-opacity duration-300
+                        transition-opacity duration-200
                         ${isSidebarCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'}
                       `}
                     >
@@ -99,6 +143,46 @@ export function Navigation() {
             })}
           </ul>
         </nav>
+
+        {/* Sidebar Footer - User Info + Logout */}
+        {user && (
+          <div className="border-t border-white/5 p-3">
+            {!isSidebarCollapsed ? (
+              <div className="space-y-3">
+                {/* User Info */}
+                <div className="flex items-center gap-3 px-3 py-2">
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-vettr-accent/20 to-vettr-accent/5 flex items-center justify-center text-vettr-accent font-semibold text-sm flex-shrink-0">
+                    {userInitials}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-white truncate">
+                      {user.display_name}
+                    </p>
+                    <span className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium mt-1 ${tierBadgeColor}`}>
+                      {user.tier.toUpperCase()}
+                    </span>
+                  </div>
+                </div>
+                {/* Logout Button */}
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-all"
+                >
+                  <LogOutIcon className="w-5 h-5" aria-hidden="true" />
+                  <span>Sign Out</span>
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center justify-center p-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all"
+                aria-label="Sign out"
+              >
+                <LogOutIcon className="w-5 h-5" aria-hidden="true" />
+              </button>
+            )}
+          </div>
+        )}
       </aside>
 
       {/* Mobile Bottom Tab Bar (< 768px) */}
@@ -106,7 +190,7 @@ export function Navigation() {
         className="
           md:hidden
           fixed bottom-0 left-0 right-0
-          bg-primaryDark border-t border-border
+          bg-vettr-dark/95 backdrop-blur-lg border-t border-white/5
           z-50
         "
         aria-label="Main navigation"
@@ -114,6 +198,7 @@ export function Navigation() {
         <ul className="flex justify-around items-center h-16">
           {navItems.map((item) => {
             const active = isActive(item.href);
+            const IconComponent = item.icon;
             return (
               <li key={item.href} className="flex-1">
                 <Link
@@ -122,13 +207,15 @@ export function Navigation() {
                   aria-current={active ? 'page' : undefined}
                   className={`
                     flex flex-col items-center justify-center h-full gap-1
-                    transition-colors duration-200
-                    ${active ? 'text-accent' : 'text-textSecondary'}
+                    transition-colors duration-200 relative
+                    ${active ? 'text-vettr-accent' : 'text-gray-400'}
                   `}
                 >
-                  <span className="text-xl" aria-hidden="true">
-                    {item.icon}
-                  </span>
+                  {/* Active dot indicator */}
+                  {active && (
+                    <div className="absolute top-0 w-1 h-1 rounded-full bg-vettr-accent" />
+                  )}
+                  <IconComponent className="w-5 h-5" aria-hidden="true" />
                   <span className="text-xs font-medium">{item.label}</span>
                 </Link>
               </li>

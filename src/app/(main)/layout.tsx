@@ -56,18 +56,18 @@ export default function MainLayout({
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-primary">
+      <div className="min-h-screen bg-vettr-navy">
         {/* Skip to main content link for accessibility */}
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-accent focus:text-primary focus:rounded focus:outline-none focus:ring-2 focus:ring-accent"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-vettr-accent focus:text-vettr-navy focus:rounded focus:outline-none focus:ring-2 focus:ring-vettr-accent"
         >
           Skip to main content
         </a>
-        <Header />
         <Navigation />
-        {/* Main content area - offset for header, desktop sidebar, and mobile bottom bar */}
-        <main id="main-content" className="md:ml-64 pt-16 pb-16 md:pb-0">
+        <Header />
+        {/* Main content area - offset for desktop sidebar and mobile bottom bar */}
+        <main id="main-content" className="md:ml-64 pt-16 pb-20 md:pb-0">
           {children}
         </main>
         {/* Onboarding overlay */}

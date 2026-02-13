@@ -52,7 +52,6 @@ export function Header() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const pageTitle = getPageTitle(pathname || '');
@@ -85,52 +84,20 @@ export function Header() {
   const tierBadgeColor = getTierBadgeColor(user.tier);
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-16 bg-primaryDark border-b border-border z-50 md:ml-64">
+    <header className="fixed top-0 left-0 right-0 h-16 bg-vettr-navy/80 backdrop-blur-lg border-b border-white/5 z-40 md:ml-64">
       <div className="h-full flex items-center justify-between px-4 md:px-6">
-        {/* Left: Mobile hamburger + Logo */}
+        {/* Left: Mobile logo */}
         <div className="flex items-center gap-4">
-          {/* Mobile hamburger menu (shown on mobile only) */}
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden text-textSecondary hover:text-textPrimary transition-colors"
-            aria-label="Toggle mobile menu"
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              {isMobileMenuOpen ? (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              ) : (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              )}
-            </svg>
-          </button>
-
           {/* Logo - visible on mobile, hidden on desktop (desktop has logo in sidebar) */}
           <Link
             href="/pulse"
-            className="md:hidden font-bold text-xl text-accent"
+            className="md:hidden font-bold text-xl"
           >
-            VETTR
+            <span className="text-vettr-accent">V</span>
+            <span className="text-white">ETTR</span>
           </Link>
-        </div>
-
-        {/* Center: Page title (hidden on mobile) */}
-        <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2">
-          <h1 className="text-lg font-semibold text-textPrimary">
+          {/* Page title on desktop */}
+          <h1 className="hidden md:block text-lg font-semibold text-white">
             {pageTitle}
           </h1>
         </div>
@@ -144,33 +111,22 @@ export function Header() {
             aria-expanded={isDropdownOpen}
           >
             {/* User avatar */}
-            <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center text-primaryDark font-bold text-sm">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-vettr-accent/20 to-vettr-accent/5 flex items-center justify-center text-vettr-accent font-semibold text-sm">
               {userInitials}
             </div>
-            {/* Desktop only: display name and tier */}
-            <div className="hidden md:flex flex-col items-start">
-              <span className="text-sm font-medium text-textPrimary">
-                {user.display_name}
-              </span>
-              <span
-                className={`text-xs px-2 py-0.5 rounded-full font-medium ${tierBadgeColor}`}
-              >
-                {user.tier.toUpperCase()}
-              </span>
-            </div>
-            {/* Dropdown arrow */}
+            {/* Dropdown arrow - desktop only */}
             <svg
-              className={`w-4 h-4 text-textSecondary transition-transform ${
+              className={`hidden md:block w-4 h-4 text-gray-400 transition-transform ${
                 isDropdownOpen ? 'rotate-180' : ''
               }`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
+              strokeWidth={1.5}
             >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeWidth={2}
                 d="M19 9l-7 7-7-7"
               />
             </svg>
@@ -184,14 +140,14 @@ export function Header() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
-                className="absolute right-0 mt-2 w-56 bg-primaryLight border border-border rounded-lg shadow-lg overflow-hidden"
+                className="absolute right-0 mt-2 w-56 bg-vettr-card border border-white/10 rounded-xl shadow-xl overflow-hidden"
               >
-                {/* User info (mobile only) */}
-                <div className="md:hidden px-4 py-3 border-b border-border">
-                  <p className="text-sm font-medium text-textPrimary">
+                {/* User info header */}
+                <div className="px-4 py-3 border-b border-white/5">
+                  <p className="text-sm font-medium text-white">
                     {user.display_name}
                   </p>
-                  <p className="text-xs text-textSecondary mt-1">
+                  <p className="text-xs text-gray-400 mt-1">
                     {user.email}
                   </p>
                   <span
@@ -202,24 +158,25 @@ export function Header() {
                 </div>
 
                 {/* Menu items */}
-                <div className="py-2">
+                <div className="p-1">
                   <Link
                     href="/profile"
                     onClick={() => setIsDropdownOpen(false)}
-                    className="block px-4 py-2 text-sm text-textPrimary hover:bg-surfaceLight transition-colors"
+                    className="block px-3 py-2 text-sm text-white hover:bg-white/5 rounded-lg transition-colors"
                   >
                     Profile
                   </Link>
                   <Link
                     href="/profile/settings"
                     onClick={() => setIsDropdownOpen(false)}
-                    className="block px-4 py-2 text-sm text-textPrimary hover:bg-surfaceLight transition-colors"
+                    className="block px-3 py-2 text-sm text-white hover:bg-white/5 rounded-lg transition-colors"
                   >
                     Settings
                   </Link>
+                  <div className="h-px bg-white/5 my-1" />
                   <button
                     onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 text-sm text-error hover:bg-surfaceLight transition-colors"
+                    className="w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-white/5 rounded-lg transition-colors"
                   >
                     Sign Out
                   </button>
@@ -229,25 +186,6 @@ export function Header() {
           </AnimatePresence>
         </div>
       </div>
-
-      {/* Mobile menu overlay (optional, not in original requirements but improves UX) */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-primaryLight border-b border-border overflow-hidden"
-          >
-            <div className="px-4 py-3">
-              <p className="text-xs text-textMuted mb-2">Current Page</p>
-              <p className="text-base font-semibold text-textPrimary">
-                {pageTitle}
-              </p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </header>
   );
 }
