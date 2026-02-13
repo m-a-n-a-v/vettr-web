@@ -1,7 +1,26 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+
+// Hook to check for reduced motion preference
+function usePrefersReducedMotion() {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+
+    const handleChange = (e: MediaQueryListEvent) => {
+      setPrefersReducedMotion(e.matches);
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
+  return prefersReducedMotion;
+}
 
 interface OnboardingProps {
   isOpen: boolean;
@@ -64,6 +83,7 @@ const slides: Slide[] = [
 
 export default function Onboarding({ isOpen, onClose }: OnboardingProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   // Prevent body scroll when modal is open
   useEffect(() => {
@@ -141,20 +161,20 @@ export default function Onboarding({ isOpen, onClose }: OnboardingProps) {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-vettr-navy/95 backdrop-blur-lg">
           {/* Centered Content Card */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            transition={{ duration: 0.2 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: prefersReducedMotion ? 0 : 0.2 }}
             className="relative w-full max-w-lg mx-4"
           >
-            {/* Slide Content with horizontal slide animation */}
+            {/* Slide Content with opacity-only animation (no horizontal slide for performance) */}
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentSlide}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.2 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: prefersReducedMotion ? 0 : 0.15 }}
                 className="text-center"
               >
                 {/* Icon */}

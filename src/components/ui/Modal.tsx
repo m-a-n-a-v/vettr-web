@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { XIcon } from '@/components/icons';
 
@@ -32,6 +32,20 @@ export default function Modal({
   const modalRef = useRef<HTMLDivElement>(null);
   const titleId = useRef(`modal-title-${Math.random().toString(36).substr(2, 9)}`);
   const previousActiveElement = useRef<HTMLElement | null>(null);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  // Check for reduced motion preference
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+
+    const handleChange = (e: MediaQueryListEvent) => {
+      setPrefersReducedMotion(e.matches);
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
 
   // Handle escape key
   useEffect(() => {
@@ -134,7 +148,7 @@ export default function Modal({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: prefersReducedMotion ? 0 : 0.2 }}
           />
 
           {/* Modal Content */}
@@ -150,10 +164,10 @@ export default function Modal({
               border border-white/10 rounded-2xl shadow-2xl
               ${className}
             `}
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            transition={{ duration: 0.2 }}
+            exit={{ opacity: 0, y: prefersReducedMotion ? 0 : 10 }}
+            transition={{ duration: prefersReducedMotion ? 0 : 0.2 }}
           >
             {/* Header */}
             {(title || showCloseButton) && (

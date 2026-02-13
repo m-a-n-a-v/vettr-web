@@ -1650,3 +1650,42 @@ Files modified:
 - Dashboard cards already have proper bg-vettr-card/50 backgrounds; adding additional bottom gradients would be redundant and potentially too busy
 
 ---
+
+## V2-039: Polish hover states and micro-interactions throughout
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Added focus-visible rings to all interactive elements (buttons, links, icon buttons)
+- Applied active:scale-[0.98] or active:scale-95 to buttons for tactile feedback
+- Enhanced Button.tsx with focus-visible:ring-2 ring-vettr-accent/30
+- Enhanced RefreshButton.tsx with focus-visible ring and active scale
+- Enhanced StockCard.tsx favorite button with focus-visible ring
+- Enhanced Navigation.tsx collapse button and logout buttons with focus-visible rings and active scale
+- Enhanced Header.tsx search button, refresh button, notification bell, user dropdown, and all dropdown menu items
+- Enhanced Profile page links and buttons with focus-visible rings
+- All hover states already followed consistent patterns (hover:bg-white/5, hover:text-vettr-accent, etc.)
+- Table rows already had hover:bg-white/[0.03] pattern
+- Cards already had hover:border-vettr-accent/20 hover:bg-vettr-card/80 pattern
+- No double hover effect conflicts detected
+
+Files modified:
+- src/components/ui/Button.tsx
+- src/components/ui/RefreshButton.tsx
+- src/components/ui/StockCard.tsx
+- src/components/Navigation.tsx
+- src/components/Header.tsx
+- src/app/(main)/profile/page.tsx
+- scripts/ralph/prd-v2.json
+
+**Learnings for future iterations:**
+- The codebase already had excellent hover states from previous V2 stories - most patterns were already in place
+- focus-visible is preferred over focus for accessibility (only shows ring on keyboard focus, not mouse click)
+- active:scale-[0.98] provides subtle tactile feedback without being jarring
+- Using focus-visible:ring-inset for list-like items prevents ring from expanding the container
+- Button.tsx already used framer-motion whileTap for scale effect, which is equivalent to active:scale
+- Consistent transition-all duration-200 or transition-colors provides smooth micro-interactions
+- Icon buttons benefit from smaller scale effect (0.95) compared to full buttons (0.98)
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+---

@@ -57,8 +57,22 @@ export function Header() {
   const { openQuickSearch } = useQuickSearch();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   const pageTitle = getPageTitle(pathname || '');
+
+  // Check for reduced motion preference
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+
+    const handleChange = (e: MediaQueryListEvent) => {
+      setPrefersReducedMotion(e.matches);
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
 
   // Handle refresh button click
   const handleRefresh = () => {
@@ -172,10 +186,10 @@ export function Header() {
             <AnimatePresence>
               {isDropdownOpen && (
                 <motion.div
-                  initial={{ opacity: 0, y: -10 }}
+                  initial={{ opacity: 0, y: prefersReducedMotion ? 0 : -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.15 }}
+                  exit={{ opacity: 0, y: prefersReducedMotion ? 0 : -10 }}
+                  transition={{ duration: prefersReducedMotion ? 0 : 0.15 }}
                   className="absolute right-0 mt-2 w-64 sm:w-56 max-w-[calc(100vw-2rem)] bg-white dark:bg-vettr-card border border-gray-200 dark:border-white/10 rounded-xl shadow-xl overflow-hidden"
                 >
                   {/* User info header */}

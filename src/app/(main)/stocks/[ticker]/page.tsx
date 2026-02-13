@@ -1,10 +1,29 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+
+// Hook to check for reduced motion preference
+function usePrefersReducedMotion() {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+
+    const handleChange = (e: MediaQueryListEvent) => {
+      setPrefersReducedMotion(e.matches);
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
+  return prefersReducedMotion;
+}
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useStock } from '@/hooks/useStock';
 import { useVetrScore } from '@/hooks/useVetrScore';
@@ -44,6 +63,7 @@ export default function StockDetailPage() {
   const ticker = params.ticker as string;
   const [activeTab, setActiveTab] = useState<Tab>('overview');
   const { showToast } = useToast();
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   // Pedigree tab state
   const [executiveSearch, setExecutiveSearch] = useState('');
@@ -437,10 +457,10 @@ export default function StockDetailPage() {
               role="tabpanel"
               id="overview-panel"
               aria-labelledby="overview-tab"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              transition={{ duration: 0.3, ease: 'easeInOut' }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: prefersReducedMotion ? 0 : 0.15, ease: 'easeOut' }}
               className="space-y-6"
             >
             {/* VETTR Score section */}
@@ -760,10 +780,10 @@ export default function StockDetailPage() {
             role="tabpanel"
             id="pedigree-panel"
             aria-labelledby="pedigree-tab"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: prefersReducedMotion ? 0 : 0.15, ease: 'easeOut' }}
             className="space-y-6"
           >
             {/* Search and Filters */}
@@ -908,10 +928,10 @@ export default function StockDetailPage() {
             id="red-flags-panel"
             aria-labelledby="red-flags-tab"
             key="red-flags"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: prefersReducedMotion ? 0 : 0.15, ease: 'easeOut' }}
             className="space-y-6"
           >
             {redFlagsLoading ? (

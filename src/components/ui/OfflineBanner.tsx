@@ -6,6 +6,20 @@ import { motion, AnimatePresence } from 'framer-motion'
 export default function OfflineBanner() {
   const [isOnline, setIsOnline] = useState(true)
   const [showBanner, setShowBanner] = useState(false)
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+
+  // Check for reduced motion preference
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+
+    const handleChange = (e: MediaQueryListEvent) => {
+      setPrefersReducedMotion(e.matches);
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
 
   useEffect(() => {
     // Initialize with current status
@@ -40,10 +54,10 @@ export default function OfflineBanner() {
     <AnimatePresence>
       {showBanner && (
         <motion.div
-          initial={{ y: -100, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: -100, opacity: 0 }}
-          transition={{ duration: 0.3, ease: 'easeOut' }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: prefersReducedMotion ? 0 : 0.2, ease: 'easeOut' }}
           className={`fixed top-0 left-0 right-0 z-50 ${
             isOnline
               ? 'bg-accent'

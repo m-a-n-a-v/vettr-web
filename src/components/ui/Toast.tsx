@@ -1,8 +1,27 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircleIcon, XCircleIcon, AlertTriangleIcon, InfoCircleIcon, XIcon } from '@/components/icons';
+
+// Hook to check for reduced motion preference
+function usePrefersReducedMotion() {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+
+    const handleChange = (e: MediaQueryListEvent) => {
+      setPrefersReducedMotion(e.matches);
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
+  return prefersReducedMotion;
+}
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
@@ -21,6 +40,7 @@ interface ToastProps {
 
 export function Toast({ toast, onDismiss }: ToastProps) {
   const [progress, setProgress] = useState(100);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   const handleDismiss = useCallback(() => {
     onDismiss(toast.id);
@@ -91,10 +111,10 @@ export function Toast({ toast, onDismiss }: ToastProps) {
         min-w-[320px] flex items-start gap-3 px-4 py-3
         border-l-2 ${config.borderColor}
       `}
-      initial={{ opacity: 0, x: 20 }}
+      initial={{ opacity: 0, x: prefersReducedMotion ? 0 : 20 }}
       animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 20 }}
-      transition={{ duration: 0.2, ease: 'easeOut' }}
+      exit={{ opacity: 0, x: prefersReducedMotion ? 0 : 20 }}
+      transition={{ duration: prefersReducedMotion ? 0 : 0.2, ease: 'easeOut' }}
     >
       {/* Icon */}
       <div className={`flex-shrink-0 ${config.iconColor}`}>
