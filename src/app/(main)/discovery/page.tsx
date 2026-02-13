@@ -195,7 +195,7 @@ function DiscoveryPageContent() {
   };
 
   return (
-    <div className="min-h-screen bg-primary pb-20 md:pb-6">
+    <div className="min-h-screen bg-vettr-navy pb-20 md:pb-6">
       {/* Pull-to-refresh indicator (mobile only) */}
       <PullToRefreshIndicator
         isPulling={isPulling}
@@ -204,11 +204,11 @@ function DiscoveryPageContent() {
       />
 
       {/* Page Header */}
-      <div className="bg-primaryLight border-b border-border px-4 py-6 md:px-6">
+      <div className="bg-vettr-card/30 border-b border-white/5 px-4 py-6 md:px-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-textPrimary mb-2">Discovery</h1>
-            <p className="text-sm text-textSecondary">
+            <h1 className="text-2xl font-bold text-white mb-2">Discovery</h1>
+            <p className="text-sm text-gray-400">
               Explore stocks and recent filings by sector
             </p>
           </div>
@@ -224,38 +224,40 @@ function DiscoveryPageContent() {
       </div>
 
       <div className="px-4 py-6 md:px-6 space-y-8">
-        {/* Search Bar */}
-        <div className="max-w-2xl">
-          <SearchInput
-            value={searchQuery}
-            onChange={handleSearchChange}
-            placeholder="Search by ticker, company name, or sector..."
-            autoFocus={false}
-          />
+        {/* Hero Search Bar */}
+        <div className="max-w-2xl mx-auto">
+          <div className="relative">
+            <SearchInput
+              value={searchQuery}
+              onChange={handleSearchChange}
+              placeholder="Search by ticker, company name, or sector..."
+              autoFocus={false}
+              className="text-lg py-3 shadow-lg shadow-vettr-accent/5 focus:shadow-vettr-accent/10 transition-shadow"
+            />
+          </div>
         </div>
 
         {/* Sector Filter Chips */}
         <div>
-          <h2 className="text-sm font-bold text-textSecondary uppercase tracking-wider mb-4 pl-1">
+          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">
             Filter by Sector
           </h2>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
             {sectors.map((sector) => (
-              <Button
+              <button
                 key={sector}
                 onClick={() => handleSectorClick(sector)}
-                variant={selectedSector === sector ? 'primary' : 'secondary'}
-                size="sm"
                 className={`
-                  rounded-full transition-all duration-300
+                  flex-shrink-0 px-4 py-1.5 text-sm font-medium rounded-full
+                  transition-all duration-300
                   ${selectedSector === sector
-                    ? 'shadow-[0_0_15px_rgba(0,230,118,0.4)]'
-                    : 'hover:border-accent/50 hover:text-white'
+                    ? 'bg-vettr-accent/10 border border-vettr-accent/30 text-vettr-accent'
+                    : 'bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10'
                   }
                 `}
               >
                 {sector}
-              </Button>
+              </button>
             ))}
           </div>
         </div>
@@ -263,21 +265,20 @@ function DiscoveryPageContent() {
         {/* Featured Stocks Section */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="text-xl font-bold text-textPrimary">Featured Stocks</h2>
-              <p className="text-sm text-textSecondary mt-1">
-                {selectedSector !== 'All'
-                  ? `Top stocks in ${selectedSector}`
-                  : 'Top stocks across all sectors'}
-              </p>
-            </div>
+            <h2 className="text-lg font-semibold text-white">Featured Stocks</h2>
+            <button
+              onClick={() => router.push('/stocks')}
+              className="text-sm text-vettr-accent hover:text-vettr-accent/80 transition-colors"
+            >
+              View All →
+            </button>
           </div>
 
-          {/* Horizontal Scroll Container */}
+          {/* Horizontal Scroll Container with Snap Scrolling */}
           {isLoadingStocks || isLoadingFiltered ? (
-            <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
+            <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 snap-x snap-mandatory">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="flex-shrink-0 w-80">
+                <div key={i} className="flex-shrink-0 w-80 snap-start">
                   <SkeletonStockCard />
                 </div>
               ))}
@@ -299,9 +300,9 @@ function DiscoveryPageContent() {
               }
             />
           ) : (
-            <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
+            <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 snap-x snap-mandatory">
               {featuredStocks.map((stock) => (
-                <div key={stock.ticker} className="flex-shrink-0 w-80">
+                <div key={stock.ticker} className="flex-shrink-0 w-80 snap-start">
                   <StockCard
                     stock={stock}
                     showFavorite={true}
@@ -318,14 +319,13 @@ function DiscoveryPageContent() {
         {/* Recent Filings Section */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="text-xl font-bold text-textPrimary">Recent Filings</h2>
-              <p className="text-sm text-textSecondary mt-1">
-                {selectedSector !== 'All'
-                  ? `Latest filings in ${selectedSector}`
-                  : 'Latest filings across all sectors'}
-              </p>
-            </div>
+            <h2 className="text-lg font-semibold text-white">Recent Filings</h2>
+            <button
+              onClick={() => router.push('/filings')}
+              className="text-sm text-vettr-accent hover:text-vettr-accent/80 transition-colors"
+            >
+              View All →
+            </button>
           </div>
 
           {/* Filings List - Responsive: Cards on mobile, Table on desktop */}
@@ -354,7 +354,7 @@ function DiscoveryPageContent() {
           ) : (
             <>
               {/* Desktop: Table View */}
-              <div className="hidden md:block bg-primaryLight rounded-lg border border-border overflow-hidden">
+              <div className="hidden md:block bg-vettr-card/30 border border-white/5 rounded-2xl overflow-hidden">
                 <FilingTable filings={filteredFilings} showStock={true} />
               </div>
               {/* Mobile: Card View */}
@@ -391,14 +391,14 @@ function FilingRow({ filing }: FilingRowProps) {
     <a
       href={`/filings/${filing.id}`}
       className="
-        block bg-primaryLight rounded-lg p-4 border border-border
-        hover:bg-surface hover:border-accent/30 transition-all duration-200
+        block bg-vettr-card/50 border border-white/5 rounded-2xl p-4
+        hover:bg-vettr-card/80 hover:border-vettr-accent/20 transition-all duration-300
       "
     >
       <div className="flex items-start gap-4">
         {/* Unread indicator (blue dot) */}
         {!filing.is_read && (
-          <div className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0 mt-2" />
+          <div className="w-2 h-2 rounded-full bg-blue-400 flex-shrink-0 mt-2" />
         )}
 
         {/* Filing Type Icon */}
@@ -409,25 +409,25 @@ function FilingRow({ filing }: FilingRowProps) {
         {/* Filing Details */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-4 mb-2">
-            <h3 className="text-base font-semibold text-textPrimary line-clamp-2">
+            <h3 className="text-base font-semibold text-white line-clamp-2">
               {filing.title}
             </h3>
             {filing.is_material && (
-              <span className="flex-shrink-0 px-2 py-1 bg-warning/20 border border-warning/30 rounded text-xs font-medium text-warning">
+              <span className="flex-shrink-0 px-2.5 py-0.5 bg-yellow-500/10 text-yellow-400 rounded-full text-xs font-medium">
                 Material
               </span>
             )}
           </div>
 
-          <div className="flex items-center gap-3 text-sm text-textSecondary">
-            <span className="font-medium text-accent">{filing.ticker}</span>
+          <div className="flex items-center gap-3 text-sm text-gray-400">
+            <span className="font-medium text-vettr-accent">{filing.ticker}</span>
             <span>•</span>
             <span>{formattedDate}</span>
           </div>
 
           {/* Summary Preview (if available) */}
           {filing.summary && (
-            <p className="mt-2 text-sm text-textMuted line-clamp-2">
+            <p className="mt-2 text-sm text-gray-500 line-clamp-2">
               {filing.summary}
             </p>
           )}
@@ -441,15 +441,15 @@ function FilingRow({ filing }: FilingRowProps) {
 export default function DiscoveryPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-primary pb-20 md:pb-6">
-        <div className="bg-primaryLight border-b border-border px-4 py-6 md:px-6">
-          <h1 className="text-2xl font-bold text-textPrimary">Discovery</h1>
+      <div className="min-h-screen bg-vettr-navy pb-20 md:pb-6">
+        <div className="bg-vettr-card/30 border-b border-white/5 px-4 py-6 md:px-6">
+          <h1 className="text-2xl font-bold text-white">Discovery</h1>
         </div>
         <div className="px-4 py-6 md:px-6">
-          <div className="h-10 bg-surface rounded-lg animate-pulse mb-6"></div>
+          <div className="h-10 bg-white/5 rounded-xl animate-pulse mb-6 max-w-2xl mx-auto"></div>
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-32 bg-surface rounded-lg animate-pulse"></div>
+              <div key={i} className="h-32 bg-white/5 rounded-xl animate-pulse"></div>
             ))}
           </div>
         </div>
