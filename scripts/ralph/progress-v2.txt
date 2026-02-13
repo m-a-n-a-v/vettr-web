@@ -268,3 +268,35 @@ Files modified:
 - All old design tokens (text-textPrimary, bg-surface, text-accent, text-error, text-warning) replaced with V2 tokens
 ---
 
+
+## V2-008: Redesign VetrScoreBadge with SVG ring visualization
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Completely redesigned VetrScoreBadge with proper SVG circular progress ring
+- Removed framer-motion dependency, replaced with native requestAnimationFrame animation
+- SVG structure: track ring (stroke rgba(255,255,255,0.1)) + progress ring (colored by score)
+- Three sizes implemented: sm (32px), md (48px), lg (64px) with proportional stroke widths (2/3/4)
+- Animated on mount: ring fills from 0 to target score with 1s ease-out transition
+- Score number uses tabular-nums font variant for consistent width
+- Optional label below ring with showLabel prop
+- Colors from Tailwind theme: >=80 vettr-accent (#00E676), >=60 yellow-400 (#FBBF24), >=40 orange-400 (#FB923C), <40 red-400 (#F87171)
+- SVG transform -rotate-90 to start progress from top (12 o'clock position)
+- strokeDasharray and strokeDashoffset used for circular progress animation
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/components/ui/VetrScoreBadge.tsx
+
+**Learnings for future iterations:**
+- requestAnimationFrame provides better performance than framer-motion for simple number animations
+- SVG circles need transform -rotate-90 to start progress from top instead of 3 o'clock position
+- circumference = 2 * π * radius, strokeDashoffset = circumference - (score/100) * circumference
+- strokeLinecap="round" creates rounded ends on the progress ring for premium look
+- tabular-nums font variant prevents number width shifting during animation
+- Hex color constants are acceptable for direct stroke attribute (can't use Tailwind classes on SVG stroke)
+- CSS transition on SVG circle with duration-1000 ease-out provides smooth animation
+- Gap between badge and label increased from gap-1 to gap-2 for better visual spacing
+- Relative wrapper div with absolute centered text overlay pattern works well for SVG rings
+---
