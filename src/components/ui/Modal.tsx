@@ -2,12 +2,14 @@
 
 import React, { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { XIcon } from '@/components/icons';
 
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   title?: string;
   children: React.ReactNode;
+  footer?: React.ReactNode;
   className?: string;
   showCloseButton?: boolean;
   closeOnBackdropClick?: boolean;
@@ -20,6 +22,7 @@ export default function Modal({
   onClose,
   title,
   children,
+  footer,
   className = '',
   showCloseButton = true,
   closeOnBackdropClick = true,
@@ -106,7 +109,7 @@ export default function Modal({
   }, [isOpen]);
 
   const sizeClasses = {
-    sm: 'max-w-md',
+    sm: 'max-w-sm',
     md: 'max-w-lg',
     lg: 'max-w-2xl',
     xl: 'max-w-4xl',
@@ -143,46 +146,34 @@ export default function Modal({
             aria-label={!title ? 'Modal dialog' : undefined}
             tabIndex={-1}
             className={`
-              relative w-full ${sizeClasses[size]} bg-primaryLight rounded-xl
-              border border-border shadow-2xl
+              relative w-full ${sizeClasses[size]} bg-vettr-card
+              border border-white/10 rounded-2xl shadow-2xl
               ${className}
             `}
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            transition={{ duration: 0.3, ease: 'easeOut' }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            transition={{ duration: 0.2 }}
           >
             {/* Header */}
             {(title || showCloseButton) && (
-              <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+              <div className="flex items-center justify-between px-6 pt-6 pb-0">
                 {title && (
-                  <h2 id={titleId.current} className="text-xl font-semibold text-textPrimary">{title}</h2>
+                  <h2 id={titleId.current} className="text-lg font-semibold text-white">{title}</h2>
                 )}
                 {showCloseButton && (
                   <button
                     type="button"
                     onClick={onClose}
                     className="
-                      ml-auto text-textMuted hover:text-textPrimary
-                      transition-colors duration-200
-                      focus:outline-none focus:ring-2 focus:ring-accent rounded-full
-                      p-1.5
+                      ml-auto text-gray-400 hover:text-white
+                      transition-colors
+                      focus:outline-none focus-visible:ring-2 focus-visible:ring-vettr-accent/30
+                      rounded-lg hover:bg-white/5 p-1
                     "
                     aria-label="Close modal"
                   >
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
+                    <XIcon className="w-5 h-5" />
                   </button>
                 )}
               </div>
@@ -192,6 +183,13 @@ export default function Modal({
             <div className="px-6 py-4 max-h-[calc(100vh-200px)] overflow-y-auto">
               {children}
             </div>
+
+            {/* Footer */}
+            {footer && (
+              <div className="px-6 pb-6 pt-0 flex justify-end gap-3">
+                {footer}
+              </div>
+            )}
           </motion.div>
         </div>
       )}
