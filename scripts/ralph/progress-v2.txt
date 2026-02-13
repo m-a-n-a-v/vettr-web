@@ -2029,3 +2029,29 @@ Files modified:
 - next-pwa already handles PWA configuration, so vercel.json focuses on security and caching
 
 ---
+
+## V2-048: Add Vercel Analytics and Speed Insights
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Installed @vercel/analytics and @vercel/speed-insights npm packages
+- Added Analytics component to root layout (src/app/layout.tsx)
+- Added SpeedInsights component to root layout (src/app/layout.tsx)
+- Both components wrapped in production check: process.env.NODE_ENV === 'production'
+- Components only render in production build, not during development
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/app/layout.tsx
+- package.json
+- package-lock.json
+
+**Learnings for future iterations:**
+- Vercel Analytics and Speed Insights are zero-config in Next.js - just import and add to layout
+- Production check using process.env.NODE_ENV ensures components don't run during development
+- Both components are React components that should be placed at the end of body tag
+- The components automatically handle data collection and reporting to Vercel dashboard
+- No additional configuration needed - they work out of the box with Vercel deployment
+
+---
