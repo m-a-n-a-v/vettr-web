@@ -34,7 +34,7 @@ import VetrScoreComparison from '@/components/VetrScoreComparison';
 import VetrScoreTrend from '@/components/VetrScoreTrend';
 import { SkeletonStockDetailHeader, SkeletonVetrScoreSection, SkeletonCard, SkeletonFilingRow, SkeletonStockRow } from '@/components/ui/SkeletonLoader';
 import Breadcrumb from '@/components/ui/Breadcrumb';
-import { StarIcon, StarFilledIcon, ShareIcon, MoreHorizontalIcon, ArrowUpIcon, ArrowDownIcon } from '@/components/icons';
+import { StarIcon, StarFilledIcon, ShareIcon, MoreHorizontalIcon, ArrowUpIcon, ArrowDownIcon, UsersIcon } from '@/components/icons';
 
 type Tab = 'overview' | 'pedigree' | 'red-flags';
 
@@ -879,7 +879,7 @@ export default function StockDetailPage() {
                 </div>
               ) : (
                 <EmptyState
-                  icon="👔"
+                  icon={<UsersIcon className="w-16 h-16 text-gray-600" />}
                   title="No executives found"
                   message={
                     executiveSearch || executiveTitleFilter !== 'all'
