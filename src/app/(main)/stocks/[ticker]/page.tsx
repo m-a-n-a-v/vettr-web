@@ -32,7 +32,7 @@ import ExecutiveDetail from '@/components/ExecutiveDetail';
 import VetrScoreDetail from '@/components/VetrScoreDetail';
 import VetrScoreComparison from '@/components/VetrScoreComparison';
 import VetrScoreTrend from '@/components/VetrScoreTrend';
-import { SkeletonStockDetailHeader, SkeletonVetrScoreSection, SkeletonCard, SkeletonFilingRow, SkeletonStockRow } from '@/components/ui/SkeletonLoader';
+import { SkeletonStockDetailHeader, SkeletonVetrScoreSection, SkeletonChart, SkeletonFilingRow, SkeletonMetricCard } from '@/components/ui/SkeletonLoader';
 import Breadcrumb from '@/components/ui/Breadcrumb';
 import { StarIcon, StarFilledIcon, ShareIcon, MoreHorizontalIcon, ArrowUpIcon, ArrowDownIcon, UsersIcon, FlagIcon, ShieldCheckIcon, BarChartIcon, DocumentIcon } from '@/components/icons';
 import { chartTheme, getTooltipStyle } from '@/lib/chart-theme';
@@ -234,42 +234,53 @@ export default function StockDetailPage() {
     return (
       <div className="min-h-screen bg-vettr-navy">
         <div className="max-w-6xl mx-auto px-6 pt-6 pb-20 md:pb-6">
-          {/* Breadcrumb skeleton */}
-          <div className="h-4 w-32 bg-white/5 rounded animate-pulse mb-6"></div>
-
-          {/* Header skeleton */}
-          <div className="mb-6">
-            <div className="h-8 w-64 bg-white/5 rounded-xl animate-pulse mb-3"></div>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="h-6 w-16 bg-white/5 rounded-lg animate-pulse"></div>
-              <div className="h-6 w-24 bg-white/5 rounded-lg animate-pulse"></div>
-              <div className="h-6 w-20 bg-white/5 rounded-lg animate-pulse"></div>
-            </div>
-            <div className="h-12 w-48 bg-white/5 rounded-xl animate-pulse"></div>
-          </div>
+          {/* Stock Detail Header Skeleton */}
+          <SkeletonStockDetailHeader className="mb-6" />
 
           {/* Tab navigation skeleton */}
-          <div className="flex gap-4 border-b border-white/5 mb-6">
-            <div className="h-10 w-24 bg-white/5 rounded animate-pulse"></div>
-            <div className="h-10 w-24 bg-white/5 rounded animate-pulse"></div>
-            <div className="h-10 w-24 bg-white/5 rounded animate-pulse"></div>
+          <div className="flex gap-6 border-b border-white/5 mb-6 sticky top-16 bg-vettr-navy/80 backdrop-blur-sm z-30 -mx-6 px-6 py-3">
+            <div className="h-8 w-24 bg-white/5 rounded animate-pulse"></div>
+            <div className="h-8 w-24 bg-white/5 rounded animate-pulse"></div>
+            <div className="h-8 w-24 bg-white/5 rounded animate-pulse"></div>
           </div>
 
-          {/* Content skeleton */}
-          <div className="space-y-6">
-            <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-6">
-              <div className="h-6 w-32 bg-white/5 rounded animate-pulse mb-4"></div>
-              <div className="flex justify-center py-8">
-                <div className="w-32 h-32 bg-white/5 rounded-full animate-pulse"></div>
-              </div>
+          {/* Content skeleton - Overview Tab */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left column - VETTR Score */}
+            <div className="lg:col-span-1">
+              <SkeletonVetrScoreSection />
             </div>
-            <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-6">
-              <div className="h-6 w-40 bg-white/5 rounded animate-pulse mb-4"></div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="h-20 bg-white/5 rounded-xl animate-pulse"></div>
-                <div className="h-20 bg-white/5 rounded-xl animate-pulse"></div>
-                <div className="h-20 bg-white/5 rounded-xl animate-pulse"></div>
-                <div className="h-20 bg-white/5 rounded-xl animate-pulse"></div>
+
+            {/* Right column - Charts and Data */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Key Metrics */}
+              <div>
+                <div className="h-6 w-32 bg-white/5 rounded animate-pulse mb-4"></div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <SkeletonMetricCard />
+                  <SkeletonMetricCard />
+                  <SkeletonMetricCard />
+                  <SkeletonMetricCard />
+                </div>
+              </div>
+
+              {/* Chart */}
+              <SkeletonChart />
+
+              {/* Recent Filings */}
+              <div className="bg-vettr-card/50 border border-white/5 rounded-2xl overflow-hidden">
+                <div className="px-6 py-4 border-b border-white/5">
+                  <div className="h-6 w-32 bg-white/5 rounded animate-pulse"></div>
+                </div>
+                <table className="w-full">
+                  <tbody>
+                    <SkeletonFilingRow />
+                    <SkeletonFilingRow />
+                    <SkeletonFilingRow />
+                    <SkeletonFilingRow />
+                    <SkeletonFilingRow />
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>

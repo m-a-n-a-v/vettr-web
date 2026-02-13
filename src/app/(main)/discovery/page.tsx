@@ -17,7 +17,7 @@ import Button from '@/components/ui/Button';
 import FilingTypeIcon from '@/components/ui/FilingTypeIcon';
 import FilingTable from '@/components/ui/FilingTable';
 import EmptyState from '@/components/ui/EmptyState';
-import { SkeletonStockCard, SkeletonCard } from '@/components/ui/SkeletonLoader';
+import { SkeletonStockCard, SkeletonFilingRow } from '@/components/ui/SkeletonLoader';
 import RefreshButton from '@/components/ui/RefreshButton';
 import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator';
 import type { Filing, FilingType } from '@/types/api';
@@ -331,11 +331,47 @@ function DiscoveryPageContent() {
 
           {/* Filings List - Responsive: Cards on mobile, Table on desktop */}
           {isLoadingFilings ? (
-            <div className="space-y-3">
-              {[...Array(5)].map((_, i) => (
-                <SkeletonCard key={i} />
-              ))}
-            </div>
+            <>
+              {/* Desktop Table Skeleton */}
+              <div className="hidden md:block bg-vettr-card/30 border border-white/5 rounded-2xl overflow-hidden">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-white/5">
+                      <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Type</th>
+                      <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Title</th>
+                      <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Ticker</th>
+                      <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Date</th>
+                      <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Material</th>
+                      <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[...Array(5)].map((_, i) => (
+                      <SkeletonFilingRow key={i} />
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile Card Skeleton */}
+              <div className="md:hidden space-y-3">
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} className="bg-vettr-card/50 border border-white/5 rounded-2xl p-4">
+                    <div className="flex items-start gap-4">
+                      <div className="h-10 w-10 bg-white/5 rounded-full animate-pulse" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-4 w-3/4 bg-white/5 rounded animate-pulse" />
+                        <div className="h-3 w-1/2 bg-white/5 rounded animate-pulse" />
+                        <div className="flex gap-2">
+                          <div className="h-5 w-16 bg-white/5 rounded-full animate-pulse" />
+                          <div className="h-5 w-16 bg-white/5 rounded-full animate-pulse" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
           ) : filingsError ? (
             <EmptyState
               icon={<AlertTriangleIcon className="w-16 h-16 text-yellow-400" />}

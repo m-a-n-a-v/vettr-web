@@ -248,7 +248,7 @@ function AlertsPageContent() {
             <h2 className="text-lg font-semibold text-white mb-4">Recent Triggers</h2>
             <div className="space-y-3">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-white/5 rounded-xl h-20 animate-pulse" />
+                <SkeletonAlertTrigger key={i} />
               ))}
             </div>
           </div>
@@ -263,10 +263,40 @@ function AlertsPageContent() {
             {/* Search bar skeleton */}
             <div className="h-10 bg-white/5 rounded-xl animate-pulse mb-4"></div>
 
-            {/* Rules skeleton */}
-            <div className="space-y-3">
+            {/* Desktop Table Skeleton */}
+            <div className="hidden md:block bg-vettr-card/50 border border-white/5 rounded-2xl overflow-hidden">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-white/5">
+                    <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Stock</th>
+                    <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Type</th>
+                    <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Condition</th>
+                    <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Frequency</th>
+                    <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-center">Status</th>
+                    <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <SkeletonAlertRule key={i} />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Card Skeleton */}
+            <div className="md:hidden space-y-3">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-white/5 rounded-xl h-24 animate-pulse" />
+                <div key={i} className="bg-vettr-card/50 border border-white/5 rounded-2xl p-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="h-4 w-16 bg-white/5 rounded animate-pulse" />
+                      <div className="h-6 w-12 bg-white/5 rounded-full animate-pulse" />
+                    </div>
+                    <div className="h-3 w-3/4 bg-white/5 rounded animate-pulse" />
+                    <div className="h-3 w-1/2 bg-white/5 rounded animate-pulse" />
+                  </div>
+                </div>
               ))}
             </div>
           </div>

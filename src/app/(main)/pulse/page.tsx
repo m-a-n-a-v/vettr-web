@@ -11,7 +11,7 @@ import StockCard from '@/components/ui/StockCard'
 import FilingTypeIcon from '@/components/ui/FilingTypeIcon'
 import VetrScoreBadge from '@/components/ui/VetrScoreBadge'
 import PriceChangeIndicator from '@/components/ui/PriceChangeIndicator'
-import { SkeletonCard, SkeletonStockCard } from '@/components/ui/SkeletonLoader'
+import { SkeletonMetricCard, SkeletonStockCard, SkeletonFilingRow } from '@/components/ui/SkeletonLoader'
 import EmptyState from '@/components/ui/EmptyState'
 import RefreshButton from '@/components/ui/RefreshButton'
 import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator'
@@ -163,10 +163,10 @@ export default function PulsePage() {
 
         {isLoadingStocks ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <SkeletonCard />
-            <SkeletonCard />
-            <SkeletonCard />
-            <SkeletonCard />
+            <SkeletonMetricCard />
+            <SkeletonMetricCard />
+            <SkeletonMetricCard />
+            <SkeletonMetricCard />
           </div>
         ) : stocksError ? (
           <EmptyState
@@ -246,7 +246,36 @@ export default function PulsePage() {
 
         {isLoadingRedFlagTrend ? (
           <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-6">
-            <SkeletonCard />
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <div className="h-3 w-32 bg-white/5 rounded animate-pulse" />
+                  <div className="h-10 w-24 bg-white/5 rounded animate-pulse" />
+                </div>
+                <div className="space-y-2">
+                  <div className="h-3 w-28 bg-white/5 rounded animate-pulse" />
+                  <div className="h-3 w-full bg-white/5 rounded-full animate-pulse" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div className="space-y-1">
+                  <div className="h-3 w-16 bg-white/5 rounded animate-pulse" />
+                  <div className="h-6 w-12 bg-white/5 rounded animate-pulse" />
+                </div>
+                <div className="space-y-1">
+                  <div className="h-3 w-16 bg-white/5 rounded animate-pulse" />
+                  <div className="h-6 w-12 bg-white/5 rounded animate-pulse" />
+                </div>
+                <div className="space-y-1">
+                  <div className="h-3 w-20 bg-white/5 rounded animate-pulse" />
+                  <div className="h-6 w-12 bg-white/5 rounded animate-pulse" />
+                </div>
+                <div className="space-y-1">
+                  <div className="h-3 w-12 bg-white/5 rounded animate-pulse" />
+                  <div className="h-6 w-12 bg-white/5 rounded animate-pulse" />
+                </div>
+              </div>
+            </div>
           </div>
         ) : redFlagTrendError ? (
           <EmptyState
@@ -360,11 +389,49 @@ export default function PulsePage() {
         </div>
 
         {isLoadingFilings ? (
-          <div className="space-y-3">
-            <SkeletonCard />
-            <SkeletonCard />
-            <SkeletonCard />
-          </div>
+          <>
+            {/* Desktop Table Skeleton */}
+            <div className="hidden md:block bg-vettr-card/50 border border-white/5 rounded-2xl overflow-hidden">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-white/5">
+                    <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Type</th>
+                    <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Title</th>
+                    <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Ticker</th>
+                    <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Date</th>
+                    <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Material</th>
+                    <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <SkeletonFilingRow />
+                  <SkeletonFilingRow />
+                  <SkeletonFilingRow />
+                  <SkeletonFilingRow />
+                  <SkeletonFilingRow />
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Card Skeleton */}
+            <div className="md:hidden space-y-3">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="bg-vettr-card/50 border border-white/5 rounded-2xl p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="h-10 w-10 bg-white/5 rounded-full animate-pulse" />
+                    <div className="flex-1 space-y-2">
+                      <div className="h-4 w-3/4 bg-white/5 rounded animate-pulse" />
+                      <div className="h-3 w-1/2 bg-white/5 rounded animate-pulse" />
+                      <div className="flex gap-2">
+                        <div className="h-5 w-16 bg-white/5 rounded-full animate-pulse" />
+                        <div className="h-5 w-16 bg-white/5 rounded-full animate-pulse" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         ) : filingsError ? (
           <EmptyState
             icon={<DocumentIcon className="w-16 h-16 text-yellow-400" />}
@@ -478,10 +545,24 @@ export default function PulsePage() {
         <h2 className="text-lg font-semibold text-white mb-4">Top Movers</h2>
 
         {isLoadingStocks ? (
-          <div className="space-y-3">
-            <SkeletonCard />
-            <SkeletonCard />
-            <SkeletonCard />
+          <div className="space-y-2">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="bg-vettr-card/50 border border-white/5 rounded-2xl p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1 space-y-2">
+                    <div className="flex items-center gap-3">
+                      <div className="h-4 w-16 bg-white/5 rounded animate-pulse" />
+                      <div className="h-6 w-6 bg-white/5 rounded-full animate-pulse" />
+                    </div>
+                    <div className="h-3 w-2/3 bg-white/5 rounded animate-pulse" />
+                  </div>
+                  <div className="text-right space-y-1">
+                    <div className="h-4 w-16 bg-white/5 rounded animate-pulse ml-auto" />
+                    <div className="h-4 w-12 bg-white/5 rounded animate-pulse ml-auto" />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         ) : stocksError ? (
           <EmptyState

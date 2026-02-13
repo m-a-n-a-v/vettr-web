@@ -13,7 +13,7 @@ export default function SkeletonLoader({
   height,
   className = ''
 }: SkeletonLoaderProps) {
-  const baseClasses = 'animate-shimmer bg-surface';
+  const baseClasses = 'animate-pulse bg-white/5';
 
   const getVariantClasses = () => {
     switch (variant) {
@@ -22,11 +22,11 @@ export default function SkeletonLoader({
       case 'circular':
         return 'rounded-full';
       case 'rectangular':
-        return 'rounded-lg';
+        return 'rounded-xl';
       case 'card':
-        return 'rounded-lg p-4 border border-border';
+        return 'rounded-xl p-4 border border-white/5';
       default:
-        return 'rounded-lg';
+        return 'rounded-xl';
     }
   };
 
@@ -45,7 +45,7 @@ export default function SkeletonLoader({
   );
 }
 
-// Predefined skeleton components for common use cases
+// Predefined skeleton components for common use cases - V2 Design
 
 export function SkeletonText({ lines = 3, className = '' }: { lines?: number; className?: string }) {
   return (
@@ -63,7 +63,7 @@ export function SkeletonText({ lines = 3, className = '' }: { lines?: number; cl
 
 export function SkeletonCard({ className = '' }: { className?: string }) {
   return (
-    <div className={`bg-primaryLight border border-border rounded-lg p-4 ${className}`}>
+    <div className={`bg-white/5 rounded-xl p-4 ${className}`}>
       <div className="flex items-start gap-3 mb-3">
         <SkeletonLoader variant="circular" width="3rem" height="3rem" />
         <div className="flex-1 space-y-2">
@@ -79,30 +79,39 @@ export function SkeletonCard({ className = '' }: { className?: string }) {
   );
 }
 
+// V2 Metric Card Skeleton - for Pulse page metric cards
+export function SkeletonMetricCard({ className = '' }: { className?: string }) {
+  return (
+    <div className={`bg-vettr-card/50 border border-white/5 rounded-2xl p-5 ${className}`}>
+      <SkeletonLoader variant="text" width="60%" height="0.75rem" className="mb-2" />
+      <SkeletonLoader variant="text" width="40%" height="2rem" />
+    </div>
+  );
+}
+
+// V2 Stock Card Skeleton - matches StockCard component
 export function SkeletonStockCard({ className = '' }: { className?: string }) {
   return (
-    <div className={`bg-primaryLight border border-border rounded-lg p-4 ${className}`}>
-      {/* Header with avatar and info */}
-      <div className="flex items-start gap-3 mb-3">
-        <SkeletonLoader variant="circular" width="3rem" height="3rem" />
-        <div className="flex-1 space-y-2">
-          <div className="flex items-center gap-2">
-            <SkeletonLoader variant="text" width="4rem" height="1.25rem" />
-            <SkeletonLoader variant="circular" width="2rem" height="2rem" />
-          </div>
-          <SkeletonLoader variant="text" width="70%" />
+    <div className={`bg-vettr-card/50 border border-white/5 rounded-2xl p-5 ${className}`}>
+      {/* Header row: ticker + company + favorite */}
+      <div className="flex items-start justify-between mb-3">
+        <div className="flex-1 space-y-1">
+          <SkeletonLoader variant="text" width="4rem" height="1rem" />
+          <SkeletonLoader variant="text" width="70%" height="0.875rem" />
         </div>
+        <SkeletonLoader variant="circular" width="1.25rem" height="1.25rem" />
       </div>
 
-      {/* Price section */}
+      {/* Price row */}
       <div className="mb-3">
-        <SkeletonLoader variant="text" width="5rem" height="2rem" />
+        <SkeletonLoader variant="text" width="6rem" height="2rem" className="mb-1" />
+        <SkeletonLoader variant="text" width="4rem" height="0.875rem" />
       </div>
 
-      {/* Chips */}
-      <div className="flex items-center gap-2">
+      {/* Bottom row: sector chip + score badge */}
+      <div className="flex items-center justify-between">
         <SkeletonLoader variant="text" width="5rem" height="1.5rem" className="rounded-full" />
-        <SkeletonLoader variant="text" width="3rem" height="1.5rem" className="rounded-full" />
+        <SkeletonLoader variant="circular" width="2rem" height="2rem" />
       </div>
     </div>
   );
@@ -118,161 +127,224 @@ export function SkeletonList({ count = 5, className = '' }: { count?: number; cl
   );
 }
 
-export function SkeletonMetricCard({ className = '' }: { className?: string }) {
-  return (
-    <div className={`bg-primaryLight border border-border rounded-lg p-4 ${className}`}>
-      <SkeletonLoader variant="text" width="60%" className="mb-2" />
-      <SkeletonLoader variant="text" width="40%" height="2rem" />
-    </div>
-  );
-}
-
+// V2 Filing Table Row Skeleton - for table view
 export function SkeletonFilingRow({ className = '' }: { className?: string }) {
   return (
-    <div className={`bg-primaryLight border border-border rounded-lg p-4 ${className}`}>
-      <div className="flex items-start gap-3">
-        <SkeletonLoader variant="circular" width="2.5rem" height="2.5rem" />
-        <div className="flex-1 space-y-2">
-          <div className="flex items-center justify-between gap-2">
-            <SkeletonLoader variant="text" width="70%" />
-            <SkeletonLoader variant="text" width="4rem" height="1.5rem" className="rounded" />
-          </div>
-          <SkeletonLoader variant="text" width="50%" />
-        </div>
-      </div>
-    </div>
+    <tr className={`border-b border-white/5 ${className}`}>
+      <td className="px-4 py-3">
+        <SkeletonLoader variant="circular" width="2rem" height="2rem" />
+      </td>
+      <td className="px-4 py-3">
+        <SkeletonLoader variant="text" width="80%" height="0.875rem" />
+      </td>
+      <td className="px-4 py-3">
+        <SkeletonLoader variant="text" width="3rem" height="0.875rem" />
+      </td>
+      <td className="px-4 py-3">
+        <SkeletonLoader variant="text" width="5rem" height="0.875rem" />
+      </td>
+      <td className="px-4 py-3">
+        <SkeletonLoader variant="text" width="3rem" height="1.25rem" className="rounded-full" />
+      </td>
+      <td className="px-4 py-3">
+        <SkeletonLoader variant="text" width="3rem" height="1.25rem" className="rounded-full" />
+      </td>
+    </tr>
   );
 }
 
+// V2 Stock Table Row Skeleton - for table view on Stocks page
 export function SkeletonStockRow({ className = '' }: { className?: string }) {
   return (
-    <div className={`bg-primaryLight border border-border rounded-lg p-4 ${className}`}>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3 flex-1">
-          <SkeletonLoader variant="circular" width="3rem" height="3rem" />
-          <div className="flex-1 space-y-2">
-            <div className="flex items-center gap-2">
-              <SkeletonLoader variant="text" width="5rem" />
-              <SkeletonLoader variant="circular" width="2rem" height="2rem" />
-            </div>
-            <SkeletonLoader variant="text" width="60%" />
-          </div>
-        </div>
-        <div className="text-right space-y-1">
-          <SkeletonLoader variant="text" width="4rem" height="1.5rem" />
-          <SkeletonLoader variant="text" width="3rem" />
-        </div>
-      </div>
-    </div>
+    <tr className={`border-b border-white/5 ${className}`}>
+      <td className="px-4 py-3">
+        <SkeletonLoader variant="text" width="3rem" height="0.875rem" />
+      </td>
+      <td className="px-4 py-3">
+        <SkeletonLoader variant="text" width="70%" height="0.875rem" />
+      </td>
+      <td className="px-4 py-3">
+        <SkeletonLoader variant="text" width="4rem" height="0.875rem" />
+      </td>
+      <td className="px-4 py-3">
+        <SkeletonLoader variant="text" width="3rem" height="0.875rem" />
+      </td>
+      <td className="px-4 py-3">
+        <SkeletonLoader variant="circular" width="2rem" height="2rem" />
+      </td>
+      <td className="px-4 py-3">
+        <SkeletonLoader variant="text" width="5rem" height="0.875rem" />
+      </td>
+      <td className="px-4 py-3">
+        <SkeletonLoader variant="text" width="4rem" height="0.875rem" />
+      </td>
+      <td className="px-4 py-3 text-center">
+        <SkeletonLoader variant="circular" width="1.25rem" height="1.25rem" className="mx-auto" />
+      </td>
+    </tr>
   );
 }
 
+// V2 Alert Rule Row Skeleton - for table view
 export function SkeletonAlertRule({ className = '' }: { className?: string }) {
   return (
-    <div className={`bg-primaryLight border border-border rounded-lg p-4 ${className}`}>
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex-1 space-y-2">
-          <div className="flex items-center gap-2">
-            <SkeletonLoader variant="text" width="4rem" />
-            <SkeletonLoader variant="text" width="7rem" />
-          </div>
-          <SkeletonLoader variant="text" width="80%" />
-        </div>
-        <div className="flex items-center gap-2">
-          <SkeletonLoader variant="rectangular" width="3rem" height="1.5rem" className="rounded-full" />
+    <tr className={`border-b border-white/5 ${className}`}>
+      <td className="px-4 py-3">
+        <SkeletonLoader variant="text" width="4rem" height="0.875rem" />
+      </td>
+      <td className="px-4 py-3">
+        <SkeletonLoader variant="text" width="6rem" height="0.875rem" />
+      </td>
+      <td className="px-4 py-3">
+        <SkeletonLoader variant="text" width="70%" height="0.875rem" />
+      </td>
+      <td className="px-4 py-3">
+        <SkeletonLoader variant="text" width="5rem" height="0.875rem" />
+      </td>
+      <td className="px-4 py-3">
+        <SkeletonLoader variant="rectangular" width="2.75rem" height="1.5rem" className="rounded-full" />
+      </td>
+      <td className="px-4 py-3">
+        <div className="flex items-center gap-2 justify-end">
           <SkeletonLoader variant="circular" width="2rem" height="2rem" />
           <SkeletonLoader variant="circular" width="2rem" height="2rem" />
         </div>
-      </div>
-    </div>
+      </td>
+    </tr>
   );
 }
 
+// V2 Alert Trigger Card Skeleton
 export function SkeletonAlertTrigger({ className = '' }: { className?: string }) {
   return (
-    <div className={`bg-primaryLight border border-border rounded-lg p-4 ${className}`}>
+    <div className={`bg-white/[0.03] border border-white/5 rounded-xl p-4 ${className}`}>
       <div className="flex items-start gap-3">
-        <SkeletonLoader variant="circular" width="2.5rem" height="2.5rem" />
+        <SkeletonLoader variant="circular" width="2rem" height="2rem" />
         <div className="flex-1 space-y-2">
-          <SkeletonLoader variant="text" width="40%" />
-          <SkeletonLoader variant="text" width="70%" />
-          <SkeletonLoader variant="text" width="30%" />
+          <SkeletonLoader variant="text" width="40%" height="0.875rem" />
+          <SkeletonLoader variant="text" width="70%" height="0.75rem" />
+          <SkeletonLoader variant="text" width="30%" height="0.75rem" />
         </div>
       </div>
     </div>
   );
 }
 
+// V2 Stock Detail Header Skeleton
 export function SkeletonStockDetailHeader({ className = '' }: { className?: string }) {
   return (
-    <div className={`bg-primaryLight border border-border rounded-lg p-6 ${className}`}>
-      <div className="space-y-4">
-        <div className="flex items-start justify-between">
-          <div className="flex-1 space-y-3">
-            <SkeletonLoader variant="text" width="60%" height="2rem" />
-            <SkeletonLoader variant="text" width="40%" height="3rem" />
-            <div className="flex items-center gap-2">
-              <SkeletonLoader variant="text" width="6rem" height="1.5rem" className="rounded-full" />
-              <SkeletonLoader variant="text" width="5rem" height="1.5rem" className="rounded-full" />
-            </div>
+    <div className={`space-y-4 ${className}`}>
+      {/* Breadcrumb */}
+      <SkeletonLoader variant="text" width="10rem" height="0.875rem" />
+
+      {/* Stock Header */}
+      <div className="flex items-start justify-between">
+        <div className="flex-1 space-y-3">
+          <div className="flex items-center gap-3">
+            <SkeletonLoader variant="text" width="12rem" height="2rem" />
+            <SkeletonLoader variant="text" width="4rem" height="1.5rem" className="rounded-lg" />
+            <SkeletonLoader variant="text" width="3rem" height="1.5rem" className="rounded-full" />
           </div>
-          <div className="flex gap-2">
-            <SkeletonLoader variant="circular" width="2.5rem" height="2.5rem" />
-            <SkeletonLoader variant="circular" width="2.5rem" height="2.5rem" />
-          </div>
+          <SkeletonLoader variant="text" width="8rem" height="3rem" />
+          <SkeletonLoader variant="text" width="6rem" height="1.25rem" />
+        </div>
+        <div className="flex items-center gap-2">
+          <SkeletonLoader variant="circular" width="2.5rem" height="2.5rem" />
+          <SkeletonLoader variant="circular" width="2.5rem" height="2.5rem" />
+          <SkeletonLoader variant="circular" width="2.5rem" height="2.5rem" />
         </div>
       </div>
     </div>
   );
 }
 
+// V2 VETTR Score Section Skeleton
 export function SkeletonVetrScoreSection({ className = '' }: { className?: string }) {
   return (
-    <div className={`bg-primaryLight border border-border rounded-lg p-6 ${className}`}>
-      <SkeletonLoader variant="text" width="40%" className="mb-4" />
-      <div className="flex items-center justify-center">
+    <div className={`bg-vettr-card/50 border border-white/5 rounded-2xl p-6 ${className}`}>
+      <SkeletonLoader variant="text" width="40%" height="1rem" className="mb-4" />
+      <div className="flex items-center justify-center mb-6">
         <SkeletonLoader variant="circular" width="8rem" height="8rem" />
       </div>
+      {/* Component breakdown bars */}
+      <div className="space-y-3">
+        <SkeletonLoader variant="text" width="100%" height="2rem" className="rounded-full" />
+        <SkeletonLoader variant="text" width="100%" height="2rem" className="rounded-full" />
+        <SkeletonLoader variant="text" width="100%" height="2rem" className="rounded-full" />
+        <SkeletonLoader variant="text" width="100%" height="2rem" className="rounded-full" />
+        <SkeletonLoader variant="text" width="100%" height="2rem" className="rounded-full" />
+      </div>
     </div>
   );
 }
 
+// V2 User Profile Header Skeleton
 export function SkeletonUserHeader({ className = '' }: { className?: string }) {
   return (
-    <div className={`bg-primaryLight border border-border rounded-lg p-6 ${className}`}>
-      <div className="flex items-start gap-4">
-        <SkeletonLoader variant="circular" width="5rem" height="5rem" />
-        <div className="flex-1 space-y-2">
-          <div className="flex items-center gap-3">
-            <SkeletonLoader variant="text" width="10rem" height="2rem" />
-            <SkeletonLoader variant="text" width="4rem" height="1.5rem" className="rounded-full" />
-          </div>
-          <SkeletonLoader variant="text" width="60%" />
+    <div className={`flex items-start gap-4 mb-8 ${className}`}>
+      <SkeletonLoader variant="circular" width="4rem" height="4rem" />
+      <div className="flex-1 space-y-2">
+        <div className="flex items-center gap-3">
+          <SkeletonLoader variant="text" width="10rem" height="1.5rem" />
+          <SkeletonLoader variant="text" width="4rem" height="1.25rem" className="rounded-full" />
         </div>
-        <SkeletonLoader variant="rectangular" width="6rem" height="2.5rem" className="rounded-lg" />
+        <SkeletonLoader variant="text" width="60%" height="0.875rem" />
       </div>
     </div>
   );
 }
 
+// V2 Profile Section Skeleton - for grouped cards
 export function SkeletonProfileSection({ className = '' }: { className?: string }) {
   return (
-    <div className={`bg-primaryLight border border-border rounded-lg p-6 ${className}`}>
-      <SkeletonLoader variant="text" width="30%" height="1.5rem" className="mb-4" />
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <SkeletonLoader variant="text" width="30%" />
-          <SkeletonLoader variant="text" width="20%" />
+    <div className={`bg-vettr-card/30 border border-white/5 rounded-2xl overflow-hidden ${className}`}>
+      <div className="space-y-0">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
+          <SkeletonLoader variant="text" width="30%" height="0.875rem" />
+          <SkeletonLoader variant="text" width="20%" height="0.875rem" />
         </div>
-        <div className="flex items-center justify-between">
-          <SkeletonLoader variant="text" width="35%" />
-          <SkeletonLoader variant="text" width="25%" />
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
+          <SkeletonLoader variant="text" width="35%" height="0.875rem" />
+          <SkeletonLoader variant="text" width="25%" height="0.875rem" />
         </div>
-        <div className="flex items-center justify-between">
-          <SkeletonLoader variant="text" width="40%" />
-          <SkeletonLoader variant="text" width="15%" />
+        <div className="flex items-center justify-between px-6 py-4">
+          <SkeletonLoader variant="text" width="40%" height="0.875rem" />
+          <SkeletonLoader variant="text" width="15%" height="0.875rem" />
         </div>
       </div>
+    </div>
+  );
+}
+
+// V2 Chart Skeleton - for Recharts placeholders
+export function SkeletonChart({ className = '' }: { className?: string }) {
+  return (
+    <div className={`bg-vettr-card/30 border border-white/5 rounded-2xl p-6 ${className}`}>
+      <SkeletonLoader variant="text" width="40%" height="1rem" className="mb-4" />
+      <div className="flex items-end gap-2 h-64">
+        {Array.from({ length: 12 }).map((_, i) => (
+          <SkeletonLoader
+            key={i}
+            variant="rectangular"
+            className="flex-1"
+            height={`${Math.random() * 60 + 40}%`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// V2 Filter Bar Skeleton - for Stocks/Discovery pages
+export function SkeletonFilterBar({ className = '' }: { className?: string }) {
+  return (
+    <div className={`bg-vettr-card/30 border border-white/5 rounded-2xl p-3 flex items-center gap-3 ${className}`}>
+      <SkeletonLoader variant="rectangular" width="16rem" height="2.5rem" className="rounded-xl" />
+      <SkeletonLoader variant="rectangular" width="10rem" height="2.5rem" className="rounded-xl" />
+      <SkeletonLoader variant="rectangular" width="8rem" height="2.5rem" className="rounded-xl" />
+      <div className="flex-1" />
+      <SkeletonLoader variant="circular" width="2.5rem" height="2.5rem" />
+      <SkeletonLoader variant="circular" width="2.5rem" height="2.5rem" />
     </div>
   );
 }

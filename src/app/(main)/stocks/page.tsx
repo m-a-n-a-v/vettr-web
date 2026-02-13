@@ -17,7 +17,7 @@ import VetrScoreBadge from '@/components/ui/VetrScoreBadge'
 import PriceChangeIndicator from '@/components/ui/PriceChangeIndicator'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import EmptyState from '@/components/ui/EmptyState'
-import { SkeletonStockRow } from '@/components/ui/SkeletonLoader'
+import { SkeletonStockRow, SkeletonStockCard, SkeletonFilterBar } from '@/components/ui/SkeletonLoader'
 import RefreshButton from '@/components/ui/RefreshButton'
 import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator'
 import StockCard from '@/components/ui/StockCard'
@@ -291,23 +291,38 @@ function StocksPageContent() {
         </div>
 
         {/* Filters skeleton */}
-        <div className="mb-6 bg-vettr-card/30 border border-white/5 rounded-2xl p-3">
-          <div className="flex flex-col md:flex-row gap-3">
-            <div className="h-10 flex-1 bg-white/5 rounded-xl animate-pulse"></div>
-            <div className="h-10 w-full md:w-48 bg-white/5 rounded-xl animate-pulse"></div>
-            <div className="h-10 w-10 bg-white/5 rounded-xl animate-pulse"></div>
-            <div className="h-10 w-10 bg-white/5 rounded-xl animate-pulse"></div>
-            <div className="h-10 w-10 bg-white/5 rounded-xl animate-pulse"></div>
-          </div>
-        </div>
+        <SkeletonFilterBar className="mb-6" />
 
         {/* Result count skeleton */}
         <div className="mb-4 h-5 w-32 bg-white/5 rounded animate-pulse"></div>
 
-        {/* Stock list skeleton */}
-        <div className="space-y-3">
-          {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-            <SkeletonStockRow key={i} />
+        {/* Desktop Table skeleton */}
+        <div className="hidden md:block bg-vettr-card/50 border border-white/5 rounded-2xl overflow-hidden">
+          <table className="w-full">
+            <thead className="sticky top-16 bg-vettr-dark/80 backdrop-blur-sm z-20">
+              <tr className="border-b border-white/5">
+                <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Ticker</th>
+                <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Company</th>
+                <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-right">Price</th>
+                <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-right">Change</th>
+                <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-center">VETTR Score</th>
+                <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Sector</th>
+                <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-right">Market Cap</th>
+                <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-center">Favorite</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Array.from({ length: 25 }).map((_, i) => (
+                <SkeletonStockRow key={i} />
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Mobile Card skeleton */}
+        <div className="md:hidden grid grid-cols-1 gap-4">
+          {Array.from({ length: 10 }).map((_, i) => (
+            <SkeletonStockCard key={i} />
           ))}
         </div>
       </div>
