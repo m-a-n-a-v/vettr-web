@@ -65,7 +65,27 @@ export interface ApiRequestOptions extends RequestInit {
   requiresAuth?: boolean;
   skipRefresh?: boolean;
   retryCount?: number; // Internal: tracks retry attempts for rate limiting
+  timeout?: number; // Request timeout in milliseconds (default: 30000)
 }
+
+// Interceptor types
+type RequestInterceptor = (url: string, options: ApiRequestOptions) => Promise<{ url: string; options: ApiRequestOptions }> | { url: string; options: ApiRequestOptions };
+type ResponseInterceptor = <T>(response: ApiResponse<T>, url: string, options: ApiRequestOptions) => Promise<ApiResponse<T>> | ApiResponse<T>;
+
+// Interceptor storage
+const requestInterceptors: RequestInterceptor[] = [];
+const responseInterceptors: ResponseInterceptor[] = [];
+
+// Request deduplication cache
+interface PendingRequest {
+  promise: Promise<ApiResponse<unknown>>;
+  timestamp: number;
+}
+const pendingRequests = new Map<string, PendingRequest>();
+const DEDUPLICATION_WINDOW_MS = 100;
+
+// Token refresh mutex to prevent multiple simultaneous refresh calls
+let refreshPromise: Promise<AuthTokens | null> | null = null;
 
 /**
  * Get access token from localStorage
@@ -102,47 +122,60 @@ export function clearTokens(): void {
 }
 
 /**
- * Refresh access token using refresh token
+ * Refresh access token using refresh token with mutex to prevent multiple simultaneous calls
  */
 async function refreshAccessToken(): Promise<AuthTokens | null> {
+  // If a refresh is already in progress, return that promise
+  if (refreshPromise) {
+    return refreshPromise;
+  }
+
   const refreshToken = getRefreshToken();
 
   if (!refreshToken) {
     return null;
   }
 
-  try {
-    const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ refresh_token: refreshToken }),
-    });
+  // Create the refresh promise and store it
+  refreshPromise = (async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ refresh_token: refreshToken }),
+      });
 
-    if (!response.ok) {
+      if (!response.ok) {
+        clearTokens();
+        return null;
+      }
+
+      const data: ApiResponse<{ access_token: string; refresh_token: string }> = await response.json();
+
+      if (data.success && data.data) {
+        const tokens: AuthTokens = {
+          accessToken: data.data.access_token,
+          refreshToken: data.data.refresh_token,
+        };
+        setTokens(tokens.accessToken, tokens.refreshToken);
+        return tokens;
+      }
+
       clearTokens();
       return null;
+    } catch (error) {
+      console.error('Token refresh failed:', error);
+      clearTokens();
+      return null;
+    } finally {
+      // Clear the promise after completion
+      refreshPromise = null;
     }
+  })();
 
-    const data: ApiResponse<{ access_token: string; refresh_token: string }> = await response.json();
-
-    if (data.success && data.data) {
-      const tokens: AuthTokens = {
-        accessToken: data.data.access_token,
-        refreshToken: data.data.refresh_token,
-      };
-      setTokens(tokens.accessToken, tokens.refreshToken);
-      return tokens;
-    }
-
-    clearTokens();
-    return null;
-  } catch (error) {
-    console.error('Token refresh failed:', error);
-    clearTokens();
-    return null;
-  }
+  return refreshPromise;
 }
 
 /**
@@ -174,6 +207,71 @@ function showRateLimitToast(retryAfterSeconds: number): void {
 }
 
 /**
+ * Get a cache key for request deduplication
+ */
+function getRequestCacheKey(url: string, method: string): string {
+  return `${method}:${url}`;
+}
+
+/**
+ * Get a better error message based on response status
+ */
+function getErrorMessage(status: number, defaultMessage: string): string {
+  switch (status) {
+    case 400:
+      return 'Invalid request. Please check your input.';
+    case 401:
+      return 'Authentication required. Please log in.';
+    case 403:
+      return 'Access denied. You do not have permission to perform this action.';
+    case 404:
+      return 'Not found. The requested resource does not exist.';
+    case 408:
+      return 'Request timeout. Please try again.';
+    case 429:
+      return 'Too many requests. Please slow down and try again later.';
+    case 500:
+      return 'Server error. Our team has been notified.';
+    case 502:
+      return 'Unable to connect to server. Please try again.';
+    case 503:
+      return 'Service temporarily unavailable. Please try again later.';
+    case 504:
+      return 'Gateway timeout. The server took too long to respond.';
+    default:
+      return defaultMessage || 'An unexpected error occurred.';
+  }
+}
+
+/**
+ * Create a fetch request with timeout using AbortController
+ */
+async function fetchWithTimeout(
+  url: string,
+  options: RequestInit & { timeout?: number }
+): Promise<Response> {
+  const { timeout = 30000, ...fetchOptions } = options;
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+  try {
+    const response = await fetch(url, {
+      ...fetchOptions,
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+    return response;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error('Request timeout. Please try again.');
+    }
+    throw error;
+  }
+}
+
+/**
  * Main API client function
  *
  * @param endpoint - API endpoint (e.g., '/stocks', '/auth/login')
@@ -188,131 +286,204 @@ export async function apiClient<T = unknown>(
     requiresAuth = true,
     skipRefresh = false,
     retryCount = 0,
+    timeout = 30000,
     headers = {},
     ...fetchOptions
   } = options;
 
   // Build full URL
-  const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`;
+  let url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`;
+  let requestOptions: ApiRequestOptions = { ...options, requiresAuth, skipRefresh, retryCount, timeout, headers, ...fetchOptions };
 
-  // Build headers
-  const requestHeaders: Record<string, string> = {
-    'Content-Type': 'application/json',
-    ...(headers as Record<string, string>),
-  };
-
-  // Add Authorization header if auth is required
-  if (requiresAuth) {
-    const accessToken = getAccessToken();
-    if (accessToken) {
-      requestHeaders['Authorization'] = `Bearer ${accessToken}`;
-    }
+  // Run request interceptors
+  for (const interceptor of requestInterceptors) {
+    const result = await interceptor(url, requestOptions);
+    url = result.url;
+    requestOptions = result.options;
   }
 
-  try {
-    // Make the request
-    const response = await fetch(url, {
-      ...fetchOptions,
-      headers: requestHeaders,
-    });
+  // Check for pending duplicate request (deduplication)
+  const method = (requestOptions.method || 'GET').toUpperCase();
+  const cacheKey = getRequestCacheKey(url, method);
+  const now = Date.now();
 
-    // Handle 401 Unauthorized - attempt token refresh
-    if (response.status === 401 && requiresAuth && !skipRefresh) {
-      const tokens = await refreshAccessToken();
+  const pendingRequest = pendingRequests.get(cacheKey);
+  if (pendingRequest && (now - pendingRequest.timestamp) < DEDUPLICATION_WINDOW_MS) {
+    // Return the existing promise for this request
+    return pendingRequest.promise as Promise<ApiResponse<T>>;
+  }
 
-      if (tokens) {
-        // Retry the original request with new token
-        return apiClient<T>(endpoint, { ...options, skipRefresh: true });
-      } else {
-        // Refresh failed, redirect to login
-        if (typeof window !== 'undefined') {
-          window.location.href = '/login';
+  // Create the actual request promise
+  const requestPromise = (async (): Promise<ApiResponse<T>> => {
+    // Build headers
+    const requestHeaders: Record<string, string> = {
+      'Content-Type': 'application/json',
+      ...(requestOptions.headers as Record<string, string>),
+    };
+
+    // Add Authorization header if auth is required
+    if (requestOptions.requiresAuth) {
+      const accessToken = getAccessToken();
+      if (accessToken) {
+        requestHeaders['Authorization'] = `Bearer ${accessToken}`;
+      }
+    }
+
+    try {
+      // Make the request with timeout
+      const response = await fetchWithTimeout(url, {
+        ...fetchOptions,
+        headers: requestHeaders,
+        timeout: requestOptions.timeout,
+      });
+
+      // Handle 401 Unauthorized - attempt token refresh
+      if (response.status === 401 && requestOptions.requiresAuth && !requestOptions.skipRefresh) {
+        const tokens = await refreshAccessToken();
+
+        if (tokens) {
+          // Retry the original request with new token
+          return apiClient<T>(endpoint, { ...options, skipRefresh: true });
+        } else {
+          // Refresh failed, redirect to login
+          if (typeof window !== 'undefined') {
+            window.location.href = '/login';
+          }
+          return {
+            success: false,
+            error: {
+              code: 'AUTH_REQUIRED',
+              message: 'Authentication required. Please log in.',
+            },
+          };
         }
+      }
+
+      // Handle 429 Too Many Requests - rate limiting with non-blocking retry
+      if (response.status === 429 && requestOptions.retryCount! < 5) {
+        // Read Retry-After header (can be in seconds or HTTP date format)
+        const retryAfterHeader = response.headers.get('Retry-After');
+        let retryAfterMs = getExponentialBackoffDelay(requestOptions.retryCount!);
+
+        if (retryAfterHeader) {
+          // Check if it's a number (seconds) or a date
+          const retryAfterSeconds = parseInt(retryAfterHeader, 10);
+          if (!isNaN(retryAfterSeconds)) {
+            retryAfterMs = retryAfterSeconds * 1000;
+          } else {
+            // Try parsing as HTTP date
+            const retryAfterDate = new Date(retryAfterHeader);
+            if (!isNaN(retryAfterDate.getTime())) {
+              retryAfterMs = Math.max(0, retryAfterDate.getTime() - Date.now());
+            }
+          }
+        }
+
+        // Cap retry delay at 2 minutes (120s) to prevent indefinite hangs
+        retryAfterMs = Math.min(retryAfterMs, 120000);
+
+        console.warn(`[API] Rate limited (429). Retrying after ${Math.ceil(retryAfterMs / 1000)}s. Attempt ${requestOptions.retryCount! + 1}/5`);
+
+        // Show toast notification with countdown (non-blocking)
+        showRateLimitToast(Math.ceil(retryAfterMs / 1000));
+
+        // Wait for the specified time
+        await sleep(retryAfterMs);
+
+        // Retry the request
+        return apiClient<T>(endpoint, {
+          ...options,
+          retryCount: requestOptions.retryCount! + 1,
+        });
+      }
+
+      // If we've exhausted retries on 429, return error
+      if (response.status === 429) {
         return {
           success: false,
           error: {
-            code: 'AUTH_REQUIRED',
-            message: 'Authentication required. Please log in.',
+            code: 'RATE_LIMIT_EXCEEDED',
+            message: 'Rate limit exceeded. Please try again later.',
           },
         };
       }
-    }
 
-    // Handle 429 Too Many Requests - rate limiting
-    if (response.status === 429 && retryCount < 5) {
-      // Read Retry-After header (can be in seconds or HTTP date format)
-      const retryAfterHeader = response.headers.get('Retry-After');
-      let retryAfterMs = getExponentialBackoffDelay(retryCount);
-
-      if (retryAfterHeader) {
-        // Check if it's a number (seconds) or a date
-        const retryAfterSeconds = parseInt(retryAfterHeader, 10);
-        if (!isNaN(retryAfterSeconds)) {
-          retryAfterMs = retryAfterSeconds * 1000;
-        } else {
-          // Try parsing as HTTP date
-          const retryAfterDate = new Date(retryAfterHeader);
-          if (!isNaN(retryAfterDate.getTime())) {
-            retryAfterMs = Math.max(0, retryAfterDate.getTime() - Date.now());
-          }
-        }
+      // Parse response
+      let data: ApiResponse<T>;
+      try {
+        data = await response.json();
+      } catch (parseError) {
+        // If JSON parsing fails, create error response
+        return {
+          success: false,
+          error: {
+            code: 'PARSE_ERROR',
+            message: getErrorMessage(response.status, 'Failed to parse server response'),
+          },
+        };
       }
 
-      // Cap retry delay at 2 minutes (120s) to prevent indefinite hangs, but allow for longer waits
-      retryAfterMs = Math.min(retryAfterMs, 120000);
+      // Check if response indicates failure
+      if (!response.ok || !data.success) {
+        return {
+          success: false,
+          error: data.error || {
+            code: `HTTP_${response.status}`,
+            message: getErrorMessage(response.status, response.statusText || 'An error occurred'),
+          },
+        };
+      }
 
-      console.warn(`[API] Rate limited (429). Retrying after ${Math.ceil(retryAfterMs / 1000)}s. Attempt ${retryCount + 1}/5`);
+      // Run response interceptors
+      let finalResponse: ApiResponse<T> = data;
+      for (const interceptor of responseInterceptors) {
+        finalResponse = await interceptor(finalResponse, url, requestOptions);
+      }
 
-      // Show toast notification
-      showRateLimitToast(Math.ceil(retryAfterMs / 1000));
+      return finalResponse;
+    } catch (error) {
+      // Network or timeout error
+      console.error('API request failed:', error);
 
-      // Wait for the specified time
-      await sleep(retryAfterMs);
+      // Check if it's a timeout error
+      if (error instanceof Error && error.message.includes('timeout')) {
+        return {
+          success: false,
+          error: {
+            code: 'TIMEOUT_ERROR',
+            message: 'Request timeout. Please try again.',
+          },
+        };
+      }
 
-      // Retry the request
-      return apiClient<T>(endpoint, {
-        ...options,
-        retryCount: retryCount + 1,
-      });
-    }
-
-    // If we've exhausted retries on 429, return error
-    if (response.status === 429) {
+      // Network error
       return {
         success: false,
         error: {
-          code: 'RATE_LIMIT_EXCEEDED',
-          message: 'Rate limit exceeded. Please try again later.',
+          code: 'NETWORK_ERROR',
+          message: 'Unable to connect to server. Please check your internet connection.',
         },
       };
     }
+  })();
 
-    // Parse response
-    const data: ApiResponse<T> = await response.json();
+  // Store in deduplication cache
+  pendingRequests.set(cacheKey, {
+    promise: requestPromise as Promise<ApiResponse<unknown>>,
+    timestamp: now,
+  });
 
-    // Check if response indicates failure
-    if (!response.ok || !data.success) {
-      return {
-        success: false,
-        error: data.error || {
-          code: 'UNKNOWN_ERROR',
-          message: response.statusText || 'An unknown error occurred',
-        },
-      };
-    }
+  // Clean up cache entry after request completes
+  requestPromise.finally(() => {
+    setTimeout(() => {
+      const cachedRequest = pendingRequests.get(cacheKey);
+      if (cachedRequest && cachedRequest.timestamp === now) {
+        pendingRequests.delete(cacheKey);
+      }
+    }, DEDUPLICATION_WINDOW_MS);
+  });
 
-    return data;
-  } catch (error) {
-    // Network or parsing error
-    console.error('API request failed:', error);
-    return {
-      success: false,
-      error: {
-        code: 'NETWORK_ERROR',
-        message: error instanceof Error ? error.message : 'Network request failed',
-      },
-    };
-  }
+  return requestPromise;
 }
 
 /**
@@ -407,5 +578,56 @@ export const authApi = {
    */
   refresh: async (): Promise<AuthTokens | null> => {
     return refreshAccessToken();
+  },
+};
+
+/**
+ * Interceptor management API
+ *
+ * Allows adding request and response interceptors for extensibility
+ */
+export const interceptors = {
+  /**
+   * Add a request interceptor
+   * @param interceptor - Function that receives and can modify URL and options before the request
+   * @returns Function to remove the interceptor
+   */
+  addRequestInterceptor: (interceptor: RequestInterceptor): (() => void) => {
+    requestInterceptors.push(interceptor);
+    return () => {
+      const index = requestInterceptors.indexOf(interceptor);
+      if (index > -1) {
+        requestInterceptors.splice(index, 1);
+      }
+    };
+  },
+
+  /**
+   * Add a response interceptor
+   * @param interceptor - Function that receives and can modify the response
+   * @returns Function to remove the interceptor
+   */
+  addResponseInterceptor: (interceptor: ResponseInterceptor): (() => void) => {
+    responseInterceptors.push(interceptor);
+    return () => {
+      const index = responseInterceptors.indexOf(interceptor);
+      if (index > -1) {
+        responseInterceptors.splice(index, 1);
+      }
+    };
+  },
+
+  /**
+   * Clear all request interceptors
+   */
+  clearRequestInterceptors: (): void => {
+    requestInterceptors.length = 0;
+  },
+
+  /**
+   * Clear all response interceptors
+   */
+  clearResponseInterceptors: (): void => {
+    responseInterceptors.length = 0;
   },
 };
