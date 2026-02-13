@@ -279,7 +279,7 @@ function DiscoveryPageContent() {
           {isLoadingStocks || isLoadingFiltered ? (
             <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 snap-x snap-mandatory">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="flex-shrink-0 w-80 snap-start">
+                <div key={i} className="flex-shrink-0 w-full sm:w-80 snap-start">
                   <SkeletonStockCard />
                 </div>
               ))}
@@ -303,7 +303,7 @@ function DiscoveryPageContent() {
           ) : (
             <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 snap-x snap-mandatory">
               {featuredStocks.map((stock) => (
-                <div key={stock.ticker} className="flex-shrink-0 w-80 snap-start">
+                <div key={stock.ticker} className="flex-shrink-0 w-full sm:w-80 snap-start">
                   <StockCard
                     stock={stock}
                     showFavorite={true}

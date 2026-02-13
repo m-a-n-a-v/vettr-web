@@ -83,8 +83,8 @@ export default function FilingTable({ filings, showStock = true }: FilingTablePr
   };
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full border-collapse" role="table" aria-label="Filings">
+    <div className="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0">
+      <table className="w-full min-w-[700px] border-collapse" role="table" aria-label="Filings">
         <thead className="sticky top-16 z-20 bg-vettr-navy dark:bg-vettr-navy bg-lightBg backdrop-blur-sm">
           <tr role="row" className="border-b border-white/5">
             <th
@@ -136,7 +136,7 @@ export default function FilingTable({ filings, showStock = true }: FilingTablePr
             <th
               role="columnheader"
               aria-sort={sortField === 'material' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
-              className="px-4 py-3 text-center text-xs text-gray-500 uppercase tracking-wider font-medium hover:text-white cursor-pointer group"
+              className="hidden md:table-cell px-4 py-3 text-center text-xs text-gray-500 uppercase tracking-wider font-medium hover:text-white cursor-pointer group"
               onClick={() => handleSort('material')}
             >
               <div className="flex items-center justify-center gap-2">
@@ -206,7 +206,7 @@ export default function FilingTable({ filings, showStock = true }: FilingTablePr
                   })}
                 </span>
               </td>
-              <td role="cell" className="px-4 py-3 text-center">
+              <td role="cell" className="hidden md:table-cell px-4 py-3 text-center">
                 {filing.is_material ? (
                   <span className="inline-block px-2.5 py-0.5 bg-yellow-500/10 text-yellow-400 rounded-full text-xs font-medium">
                     Yes

@@ -335,7 +335,7 @@ export default function PulsePage() {
             {/* Severity Breakdown */}
             <div>
               <p className="text-sm text-gray-400 mb-3">Breakdown by Severity</p>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
                 {/* Critical */}
                 <div className="bg-white/[0.03] rounded-xl p-4 border border-white/5">
                   <div className="flex items-center gap-2 mb-2">
@@ -624,13 +624,13 @@ export default function PulsePage() {
 
         {isLoadingStocks ? (
           <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-            <div className="flex-shrink-0 w-72">
+            <div className="flex-shrink-0 w-full sm:w-72">
               <SkeletonStockCard />
             </div>
-            <div className="flex-shrink-0 w-72">
+            <div className="flex-shrink-0 w-full sm:w-72">
               <SkeletonStockCard />
             </div>
-            <div className="flex-shrink-0 w-72">
+            <div className="flex-shrink-0 w-full sm:w-72">
               <SkeletonStockCard />
             </div>
           </div>
@@ -649,7 +649,7 @@ export default function PulsePage() {
         ) : (
           <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">
             {topScores.map((stock) => (
-              <div key={stock.ticker} className="flex-shrink-0 w-72 snap-start">
+              <div key={stock.ticker} className="flex-shrink-0 w-full sm:w-72 snap-start">
                 <StockCard
                   stock={stock}
                   showFavorite={true}

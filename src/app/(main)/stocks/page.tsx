@@ -538,8 +538,8 @@ function StocksPageContent() {
       {/* Stock list - Responsive: Card view on mobile, Card or Table on desktop */}
       {viewMode === 'table' && !isMobile ? (
         // Table view - Desktop only (>= 768px)
-        <div className="hidden md:block overflow-x-auto">
-          <table className="w-full">
+        <div className="hidden md:block overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0">
+          <table className="w-full min-w-[800px]">
             <thead className="sticky top-16 z-20 bg-vettr-navy dark:bg-vettr-navy bg-lightBg backdrop-blur-sm">
               <tr className="border-b border-white/5 dark:border-white/5 border-gray-200">
                 <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">

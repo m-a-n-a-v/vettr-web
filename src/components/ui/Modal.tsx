@@ -109,10 +109,10 @@ export default function Modal({
   }, [isOpen]);
 
   const sizeClasses = {
-    sm: 'max-w-sm',
-    md: 'max-w-lg',
-    lg: 'max-w-2xl',
-    xl: 'max-w-4xl',
+    sm: 'max-w-sm',      // 384px
+    md: 'max-w-lg',      // 512px
+    lg: 'max-w-2xl',     // 672px
+    xl: 'max-w-4xl',     // 896px
   };
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -125,7 +125,7 @@ export default function Modal({
     <AnimatePresence>
       {isOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4"
           onClick={handleBackdropClick}
         >
           {/* Backdrop */}
@@ -157,9 +157,9 @@ export default function Modal({
           >
             {/* Header */}
             {(title || showCloseButton) && (
-              <div className="flex items-center justify-between px-6 pt-6 pb-0">
+              <div className="flex items-center justify-between px-4 sm:px-6 pt-4 sm:pt-6 pb-0">
                 {title && (
-                  <h2 id={titleId.current} className="text-lg font-semibold text-white">{title}</h2>
+                  <h2 id={titleId.current} className="text-base sm:text-lg font-semibold text-white">{title}</h2>
                 )}
                 {showCloseButton && (
                   <button
@@ -180,13 +180,13 @@ export default function Modal({
             )}
 
             {/* Body */}
-            <div className="px-6 py-4 max-h-[calc(100vh-200px)] overflow-y-auto">
+            <div className="px-4 sm:px-6 py-4 max-h-[calc(100vh-12rem)] sm:max-h-[calc(100vh-200px)] overflow-y-auto">
               {children}
             </div>
 
             {/* Footer */}
             {footer && (
-              <div className="px-6 pb-6 pt-0 flex justify-end gap-3">
+              <div className="px-4 sm:px-6 pb-4 sm:pb-6 pt-0 flex flex-col sm:flex-row justify-end gap-2 sm:gap-3">
                 {footer}
               </div>
             )}

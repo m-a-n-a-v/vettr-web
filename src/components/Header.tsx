@@ -119,10 +119,11 @@ export function Header() {
         {/* Center-right: Search shortcut (desktop only) */}
         <button
           onClick={handleSearchClick}
-          className="hidden lg:flex items-center gap-2 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-1.5 text-sm text-gray-500 hover:bg-gray-200 dark:hover:bg-white/[0.07] hover:border-gray-300 dark:hover:border-white/20 transition-all"
+          className="hidden md:flex items-center gap-2 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-1.5 text-sm text-gray-500 hover:bg-gray-200 dark:hover:bg-white/[0.07] hover:border-gray-300 dark:hover:border-white/20 transition-all flex-shrink-0"
         >
           <SearchIcon className="w-4 h-4" />
-          <span>Quick search...</span>
+          <span className="hidden lg:inline">Quick search...</span>
+          <span className="lg:hidden">Search</span>
           <kbd className="ml-2 px-1.5 py-0.5 bg-white dark:bg-white/10 border border-gray-300 dark:border-white/10 rounded text-xs font-medium text-gray-600 dark:text-gray-400">
             ⌘K
           </kbd>
@@ -175,7 +176,7 @@ export function Header() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.15 }}
-                  className="absolute right-0 mt-2 w-56 bg-white dark:bg-vettr-card border border-gray-200 dark:border-white/10 rounded-xl shadow-xl overflow-hidden"
+                  className="absolute right-0 mt-2 w-64 sm:w-56 max-w-[calc(100vw-2rem)] bg-white dark:bg-vettr-card border border-gray-200 dark:border-white/10 rounded-xl shadow-xl overflow-hidden"
                 >
                   {/* User info header */}
                   <div className="px-4 py-3 border-b border-gray-200 dark:border-white/5">

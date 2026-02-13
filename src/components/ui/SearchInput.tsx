@@ -63,7 +63,7 @@ export default function SearchInput({
         disabled={disabled}
         autoFocus={autoFocus}
         className={`
-          w-full pl-11 pr-10 py-2.5 rounded-xl text-sm
+          w-full pl-9 sm:pl-11 pr-9 sm:pr-10 py-2.5 rounded-xl text-sm
           bg-white/5 border border-white/10
           text-white placeholder:text-gray-500
           focus:outline-none focus:border-vettr-accent/40 focus:ring-1 focus:ring-vettr-accent/20 focus:bg-white/[0.07]
