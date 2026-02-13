@@ -8,6 +8,15 @@ import SelectDropdown from '@/components/ui/SelectDropdown';
 import Breadcrumb from '@/components/ui/Breadcrumb';
 import { useToast } from '@/contexts/ToastContext';
 import { useTheme, type Theme } from '@/contexts/ThemeContext';
+import {
+  ChevronLeftIcon,
+  BellIcon,
+  FlagIcon,
+  DollarCircleIcon,
+  PickaxeIcon,
+  UsersIcon,
+  CheckCircleIcon,
+} from '@/components/icons';
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -79,10 +88,10 @@ export default function SettingsPage() {
     return (
       <div className="flex items-center justify-center min-h-screen pb-20 md:pb-6">
         <div className="text-center">
-          <p className="text-error mb-4">Failed to load settings</p>
+          <p className="text-red-400 mb-4">Failed to load settings</p>
           <button
             onClick={() => router.push('/profile')}
-            className="px-4 py-2 bg-primaryLight hover:bg-surfaceLight rounded-lg transition-colors"
+            className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors text-white"
           >
             Back to Profile
           </button>
@@ -106,41 +115,34 @@ export default function SettingsPage() {
         <div className="mb-6">
           <button
             onClick={() => router.push('/profile')}
-            className="text-accent hover:text-accentDim mb-3 flex items-center gap-2 transition-colors"
+            className="text-vettr-accent hover:text-vettr-accent/80 mb-3 flex items-center gap-2 transition-colors"
           >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
+            <ChevronLeftIcon className="w-4 h-4" />
             Back to Profile
           </button>
           <h1 className="text-3xl font-bold text-white">Settings</h1>
-          <p className="text-textSecondary mt-1">Manage your notification preferences and appearance</p>
+          <p className="text-gray-400 mt-1">Manage your notification preferences and appearance</p>
         </div>
 
         {/* Notification Settings Section */}
-        <div className="bg-primaryLight border border-border rounded-lg p-6 mb-4">
-          <h2 className="text-xl font-semibold text-white mb-4">Notification Settings</h2>
+        <div className="bg-vettr-card/30 border border-white/5 rounded-2xl overflow-hidden mb-4">
+          <div className="px-6 py-4 border-b border-white/5">
+            <h2 className="text-lg font-semibold text-white">Notification Settings</h2>
+          </div>
 
           {/* Enable Notifications Toggle */}
-          <div className="flex items-center justify-between py-3 border-b border-border">
-            <div>
-              <p className="text-white font-medium">Enable Notifications</p>
-              <p className="text-textSecondary text-sm">Receive alerts and updates</p>
+          <div className="flex items-center justify-between px-6 py-4">
+            <div className="flex items-center gap-3">
+              <BellIcon className="w-5 h-5 text-gray-400" />
+              <div>
+                <p className="text-sm font-medium text-white">Enable Notifications</p>
+                <p className="text-xs text-gray-500">Receive alerts and updates</p>
+              </div>
             </div>
             <button
               onClick={() => setNotificationsEnabled(!notificationsEnabled)}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                notificationsEnabled ? 'bg-accent' : 'bg-surface'
+                notificationsEnabled ? 'bg-vettr-accent' : 'bg-white/10'
               }`}
             >
               <span
@@ -153,23 +155,25 @@ export default function SettingsPage() {
         </div>
 
         {/* Alert Preferences Section */}
-        <div className="bg-primaryLight border border-border rounded-lg p-6 mb-4">
-          <h2 className="text-xl font-semibold text-white mb-4">Alert Preferences</h2>
-          <p className="text-textSecondary text-sm mb-4">Choose which types of alerts you want to receive</p>
+        <div className="bg-vettr-card/30 border border-white/5 rounded-2xl overflow-hidden mb-4">
+          <div className="px-6 py-4 border-b border-white/5">
+            <h2 className="text-lg font-semibold text-white">Alert Preferences</h2>
+            <p className="text-xs text-gray-500 mt-1">Choose which types of alerts you want to receive</p>
+          </div>
 
           {/* Red Flag Alerts */}
-          <div className="flex items-center justify-between py-3 border-b border-border">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
             <div className="flex items-center gap-3">
-              <span className="text-2xl">🚩</span>
+              <FlagIcon className="w-5 h-5 text-red-400" />
               <div>
-                <p className="text-white font-medium">Red Flag Alerts</p>
-                <p className="text-textSecondary text-sm">Get notified of new risk indicators</p>
+                <p className="text-sm font-medium text-white">Red Flag Alerts</p>
+                <p className="text-xs text-gray-500">Get notified of new risk indicators</p>
               </div>
             </div>
             <button
               onClick={() => setAlertRedFlag(!alertRedFlag)}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                alertRedFlag ? 'bg-error' : 'bg-surface'
+                alertRedFlag ? 'bg-vettr-accent' : 'bg-white/10'
               }`}
             >
               <span
@@ -181,18 +185,18 @@ export default function SettingsPage() {
           </div>
 
           {/* Financing Alerts */}
-          <div className="flex items-center justify-between py-3 border-b border-border">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
             <div className="flex items-center gap-3">
-              <span className="text-2xl">💰</span>
+              <DollarCircleIcon className="w-5 h-5 text-yellow-400" />
               <div>
-                <p className="text-white font-medium">Financing Alerts</p>
-                <p className="text-textSecondary text-sm">Updates on financing activities</p>
+                <p className="text-sm font-medium text-white">Financing Alerts</p>
+                <p className="text-xs text-gray-500">Updates on financing activities</p>
               </div>
             </div>
             <button
               onClick={() => setAlertFinancing(!alertFinancing)}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                alertFinancing ? 'bg-warning' : 'bg-surface'
+                alertFinancing ? 'bg-vettr-accent' : 'bg-white/10'
               }`}
             >
               <span
@@ -204,18 +208,18 @@ export default function SettingsPage() {
           </div>
 
           {/* Drill Result Alerts */}
-          <div className="flex items-center justify-between py-3 border-b border-border">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
             <div className="flex items-center gap-3">
-              <span className="text-2xl">⛏️</span>
+              <PickaxeIcon className="w-5 h-5 text-blue-400" />
               <div>
-                <p className="text-white font-medium">Drill Result Alerts</p>
-                <p className="text-textSecondary text-sm">New drilling results and updates</p>
+                <p className="text-sm font-medium text-white">Drill Result Alerts</p>
+                <p className="text-xs text-gray-500">New drilling results and updates</p>
               </div>
             </div>
             <button
               onClick={() => setAlertDrillResult(!alertDrillResult)}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                alertDrillResult ? 'bg-accent' : 'bg-surface'
+                alertDrillResult ? 'bg-vettr-accent' : 'bg-white/10'
               }`}
             >
               <span
@@ -227,18 +231,18 @@ export default function SettingsPage() {
           </div>
 
           {/* Management Change Alerts */}
-          <div className="flex items-center justify-between py-3">
+          <div className="flex items-center justify-between px-6 py-4">
             <div className="flex items-center gap-3">
-              <span className="text-2xl">👔</span>
+              <UsersIcon className="w-5 h-5 text-purple-400" />
               <div>
-                <p className="text-white font-medium">Management Change Alerts</p>
-                <p className="text-textSecondary text-sm">Executive team changes</p>
+                <p className="text-sm font-medium text-white">Management Change Alerts</p>
+                <p className="text-xs text-gray-500">Executive team changes</p>
               </div>
             </div>
             <button
               onClick={() => setAlertManagementChange(!alertManagementChange)}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                alertManagementChange ? 'bg-warning' : 'bg-surface'
+                alertManagementChange ? 'bg-vettr-accent' : 'bg-white/10'
               }`}
             >
               <span
@@ -251,32 +255,82 @@ export default function SettingsPage() {
         </div>
 
         {/* Appearance Section */}
-        <div className="bg-primaryLight border border-border rounded-lg p-6 mb-4">
-          <h2 className="text-xl font-semibold text-white mb-4">Appearance</h2>
+        <div className="bg-vettr-card/30 border border-white/5 rounded-2xl overflow-hidden mb-4">
+          <div className="px-6 py-4 border-b border-white/5">
+            <h2 className="text-lg font-semibold text-white">Appearance</h2>
+          </div>
 
-          {/* Theme Toggle */}
-          <div className="mb-4">
-            <label className="block text-white dark:text-white font-medium mb-2">Theme</label>
-            <SelectDropdown
-              value={theme}
-              onChange={(value) => handleThemeChange(value as Theme)}
-              options={[
-                { value: 'dark', label: 'Dark (Default)' },
-                { value: 'light', label: 'Light' },
-                { value: 'system', label: 'System' },
-              ]}
-            />
-            <p className="text-textSecondary dark:text-textSecondary text-sm mt-2">Choose your preferred theme. Changes apply immediately.</p>
+          {/* Theme Selection */}
+          <div className="px-6 py-4">
+            <label className="block text-white font-medium mb-3 text-sm">Theme</label>
+            <div className="grid grid-cols-3 gap-3">
+              {/* Dark Theme */}
+              <button
+                onClick={() => handleThemeChange('dark')}
+                className={`px-4 py-3 rounded-xl border transition-all ${
+                  theme === 'dark'
+                    ? 'bg-vettr-accent/10 border-vettr-accent text-white'
+                    : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10 hover:border-white/20'
+                }`}
+              >
+                <div className="flex flex-col items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-gray-900 border border-white/20"></div>
+                  <span className="text-xs font-medium">Dark</span>
+                  {theme === 'dark' && (
+                    <CheckCircleIcon className="w-4 h-4 text-vettr-accent" />
+                  )}
+                </div>
+              </button>
+
+              {/* Light Theme */}
+              <button
+                onClick={() => handleThemeChange('light')}
+                className={`px-4 py-3 rounded-xl border transition-all ${
+                  theme === 'light'
+                    ? 'bg-vettr-accent/10 border-vettr-accent text-white'
+                    : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10 hover:border-white/20'
+                }`}
+              >
+                <div className="flex flex-col items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-white border border-gray-300"></div>
+                  <span className="text-xs font-medium">Light</span>
+                  {theme === 'light' && (
+                    <CheckCircleIcon className="w-4 h-4 text-vettr-accent" />
+                  )}
+                </div>
+              </button>
+
+              {/* System Theme */}
+              <button
+                onClick={() => handleThemeChange('system')}
+                className={`px-4 py-3 rounded-xl border transition-all ${
+                  theme === 'system'
+                    ? 'bg-vettr-accent/10 border-vettr-accent text-white'
+                    : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10 hover:border-white/20'
+                }`}
+              >
+                <div className="flex flex-col items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-gray-900 to-white border border-white/20"></div>
+                  <span className="text-xs font-medium">System</span>
+                  {theme === 'system' && (
+                    <CheckCircleIcon className="w-4 h-4 text-vettr-accent" />
+                  )}
+                </div>
+              </button>
+            </div>
+            <p className="text-xs text-gray-500 mt-3">Choose your preferred theme. Changes apply immediately.</p>
           </div>
         </div>
 
         {/* Default Settings Section */}
-        <div className="bg-primaryLight border border-border rounded-lg p-6 mb-4">
-          <h2 className="text-xl font-semibold text-white mb-4">Default Settings</h2>
+        <div className="bg-vettr-card/30 border border-white/5 rounded-2xl overflow-hidden mb-6">
+          <div className="px-6 py-4 border-b border-white/5">
+            <h2 className="text-lg font-semibold text-white">Default Settings</h2>
+          </div>
 
           {/* Default Sort Order */}
-          <div className="mb-4">
-            <label className="block text-white font-medium mb-2">Default Sort Order</label>
+          <div className="px-6 py-4">
+            <label className="block text-white font-medium mb-2 text-sm">Default Sort Order</label>
             <SelectDropdown
               value={defaultSortOrder}
               onChange={(value) => setDefaultSortOrder(value)}
@@ -288,7 +342,7 @@ export default function SettingsPage() {
                 { value: 'sector', label: 'Sector' },
               ]}
             />
-            <p className="text-textSecondary text-sm mt-2">Default sorting for stock lists</p>
+            <p className="text-xs text-gray-500 mt-2">Default sorting for stock lists</p>
           </div>
         </div>
 
@@ -296,7 +350,7 @@ export default function SettingsPage() {
         <div className="flex justify-end gap-3">
           <button
             onClick={() => router.push('/profile')}
-            className="px-6 py-3 bg-surface hover:bg-surfaceLight rounded-lg transition-colors text-white font-medium"
+            className="px-6 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors text-white font-medium"
             disabled={isUpdating}
           >
             Cancel
@@ -304,7 +358,7 @@ export default function SettingsPage() {
           <button
             onClick={handleSaveSettings}
             disabled={isUpdating}
-            className="px-6 py-3 bg-accent hover:bg-accentDim rounded-lg transition-colors text-primaryDark font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="px-6 py-2.5 bg-vettr-accent hover:bg-vettr-accent/90 rounded-xl transition-colors text-vettr-navy font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
             {isUpdating ? (
               <>

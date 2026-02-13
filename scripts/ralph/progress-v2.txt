@@ -768,3 +768,50 @@ Files modified:
 - Modal max-w-2xl provides good width for multi-step wizard without being too wide
 - Step transitions should be fade-only (not slide left/right) to avoid layout shift and complexity
 ---
+
+## V2-021: Redesign Profile page
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Completely redesigned Profile page with premium V2 design system
+- Updated user header: w-16 h-16 gradient initials avatar (from-vettr-accent/20 to-vettr-accent/5), display name in text-xl font-semibold, email in text-gray-400
+- Tier badge updated to V2 tokens: premium=vettr-accent/10, pro=yellow-400/10, free=gray-400/10
+- Redesigned Account section (previously Subscription) as grouped card with border-separated rows
+- Account section shows: Current Plan, Watchlist Limit, Stocks Tracked (removed billing_period and expires_at for cleaner layout)
+- Removed Data Sync section, merged into Data section
+- Redesigned Data section with favorites count, last sync timestamp, and Clear Cache button as interactive row
+- Clear Cache button styled as row with icon, label, description, and chevron right arrow
+- Redesigned Help section (previously Help & Learning): Glossary and FAQ as rows with SVG icons and chevron
+- Removed "View Onboarding" button (not in V2-021 requirements)
+- Updated SVG icons to proper inline SVG with strokeWidth={1.5}: book icon (Glossary), question mark icon (FAQ)
+- Redesigned About section: Version as data row, Terms/Privacy/Contact as interactive rows with SVG icons
+- Terms uses document icon, Privacy uses shield icon, Contact uses mail icon
+- Removed "Send Feedback" button from About section (FeedbackForm modal still exists but not linked in Profile)
+- Sign Out button redesigned: text-red-400 hover:text-red-300 with hover:bg-red-400/10, border border-white/5
+- Sign Out confirmation modal updated with V2 tokens: bg-white/5 for Cancel button, bg-red-500 for Sign Out button
+- All sections use consistent pattern: bg-vettr-card/30 border-white/5 rounded-2xl overflow-hidden
+- Section headers: text-lg font-semibold text-white px-6 py-4 border-b border-white/5
+- Section rows: px-6 py-4 border-b border-white/5 (last item has no border-b)
+- All interactive rows: hover:bg-white/5 transition-colors with chevron right arrow
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/app/(main)/profile/page.tsx
+
+**Learnings for future iterations:**
+- Grouped card sections with border-separated rows create cleaner, more professional layout than individual cards
+- Each section should be bg-vettr-card/30 border-white/5 rounded-2xl with overflow-hidden for clean borders
+- Section header pattern: px-6 py-4 with border-b border-white/5 for separation
+- Interactive rows work better than buttons for navigation links (Glossary, FAQ, Terms, etc.)
+- Row pattern: flex items-center justify-between px-6 py-4 with hover:bg-white/5 and chevron right icon
+- Icon + label + description layout provides context without cluttering UI
+- Data rows (read-only): flex justify-between with label on left (text-gray-400) and value on right (text-white font-medium)
+- Sign Out should be subtle button (not bold bg-error), using text-red-400 with border
+- Tier badge colors: premium=vettr-accent/10 text-vettr-accent, pro=yellow-400/10 text-yellow-400, free=gray-400/10 text-gray-400
+- User avatar should be w-16 h-16 (not w-20 h-20) per V2 design system
+- SVG icons in rows should use text-gray-400 with group-hover:text-white transition
+- Chevron icons use group-hover:text-vettr-accent for accent color on hover
+- All old design tokens replaced: bg-primary → bg-vettr-navy, bg-primaryLight → bg-vettr-card/30, text-textPrimary → text-white, text-textSecondary → text-gray-400, text-textMuted → text-gray-500, border-border → border-white/5, bg-surface → bg-white/5, bg-accent → bg-vettr-accent, text-accent → text-vettr-accent, bg-error → bg-red-500, text-error → text-red-400
+- Removed emoji icons (🚀, 📖, ❓) and replaced with proper SVG icons for consistency
+---
