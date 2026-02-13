@@ -815,3 +815,44 @@ Files modified:
 - All old design tokens replaced: bg-primary → bg-vettr-navy, bg-primaryLight → bg-vettr-card/30, text-textPrimary → text-white, text-textSecondary → text-gray-400, text-textMuted → text-gray-500, border-border → border-white/5, bg-surface → bg-white/5, bg-accent → bg-vettr-accent, text-accent → text-vettr-accent, bg-error → bg-red-500, text-error → text-red-400
 - Removed emoji icons (🚀, 📖, ❓) and replaced with proper SVG icons for consistency
 ---
+
+## V2-022: Redesign Settings page
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Completely redesigned Settings page with premium V2 design system
+- Added DollarCircleIcon and PickaxeIcon to icon library for alert preferences
+- Updated header with ChevronLeftIcon (replaced inline SVG) and V2 color tokens
+- Redesigned all sections with grouped card pattern: bg-vettr-card/30 border-white/5 rounded-2xl overflow-hidden
+- Section headers: px-6 py-4 border-b border-white/5 with text-lg font-semibold
+- Notification Settings section: BellIcon added, toggle row with proper V2 styling
+- Alert Preferences section: replaced emoji icons with proper SVG components (FlagIcon, DollarCircleIcon, PickaxeIcon, UsersIcon)
+- Alert type icons colored: Red Flag=red-400, Financing=yellow-400, Drill Results=blue-400, Management=purple-400
+- Toggle switches updated: bg-vettr-accent when on, bg-white/10 when off (not bg-surface)
+- Each toggle row: px-6 py-4 with icon, label (text-sm font-medium), description (text-xs text-gray-500)
+- Appearance section: redesigned as 3 option cards (Dark/Light/System) instead of dropdown
+- Theme cards show visual preview (dark bg, light bg, gradient for system) with CheckCircleIcon when selected
+- Active theme card: bg-vettr-accent/10 border-vettr-accent, inactive: bg-white/5 border-white/10 with hover states
+- Default Settings section: SelectDropdown for sort order with V2 tokens
+- Save/Cancel buttons updated: Cancel uses bg-white/5 border-white/10, Save uses bg-vettr-accent text-vettr-navy
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/components/icons/index.tsx (added DollarCircleIcon, PickaxeIcon)
+- src/app/(main)/profile/settings/page.tsx
+
+**Learnings for future iterations:**
+- Settings page should use grouped card sections with border-separated rows (not individual cards)
+- Alert preference icons should be colored SVG components for visual distinction (not emoji)
+- Icon colors per acceptance criteria: Red Flag=red-400, Financing=yellow-400, Drill=blue-400, Management=purple-400
+- Toggle switches should use bg-white/10 when off (not bg-surface or old design tokens)
+- Appearance section works better as visual card options than dropdown for theme selection
+- Theme preview cards show actual color (dark bg, light bg, gradient) for better UX
+- CheckCircleIcon provides clear selected state indication on theme cards
+- Section pattern: header with border-b, then rows with border-b between items (last row has no border)
+- All old design tokens replaced: bg-primaryLight → bg-vettr-card/30, border-border → border-white/5, text-textSecondary → text-gray-400 or text-gray-500, bg-surface → bg-white/10, bg-accent → bg-vettr-accent, text-accent → text-vettr-accent, bg-error/bg-warning → use specific toggle switches all use bg-vettr-accent when on
+- DollarCircleIcon includes dollar sign with vertical line (not just $ symbol)
+- PickaxeIcon represents drilling/mining tool for drill result alerts
+- Settings page maintains existing save functionality (manual save with toast notification)
+---
