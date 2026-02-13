@@ -53,7 +53,11 @@ function MainLayoutContent({ children }: { children: React.ReactNode }) {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-lightBg dark:bg-vettr-navy transition-colors duration-200">
+      <div className="min-h-screen bg-lightBg dark:bg-vettr-navy transition-colors duration-200 relative">
+        {/* Background gradients for depth - subtle in both modes */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(0,230,118,0.02)_0%,_transparent_50%)] dark:bg-[radial-gradient(ellipse_at_top_right,_rgba(0,230,118,0.04)_0%,_transparent_50%)] pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_rgba(68,138,255,0.015)_0%,_transparent_50%)] dark:bg-[radial-gradient(ellipse_at_bottom_left,_rgba(68,138,255,0.03)_0%,_transparent_50%)] pointer-events-none" />
+
         {/* Skip to main content link for accessibility */}
         <a
           href="#main-content"
@@ -64,7 +68,7 @@ function MainLayoutContent({ children }: { children: React.ReactNode }) {
         <Navigation />
         <Header />
         {/* Main content area - offset for desktop sidebar and mobile bottom bar */}
-        <main id="main-content" className="md:ml-64 pt-16 pb-20 md:pb-0 transition-colors duration-200">
+        <main id="main-content" className="md:ml-64 pt-16 pb-20 md:pb-0 transition-colors duration-200 relative z-10">
           {children}
         </main>
         {/* Onboarding overlay */}

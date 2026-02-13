@@ -74,7 +74,7 @@ export function Navigation() {
         className={`
           hidden md:flex md:flex-col
           fixed left-0 top-0 h-screen
-          bg-white dark:bg-vettr-dark border-r border-gray-200 dark:border-white/5
+          bg-gradient-to-b from-white to-gray-50 dark:from-vettr-dark dark:to-vettr-dark/95 border-r border-gray-200 dark:border-white/5
           transition-all duration-200 ease-in-out
           ${isSidebarCollapsed ? 'w-16' : 'w-64'}
           z-40
