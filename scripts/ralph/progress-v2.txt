@@ -1107,3 +1107,41 @@ Files modified:
 - All old design tokens replaced: bg-primaryLight → removed (no card), text-textPrimary → text-white, text-textSecondary → text-gray-400, text-textMuted → text-gray-500, bg-accent → bg-vettr-accent, text-primaryDark → text-vettr-navy
 - Removed close button per acceptance criteria (user completes flow or skips, no X button)
 ---
+## V2-029: Redesign FeedbackForm modal
+Status: ✅ COMPLETE
+Date: 2026-02-13
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Completely redesigned FeedbackForm component with premium V2 design system
+- Replaced dropdown category selector with 3-column grid of card options
+- Category cards show icon, label with bg-vettr-accent/5 border-vettr-accent when selected
+- Category icons: Bug (FlagIcon red-400), Feature (lightbulb vettr-accent), General (chat bubbles blue-400)
+- Updated modal styling: bg-vettr-card border-white/10 rounded-2xl shadow-2xl
+- Updated backdrop: bg-black/60 backdrop-blur-sm for consistency with V2 modals
+- Header uses XIcon component from icon library with p-1 hover:bg-white/5 rounded-lg
+- Message textarea: bg-white/5 border-white/10 rounded-xl with min-h-[120px], focus:border-vettr-accent/40
+- Email input with same V2 input styling (bg-white/5 border-white/10 rounded-xl)
+- Submit button: bg-vettr-accent text-vettr-navy font-semibold rounded-xl with loading spinner
+- Cancel button: bg-white/5 border-white/10 text-white rounded-xl hover:bg-white/10
+- Implemented success state with CheckCircleIcon animation (zoom-in) and "Thank you!" message
+- Success state displays for 2 seconds before auto-closing modal and resetting form
+- Loading spinner uses border-vettr-navy to contrast against green button background
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+Files modified:
+- src/components/FeedbackForm.tsx
+
+**Learnings for future iterations:**
+- Category selector works much better as visual card options than dropdown for 3 choices
+- Grid layout (grid-cols-3) creates compact category selector without taking too much vertical space
+- Each category card should have unique colored icon for visual distinction (not all same color)
+- Success state with checkmark animation provides better feedback than just toast notification
+- Auto-close after success state (2s delay) gives user time to see confirmation without manual dismissal
+- isSuccess state controls which content to render (success message vs form)
+- Category icons inline SVG allows custom colors per category (FlagIcon for bug, custom lightbulb for feature, chat for general)
+- min-h-[120px] on textarea matches acceptance criteria exactly
+- All old design tokens replaced: bg-primaryLight → bg-vettr-card, border-border → border-white/10, text-textSecondary → text-gray-300, text-textMuted → text-gray-500, bg-surface → bg-white/5, text-error → text-red-400, bg-accent → bg-vettr-accent, text-primary → text-vettr-navy
+- Card options should be buttons (not divs) for better accessibility
+- Category type updated to 'Bug' | 'Feature' | 'General' (simpler than 'Bug Report' | 'Feature Request' | 'General Feedback')
+---
+
