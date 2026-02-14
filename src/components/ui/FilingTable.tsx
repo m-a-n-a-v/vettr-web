@@ -83,9 +83,9 @@ export default function FilingTable({ filings, showStock = true }: FilingTablePr
   };
 
   return (
-    <div className="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0">
+    <div className="overflow-x-auto">
       <table className="w-full min-w-[700px] border-collapse" role="table" aria-label="Filings">
-        <thead className="sticky top-16 z-20 bg-vettr-navy dark:bg-vettr-navy bg-lightBg backdrop-blur-sm">
+        <thead className="bg-vettr-navy">
           <tr role="row" className="border-b border-white/5">
             <th
               role="columnheader"

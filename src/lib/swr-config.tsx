@@ -17,18 +17,20 @@ export function SWRProvider({ children }: SWRProviderProps) {
   return (
     <SWRConfig
       value={{
-        // Cache settings — generous deduplication to stay within 60 req/min rate limit
-        dedupingInterval: 30000, // Prevent duplicate requests within 30s
-        focusThrottleInterval: 60000, // Throttle revalidation on focus to once per 60s
+        // Cache settings — generous deduplication to stay within rate limits
+        dedupingInterval: 60000, // Prevent duplicate requests within 60s
+        focusThrottleInterval: 120000, // Throttle revalidation on focus to once per 2min
 
-        // Revalidation settings — conservative to avoid rate limiting
-        revalidateOnFocus: false, // Disabled globally — pages can opt-in per-hook if needed
-        revalidateOnReconnect: true, // Revalidate when network reconnects (rare event)
-        revalidateIfStale: true, // Revalidate if data is stale
+        // Revalidation settings — very conservative to avoid rate limiting
+        revalidateOnFocus: false, // Disabled globally — never revalidate on tab focus
+        revalidateOnReconnect: false, // Don't revalidate on reconnect — user can manually refresh
+        revalidateIfStale: false, // CRITICAL: Don't auto-revalidate stale data on mount — this was causing the storm
+        // When navigating between pages, SWR was refiring ALL stale keys from previously visited pages.
+        // Users can manually refresh; data is refreshed on explicit mutate() calls only.
 
         // Error retry settings — conservative to avoid compounding 429s
-        errorRetryCount: 2,
-        errorRetryInterval: 10000, // 10s between retries
+        errorRetryCount: 1,
+        errorRetryInterval: 15000, // 15s between retries
         shouldRetryOnError: true,
         onErrorRetry: (error: { status?: number; code?: string }, key, config, revalidate, { retryCount }) => {
           // Never retry on 404
@@ -40,11 +42,11 @@ export function SWRProvider({ children }: SWRProviderProps) {
           // Never retry on auth errors
           if (error.status === 401 || error.status === 403) return;
 
-          // Only retry up to 2 times
-          if (retryCount >= 2) return;
+          // Only retry once
+          if (retryCount >= 1) return;
 
-          // Retry with increasing delay (10s, 20s)
-          setTimeout(() => revalidate({ retryCount }), 10000 * (retryCount + 1));
+          // Retry with 15s delay
+          setTimeout(() => revalidate({ retryCount }), 15000);
         },
 
         // Cache time settings

@@ -87,8 +87,8 @@ const DEDUPLICATION_WINDOW_MS = 2000; // 2s dedup window — prevents same reque
 // ─── Global Request Throttler ───────────────────────────────────────────────
 // Spaces out concurrent API calls to avoid hitting rate limits.
 // Instead of firing 10 requests simultaneously, they are staggered.
-const MAX_CONCURRENT_REQUESTS = 4; // Max in-flight requests at once
-const REQUEST_STAGGER_MS = 150; // Minimum ms between request dispatches
+const MAX_CONCURRENT_REQUESTS = 3; // Max in-flight requests at once
+const REQUEST_STAGGER_MS = 200; // Minimum ms between request dispatches
 let activeRequestCount = 0;
 let lastRequestTime = 0;
 

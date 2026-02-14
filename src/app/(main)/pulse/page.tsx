@@ -26,8 +26,10 @@ export default function PulsePage() {
   // Fetch all stocks for analysis
   const { stocks, isLoading: isLoadingStocks, error: stocksError, mutate: mutateStocks } = useStocks({ limit: 100 })
 
-  // Fetch recent filings
-  const { filings, isLoading: isLoadingFilings, error: filingsError, mutate: mutateFilings } = useFilings({ limit: 5 })
+  // Fetch recent filings (limit: 10 to share SWR cache key with Discovery page)
+  const { filings: allRecentFilings, isLoading: isLoadingFilings, error: filingsError, mutate: mutateFilings } = useFilings({ limit: 10 })
+  // Only show 5 on Pulse
+  const filings = useMemo(() => allRecentFilings.slice(0, 5), [allRecentFilings])
 
   // Fetch red flag trend data
   const { trend: redFlagTrend, isLoading: isLoadingRedFlagTrend, error: redFlagTrendError, mutate: mutateRedFlagTrend } = useRedFlagTrend()

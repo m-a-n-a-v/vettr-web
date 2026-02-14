@@ -44,24 +44,34 @@ function DiscoveryPageContent() {
   const [isClient, setIsClient] = useState(false);
   const { showToast } = useToast();
 
-  // Fetch all stocks for featured section and sector extraction
+  // Fetch all stocks (shares SWR cache key with Pulse page: /stocks?limit=100&offset=0)
   const {
     stocks: allStocks,
     isLoading: isLoadingStocks,
     isError: isErrorStocks,
     mutate: mutateAllStocks,
-  } = useStocks({ limit: 100 }); // Fetch more stocks for better variety
+  } = useStocks({ limit: 100 });
 
-  // Fetch stocks filtered by search and sector
-  const {
-    stocks: filteredStocks,
-    isLoading: isLoadingFiltered,
-    mutate: mutateFilteredStocks,
-  } = useStocks({
-    limit: 8,
-    search: searchQuery || undefined,
-    sector: selectedSector !== 'All' ? selectedSector : undefined,
-  });
+  // Filter stocks client-side instead of making a separate API call
+  // This eliminates an extra API request that was contributing to rate limiting
+  const filteredStocks = useMemo(() => {
+    let result = allStocks;
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter(
+        (s) =>
+          s.ticker.toLowerCase().includes(q) ||
+          (s.company_name || '').toLowerCase().includes(q) ||
+          (s.sector || '').toLowerCase().includes(q)
+      );
+    }
+    if (selectedSector !== 'All') {
+      result = result.filter((s) => s.sector === selectedSector);
+    }
+    return result.slice(0, 8);
+  }, [allStocks, searchQuery, selectedSector]);
+
+  const isLoadingFiltered = isLoadingStocks;
 
   // Fetch recent filings filtered by sector
   const {
@@ -113,7 +123,6 @@ function DiscoveryPageContent() {
     try {
       await Promise.all([
         mutateAllStocks(),
-        mutateFilteredStocks(),
         mutateFilings(),
       ]);
       showToast('Data refreshed successfully', 'success');
@@ -121,7 +130,7 @@ function DiscoveryPageContent() {
       showToast('Failed to refresh data', 'error');
       throw error;
     }
-  }, [mutateAllStocks, mutateFilteredStocks, mutateFilings, showToast]);
+  }, [mutateAllStocks, mutateFilings, showToast]);
 
   // Use refresh hook with debouncing
   const { isRefreshing, handleRefresh, canRefresh } = useRefresh({
