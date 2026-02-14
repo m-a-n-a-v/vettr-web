@@ -96,7 +96,8 @@ function StockDetailContent() {
   const { stock, isLoading: stockLoading, error: stockError } = useStock(ticker);
   const { score, isLoading: scoreLoading } = useVetrScore({ ticker });
   const { filings, isLoading: filingsLoading } = useFilings({ ticker, limit: 5 });
-  const { executives, isLoading: executivesLoading } = useExecutives({ ticker, search: executiveSearch });
+  // Fetch all executives for this ticker — client-side filtering via filteredAndSortedExecutives
+  const { executives, isLoading: executivesLoading } = useExecutives({ ticker });
   const { watchlist, isAdding, isRemoving, addToWatchlist, removeFromWatchlist } = useWatchlist();
   const { redFlags, isLoading: redFlagsLoading, mutate: mutateRedFlags } = useRedFlags({ ticker });
   const { history: flagHistory, isLoading: flagHistoryLoading } = useRedFlagHistory({ ticker, limit: 10 });
@@ -170,9 +171,18 @@ function StockDetailContent() {
     router.replace(newUrl, { scroll: false });
   }, [activeTab, executiveSearch, executiveTitleFilter, executiveSortBy, scoreHistoryPeriod, isClient, router, ticker]);
 
-  // Filter and sort executives
+  // Filter and sort executives (client-side filtering for search + title)
   const filteredAndSortedExecutives = useMemo(() => {
     let result = [...executives];
+
+    // Apply name search filter
+    if (executiveSearch) {
+      const q = executiveSearch.toLowerCase();
+      result = result.filter(exec =>
+        exec.name.toLowerCase().includes(q) ||
+        exec.title.toLowerCase().includes(q)
+      );
+    }
 
     // Apply title filter
     if (executiveTitleFilter !== 'all') {
@@ -187,18 +197,18 @@ function StockDetailContent() {
         case 'title':
           return a.title.localeCompare(b.title);
         case 'tenure':
-          return b.years_at_company - a.years_at_company;
+          return (b.years_at_company ?? 0) - (a.years_at_company ?? 0);
         case 'experience':
-          return b.total_experience_years - a.total_experience_years;
+          return (b.total_experience_years ?? 0) - (a.total_experience_years ?? 0);
         case 'specialization':
-          return a.specialization.localeCompare(b.specialization);
+          return (a.specialization ?? '').localeCompare(b.specialization ?? '');
         default:
           return 0;
       }
     });
 
     return result;
-  }, [executives, executiveTitleFilter, executiveSortBy]);
+  }, [executives, executiveSearch, executiveTitleFilter, executiveSortBy]);
 
   // Extract unique titles for filter options
   const uniqueTitles = useMemo(() => {

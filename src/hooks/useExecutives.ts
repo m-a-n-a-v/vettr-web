@@ -5,8 +5,8 @@ import { api } from '@/lib/api-client';
 import type { Executive, PaginatedResponse } from '@/types/api';
 
 interface UseExecutivesParams {
-  ticker?: string; // Filter by stock ticker
-  search?: string; // Search by name
+  ticker?: string; // Stock ticker (required for data fetch)
+  search?: string; // Search by name (used for search endpoint)
   limit?: number;
   offset?: number;
 }
@@ -25,34 +25,30 @@ interface UseExecutivesReturn {
 }
 
 /**
- * Hook to fetch executives list with optional filtering by ticker and search query
- * Supports pagination with limit/offset
+ * Hook to fetch executives for a stock ticker
+ * Uses /stocks/:ticker/executives endpoint (paginated)
+ * Falls back to /executives/search when search query is provided
  */
 export function useExecutives(
   params: UseExecutivesParams = {}
 ): UseExecutivesReturn {
   const { ticker, search, limit = 25, offset = 0 } = params;
 
-  // Build query string based on whether we're searching or listing
-  const queryParams = new URLSearchParams();
+  // Determine the endpoint based on whether we have a ticker and/or search
+  let key: string | null = null;
 
-  // If search query is provided, use search endpoint
-  if (search) {
-    queryParams.append('q', search);
+  if (ticker && search) {
+    // Search executives by name within the stock context
+    // Use the search endpoint with ticker filter
+    const queryParams = new URLSearchParams({
+      q: search,
+      limit: limit.toString(),
+    });
+    key = `/executives/search?${queryParams.toString()}`;
+  } else if (ticker) {
+    // Fetch all executives for a stock — uses /stocks/:ticker/executives
+    key = `/stocks/${ticker}/executives`;
   }
-
-  // Add ticker filter if provided
-  if (ticker) {
-    queryParams.append('ticker', ticker);
-  }
-
-  queryParams.append('limit', limit.toString());
-  queryParams.append('offset', offset.toString());
-
-  const queryString = queryParams.toString();
-  // Use search endpoint if search query exists, otherwise use list endpoint
-  const endpoint = search ? '/executives/search' : '/executives';
-  const key = queryString ? `${endpoint}?${queryString}` : endpoint;
 
   const fetcher = async (url: string): Promise<PaginatedResponse<Executive>> => {
     const response = await api.get<PaginatedResponse<Executive>>(url);
