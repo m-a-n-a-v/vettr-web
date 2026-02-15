@@ -117,3 +117,56 @@ Files Modified:
 - Removed all references to old 5-pillar system from chart theme configuration
 ---
 
+## VS2-022: Update VetrScoreTrend component
+Status: ✅ COMPLETE
+Date: 2026-02-15
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Updated src/components/VetrScoreTrend.tsx to use 5-tier color scale for direction indicators
+- Changed direction color mappings to use proper design system colors:
+  - Improving: text-vettr-accent (#00E676 green)
+  - Stable: text-yellow-400 (#FBBF24 yellow)
+  - Declining: text-red-400 (#F87171 red)
+- Updated card container to use premium design system pattern: bg-vettr-card/50 with hover effects
+- Changed all text color classes from old theme (text-textPrimary, text-textSecondary, text-textMuted) to design system colors (text-white, text-gray-400, text-gray-500)
+- Updated border styles to use border-white/10 for consistent design language
+- Changed icons to use strokeWidth={1.5} per design system icon pattern
+- Updated recent changes delta display to use text-vettr-accent for positive and text-red-400 for negative
+- Verified no references to old pillar names (pedigree, filing_velocity, red_flag, growth, governance)
+- Component already uses overall_score from trend data (not individual pillar scores)
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+Files Modified:
+- src/components/VetrScoreTrend.tsx
+
+**Learnings for future iterations:**
+- VetrScoreTrend component focuses on direction/momentum rather than absolute scores, so 5-tier colors apply to directional indicators
+- Design system requires consistent use of vettr-accent, gray-*, and explicit color utilities rather than abstract theme tokens
+- Card pattern with hover effects (hover:border-vettr-accent/20 hover:bg-vettr-card/80) enhances user experience
+- Recent changes show point deltas (not absolute scores), so green/red for positive/negative is semantically correct
+---
+
+## VS2-023: Update useVetrScore hook response parsing
+Status: ✅ COMPLETE
+Date: 2026-02-15
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Updated src/hooks/useVetrScore.ts JSDoc comment to reflect 4-pillar breakdown system
+- Changed description from "component breakdown" to "4-pillar breakdown"
+- Documented the 4 pillars: Financial Survival, Operational Efficiency, Shareholder Structure, Market Sentiment
+- Noted that null_pillars array is included in return value
+- Hook already uses VetrScore type from @/types/api which was updated in VS2-018 to new 4-pillar structure
+- Hook passes through API response without transformation, so null_pillars and all new pillar fields are automatically exposed
+- Verified no references to old pillar names (pedigree, filing_velocity, red_flag, growth, governance) in hook code
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+Files Modified:
+- src/hooks/useVetrScore.ts
+
+**Learnings for future iterations:**
+- The useVetrScore hook is a clean pass-through hook that relies on TypeScript interfaces for structure
+- Since VetrScore interface was updated in VS2-018, the hook automatically exposes all new fields including null_pillars
+- No response transformation/mapping logic needed - SWR and TypeScript types handle everything
+- JSDoc documentation is important for developer experience when using the hook
+---
+
