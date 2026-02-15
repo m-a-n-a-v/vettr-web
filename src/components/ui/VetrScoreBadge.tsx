@@ -47,12 +47,13 @@ export default function VetrScoreBadge({
     }
   }, [safeScore, shouldAnimate]);
 
-  // Determine stroke color based on score (using Tailwind theme colors)
+  // Determine stroke color based on score (5-tier color scale)
   const getStrokeColor = (): string => {
-    if (safeScore >= 80) return '#00E676'; // vettr-accent
-    if (safeScore >= 60) return '#FBBF24'; // yellow-400
-    if (safeScore >= 40) return '#FB923C'; // orange-400
-    return '#F87171'; // red-400
+    if (safeScore >= 90) return '#166534'; // dark green (90-100)
+    if (safeScore >= 75) return '#00E676'; // green (75-89)
+    if (safeScore >= 50) return '#FBBF24'; // yellow (50-74)
+    if (safeScore >= 30) return '#FB923C'; // orange (30-49)
+    return '#F87171'; // red (0-29)
   };
 
   // Size configurations

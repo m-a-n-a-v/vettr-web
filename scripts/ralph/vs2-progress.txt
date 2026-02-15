@@ -1,3 +1,31 @@
 # VETTR Web App - Score V2 Ralph Progress Log
 Started: Sun Feb 15 17:05:40 EST 2026
 ---
+## VS2-018: Update VetrScore TypeScript interfaces
+Status: ✅ COMPLETE
+Date: 2026-02-15
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Updated src/types/api.ts to replace 5-pillar VetrScore interface with 4-pillar system
+- Created new pillar interfaces: FinancialSurvivalSubScores, OperationalEfficiencySubScores, ShareholderStructureSubScores, MarketSentimentSubScores
+- Created VetrScorePillar<T> generic interface for pillar structure with score, weight, and sub_scores
+- Updated VetrScore interface to use new 4 pillars: financial_survival, operational_efficiency, shareholder_structure, market_sentiment
+- Added null_pillars: string[] field to track pillars with missing data
+- Removed old fields: components (with pedigree, filing_velocity, red_flag, growth, governance), bonus_points, penalty_points
+- Updated VetrScoreHistoryPoint to include optional pillar scores: financial_survival_score, operational_efficiency_score, shareholder_structure_score, market_sentiment_score
+- Fixed compilation errors in src/components/VetrScoreDetail.tsx by updating component breakdown to use new 4-pillar structure
+- Fixed compilation errors in src/app/(main)/stocks/[ticker]/page.tsx by updating score display to use new pillars
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+Files Modified:
+- src/types/api.ts
+- src/components/VetrScoreDetail.tsx
+- src/app/(main)/stocks/[ticker]/page.tsx
+
+**Learnings for future iterations:**
+- When updating TypeScript interfaces, must fix all compilation errors immediately to satisfy "npm run build passes" acceptance criteria
+- The 4-pillar structure uses a more sophisticated nested approach with score, weight, and sub_scores for each pillar
+- VetrScoreDetail and stock detail page needed immediate updates to prevent build failures
+- The new structure better reflects the backend's weighted scoring system and data availability handling
+---
+
