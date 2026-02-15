@@ -21,14 +21,13 @@ export default function VetrScoreDetail({ score, onClose }: VetrScoreDetailProps
     return 'text-red-400';
   };
 
-  // Component colors matching V2-027 acceptance criteria
+  // Component colors for 4-pillar system
   const getComponentColor = (key: string): string => {
     switch (key) {
-      case 'pedigree': return 'bg-blue-400';
-      case 'filing_velocity': return 'bg-purple-400';
-      case 'red_flag': return 'bg-red-400';
-      case 'growth': return 'bg-vettr-accent';
-      case 'governance': return 'bg-yellow-400';
+      case 'financial_survival': return 'bg-blue-400';
+      case 'operational_efficiency': return 'bg-purple-400';
+      case 'shareholder_structure': return 'bg-vettr-accent';
+      case 'market_sentiment': return 'bg-yellow-400';
       default: return 'bg-gray-400';
     }
   };
@@ -36,34 +35,32 @@ export default function VetrScoreDetail({ score, onClose }: VetrScoreDetailProps
   // Component data with labels and descriptions
   const components = [
     {
-      key: 'pedigree',
-      label: 'Pedigree',
-      value: score.components.pedigree,
-      description: 'Executive team experience, tenure, and stability. Higher scores indicate strong, experienced leadership.'
+      key: 'financial_survival',
+      label: 'Financial Survival',
+      value: score.financial_survival.score,
+      weight: score.financial_survival.weight,
+      description: 'Measures cash runway and solvency. Higher scores indicate stronger financial stability and ability to sustain operations.'
     },
     {
-      key: 'filing_velocity',
-      label: 'Filing Velocity',
-      value: score.components.filing_velocity,
-      description: 'Frequency and consistency of regulatory filings. Regular filings demonstrate transparency and compliance.'
+      key: 'operational_efficiency',
+      label: 'Operational Efficiency',
+      value: score.operational_efficiency.score,
+      weight: score.operational_efficiency.weight,
+      description: 'Evaluates how efficiently the company operates relative to revenue and expenses.'
     },
     {
-      key: 'red_flag',
-      label: 'Red Flag',
-      value: score.components.red_flag,
-      description: 'Risk indicators including consolidation patterns, financing activities, and disclosure gaps.'
+      key: 'shareholder_structure',
+      label: 'Shareholder Structure',
+      value: score.shareholder_structure.score,
+      weight: score.shareholder_structure.weight,
+      description: 'Assesses pedigree, dilution patterns, and insider alignment. Higher scores indicate better shareholder protection.'
     },
     {
-      key: 'growth',
-      label: 'Growth',
-      value: score.components.growth,
-      description: 'Company growth metrics and financial performance trends over time.'
-    },
-    {
-      key: 'governance',
-      label: 'Governance',
-      value: score.components.governance,
-      description: 'Corporate governance practices, board structure, and shareholder protections.'
+      key: 'market_sentiment',
+      label: 'Market Sentiment',
+      value: score.market_sentiment.score,
+      weight: score.market_sentiment.weight,
+      description: 'Measures market liquidity and news velocity. Reflects market confidence and trading activity.'
     },
   ];
 
@@ -104,7 +101,10 @@ export default function VetrScoreDetail({ score, onClose }: VetrScoreDetailProps
               {components.map((component) => (
                 <div key={component.key}>
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-white font-medium">{component.label}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-white font-medium">{component.label}</span>
+                      <span className="text-xs text-gray-500">(weight: {component.weight}%)</span>
+                    </div>
                     <span className={`font-bold ${getScoreColor(component.value)}`}>
                       {component.value}
                     </span>
@@ -120,20 +120,17 @@ export default function VetrScoreDetail({ score, onClose }: VetrScoreDetailProps
             </div>
           </div>
 
-          {/* Bonus & Penalty Points */}
-          <div className="pt-4 border-t border-white/5">
-            <h3 className="text-lg font-semibold text-white mb-4">Adjustments</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-vettr-accent/10 border border-vettr-accent/30 rounded-xl p-4 text-center">
-                <p className="text-gray-400 text-sm mb-1">Bonus Points</p>
-                <p className="text-vettr-accent text-2xl font-bold">+{score.bonus_points}</p>
-              </div>
-              <div className="bg-red-400/10 border border-red-400/30 rounded-xl p-4 text-center">
-                <p className="text-gray-400 text-sm mb-1">Penalty Points</p>
-                <p className="text-red-400 text-2xl font-bold">-{score.penalty_points}</p>
+          {/* Null Pillars Notice */}
+          {score.null_pillars && score.null_pillars.length > 0 && (
+            <div className="pt-4 border-t border-white/5">
+              <div className="bg-yellow-400/10 border border-yellow-400/30 rounded-xl p-4">
+                <p className="text-yellow-400 text-sm font-medium mb-1">Data Availability Notice</p>
+                <p className="text-gray-400 text-xs">
+                  Weight redistributed due to insufficient data for: {score.null_pillars.join(', ')}
+                </p>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Scoring Methodology - Collapsible */}
           <div className="pt-4 border-t border-white/5">
@@ -158,7 +155,7 @@ export default function VetrScoreDetail({ score, onClose }: VetrScoreDetailProps
                 ))}
                 <div className="mt-4 p-4 bg-vettr-accent/5 border border-vettr-accent/20 rounded-xl">
                   <p className="text-gray-400 text-xs leading-relaxed">
-                    <strong className="text-white">Note:</strong> The overall VETTR Score is calculated from the sum of component scores, with bonus points added for positive factors and penalty points deducted for negative indicators. Scores range from 0-100, with higher scores indicating lower risk and stronger fundamentals.
+                    <strong className="text-white">Note:</strong> The overall VETTR Score is calculated using a weighted average of the four pillars. Each pillar&apos;s weight is dynamically adjusted based on data availability. Scores range from 0-100, with higher scores indicating lower risk and stronger fundamentals.
                   </p>
                 </div>
               </div>

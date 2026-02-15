@@ -600,65 +600,53 @@ function StockDetailContent() {
                   <p className="text-xs text-gray-500 mt-2">VETTR Score</p>
 
                   {/* Component breakdown bars */}
-                  {score.components && (
+                  {score.financial_survival && (
                     <div className="w-full max-w-md mt-6 space-y-3">
                       <div>
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-xs text-gray-400">Pedigree</span>
-                          <span className="text-xs font-medium text-white">{score.components.pedigree}</span>
+                          <span className="text-xs text-gray-400">Financial Survival</span>
+                          <span className="text-xs font-medium text-white">{score.financial_survival.score}</span>
                         </div>
                         <div className="w-full bg-white/5 rounded-full h-1.5">
                           <div
                             className="bg-blue-400 h-1.5 rounded-full transition-all duration-1000"
-                            style={{ width: `${score.components.pedigree}%` }}
+                            style={{ width: `${score.financial_survival.score}%` }}
                           />
                         </div>
                       </div>
                       <div>
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-xs text-gray-400">Filing Velocity</span>
-                          <span className="text-xs font-medium text-white">{score.components.filing_velocity}</span>
+                          <span className="text-xs text-gray-400">Operational Efficiency</span>
+                          <span className="text-xs font-medium text-white">{score.operational_efficiency.score}</span>
                         </div>
                         <div className="w-full bg-white/5 rounded-full h-1.5">
                           <div
                             className="bg-purple-400 h-1.5 rounded-full transition-all duration-1000"
-                            style={{ width: `${score.components.filing_velocity}%` }}
+                            style={{ width: `${score.operational_efficiency.score}%` }}
                           />
                         </div>
                       </div>
                       <div>
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-xs text-gray-400">Red Flag</span>
-                          <span className="text-xs font-medium text-white">{score.components.red_flag}</span>
-                        </div>
-                        <div className="w-full bg-white/5 rounded-full h-1.5">
-                          <div
-                            className="bg-red-400 h-1.5 rounded-full transition-all duration-1000"
-                            style={{ width: `${score.components.red_flag}%` }}
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-xs text-gray-400">Growth</span>
-                          <span className="text-xs font-medium text-white">{score.components.growth}</span>
+                          <span className="text-xs text-gray-400">Shareholder Structure</span>
+                          <span className="text-xs font-medium text-white">{score.shareholder_structure.score}</span>
                         </div>
                         <div className="w-full bg-white/5 rounded-full h-1.5">
                           <div
                             className="bg-vettr-accent h-1.5 rounded-full transition-all duration-1000"
-                            style={{ width: `${score.components.growth}%` }}
+                            style={{ width: `${score.shareholder_structure.score}%` }}
                           />
                         </div>
                       </div>
                       <div>
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-xs text-gray-400">Governance</span>
-                          <span className="text-xs font-medium text-white">{score.components.governance}</span>
+                          <span className="text-xs text-gray-400">Market Sentiment</span>
+                          <span className="text-xs font-medium text-white">{score.market_sentiment.score}</span>
                         </div>
                         <div className="w-full bg-white/5 rounded-full h-1.5">
                           <div
                             className="bg-yellow-400 h-1.5 rounded-full transition-all duration-1000"
-                            style={{ width: `${score.components.governance}%` }}
+                            style={{ width: `${score.market_sentiment.score}%` }}
                           />
                         </div>
                       </div>

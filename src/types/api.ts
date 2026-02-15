@@ -208,20 +208,57 @@ export interface CareerEntry {
 // =============================================================================
 
 /**
- * VETTR Score with component breakdown
+ * Sub-scores for Financial Survival pillar
+ */
+export interface FinancialSurvivalSubScores {
+  cash_runway: number;
+  solvency: number;
+}
+
+/**
+ * Sub-scores for Operational Efficiency pillar
+ */
+export interface OperationalEfficiencySubScores {
+  efficiency_ratio: number;
+}
+
+/**
+ * Sub-scores for Shareholder Structure pillar
+ */
+export interface ShareholderStructureSubScores {
+  pedigree: number;
+  dilution_penalty: number;
+  insider_alignment: number;
+}
+
+/**
+ * Sub-scores for Market Sentiment pillar
+ */
+export interface MarketSentimentSubScores {
+  liquidity: number;
+  news_velocity: number;
+}
+
+/**
+ * Pillar component with score, weight, and sub-scores
+ */
+export interface VetrScorePillar<T> {
+  score: number;
+  weight: number;
+  sub_scores: T;
+}
+
+/**
+ * VETTR Score with 4-pillar component breakdown
  */
 export interface VetrScore {
   ticker: string;
   overall_score: number;
-  components: {
-    pedigree: number;
-    filing_velocity: number;
-    red_flag: number;
-    growth: number;
-    governance: number;
-  };
-  bonus_points: number;
-  penalty_points: number;
+  financial_survival: VetrScorePillar<FinancialSurvivalSubScores>;
+  operational_efficiency: VetrScorePillar<OperationalEfficiencySubScores>;
+  shareholder_structure: VetrScorePillar<ShareholderStructureSubScores>;
+  market_sentiment: VetrScorePillar<MarketSentimentSubScores>;
+  null_pillars: string[];
   calculated_at: string;
 }
 
@@ -231,6 +268,10 @@ export interface VetrScore {
 export interface VetrScoreHistoryPoint {
   date: string;
   score: number;
+  financial_survival_score?: number;
+  operational_efficiency_score?: number;
+  shareholder_structure_score?: number;
+  market_sentiment_score?: number;
 }
 
 /**
