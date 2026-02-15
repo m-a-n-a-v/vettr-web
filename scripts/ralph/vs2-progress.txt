@@ -29,3 +29,28 @@ Files Modified:
 - The new structure better reflects the backend's weighted scoring system and data availability handling
 ---
 
+## VS2-019: Update VetrScoreBadge to 5-tier colors
+Status: ✅ COMPLETE
+Date: 2026-02-15
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Updated src/components/ui/VetrScoreBadge.tsx getStrokeColor function to implement the new 5-tier color scale
+- Changed from 4-tier (80+, 60+, 40+, <40) to 5-tier (90-100, 75-89, 50-74, 30-49, 0-29)
+- New color mappings:
+  - 90-100: #166534 (dark green)
+  - 75-89: #00E676 (green - vettr-accent)
+  - 50-74: #FBBF24 (yellow)
+  - 30-49: #FB923C (orange)
+  - 0-29: #F87171 (red)
+- Component already showed only numeric score without text labels, no changes needed there
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+Files Modified:
+- src/components/ui/VetrScoreBadge.tsx
+
+**Learnings for future iterations:**
+- The VetrScoreBadge component was already well-structured without text labels
+- The circular progress ring visual now properly reflects the new 5-tier scoring system
+- This change ensures consistency across all score displays in the app with the new color grading system
+---
+
