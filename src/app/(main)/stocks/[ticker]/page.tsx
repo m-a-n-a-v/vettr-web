@@ -55,7 +55,7 @@ import VetrScoreTrend from '@/components/VetrScoreTrend';
 import { SkeletonStockDetailHeader, SkeletonVetrScoreSection, SkeletonChart, SkeletonFilingRow, SkeletonMetricCard } from '@/components/ui/SkeletonLoader';
 import Breadcrumb from '@/components/ui/Breadcrumb';
 import { StarIcon, StarFilledIcon, ShareIcon, MoreHorizontalIcon, ArrowUpIcon, ArrowDownIcon, UsersIcon, FlagIcon, ShieldCheckIcon, BarChartIcon, DocumentIcon, PrinterIcon } from '@/components/icons';
-import { chartTheme, getTooltipStyle } from '@/lib/chart-theme';
+import { chartTheme, getTooltipStyle, getScoreColor } from '@/lib/chart-theme';
 
 type Tab = 'overview' | 'pedigree' | 'red-flags';
 
@@ -602,54 +602,35 @@ function StockDetailContent() {
                   {/* Component breakdown bars */}
                   {score.financial_survival && (
                     <div className="w-full max-w-md mt-6 space-y-3">
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-xs text-gray-400">Financial Survival</span>
-                          <span className="text-xs font-medium text-white">{score.financial_survival.score}</span>
+                      {[
+                        { label: 'Financial Survival', pillar: score.financial_survival, weight: '35%' },
+                        { label: 'Operational Efficiency', pillar: score.operational_efficiency, weight: '25%' },
+                        { label: 'Shareholder Structure', pillar: score.shareholder_structure, weight: '25%' },
+                        { label: 'Market Sentiment', pillar: score.market_sentiment, weight: '15%' },
+                      ].map(({ label, pillar, weight }) => (
+                        <div key={label}>
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-xs text-gray-400">{label} <span className="text-gray-600">({weight})</span></span>
+                            <span className="text-xs font-medium text-white">{pillar?.score ?? 'N/A'}</span>
+                          </div>
+                          <div className="w-full bg-white/5 rounded-full h-1.5">
+                            <div
+                              className="h-1.5 rounded-full transition-all duration-1000"
+                              style={{
+                                width: `${pillar?.score ?? 0}%`,
+                                backgroundColor: getScoreColor(pillar?.score ?? 0),
+                              }}
+                            />
+                          </div>
                         </div>
-                        <div className="w-full bg-white/5 rounded-full h-1.5">
-                          <div
-                            className="bg-blue-400 h-1.5 rounded-full transition-all duration-1000"
-                            style={{ width: `${score.financial_survival.score}%` }}
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-xs text-gray-400">Operational Efficiency</span>
-                          <span className="text-xs font-medium text-white">{score.operational_efficiency.score}</span>
-                        </div>
-                        <div className="w-full bg-white/5 rounded-full h-1.5">
-                          <div
-                            className="bg-purple-400 h-1.5 rounded-full transition-all duration-1000"
-                            style={{ width: `${score.operational_efficiency.score}%` }}
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-xs text-gray-400">Shareholder Structure</span>
-                          <span className="text-xs font-medium text-white">{score.shareholder_structure.score}</span>
-                        </div>
-                        <div className="w-full bg-white/5 rounded-full h-1.5">
-                          <div
-                            className="bg-vettr-accent h-1.5 rounded-full transition-all duration-1000"
-                            style={{ width: `${score.shareholder_structure.score}%` }}
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-xs text-gray-400">Market Sentiment</span>
-                          <span className="text-xs font-medium text-white">{score.market_sentiment.score}</span>
-                        </div>
-                        <div className="w-full bg-white/5 rounded-full h-1.5">
-                          <div
-                            className="bg-yellow-400 h-1.5 rounded-full transition-all duration-1000"
-                            style={{ width: `${score.market_sentiment.score}%` }}
-                          />
-                        </div>
-                      </div>
+                      ))}
+
+                      {/* Null pillars notice */}
+                      {score.null_pillars && score.null_pillars.length > 0 && (
+                        <p className="text-xs text-yellow-400/70 mt-2">
+                          ⚠ Weight redistributed — insufficient data for: {score.null_pillars.join(', ')}
+                        </p>
+                      )}
                     </div>
                   )}
 
