@@ -17,10 +17,10 @@ interface UseVetrScoreReturn {
 }
 
 /**
- * Hook to fetch VETTR score with component breakdown for a stock
+ * Hook to fetch VETTR score with 4-pillar breakdown for a stock
  * @param ticker - Stock ticker symbol
  * @param shouldFetch - Optional flag to conditionally fetch data (default: true)
- * @returns Score object, loading/error states, and mutate function
+ * @returns Score object with 4 pillars (Financial Survival, Operational Efficiency, Shareholder Structure, Market Sentiment), null_pillars array, loading/error states, and mutate function
  */
 export function useVetrScore({
   ticker,
