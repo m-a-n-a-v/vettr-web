@@ -58,13 +58,6 @@ export const chartTheme = {
     secondary: colors.vettrCard,
     tertiary: colors.gray600,
 
-    // Component-specific colors
-    pedigree: colors.blue400,
-    filingVelocity: colors.purple400,
-    redFlag: colors.red400,
-    growth: colors.vettrAccent,
-    governance: colors.yellow400,
-
     // Chart variations
     barPrimary: colors.vettrAccent,
     barSecondary: '#2A4058',
@@ -89,32 +82,13 @@ export const chartTheme = {
   },
 };
 
-// Helper function to get score color
+// Helper function to get score color (5-tier scale)
 export const getScoreColor = (score: number): string => {
-  if (score >= 80) return colors.vettrAccent;
-  if (score >= 60) return colors.yellow400;
-  if (score >= 40) return colors.orange400;
-  return colors.red400;
-};
-
-// Helper function to get component color
-export const getComponentColor = (component: string): string => {
-  switch (component.toLowerCase()) {
-    case 'pedigree':
-      return chartTheme.colors.pedigree;
-    case 'filing_velocity':
-    case 'filing velocity':
-      return chartTheme.colors.filingVelocity;
-    case 'red_flag':
-    case 'red flag':
-      return chartTheme.colors.redFlag;
-    case 'growth':
-      return chartTheme.colors.growth;
-    case 'governance':
-      return chartTheme.colors.governance;
-    default:
-      return chartTheme.colors.primary;
-  }
+  if (score >= 90) return '#166534'; // dark green
+  if (score >= 75) return colors.vettrAccent; // green (#00E676)
+  if (score >= 50) return colors.yellow400; // yellow (#FBBF24)
+  if (score >= 30) return colors.orange400; // orange (#FB923C)
+  return colors.red400; // red (#F87171)
 };
 
 // Custom tooltip style factory

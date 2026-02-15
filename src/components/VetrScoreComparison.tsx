@@ -5,7 +5,7 @@ import type { VetrScoreComparison as VetrScoreComparisonType } from '@/types/api
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import EmptyState from '@/components/ui/EmptyState';
 import { BarChartIcon } from '@/components/icons';
-import { chartTheme, getTooltipStyle } from '@/lib/chart-theme';
+import { chartTheme, getTooltipStyle, getScoreColor } from '@/lib/chart-theme';
 
 interface VetrScoreComparisonProps {
   comparison: VetrScoreComparisonType | null;
@@ -181,8 +181,10 @@ export default function VetrScoreComparison({ comparison, isLoading, currentTick
               {chartData.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
-                  fill={entry.isCurrent ? chartTheme.colors.barPrimary : chartTheme.colors.barSecondary}
-                  opacity={entry.isCurrent ? 1 : 0.7}
+                  fill={getScoreColor(entry.score)}
+                  opacity={entry.isCurrent ? 1 : 0.8}
+                  stroke={entry.isCurrent ? '#00E676' : 'transparent'}
+                  strokeWidth={entry.isCurrent ? 2 : 0}
                 />
               ))}
             </Bar>
@@ -191,18 +193,29 @@ export default function VetrScoreComparison({ comparison, isLoading, currentTick
       </div>
 
       {/* Legend */}
-      <div className="flex items-center justify-center gap-6 text-sm">
+      <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
         <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded bg-vettr-accent"></div>
+          <div className="w-4 h-4 rounded border-2 border-vettr-accent"></div>
           <span className="text-gray-400">Current Stock ({comparison.ticker})</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded opacity-70" style={{ backgroundColor: chartTheme.colors.barSecondary }}></div>
-          <span className="text-gray-400">Sector Peers</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-8 h-0.5 bg-yellow-400" style={{ borderTop: '2px dashed #FBBF24' }}></div>
           <span className="text-gray-400">Sector Average</span>
+        </div>
+        <div className="text-gray-500 text-xs">
+          Colors based on score:
+          <span className="ml-2 inline-flex items-center gap-1">
+            <span className="w-3 h-3 rounded" style={{ backgroundColor: '#166534' }}></span>
+            <span>90+</span>
+            <span className="w-3 h-3 rounded" style={{ backgroundColor: '#00E676' }}></span>
+            <span>75+</span>
+            <span className="w-3 h-3 rounded" style={{ backgroundColor: '#FBBF24' }}></span>
+            <span>50+</span>
+            <span className="w-3 h-3 rounded" style={{ backgroundColor: '#FB923C' }}></span>
+            <span>30+</span>
+            <span className="w-3 h-3 rounded" style={{ backgroundColor: '#F87171' }}></span>
+            <span>&lt;30</span>
+          </span>
         </div>
       </div>
     </div>

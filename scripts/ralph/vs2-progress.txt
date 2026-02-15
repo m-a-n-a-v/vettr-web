@@ -54,3 +54,36 @@ Files Modified:
 - This change ensures consistency across all score displays in the app with the new color grading system
 ---
 
+## VS2-020: Update VetrScoreDetail for 4-pillar breakdown
+Status: ✅ COMPLETE
+Date: 2026-02-15
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Updated src/components/VetrScoreDetail.tsx to display 4-pillar breakdown with sub-scores
+- Financial Survival pillar now shows Cash Runway and Solvency sub-scores
+- Operational Efficiency pillar shows Efficiency Ratio sub-score
+- Shareholder Structure pillar shows Pedigree, Dilution Penalty, and Insider Alignment sub-scores
+- Market Sentiment pillar shows Liquidity and News Velocity sub-scores
+- Updated getScoreColor function to use 5-tier color scale:
+  - 90-100: #166534 (dark green)
+  - 75-89: #00E676 (green/vettr-accent)
+  - 50-74: #FBBF24 (yellow)
+  - 30-49: #FB923C (orange)
+  - 0-29: #F87171 (red)
+- Updated Score Ratings legend to display 5-tier scale with color swatches
+- Updated methodology section to describe 4-pillar weighted formula and weight redistribution logic
+- Removed old component array and replaced with direct pillar rendering for better sub-score display
+- Maintained null_pillars notice display for data availability transparency
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+Files Modified:
+- src/components/VetrScoreDetail.tsx
+
+**Learnings for future iterations:**
+- Each pillar card now has its own dedicated section showing the pillar score, weight, progress bar, and all sub-scores
+- Sub-scores are displayed with their own color coding based on the 5-tier scale
+- The 5-tier color legend provides clear visual guidance for score interpretation across all score displays
+- Methodology text updated to reflect dynamic weight redistribution when pillars have null data
+- Component structure improved for better visual hierarchy and readability of sub-score breakdowns
+---
+
