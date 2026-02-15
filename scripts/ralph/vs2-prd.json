@@ -1,0 +1,104 @@
+{
+  "project": "VETTR Web App - Score V2",
+  "phase": "VETTR Score V2 - Web Frontend",
+  "branchName": "ralph/vettr-score-v2",
+  "description": "Update the VETTR web app to display the new 4-pillar VETTR score system. Replace 5-pillar components with 4-pillar breakdown (Financial Survival, Operational Efficiency, Shareholder Structure, Market Sentiment). Update color grading to 5-tier scale (dark green→red). Update TypeScript interfaces, score badge, detail view, comparison, trend, hooks, and stock detail page.",
+  "totalStories": 7,
+  "userStories": [
+    {
+      "id": "VS2-018",
+      "title": "Update VetrScore TypeScript interfaces",
+      "description": "Replace the 5-pillar VetrScore interfaces with the new 4-pillar structure in the API types file.",
+      "acceptanceCriteria": [
+        "In src/types/api.ts, update VetrScoreResponse interface: replace 5-pillar components with { financial_survival: { score, weight, sub_scores: { cash_runway, solvency } }, operational_efficiency: { score, weight, sub_scores: { efficiency_ratio } }, shareholder_structure: { score, weight, sub_scores: { pedigree, dilution_penalty, insider_alignment } }, market_sentiment: { score, weight, sub_scores: { liquidity, news_velocity } } }",
+        "Add null_pillars: string[] field to VetrScoreResponse",
+        "Remove bonus_points, penalty_points, and old pillar fields from all interfaces",
+        "Update VetrScoreHistoryEntry to use new pillar names: financial_survival_score, operational_efficiency_score, shareholder_structure_score, market_sentiment_score",
+        "npm run build passes"
+      ],
+      "priority": 1,
+      "passes": false
+    },
+    {
+      "id": "VS2-019",
+      "title": "Update VetrScoreBadge to 5-tier colors",
+      "description": "Update the VetrScoreBadge component to use the new 5-tier color scale instead of text labels.",
+      "acceptanceCriteria": [
+        "In src/components/ui/VetrScoreBadge.tsx, update getScoreColor to return: 90-100→#166534 (dark green), 75-89→#00E676 (green), 50-74→#FBBF24 (yellow), 30-49→#FB923C (orange), 0-29→#F87171 (red)",
+        "Remove any text labels (Elite, Strong Buy, Contender, Watchlist, Avoid etc.)",
+        "Badge shows only numeric score with the color background/text",
+        "npm run build passes"
+      ],
+      "priority": 2,
+      "passes": false
+    },
+    {
+      "id": "VS2-020",
+      "title": "Update VetrScoreDetail for 4-pillar breakdown",
+      "description": "Rewrite the VetrScoreDetail component to show 4 pillars with sub-scores instead of 5. Update methodology text and add 5-tier color legend.",
+      "acceptanceCriteria": [
+        "In src/components/VetrScoreDetail.tsx, show 4 pillar cards: Financial Survival (weight), Operational Efficiency (weight), Shareholder Structure (weight), Market Sentiment (weight)",
+        "Each pillar card shows its score and sub-scores (e.g., Financial Survival shows Cash Runway and Solvency sub-scores)",
+        "Show null_pillars note if any pillars have null data ('Weight redistributed due to insufficient data')",
+        "Remove all references to old pillars: pedigree, filing_velocity, red_flag, growth, governance",
+        "Remove bonus/penalty display",
+        "Add 5-tier color legend at bottom showing the 5 ranges with color swatches",
+        "Update methodology text to describe the 4-pillar formula",
+        "npm run build passes"
+      ],
+      "priority": 3,
+      "passes": false
+    },
+    {
+      "id": "VS2-021",
+      "title": "Update VetrScoreComparison component",
+      "description": "Ensure the score comparison chart uses the 5-tier color scale for bars/lines.",
+      "acceptanceCriteria": [
+        "In src/components/VetrScoreComparison.tsx, use 5-tier colors for chart bars based on score value",
+        "Remove any references to old pillar names",
+        "npm run build passes"
+      ],
+      "priority": 4,
+      "passes": false
+    },
+    {
+      "id": "VS2-022",
+      "title": "Update VetrScoreTrend component",
+      "description": "Ensure the trend component works with the new schema. Uses overall_score so changes should be minimal.",
+      "acceptanceCriteria": [
+        "In src/components/VetrScoreTrend.tsx, verify it uses overall_score (not old pillar names)",
+        "Use 5-tier colors for the trend line color zones",
+        "Remove any references to old pillar names",
+        "npm run build passes"
+      ],
+      "priority": 5,
+      "passes": false
+    },
+    {
+      "id": "VS2-023",
+      "title": "Update useVetrScore hook response parsing",
+      "description": "Update the useVetrScore hook to parse the new 4-pillar API response format.",
+      "acceptanceCriteria": [
+        "In src/hooks/useVetrScore.ts, update the response type to match the new 4-pillar VetrScoreResponse interface",
+        "Remove any mapping or parsing of old pillar names",
+        "Expose null_pillars in the hook return value",
+        "npm run build passes"
+      ],
+      "priority": 6,
+      "passes": false
+    },
+    {
+      "id": "VS2-024",
+      "title": "Update stock detail page score display",
+      "description": "Update the stock detail page to use the new 4-pillar score data and 5-tier colors.",
+      "acceptanceCriteria": [
+        "In src/app/(main)/stocks/[ticker]/page.tsx, update any references to old pillar names in the score section",
+        "Score badge in stock detail uses 5-tier colors",
+        "Any inline score display uses 5-tier color logic",
+        "npm run build passes"
+      ],
+      "priority": 7,
+      "passes": false
+    }
+  ]
+}
