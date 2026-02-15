@@ -87,3 +87,33 @@ Files Modified:
 - Component structure improved for better visual hierarchy and readability of sub-score breakdowns
 ---
 
+## VS2-021: Update VetrScoreComparison component
+Status: ✅ COMPLETE
+Date: 2026-02-15
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Updated src/lib/chart-theme.ts to implement 5-tier color scale in getScoreColor function:
+  - 90-100: #166534 (dark green)
+  - 75-89: #00E676 (green/vettr-accent)
+  - 50-74: #FBBF24 (yellow)
+  - 30-49: #FB923C (orange)
+  - 0-29: #F87171 (red)
+- Removed old pillar-specific color references from chartTheme.colors (pedigree, filingVelocity, redFlag, growth, governance)
+- Removed getComponentColor helper function that referenced old pillar names
+- Updated src/components/VetrScoreComparison.tsx to use score-based colors for all bars via getScoreColor
+- Each bar now colored based on its score value using the 5-tier scale
+- Current stock distinguished by green border outline instead of different fill color
+- Updated legend to show 5-tier color scale with score ranges
+- All quality checks passed: npm run build ✓, npm run lint ✓
+
+Files Modified:
+- src/lib/chart-theme.ts
+- src/components/VetrScoreComparison.tsx
+
+**Learnings for future iterations:**
+- The comparison chart now provides visual feedback about score quality through color coding
+- Border outline effectively distinguishes the current stock while maintaining score-based color scheme
+- Legend includes inline color scale reference for better user understanding
+- Removed all references to old 5-pillar system from chart theme configuration
+---
+
