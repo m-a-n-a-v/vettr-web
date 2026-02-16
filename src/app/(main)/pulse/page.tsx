@@ -459,13 +459,18 @@ export default function PulsePage() {
 
       {/* Recent Filings Section */}
       <section className="mb-8">
-        <div className="flex items-center gap-3 mb-4">
-          <h2 className="text-lg font-semibold text-white">Recent Filings</h2>
-          {filings && filings.length > 0 && (
-            <span className="px-2.5 py-0.5 bg-blue-500/10 text-blue-400 text-xs font-medium rounded-full">
-              {filings.filter(f => !f.is_read).length} unread
-            </span>
-          )}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <h2 className="text-lg font-semibold text-white">Recent Filings</h2>
+            {filings && filings.length > 0 && (
+              <span className="px-2.5 py-0.5 bg-blue-500/10 text-blue-400 text-xs font-medium rounded-full">
+                {filings.filter(f => !f.is_read).length} unread
+              </span>
+            )}
+          </div>
+          <Link href="/stocks" className="text-sm text-vettr-accent hover:underline">
+            View All
+          </Link>
         </div>
 
         {isLoadingFilings ? (
@@ -622,7 +627,12 @@ export default function PulsePage() {
 
       {/* Top Movers Section */}
       <section className="mb-8">
-        <h2 className="text-lg font-semibold text-white mb-4">Top Movers</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-white">Top Movers</h2>
+          <Link href="/stocks?sort=change&order=desc" className="text-sm text-vettr-accent hover:underline">
+            View All
+          </Link>
+        </div>
 
         {isLoadingStocks ? (
           <div className="space-y-2">
@@ -700,7 +710,12 @@ export default function PulsePage() {
 
       {/* Top VETTR Scores Section */}
       <section className="mb-8">
-        <h2 className="text-lg font-semibold text-white mb-4">Top VETTR Scores</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-white">Top VETTR Scores</h2>
+          <Link href="/stocks?sort=vetr_score&order=desc" className="text-sm text-vettr-accent hover:underline">
+            View All
+          </Link>
+        </div>
 
         {isLoadingStocks ? (
           <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
