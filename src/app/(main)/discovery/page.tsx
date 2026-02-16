@@ -39,7 +39,14 @@ function DiscoveryPageContent() {
 
   // Initialize state from URL params
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
-  const [selectedSector, setSelectedSector] = useState<string>(searchParams.get('sector') || 'All');
+  // Multi-select sector state: empty Set means 'All'
+  const [selectedSectors, setSelectedSectors] = useState<Set<string>>(() => {
+    const sectorsParam = searchParams.get('sectors');
+    if (sectorsParam) {
+      return new Set(sectorsParam.split(',').filter(s => s.trim()));
+    }
+    return new Set();
+  });
   const [isMobile, setIsMobile] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const { showToast } = useToast();
@@ -65,11 +72,11 @@ function DiscoveryPageContent() {
           (s.sector || '').toLowerCase().includes(q)
       );
     }
-    if (selectedSector !== 'All') {
-      result = result.filter((s) => s.sector === selectedSector);
+    if (selectedSectors.size > 0) {
+      result = result.filter((s) => selectedSectors.has(s.sector));
     }
     return result.slice(0, 8);
-  }, [allStocks, searchQuery, selectedSector]);
+  }, [allStocks, searchQuery, selectedSectors]);
 
   const isLoadingFiltered = isLoadingStocks;
 
@@ -110,13 +117,15 @@ function DiscoveryPageContent() {
     const params = new URLSearchParams();
 
     if (searchQuery) params.set('search', searchQuery);
-    if (selectedSector !== 'All') params.set('sector', selectedSector);
+    if (selectedSectors.size > 0) {
+      params.set('sectors', Array.from(selectedSectors).join(','));
+    }
 
     const queryString = params.toString();
     const newUrl = queryString ? `/discovery?${queryString}` : '/discovery';
 
     router.replace(newUrl, { scroll: false });
-  }, [searchQuery, selectedSector, isClient, router]);
+  }, [searchQuery, selectedSectors, isClient, router]);
 
   // Refresh handler
   const handleRefreshData = useCallback(async () => {
@@ -163,14 +172,14 @@ function DiscoveryPageContent() {
 
   // Filter filings by selected sector (client-side filtering)
   const filteredFilings = useMemo(() => {
-    if (selectedSector === 'All') return filings;
+    if (selectedSectors.size === 0) return filings;
 
     // Filter filings by matching stock ticker's sector
     return filings.filter((filing) => {
       const stock = allStocks.find((s) => s.ticker === filing.ticker);
-      return stock?.sector === selectedSector;
+      return stock?.sector && selectedSectors.has(stock.sector);
     });
-  }, [filings, selectedSector, allStocks]);
+  }, [filings, selectedSectors, allStocks]);
 
   // Featured stocks: use filtered stocks or top stocks by score
   const featuredStocks = useMemo(() => {
@@ -178,9 +187,23 @@ function DiscoveryPageContent() {
     return stocks.slice(0, 8);
   }, [filteredStocks, allStocks]);
 
-  // Handle sector chip click
+  // Handle sector chip click - toggle sector in/out of Set
   const handleSectorClick = (sector: string) => {
-    setSelectedSector(sector);
+    if (sector === 'All') {
+      // Clear all selections
+      setSelectedSectors(new Set());
+    } else {
+      // Toggle sector in/out of Set
+      setSelectedSectors(prev => {
+        const next = new Set(prev);
+        if (next.has(sector)) {
+          next.delete(sector);
+        } else {
+          next.add(sector);
+        }
+        return next;
+      });
+    }
   };
 
   // Handle search change
@@ -253,22 +276,28 @@ function DiscoveryPageContent() {
             Filter by Sector
           </h2>
           <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
-            {sectors.map((sector) => (
-              <button
-                key={sector}
-                onClick={() => handleSectorClick(sector)}
-                className={`
-                  flex-shrink-0 px-4 py-1.5 text-sm font-medium rounded-full
-                  transition-all duration-300
-                  ${selectedSector === sector
-                    ? 'bg-vettr-accent/10 border border-vettr-accent/30 text-vettr-accent'
-                    : 'bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10'
-                  }
-                `}
-              >
-                {sector}
-              </button>
-            ))}
+            {sectors.map((sector) => {
+              const isSelected = sector === 'All'
+                ? selectedSectors.size === 0
+                : selectedSectors.has(sector);
+
+              return (
+                <button
+                  key={sector}
+                  onClick={() => handleSectorClick(sector)}
+                  className={`
+                    flex-shrink-0 px-4 py-1.5 text-sm font-medium rounded-full
+                    transition-all duration-300
+                    ${isSelected
+                      ? 'bg-vettr-accent/10 border border-vettr-accent/30 text-vettr-accent'
+                      : 'bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10'
+                    }
+                  `}
+                >
+                  {sector}
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -304,7 +333,7 @@ function DiscoveryPageContent() {
               icon={<SearchIcon className="w-16 h-16 text-gray-600" />}
               title="No stocks found"
               description={
-                searchQuery || selectedSector !== 'All'
+                searchQuery || selectedSectors.size > 0
                   ? 'Try adjusting your search or filter criteria.'
                   : 'No stocks available at this time.'
               }
@@ -392,8 +421,8 @@ function DiscoveryPageContent() {
               icon={<DocumentIcon className="w-16 h-16 text-gray-600" />}
               title="No filings found"
               description={
-                selectedSector !== 'All'
-                  ? `No recent filings in ${selectedSector}.`
+                selectedSectors.size > 0
+                  ? `No recent filings in the selected sector${selectedSectors.size > 1 ? 's' : ''}.`
                   : 'No recent filings available.'
               }
             />
