@@ -8,6 +8,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useStocks } from '@/hooks/useStocks';
 import { useFilings } from '@/hooks/useFilings';
 import { useWatchlist } from '@/hooks/useWatchlist';
+import { useDiscoveryCollections } from '@/hooks/useDiscoveryCollections';
 import { useToast } from '@/contexts/ToastContext';
 import { useRefresh } from '@/hooks/useRefresh';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
@@ -22,6 +23,16 @@ import RefreshButton from '@/components/ui/RefreshButton';
 import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator';
 import type { Filing, FilingType } from '@/types/api';
 import { ArrowRightIcon, AlertTriangleIcon, SearchIcon, DocumentIcon } from '@/components/icons';
+
+// Collection icon mapping (SF Symbol → emoji)
+const collectionIcons: Record<string, string> = {
+  'checkmark.shield': '✅',
+  'banknote': '💰',
+  'bolt.fill': '⚡',
+  'trophy': '🏆',
+  'crown': '👑',
+  'person.badge.shield.checkmark': '🛡️',
+};
 
 /**
  * Discovery Page
@@ -94,6 +105,9 @@ function DiscoveryPageContent() {
 
   // Fetch watchlist for favorites
   const { watchlist, addToWatchlist, removeFromWatchlist, isAdding, isRemoving } = useWatchlist();
+
+  // Fetch discovery collections
+  const { collections, isLoading: isLoadingCollections } = useDiscoveryCollections();
 
   // Set client flag on mount
   useEffect(() => {
@@ -300,6 +314,33 @@ function DiscoveryPageContent() {
             })}
           </div>
         </div>
+
+        {/* Featured Collections Section */}
+        {(isLoadingCollections || collections.length > 0) && (
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-white">Featured Collections</h2>
+            </div>
+
+            {isLoadingCollections ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {[...Array(6)].map((_, i) => (
+                  <SkeletonCollectionCard key={i} />
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {collections.slice(0, 6).map((collection) => (
+                  <CollectionCard
+                    key={collection.id}
+                    collection={collection}
+                    onClick={() => router.push(`/discovery/collection/${collection.id}`)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Featured Stocks Section */}
         <div>
@@ -509,6 +550,59 @@ function FilingRow({ filing }: FilingRowProps) {
         </div>
       </div>
     </a>
+  );
+}
+
+/**
+ * Collection Card Component
+ *
+ * Displays a single collection with icon, title, tagline, and criteria summary
+ */
+interface CollectionCardProps {
+  collection: any; // Using any to avoid importing the type
+  onClick: () => void;
+}
+
+function CollectionCard({ collection, onClick }: CollectionCardProps) {
+  const icon = collectionIcons[collection.icon] || '📊';
+
+  return (
+    <div
+      onClick={onClick}
+      className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5 hover:border-vettr-accent/20 hover:bg-vettr-card/80 transition-all duration-300 cursor-pointer"
+    >
+      {/* Icon in circle */}
+      <div className="w-10 h-10 rounded-full bg-vettr-accent/10 flex items-center justify-center mb-3">
+        <span className="text-xl">{icon}</span>
+      </div>
+      {/* Title */}
+      <h3 className="text-base font-semibold text-white mb-1">{collection.name}</h3>
+      {/* Tagline */}
+      <p className="text-xs text-gray-400 mb-3 line-clamp-2">{collection.tagline}</p>
+      {/* Criteria summary */}
+      <p className="text-xs text-vettr-accent font-medium">{collection.criteria_summary}</p>
+    </div>
+  );
+}
+
+/**
+ * Collection Card Skeleton
+ *
+ * Loading skeleton for collection cards
+ */
+function SkeletonCollectionCard() {
+  return (
+    <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5">
+      {/* Icon skeleton */}
+      <div className="w-10 h-10 rounded-full bg-white/5 animate-pulse mb-3" />
+      {/* Title skeleton */}
+      <div className="h-4 w-3/4 bg-white/5 rounded animate-pulse mb-1" />
+      {/* Tagline skeleton */}
+      <div className="h-3 w-full bg-white/5 rounded animate-pulse mb-1" />
+      <div className="h-3 w-2/3 bg-white/5 rounded animate-pulse mb-3" />
+      {/* Criteria skeleton */}
+      <div className="h-3 w-1/2 bg-white/5 rounded animate-pulse" />
+    </div>
   );
 }
 
