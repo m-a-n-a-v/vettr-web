@@ -1,6 +1,5 @@
 'use client'
 
-import { useStocks } from '@/hooks/useStocks'
 import { useFilings } from '@/hooks/useFilings'
 import { useWatchlist } from '@/hooks/useWatchlist'
 import { useRedFlagTrend } from '@/hooks/useRedFlagTrend'
@@ -15,32 +14,41 @@ import { SkeletonMetricCard, SkeletonStockCard, SkeletonFilingRow } from '@/comp
 import EmptyState from '@/components/ui/EmptyState'
 import RefreshButton from '@/components/ui/RefreshButton'
 import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator'
-import { ArrowUpIcon, ArrowDownIcon, FlagIcon, AlertTriangleIcon, DocumentIcon, TrendingUpIcon, TrophyIcon } from '@/components/icons'
+import { ArrowUpIcon, ArrowDownIcon, FlagIcon, AlertTriangleIcon, DocumentIcon, TrendingUpIcon, TrophyIcon, StarIcon } from '@/components/icons'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useState, useEffect, useMemo, useCallback } from 'react'
 
 export default function PulsePage() {
+  const router = useRouter()
   const { showToast } = useToast()
   const [isMobile, setIsMobile] = useState(false)
 
-  // Fetch all stocks for analysis
-  const { stocks, isLoading: isLoadingStocks, error: stocksError, mutate: mutateStocks } = useStocks({ limit: 100 })
+  // Fetch watchlist stocks (primary data source)
+  const { watchlist: stocks, isLoading: isLoadingStocks, error: stocksError, mutate: mutateStocks, addToWatchlist, removeFromWatchlist, isAdding, isRemoving } = useWatchlist()
 
   // Fetch recent filings (limit: 10 to share SWR cache key with Discovery page)
   const { filings: allRecentFilings, isLoading: isLoadingFilings, error: filingsError, mutate: mutateFilings } = useFilings({ limit: 10 })
-  // Only show 5 on Pulse
-  const filings = useMemo(() => allRecentFilings.slice(0, 5), [allRecentFilings])
 
-  // Fetch red flag trend data
+  // Create set of watchlist tickers for efficient filtering
+  const watchlistTickers = useMemo(() => {
+    return new Set(stocks.map(stock => stock.ticker))
+  }, [stocks])
+
+  // Filter filings to only include watchlist stock tickers, then limit to 5
+  const filings = useMemo(() => {
+    return allRecentFilings
+      .filter(filing => watchlistTickers.has(filing.ticker))
+      .slice(0, 5)
+  }, [allRecentFilings, watchlistTickers])
+
+  // Fetch red flag trend data (keep as-is, it's global)
   const { trend: redFlagTrend, isLoading: isLoadingRedFlagTrend, error: redFlagTrendError, mutate: mutateRedFlagTrend } = useRedFlagTrend()
 
-  // Fetch watchlist for favorites
-  const { watchlist, addToWatchlist, removeFromWatchlist, isAdding, isRemoving } = useWatchlist()
-
-  // Create set of favorited tickers for quick lookup
+  // Create set of favorited tickers for quick lookup (all stocks are favorites now)
   const favoritedTickers = useMemo(() => {
-    return new Set(watchlist.map(stock => stock.ticker))
-  }, [watchlist])
+    return watchlistTickers
+  }, [watchlistTickers])
 
   // Detect mobile viewport
   useEffect(() => {
@@ -86,6 +94,15 @@ export default function PulsePage() {
     ? Math.round(stocks.reduce((sum, s) => sum + (s.vetr_score || 0), 0) / stocks.length)
     : 0
 
+  // Risk distribution based on VETR score thresholds
+  const riskDistribution = useMemo(() => {
+    if (!stocks || stocks.length === 0) return { low: 0, medium: 0, high: 0 }
+    const low = stocks.filter(s => (s.vetr_score || 0) > 60).length
+    const medium = stocks.filter(s => (s.vetr_score || 0) >= 40 && (s.vetr_score || 0) <= 60).length
+    const high = stocks.filter(s => (s.vetr_score || 0) < 40).length
+    return { low, medium, high }
+  }, [stocks])
+
   // Get top gainer and top loser
   const sortedByChange = stocks ? [...stocks].sort((a, b) =>
     (b.price_change_percent || 0) - (a.price_change_percent || 0)
@@ -125,6 +142,9 @@ export default function PulsePage() {
     }
   }
 
+  // Check for empty watchlist (when not loading)
+  const isEmptyWatchlist = !isLoadingStocks && stocks.length === 0
+
   return (
     <div className="p-4 md:p-6 pb-20 md:pb-6">
       {/* Pull-to-refresh indicator (mobile only) */}
@@ -159,6 +179,20 @@ export default function PulsePage() {
         </div>
       </div>
 
+      {/* Empty Watchlist State */}
+      {isEmptyWatchlist && (
+        <EmptyState
+          icon={<StarIcon className="w-16 h-16 text-gray-600" />}
+          title="Your Watchlist is Empty"
+          description="Add stocks to your watchlist to see personalized market insights."
+          actionLabel="Browse Stocks"
+          onAction={() => router.push('/stocks')}
+        />
+      )}
+
+      {/* Content - only show when watchlist is not empty or still loading */}
+      {!isEmptyWatchlist && (
+        <>
       {/* Market Overview Section */}
       <section className="mb-8">
         <h2 className="text-lg font-semibold text-white mb-4">Market Overview</h2>
@@ -177,66 +211,110 @@ export default function PulsePage() {
             description="Unable to fetch market overview. Please try again."
           />
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Stocks Tracked */}
+          <div className="space-y-4">
+            {/* Risk Distribution Bar */}
             <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5">
-              <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Stocks Tracked</p>
-              <p className="text-2xl font-bold text-white">{stocksTracked}</p>
-            </div>
+              {/* Segmented bar */}
+              <div className="flex h-7 rounded-lg overflow-hidden gap-0.5 mb-4">
+                {stocksTracked > 0 && riskDistribution.low > 0 && (
+                  <div
+                    className="bg-green-500 rounded-md transition-all duration-500"
+                    style={{ width: `${(riskDistribution.low / stocksTracked) * 100}%` }}
+                  />
+                )}
+                {stocksTracked > 0 && riskDistribution.medium > 0 && (
+                  <div
+                    className="bg-yellow-400 rounded-md transition-all duration-500"
+                    style={{ width: `${(riskDistribution.medium / stocksTracked) * 100}%` }}
+                  />
+                )}
+                {stocksTracked > 0 && riskDistribution.high > 0 && (
+                  <div
+                    className="bg-red-500 rounded-md transition-all duration-500"
+                    style={{ width: `${(riskDistribution.high / stocksTracked) * 100}%` }}
+                  />
+                )}
+              </div>
 
-            {/* Avg VETTR Score */}
-            <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5">
-              <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Avg VETTR Score</p>
-              <div className="flex items-center gap-3">
-                <p className="text-2xl font-bold text-white">{avgVetrScore}</p>
-                <VetrScoreBadge score={avgVetrScore} size="sm" />
+              {/* Legend */}
+              <div className="flex flex-wrap gap-x-6 gap-y-2">
+                <div>
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
+                    <span className="text-xs text-gray-400">
+                      Low Risk ({stocksTracked > 0 ? Math.round((riskDistribution.low / stocksTracked) * 100) : 0}%)
+                    </span>
+                  </div>
+                  <span className="text-sm font-semibold text-white pl-[18px]">{riskDistribution.low} stocks</span>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <div className="w-2.5 h-2.5 rounded-full bg-yellow-400" />
+                    <span className="text-xs text-gray-400">
+                      Medium Risk ({stocksTracked > 0 ? Math.round((riskDistribution.medium / stocksTracked) * 100) : 0}%)
+                    </span>
+                  </div>
+                  <span className="text-sm font-semibold text-white pl-[18px]">{riskDistribution.medium} stocks</span>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <div className="w-2.5 h-2.5 rounded-full bg-red-500" />
+                    <span className="text-xs text-gray-400">
+                      High Risk ({stocksTracked > 0 ? Math.round((riskDistribution.high / stocksTracked) * 100) : 0}%)
+                    </span>
+                  </div>
+                  <span className="text-sm font-semibold text-white pl-[18px]">{riskDistribution.high} stocks</span>
+                </div>
               </div>
             </div>
 
-            {/* Top Gainer */}
-            <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5">
-              <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Top Gainer</p>
-              {topGainer ? (
-                <div>
-                  <Link
-                    href={`/stocks/${topGainer.ticker}`}
-                    className="text-lg font-bold text-white hover:text-vettr-accent transition-colors"
-                  >
-                    {topGainer.ticker}
-                  </Link>
-                  <div className="flex items-center gap-1 mt-1">
-                    <ArrowUpIcon className="w-3 h-3 text-vettr-accent" />
-                    <span className="text-sm font-medium text-vettr-accent">
-                      {Math.abs(topGainer.price_change_percent || 0).toFixed(2)}%
-                    </span>
+            {/* Top Gainer / Top Loser */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Top Gainer */}
+              <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5">
+                <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Top Gainer</p>
+                {topGainer ? (
+                  <div>
+                    <Link
+                      href={`/stocks/${topGainer.ticker}`}
+                      className="text-lg font-bold text-white hover:text-vettr-accent transition-colors"
+                    >
+                      {topGainer.ticker}
+                    </Link>
+                    <div className="flex items-center gap-1 mt-1">
+                      <ArrowUpIcon className="w-3 h-3 text-vettr-accent" />
+                      <span className="text-sm font-medium text-vettr-accent">
+                        {Math.abs(topGainer.price_change_percent || 0).toFixed(2)}%
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <p className="text-gray-500">N/A</p>
-              )}
-            </div>
+                ) : (
+                  <p className="text-gray-500">N/A</p>
+                )}
+              </div>
 
-            {/* Top Loser */}
-            <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5">
-              <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Top Loser</p>
-              {topLoser && topLoser.price_change_percent !== topGainer?.price_change_percent ? (
-                <div>
-                  <Link
-                    href={`/stocks/${topLoser.ticker}`}
-                    className="text-lg font-bold text-white hover:text-vettr-accent transition-colors"
-                  >
-                    {topLoser.ticker}
-                  </Link>
-                  <div className="flex items-center gap-1 mt-1">
-                    <ArrowDownIcon className="w-3 h-3 text-red-400" />
-                    <span className="text-sm font-medium text-red-400">
-                      {Math.abs(topLoser.price_change_percent || 0).toFixed(2)}%
-                    </span>
+              {/* Top Loser */}
+              <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5">
+                <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Top Loser</p>
+                {topLoser && topLoser.price_change_percent !== topGainer?.price_change_percent ? (
+                  <div>
+                    <Link
+                      href={`/stocks/${topLoser.ticker}`}
+                      className="text-lg font-bold text-white hover:text-vettr-accent transition-colors"
+                    >
+                      {topLoser.ticker}
+                    </Link>
+                    <div className="flex items-center gap-1 mt-1">
+                      <ArrowDownIcon className="w-3 h-3 text-red-400" />
+                      <span className="text-sm font-medium text-red-400">
+                        {Math.abs(topLoser.price_change_percent || 0).toFixed(2)}%
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <p className="text-gray-500">N/A</p>
-              )}
+                ) : (
+                  <p className="text-gray-500">N/A</p>
+                )}
+              </div>
             </div>
           </div>
         )}
@@ -664,6 +742,8 @@ export default function PulsePage() {
           </div>
         )}
       </section>
+        </>
+      )}
     </div>
   )
 }
