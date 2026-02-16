@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useStocks } from '@/hooks/useStocks'
 import { useWatchlist } from '@/hooks/useWatchlist'
+import { useSubscription } from '@/hooks/useSubscription'
 import { useToast } from '@/contexts/ToastContext'
 import { useRefresh } from '@/hooks/useRefresh'
 import { usePullToRefresh } from '@/hooks/usePullToRefresh'
@@ -33,7 +34,8 @@ import {
   ChevronUpIcon,
   ChevronDownIcon,
   SearchIcon,
-  DownloadIcon
+  DownloadIcon,
+  TrashIcon
 } from '@/components/icons'
 import type { Stock } from '@/types/api'
 import { convertStocksToCSV, downloadCSV, generateCSVFilename } from '@/lib/csv-export'
@@ -51,7 +53,6 @@ function StocksPageContent() {
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '')
   const [sortBy, setSortBy] = useState<SortOption>((searchParams.get('sort') as SortOption) || 'vetr_score')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>((searchParams.get('order') as 'asc' | 'desc') || 'desc')
-  const [favoritesOnly, setFavoritesOnly] = useState(searchParams.get('favorites') === 'true')
   const [viewMode, setViewMode] = useState<ViewMode>('table') // Default to table on desktop
   const [isClient, setIsClient] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
@@ -94,6 +95,7 @@ function StocksPageContent() {
     offset: offset,
   })
   const { watchlist, addToWatchlist, removeFromWatchlist, isAdding, isRemoving, isLoading: watchlistLoading } = useWatchlist()
+  const { subscription, isLoading: subscriptionLoading } = useSubscription()
 
   // Accumulate stocks as we load more pages
   useEffect(() => {
@@ -122,13 +124,12 @@ function StocksPageContent() {
     if (searchQuery) params.set('search', searchQuery)
     if (sortBy !== 'vetr_score') params.set('sort', sortBy)
     if (sortOrder !== 'desc') params.set('order', sortOrder)
-    if (favoritesOnly) params.set('favorites', 'true')
 
     const queryString = params.toString()
     const newUrl = queryString ? `/stocks?${queryString}` : '/stocks'
 
     router.replace(newUrl, { scroll: false })
-  }, [searchQuery, sortBy, sortOrder, favoritesOnly, isClient, router])
+  }, [searchQuery, sortBy, sortOrder, isClient, router])
 
   // Reset offset when search/sort changes
   useEffect(() => {
@@ -199,11 +200,6 @@ function StocksPageContent() {
   const filteredStocks = useMemo(() => {
     let result = allStocks || []
 
-    // Filter by favorites only
-    if (favoritesOnly) {
-      result = result.filter(stock => favoritedTickers.has(stock.ticker))
-    }
-
     // Sort stocks (note: search filtering is done server-side via API)
     result = [...result].sort((a, b) => {
       let compareValue = 0
@@ -230,7 +226,7 @@ function StocksPageContent() {
     })
 
     return result
-  }, [allStocks, favoritesOnly, favoritedTickers, sortBy, sortOrder])
+  }, [allStocks, sortBy, sortOrder])
 
   // Handle sort option change
   const handleSortChange = (value: string) => {
@@ -240,11 +236,6 @@ function StocksPageContent() {
   // Toggle sort order
   const toggleSortOrder = () => {
     setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'))
-  }
-
-  // Toggle favorites filter
-  const toggleFavoritesOnly = () => {
-    setFavoritesOnly(prev => !prev)
   }
 
   // Toggle view mode
@@ -278,8 +269,13 @@ function StocksPageContent() {
         await addToWatchlist(ticker)
         showToast('Added to watchlist', 'success')
       }
-    } catch (error) {
-      showToast('Failed to update watchlist', 'error')
+    } catch (error: any) {
+      // Check if it's a tier limit error
+      if (error?.message?.includes('TIER_LIMIT_EXCEEDED') || error?.message?.includes('Watchlist full')) {
+        showToast('Watchlist full. Upgrade your plan for more.', 'error')
+      } else {
+        showToast('Failed to update watchlist', 'error')
+      }
     }
   }
 
@@ -303,7 +299,7 @@ function StocksPageContent() {
   }
 
   // Loading state
-  if (stocksLoading || watchlistLoading) {
+  if (stocksLoading || watchlistLoading || subscriptionLoading) {
     return (
       <div className="p-4 md:p-6 pb-20 md:pb-6">
         <div className="flex items-center justify-between mb-6">
@@ -406,23 +402,6 @@ function StocksPageContent() {
               )}
             </button>
 
-            <button
-              onClick={toggleFavoritesOnly}
-              className={`flex items-center justify-center w-10 h-10 rounded-xl transition-colors border ${
-                favoritesOnly
-                  ? 'bg-vettr-accent/10 text-vettr-accent border-vettr-accent/30'
-                  : 'bg-white/5 text-gray-400 border-white/10 hover:bg-white/10 hover:text-white'
-              }`}
-              title="Favorites Only"
-              aria-label="Toggle favorites filter"
-            >
-              {favoritesOnly ? (
-                <StarFilledIcon className="w-5 h-5" />
-              ) : (
-                <StarIcon className="w-5 h-5" />
-              )}
-            </button>
-
             {/* Export button - Only shown on desktop */}
             <button
               onClick={handleExport}
@@ -455,16 +434,15 @@ function StocksPageContent() {
           icon={<SearchIcon className="w-16 h-16 text-gray-600" />}
           title="No stocks match your filters"
           description={
-            searchQuery || favoritesOnly
+            searchQuery
               ? 'Try adjusting your filters or search query.'
               : 'No stocks available at this time.'
           }
-          actionLabel={searchQuery || favoritesOnly ? 'Clear Filters' : undefined}
+          actionLabel={searchQuery ? 'Clear Filters' : undefined}
           onAction={
-            searchQuery || favoritesOnly
+            searchQuery
               ? () => {
                 setSearchQuery('')
-                setFavoritesOnly(false)
               }
               : undefined
           }
@@ -530,23 +508,6 @@ function StocksPageContent() {
             )}
           </button>
 
-          <button
-            onClick={toggleFavoritesOnly}
-            className={`flex items-center justify-center w-10 h-10 rounded-xl transition-colors border ${
-              favoritesOnly
-                ? 'bg-vettr-accent/10 text-vettr-accent border-vettr-accent/30'
-                : 'bg-white/5 text-gray-400 border-white/10 hover:bg-white/10 hover:text-white'
-            }`}
-            title="Favorites Only"
-            aria-label="Toggle favorites filter"
-          >
-            {favoritesOnly ? (
-              <StarFilledIcon className="w-5 h-5" />
-            ) : (
-              <StarIcon className="w-5 h-5" />
-            )}
-          </button>
-
           {/* Export button - Only shown on desktop */}
           <button
             onClick={handleExport}
@@ -574,6 +535,83 @@ function StocksPageContent() {
           </button>
         </div>
       </div>
+
+      {/* My Watchlist Section */}
+      <div className="mb-6 bg-vettr-card/30 border border-white/5 rounded-2xl p-5">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-white">My Watchlist</h2>
+          <div className="text-sm text-gray-400">
+            {watchlist.length} / {subscription?.watchlist_limit === -1 ? 'unlimited' : subscription?.watchlist_limit || '...'} stocks
+          </div>
+        </div>
+
+        {watchlist.length === 0 ? (
+          <p className="text-sm text-gray-500 text-center py-4">
+            No stocks in your watchlist yet. Star a stock to add it.
+          </p>
+        ) : (
+          <div className="space-y-2">
+            {watchlist.map(stock => (
+              <div
+                key={stock.ticker}
+                className="flex items-center gap-3 p-3 bg-vettr-card/50 border border-white/5 rounded-xl hover:border-vettr-accent/20 hover:bg-vettr-card/80 transition-all cursor-pointer group"
+                onClick={() => window.location.href = `/stocks/${stock.ticker}`}
+              >
+                {/* Ticker and Company */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-mono text-sm font-bold text-vettr-accent">{stock.ticker}</span>
+                    <span className="text-xs text-gray-500 truncate">{stock.company_name}</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-xs text-gray-400">
+                    <span>${stock.current_price?.toFixed(2) || 'N/A'}</span>
+                    {stock.price_change_percent !== undefined && stock.price_change_percent !== null && (
+                      <div className="flex items-center gap-1">
+                        {stock.price_change_percent >= 0 ? (
+                          <ArrowUpIcon className="w-3 h-3 text-vettr-accent" />
+                        ) : (
+                          <ArrowDownIcon className="w-3 h-3 text-red-400" />
+                        )}
+                        <span className={stock.price_change_percent >= 0 ? 'text-vettr-accent' : 'text-red-400'}>
+                          {Math.abs(stock.price_change_percent).toFixed(2)}%
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* VETR Score */}
+                <div className="flex items-center gap-3">
+                  <VetrScoreBadge score={stock.vetr_score || 0} size="sm" />
+
+                  {/* Remove button */}
+                  <button
+                    onClick={async (e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      try {
+                        await removeFromWatchlist(stock.ticker)
+                        showToast('Removed from watchlist', 'success')
+                      } catch (error) {
+                        showToast('Failed to remove from watchlist', 'error')
+                      }
+                    }}
+                    disabled={isRemoving}
+                    className="text-gray-400 hover:text-red-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed p-1"
+                    aria-label="Remove from watchlist"
+                    title="Remove from watchlist"
+                  >
+                    <TrashIcon className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* All Stocks Section Header */}
+      <h2 className="text-lg font-semibold text-white mb-3">All Stocks</h2>
 
       {/* Stock count */}
       <div className="mb-4 text-sm text-gray-500">
@@ -789,8 +827,13 @@ function StocksPageContent() {
                     await addToWatchlist(ticker)
                     showToast('Added to watchlist', 'success')
                   }
-                } catch (error) {
-                  showToast('Failed to update watchlist', 'error')
+                } catch (error: any) {
+                  // Check if it's a tier limit error
+                  if (error?.message?.includes('TIER_LIMIT_EXCEEDED') || error?.message?.includes('Watchlist full')) {
+                    showToast('Watchlist full. Upgrade your plan for more.', 'error')
+                  } else {
+                    showToast('Failed to update watchlist', 'error')
+                  }
                 }
               }}
               isTogglingFavorite={isAdding || isRemoving}
