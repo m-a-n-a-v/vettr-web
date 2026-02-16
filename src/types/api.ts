@@ -431,6 +431,43 @@ export interface AlertTrigger {
 }
 
 // =============================================================================
+// Discovery Collections Types
+// =============================================================================
+
+/**
+ * Stock entity in a discovery collection
+ */
+export interface CollectionStock {
+  ticker: string;
+  name: string;
+  exchange: string;
+  sector: string;
+  market_cap: number | null;
+  price: number | null;
+  price_change: number | null;
+  vetr_score: number | null;
+}
+
+/**
+ * Discovery collection entity
+ */
+export interface DiscoveryCollection {
+  id: string;
+  name: string;
+  tagline: string;
+  icon: string;
+  criteria_summary: string;
+  stocks: CollectionStock[];
+}
+
+/**
+ * Discovery collections response data
+ */
+export interface DiscoveryCollectionsData {
+  collections: DiscoveryCollection[];
+}
+
+// =============================================================================
 // Sync Types
 // =============================================================================
 
