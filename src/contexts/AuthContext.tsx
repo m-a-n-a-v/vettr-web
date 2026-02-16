@@ -38,7 +38,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       try {
         // Fetch current user data to verify token validity
-        const response = await api.get<User>('/users/me');
+        // Use a shorter timeout (10s) for auth check to avoid blocking the UI
+        const response = await api.get<User>('/users/me', { timeout: 10000 });
         if (response.success && response.data) {
           setUser(response.data);
         } else {
