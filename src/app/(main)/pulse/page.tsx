@@ -449,8 +449,8 @@ export default function PulsePage() {
                           <p className="text-[11px] text-gray-500 truncate">{stock.company_name}</p>
                         </div>
                         <div className="text-right">
-                          <span className="text-2xl font-bold text-vettr-accent">{((stock.vetr_score || 0) / 10).toFixed(1)}</span>
-                          <p className="text-[10px] text-gray-500">/ 10.0</p>
+                          <span className="text-2xl font-bold text-vettr-accent">{Math.round(stock.vetr_score || 0)}</span>
+                          <p className="text-[10px] text-gray-500">/ 100</p>
                         </div>
                       </Link>
                     ))}

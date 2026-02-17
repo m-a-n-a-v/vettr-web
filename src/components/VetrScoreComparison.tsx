@@ -18,7 +18,7 @@ export default function VetrScoreComparison({ comparison, isLoading, currentTick
     return (
       <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-6">
         <h2 className="text-xl font-bold text-white mb-4">Sector Comparison</h2>
-        <div className="h-80 flex items-center justify-center">
+        <div className="h-64 flex items-center justify-center">
           <LoadingSpinner size="lg" color="white" />
         </div>
       </div>
@@ -128,11 +128,11 @@ export default function VetrScoreComparison({ comparison, isLoading, currentTick
       </div>
 
       {/* Bar Chart */}
-      <div className="h-80 mb-4" role="img" aria-label={`Bar chart comparing VETTR scores across ${comparison.sector} sector peers`}>
+      <div className="h-64 mb-4" role="img" aria-label={`Bar chart comparing VETTR scores across ${comparison.sector} sector peers`}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={chartData}
-            margin={{ top: 20, right: 30, left: 0, bottom: 80 }}
+            margin={{ top: 20, right: 20, left: 0, bottom: 40 }}
           >
             <CartesianGrid
               strokeDasharray={chartTheme.grid.strokeDasharray}
@@ -141,22 +141,17 @@ export default function VetrScoreComparison({ comparison, isLoading, currentTick
             <XAxis
               dataKey="ticker"
               stroke={chartTheme.axis.stroke}
-              tick={chartTheme.axis.tick}
+              tick={{ fill: '#94a3b8', fontSize: 11 }}
               angle={-45}
               textAnchor="end"
-              height={80}
+              height={50}
+              interval={0}
             />
             <YAxis
               stroke={chartTheme.axis.stroke}
               tick={chartTheme.axis.tick}
               domain={[0, 100]}
-              label={{
-                value: 'VETTR Score',
-                angle: -90,
-                position: 'insideLeft',
-                fill: chartTheme.text.secondary,
-                fontSize: 12,
-              }}
+              width={40}
             />
             <Tooltip
               content={<CustomTooltip />}
@@ -166,18 +161,19 @@ export default function VetrScoreComparison({ comparison, isLoading, currentTick
             {/* Sector average reference line */}
             <ReferenceLine
               y={comparison.sector_average}
-              stroke={chartTheme.colors.referenceLine}
-              strokeDasharray="5 5"
+              stroke="#FF9800"
+              strokeDasharray="6 4"
               strokeWidth={2}
               label={{
-                value: `Sector Avg: ${(comparison.sector_average ?? 0).toFixed(1)}`,
-                position: 'top',
-                fill: chartTheme.colors.referenceLine,
-                fontSize: 12,
+                value: `Avg: ${(comparison.sector_average ?? 0).toFixed(1)}`,
+                position: 'right',
+                fill: '#FF9800',
+                fontSize: 11,
+                fontWeight: 600,
               }}
             />
 
-            <Bar dataKey="score" radius={[4, 4, 0, 0]}>
+            <Bar dataKey="score" radius={[4, 4, 0, 0]} maxBarSize={48}>
               {chartData.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
@@ -193,27 +189,35 @@ export default function VetrScoreComparison({ comparison, isLoading, currentTick
       </div>
 
       {/* Legend */}
-      <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded border-2 border-vettr-accent"></div>
-          <span className="text-gray-400">Current Stock ({comparison.ticker})</span>
+      <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-gray-400">
+        <div className="flex items-center gap-1.5">
+          <div className="w-3.5 h-3.5 rounded-sm border-2 border-vettr-accent bg-vettr-accent/20"></div>
+          <span>Current Stock ({comparison.ticker})</span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-0.5 bg-yellow-400" style={{ borderTop: '2px dashed #FBBF24' }}></div>
-          <span className="text-gray-400">Sector Average</span>
+        <div className="flex items-center gap-1.5">
+          <svg width="20" height="4"><line x1="0" y1="2" x2="20" y2="2" stroke="#FF9800" strokeWidth="2" strokeDasharray="4 3" /></svg>
+          <span>Sector Average</span>
         </div>
-        <div className="text-gray-500 text-xs">
-          Colors based on score:
-          <span className="ml-2 inline-flex items-center gap-1">
-            <span className="w-3 h-3 rounded" style={{ backgroundColor: '#166534' }}></span>
+        <div className="flex items-center gap-1.5">
+          <span className="text-gray-500">Score:</span>
+          <span className="inline-flex items-center gap-1">
+            <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: '#166534' }}></span>
             <span>90+</span>
-            <span className="w-3 h-3 rounded" style={{ backgroundColor: '#00E676' }}></span>
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: '#00E676' }}></span>
             <span>75+</span>
-            <span className="w-3 h-3 rounded" style={{ backgroundColor: '#FBBF24' }}></span>
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: '#FBBF24' }}></span>
             <span>50+</span>
-            <span className="w-3 h-3 rounded" style={{ backgroundColor: '#FB923C' }}></span>
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: '#FB923C' }}></span>
             <span>30+</span>
-            <span className="w-3 h-3 rounded" style={{ backgroundColor: '#F87171' }}></span>
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: '#F87171' }}></span>
             <span>&lt;30</span>
           </span>
         </div>
