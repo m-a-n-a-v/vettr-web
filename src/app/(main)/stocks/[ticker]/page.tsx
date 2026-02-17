@@ -924,7 +924,7 @@ function StockDetailContent() {
               </div>
             ) : redFlags ? (
               <>
-                {/* Overall Red Flag Score */}
+                {/* Overall Red Flag Score — left-right layout */}
                 <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-6">
                   <div className="flex items-center justify-between mb-6">
                     <h2 className="text-lg font-semibold text-white">Red Flag Score</h2>
@@ -939,80 +939,93 @@ function StockDetailContent() {
                     )}
                   </div>
 
-                  <div className="flex flex-col items-center mb-8">
-                    {/* Circular progress indicator */}
-                    <div className="relative w-40 h-40">
-                      <svg className="w-40 h-40 transform -rotate-90">
-                        {/* Background circle */}
-                        <circle
-                          cx="80"
-                          cy="80"
-                          r="70"
-                          fill="none"
-                          stroke="rgba(255,255,255,0.1)"
-                          strokeWidth="12"
-                        />
-                        {/* Progress circle - higher score = more red (inverted from VETTR score) */}
-                        <circle
-                          cx="80"
-                          cy="80"
-                          r="70"
-                          fill="none"
-                          stroke={
-                            redFlags.overall_score >= 80
-                              ? '#F87171'
-                              : redFlags.overall_score >= 60
-                              ? '#FB923C'
-                              : redFlags.overall_score >= 40
-                              ? '#FBBF24'
-                              : '#00E676'
-                          }
-                          strokeWidth="12"
-                          strokeDasharray={`${(redFlags.overall_score / 100) * 439.8} 439.8`}
-                          strokeLinecap="round"
-                          className="transition-all duration-1000"
-                        />
-                      </svg>
-                      <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <span className="text-4xl font-bold text-white tabular-nums">
-                          {redFlags.overall_score}
-                        </span>
-                      </div>
-                    </div>
-                    <p className="text-sm text-gray-500 mt-2">Red Flag Score</p>
-                  </div>
-
-                  {/* Flag Breakdown Progress Bars - colors based on severity score */}
-                  <div className="space-y-3">
-                    {[
-                      { label: 'Consolidation Velocity', weight: '30%', value: redFlags.breakdown.consolidation_velocity },
-                      { label: 'Financing Velocity', weight: '25%', value: redFlags.breakdown.financing_velocity },
-                      { label: 'Executive Churn', weight: '20%', value: redFlags.breakdown.executive_churn },
-                      { label: 'Disclosure Gaps', weight: '15%', value: redFlags.breakdown.disclosure_gaps },
-                      { label: 'Debt Trend', weight: '10%', value: redFlags.breakdown.debt_trend },
-                    ].map(({ label, weight, value }) => {
-                      // Dynamic color based on severity score (higher = more critical)
-                      const barColor = value >= 80 ? '#F87171' : value >= 60 ? '#FB923C' : value >= 40 ? '#FBBF24' : '#00E676';
-                      return (
-                        <div key={label}>
-                          <div className="flex items-center justify-between mb-1.5">
-                            <div>
-                              <span className="text-sm text-gray-400">{label}</span>
-                              <span className="text-xs text-gray-600 ml-2">({weight} weight)</span>
-                            </div>
-                            <span className="text-sm font-medium text-white">{value}</span>
-                          </div>
-                          <div className="w-full bg-white/5 rounded-full h-2">
-                            <div
-                              className="h-2 rounded-full transition-all duration-1000"
-                              style={{ width: `${value}%`, backgroundColor: barColor }}
-                            />
-                          </div>
+                  <div className="grid grid-cols-1 lg:grid-cols-[auto_1fr] gap-8 items-start">
+                    {/* Left: Score circle + severity label */}
+                    <div className="flex flex-col items-center">
+                      <div className="relative w-36 h-36">
+                        <svg className="w-36 h-36 transform -rotate-90">
+                          <circle
+                            cx="72"
+                            cy="72"
+                            r="62"
+                            fill="none"
+                            stroke="rgba(255,255,255,0.1)"
+                            strokeWidth="10"
+                          />
+                          <circle
+                            cx="72"
+                            cy="72"
+                            r="62"
+                            fill="none"
+                            stroke={
+                              redFlags.overall_score >= 80
+                                ? '#F87171'
+                                : redFlags.overall_score >= 60
+                                ? '#FB923C'
+                                : redFlags.overall_score >= 40
+                                ? '#FBBF24'
+                                : '#00E676'
+                            }
+                            strokeWidth="10"
+                            strokeDasharray={`${(redFlags.overall_score / 100) * 389.6} 389.6`}
+                            strokeLinecap="round"
+                            className="transition-all duration-1000"
+                          />
+                        </svg>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                          <span className="text-3xl font-bold text-white tabular-nums">
+                            {redFlags.overall_score}
+                          </span>
                         </div>
-                      );
-                    })}
+                      </div>
+                      <span className={`mt-2 px-3 py-1 rounded-full text-xs font-semibold ${
+                        redFlags.overall_score >= 85
+                          ? 'bg-red-500/10 text-red-400'
+                          : redFlags.overall_score >= 60
+                          ? 'bg-orange-500/10 text-orange-400'
+                          : redFlags.overall_score >= 30
+                          ? 'bg-yellow-500/10 text-yellow-400'
+                          : 'bg-vettr-accent/10 text-vettr-accent'
+                      }`}>
+                        {redFlags.overall_score >= 85 ? 'Critical' : redFlags.overall_score >= 60 ? 'High' : redFlags.overall_score >= 30 ? 'Moderate' : 'Low'}
+                      </span>
+                      <p className="text-xs text-gray-600 mt-2">{redFlags.detected_flags.filter(f => !f.is_acknowledged).length} active flag{redFlags.detected_flags.filter(f => !f.is_acknowledged).length !== 1 ? 's' : ''}</p>
+                    </div>
+
+                    {/* Right: Breakdown bars */}
+                    <div className="space-y-3">
+                      {[
+                        { label: 'Consolidation Velocity', weight: '30%', value: redFlags.breakdown.consolidation_velocity },
+                        { label: 'Financing Velocity', weight: '25%', value: redFlags.breakdown.financing_velocity },
+                        { label: 'Executive Churn', weight: '20%', value: redFlags.breakdown.executive_churn },
+                        { label: 'Disclosure Gaps', weight: '15%', value: redFlags.breakdown.disclosure_gaps },
+                        { label: 'Debt Trend', weight: '10%', value: redFlags.breakdown.debt_trend },
+                      ].map(({ label, weight, value }) => {
+                        const barColor = value >= 80 ? '#F87171' : value >= 60 ? '#FB923C' : value >= 40 ? '#FBBF24' : '#00E676';
+                        return (
+                          <div key={label}>
+                            <div className="flex items-center justify-between mb-1">
+                              <div>
+                                <span className="text-sm text-gray-400">{label}</span>
+                                <span className="text-xs text-gray-600 ml-2">({weight})</span>
+                              </div>
+                              <span className="text-sm font-medium text-white tabular-nums">{value}</span>
+                            </div>
+                            <div className="w-full bg-white/5 rounded-full h-1.5">
+                              <div
+                                className="h-1.5 rounded-full transition-all duration-1000"
+                                style={{ width: `${value}%`, backgroundColor: barColor }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
+
+                {/* Detected Flags + Flag History — 2-column layout */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
                 {/* Detected Flags List */}
                 <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-6">
@@ -1187,6 +1200,8 @@ function StockDetailContent() {
                     />
                   )}
                 </div>
+
+                </div>{/* close 2-column grid */}
               </>
             ) : (
               <EmptyState
