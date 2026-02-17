@@ -25,7 +25,6 @@ function usePrefersReducedMotion() {
 
   return prefersReducedMotion;
 }
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useStock } from '@/hooks/useStock';
 import { useVetrScore } from '@/hooks/useVetrScore';
 import { useFilings } from '@/hooks/useFilings';
@@ -33,7 +32,7 @@ import { useExecutives } from '@/hooks/useExecutives';
 import { useWatchlist } from '@/hooks/useWatchlist';
 import { useRedFlags } from '@/hooks/useRedFlags';
 import { useRedFlagHistory } from '@/hooks/useRedFlagHistory';
-import { useVetrScoreHistory } from '@/hooks/useVetrScoreHistory';
+
 import { useVetrScoreComparison } from '@/hooks/useVetrScoreComparison';
 import { useVetrScoreTrend } from '@/hooks/useVetrScoreTrend';
 import { useToast } from '@/contexts/ToastContext';
@@ -52,10 +51,10 @@ import ExecutiveDetail from '@/components/ExecutiveDetail';
 import VetrScoreDetail from '@/components/VetrScoreDetail';
 import VetrScoreComparison from '@/components/VetrScoreComparison';
 import VetrScoreTrend from '@/components/VetrScoreTrend';
-import { SkeletonStockDetailHeader, SkeletonVetrScoreSection, SkeletonChart, SkeletonFilingRow, SkeletonMetricCard } from '@/components/ui/SkeletonLoader';
+import { SkeletonStockDetailHeader, SkeletonVetrScoreSection, SkeletonFilingRow, SkeletonMetricCard } from '@/components/ui/SkeletonLoader';
 import Breadcrumb from '@/components/ui/Breadcrumb';
 import { StarIcon, StarFilledIcon, ShareIcon, MoreHorizontalIcon, ArrowUpIcon, ArrowDownIcon, UsersIcon, FlagIcon, ShieldCheckIcon, BarChartIcon, DocumentIcon, PrinterIcon } from '@/components/icons';
-import { chartTheme, getTooltipStyle, getScoreColor } from '@/lib/chart-theme';
+import { getScoreColor } from '@/lib/chart-theme';
 
 type Tab = 'overview' | 'pedigree' | 'red-flags';
 
@@ -85,9 +84,6 @@ function StockDetailContent() {
   // Score detail modal state
   const [showScoreDetail, setShowScoreDetail] = useState(false);
 
-  // Score history chart state - initialize from URL
-  const [scoreHistoryPeriod, setScoreHistoryPeriod] = useState(searchParams.get('period') || '6M');
-
   // Set client flag on mount
   useEffect(() => {
     setIsClient(true);
@@ -101,7 +97,6 @@ function StockDetailContent() {
   const { watchlist, isAdding, isRemoving, addToWatchlist, removeFromWatchlist } = useWatchlist();
   const { redFlags, isLoading: redFlagsLoading, mutate: mutateRedFlags } = useRedFlags({ ticker });
   const { history: flagHistory, isLoading: flagHistoryLoading } = useRedFlagHistory({ ticker, limit: 10 });
-  const { history: scoreHistory, isLoading: scoreHistoryLoading } = useVetrScoreHistory({ ticker, period: scoreHistoryPeriod });
   const { comparison, isLoading: comparisonLoading } = useVetrScoreComparison({ ticker });
   const { trend, isLoading: trendLoading } = useVetrScoreTrend({ ticker });
 
@@ -160,16 +155,11 @@ function StockDetailContent() {
       if (executiveSortBy !== 'title') params.set('execSort', executiveSortBy);
     }
 
-    // Add score history period if not default
-    if (activeTab === 'overview' && scoreHistoryPeriod !== '6M') {
-      params.set('period', scoreHistoryPeriod);
-    }
-
     const queryString = params.toString();
     const newUrl = queryString ? `/stocks/${ticker}?${queryString}` : `/stocks/${ticker}`;
 
     router.replace(newUrl, { scroll: false });
-  }, [activeTab, executiveSearch, executiveTitleFilter, executiveSortBy, scoreHistoryPeriod, isClient, router, ticker]);
+  }, [activeTab, executiveSearch, executiveTitleFilter, executiveSortBy, isClient, router, ticker]);
 
   // Filter and sort executives (client-side filtering for search + title)
   const filteredAndSortedExecutives = useMemo(() => {
@@ -353,27 +343,20 @@ function StockDetailContent() {
           </div>
 
           {/* Content skeleton - Overview Tab */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left column - VETTR Score */}
-            <div className="lg:col-span-1">
+          <div className="space-y-6">
+            {/* VETTR Score + Key Metrics 2-column */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <SkeletonVetrScoreSection />
-            </div>
-
-            {/* Right column - Charts and Data */}
-            <div className="lg:col-span-2 space-y-6">
-              {/* Key Metrics */}
               <div>
                 <div className="h-6 w-32 bg-white/5 rounded animate-pulse mb-4"></div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                   <SkeletonMetricCard />
                   <SkeletonMetricCard />
                   <SkeletonMetricCard />
                   <SkeletonMetricCard />
                 </div>
               </div>
-
-              {/* Chart */}
-              <SkeletonChart />
+            </div>
 
               {/* Recent Filings */}
               <div className="bg-vettr-card/50 border border-white/5 rounded-2xl overflow-hidden">
@@ -390,7 +373,6 @@ function StockDetailContent() {
                   </tbody>
                 </table>
               </div>
-            </div>
           </div>
         </div>
       </div>
@@ -564,197 +546,113 @@ function StockDetailContent() {
               transition={{ duration: prefersReducedMotion ? 0 : 0.15, ease: 'easeOut' }}
               className="space-y-6"
             >
-            {/* VETTR Score section */}
-            <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-6 print-avoid-break">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold text-white">VETTR Score</h2>
-                {trend && (
-                  <div className="flex items-center gap-1">
-                    {trend.direction === 'Improving' ? (
-                      <>
-                        <ArrowUpIcon className="w-4 h-4 text-vettr-accent" />
-                        <span className="text-sm font-medium text-vettr-accent">Improving</span>
-                      </>
-                    ) : trend.direction === 'Declining' ? (
-                      <>
-                        <ArrowDownIcon className="w-4 h-4 text-red-400" />
-                        <span className="text-sm font-medium text-red-400">Declining</span>
-                      </>
-                    ) : (
-                      <span className="text-sm font-medium text-gray-400">Stable</span>
-                    )}
-                  </div>
-                )}
-              </div>
-              {scoreLoading ? (
-                <div className="flex justify-center py-8">
-                  <LoadingSpinner size="lg" color="white" />
-                </div>
-              ) : score ? (
-                <button
-                  onClick={() => setShowScoreDetail(true)}
-                  className="w-full flex flex-col items-center justify-center cursor-pointer hover:bg-white/[0.03] rounded-xl p-4 transition-colors group"
-                  aria-label="View score details"
-                >
-                  <VetrScoreBadge score={score.overall_score} size="lg" animate={true} showLabel={false} />
-                  <p className="text-xs text-gray-500 mt-2">VETTR Score</p>
-
-                  {/* Component breakdown bars */}
-                  {score.financial_survival && (
-                    <div className="w-full max-w-md mt-6 space-y-3">
-                      {[
-                        { label: 'Financial Survival', pillar: score.financial_survival, weight: '35%' },
-                        { label: 'Operational Efficiency', pillar: score.operational_efficiency, weight: '25%' },
-                        { label: 'Shareholder Structure', pillar: score.shareholder_structure, weight: '25%' },
-                        { label: 'Market Sentiment', pillar: score.market_sentiment, weight: '15%' },
-                      ].map(({ label, pillar, weight }) => (
-                        <div key={label}>
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-xs text-gray-400">{label} <span className="text-gray-600">({weight})</span></span>
-                            <span className="text-xs font-medium text-white">{pillar?.score ?? 'N/A'}</span>
-                          </div>
-                          <div className="w-full bg-white/5 rounded-full h-1.5">
-                            <div
-                              className="h-1.5 rounded-full transition-all duration-1000"
-                              style={{
-                                width: `${pillar?.score ?? 0}%`,
-                                backgroundColor: getScoreColor(pillar?.score ?? 0),
-                              }}
-                            />
-                          </div>
-                        </div>
-                      ))}
-
-                      {/* Null pillars notice */}
-                      {score.null_pillars && score.null_pillars.length > 0 && (
-                        <p className="text-xs text-yellow-400/70 mt-2">
-                          ⚠ Weight redistributed — insufficient data for: {score.null_pillars.join(', ')}
-                        </p>
+            {/* VETTR Score + Key Metrics — 2-column layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* VETTR Score section */}
+              <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-6 print-avoid-break">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-lg font-semibold text-white">VETTR Score</h2>
+                  {trend && (
+                    <div className="flex items-center gap-1">
+                      {trend.direction === 'Improving' ? (
+                        <>
+                          <ArrowUpIcon className="w-4 h-4 text-vettr-accent" />
+                          <span className="text-sm font-medium text-vettr-accent">Improving</span>
+                        </>
+                      ) : trend.direction === 'Declining' ? (
+                        <>
+                          <ArrowDownIcon className="w-4 h-4 text-red-400" />
+                          <span className="text-sm font-medium text-red-400">Declining</span>
+                        </>
+                      ) : (
+                        <span className="text-sm font-medium text-gray-400">Stable</span>
                       )}
                     </div>
                   )}
-
-                  <p className="text-gray-500 text-xs mt-4 group-hover:text-gray-300 transition-colors">
-                    Click to view detailed breakdown
-                  </p>
-                </button>
-              ) : (
-                <p className="text-gray-400 text-center py-4">Score not available</p>
-              )}
-            </div>
-
-
-            {/* Score History Chart */}
-            <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold text-white">Score History</h2>
-                {/* Time Range Pills */}
-                <div className="flex gap-2">
-                  {['1M', '3M', '6M', '12M', '24M'].map((period) => (
-                    <button
-                      key={period}
-                      onClick={() => setScoreHistoryPeriod(period)}
-                      className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
-                        scoreHistoryPeriod === period
-                          ? 'bg-vettr-accent/10 text-vettr-accent'
-                          : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
-                      }`}
-                    >
-                      {period}
-                    </button>
-                  ))}
                 </div>
+                {scoreLoading ? (
+                  <div className="flex justify-center py-8">
+                    <LoadingSpinner size="lg" color="white" />
+                  </div>
+                ) : score ? (
+                  <button
+                    onClick={() => setShowScoreDetail(true)}
+                    className="w-full flex flex-col items-center justify-center cursor-pointer hover:bg-white/[0.03] rounded-xl p-4 transition-colors group"
+                    aria-label="View score details"
+                  >
+                    <VetrScoreBadge score={score.overall_score} size="lg" animate={true} showLabel={false} />
+                    <p className="text-xs text-gray-500 mt-2">VETTR Score</p>
+
+                    {/* Component breakdown bars */}
+                    {score.financial_survival && (
+                      <div className="w-full max-w-md mt-6 space-y-3">
+                        {[
+                          { label: 'Financial Survival', pillar: score.financial_survival, weight: '35%' },
+                          { label: 'Operational Efficiency', pillar: score.operational_efficiency, weight: '25%' },
+                          { label: 'Shareholder Structure', pillar: score.shareholder_structure, weight: '25%' },
+                          { label: 'Market Sentiment', pillar: score.market_sentiment, weight: '15%' },
+                        ].map(({ label, pillar, weight }) => (
+                          <div key={label}>
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-xs text-gray-400">{label} <span className="text-gray-600">({weight})</span></span>
+                              <span className="text-xs font-medium text-white">{pillar?.score ?? 'N/A'}</span>
+                            </div>
+                            <div className="w-full bg-white/5 rounded-full h-1.5">
+                              <div
+                                className="h-1.5 rounded-full transition-all duration-1000"
+                                style={{
+                                  width: `${pillar?.score ?? 0}%`,
+                                  backgroundColor: getScoreColor(pillar?.score ?? 0),
+                                }}
+                              />
+                            </div>
+                          </div>
+                        ))}
+
+                        {/* Null pillars notice */}
+                        {score.null_pillars && score.null_pillars.length > 0 && (
+                          <p className="text-xs text-yellow-400/70 mt-2">
+                            ⚠ Weight redistributed — insufficient data for: {score.null_pillars.join(', ')}
+                          </p>
+                        )}
+                      </div>
+                    )}
+
+                    <p className="text-gray-500 text-xs mt-4 group-hover:text-gray-300 transition-colors">
+                      Click to view detailed breakdown
+                    </p>
+                  </button>
+                ) : (
+                  <p className="text-gray-400 text-center py-4">Score not available</p>
+                )}
               </div>
 
-              {scoreHistoryLoading ? (
-                <div className="h-64 flex items-center justify-center">
-                  <LoadingSpinner size="lg" color="white" />
-                </div>
-              ) : scoreHistory.length > 0 && scoreHistory[0]?.history && scoreHistory[0].history.length >= 2 ? (
-                <div className="h-64" role="img" aria-label="VETTR Score history chart showing score trends over time">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart
-                      data={scoreHistory[0].history}
-                      margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
-                    >
-                      <CartesianGrid
-                        strokeDasharray={chartTheme.grid.strokeDasharray}
-                        stroke={chartTheme.grid.stroke}
-                      />
-                      <XAxis
-                        dataKey="date"
-                        stroke={chartTheme.axis.stroke}
-                        tick={chartTheme.axis.tick}
-                        tickFormatter={(value) => {
-                          const date = new Date(value);
-                          return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                        }}
-                      />
-                      <YAxis
-                        stroke={chartTheme.axis.stroke}
-                        tick={chartTheme.axis.tick}
-                        domain={[0, 100]}
-                      />
-                      <Tooltip
-                        contentStyle={getTooltipStyle()}
-                        labelStyle={{ color: chartTheme.text.secondary }}
-                        formatter={(value: number | undefined) => [value?.toFixed(1) ?? 'N/A', 'Score']}
-                        labelFormatter={(label) => {
-                          const date = new Date(label);
-                          return date.toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                          });
-                        }}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="score"
-                        stroke={chartTheme.colors.primary}
-                        strokeWidth={2}
-                        dot={{ fill: chartTheme.colors.primary, r: 4 }}
-                        activeDot={{ r: 6 }}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              ) : (
-                <div className="h-64 flex items-center justify-center">
-                  <EmptyState
-                    icon={<BarChartIcon className="w-16 h-16 text-gray-600" />}
-                    title="Not enough data"
-                    description="Score history will be displayed once sufficient data is available."
-                  />
-                </div>
-              )}
-            </div>
-
-            {/* Key Metrics grid */}
-            <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-6 print-avoid-break print-page-break">
-              <h2 className="text-lg font-semibold text-white mb-4">Key Metrics</h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-white/[0.03] rounded-xl p-4">
-                  <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Market Cap</p>
-                  <p className="text-white font-semibold">
-                    {stock.market_cap
-                      ? `$${(stock.market_cap / 1000000000).toFixed(1)}B`
-                      : 'N/A'}
-                  </p>
-                </div>
-                <div className="bg-white/[0.03] rounded-xl p-4">
-                  <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Exchange</p>
-                  <p className="text-white font-semibold">{stock.exchange || 'N/A'}</p>
-                </div>
-                <div className="bg-white/[0.03] rounded-xl p-4">
-                  <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Sector</p>
-                  <p className="text-white font-semibold">{stock.sector}</p>
-                </div>
-                <div className="bg-white/[0.03] rounded-xl p-4">
-                  <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Recent Filings</p>
-                  <p className="text-white font-semibold">
-                    {filings?.length || 0}
-                  </p>
+              {/* Key Metrics */}
+              <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-6 print-avoid-break print-page-break">
+                <h2 className="text-lg font-semibold text-white mb-4">Key Metrics</h2>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-white/[0.03] rounded-xl p-4">
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Market Cap</p>
+                    <p className="text-white font-semibold">
+                      {stock.market_cap
+                        ? `$${(stock.market_cap / 1000000000).toFixed(1)}B`
+                        : 'N/A'}
+                    </p>
+                  </div>
+                  <div className="bg-white/[0.03] rounded-xl p-4">
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Exchange</p>
+                    <p className="text-white font-semibold">{stock.exchange || 'N/A'}</p>
+                  </div>
+                  <div className="bg-white/[0.03] rounded-xl p-4">
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Sector</p>
+                    <p className="text-white font-semibold">{stock.sector}</p>
+                  </div>
+                  <div className="bg-white/[0.03] rounded-xl p-4">
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Recent Filings</p>
+                    <p className="text-white font-semibold">
+                      {filings?.length || 0}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
