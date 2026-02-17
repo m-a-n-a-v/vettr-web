@@ -244,7 +244,7 @@ export default function ExecutiveDetail({ executive, onClose }: ExecutiveDetailP
           {/* Tenure Assessment */}
           <div className={`rounded-xl p-5 border-2 ${getTenureRiskColors()}`}>
             <div className="flex items-center gap-2 mb-3">
-              <div className={`w-2 h-2 rounded-full ${executive.tenure_risk === 'Stable' ? 'bg-vettr-accent' : executive.tenure_risk === 'Watch' ? 'bg-yellow-400' : 'bg-red-400'}`} />
+              <div className={`w-2 h-2 rounded-full ${executive.tenure_risk === 'Stable' ? 'bg-vettr-accent' : executive.tenure_risk === 'Watch' ? 'bg-yellow-400' : executive.tenure_risk === 'Flight Risk' ? 'bg-red-400' : 'bg-gray-400'}`} />
               <h4 className="text-lg font-semibold">
                 Tenure Assessment: {executive.tenure_risk}
               </h4>

@@ -49,8 +49,8 @@ export default function ExecutiveTable({ executives, onExecutiveClick }: Executi
           comparison = (a.specialization || '').localeCompare(b.specialization || '');
           break;
         case 'risk':
-          const riskOrder = { 'Stable': 0, 'Watch': 1, 'Flight Risk': 2 };
-          comparison = riskOrder[a.tenure_risk] - riskOrder[b.tenure_risk];
+          const riskOrder: Record<string, number> = { 'Stable': 0, 'Watch': 1, 'Flight Risk': 2, 'Unknown': 3 };
+          comparison = (riskOrder[a.tenure_risk] ?? 3) - (riskOrder[b.tenure_risk] ?? 3);
           break;
       }
 
@@ -186,14 +186,22 @@ export default function ExecutiveTable({ executives, onExecutiveClick }: Executi
                 </span>
               </td>
               <td role="cell" className="px-4 py-4 text-center">
-                <span className="text-sm text-white dark:text-white text-gray-900 font-medium">
-                  {executive.years_at_company} {executive.years_at_company === 1 ? 'year' : 'years'}
-                </span>
+                {executive.years_at_company > 0 ? (
+                  <span className="text-sm text-white dark:text-white text-gray-900 font-medium">
+                    {executive.years_at_company} {executive.years_at_company === 1 ? 'year' : 'years'}
+                  </span>
+                ) : (
+                  <span className="text-sm text-gray-500">—</span>
+                )}
               </td>
               <td role="cell" className="px-4 py-4 text-center">
-                <span className="text-sm text-white dark:text-white text-gray-900 font-medium">
-                  {executive.total_experience_years} {executive.total_experience_years === 1 ? 'year' : 'years'}
-                </span>
+                {executive.total_experience_years > 0 ? (
+                  <span className="text-sm text-white dark:text-white text-gray-900 font-medium">
+                    {executive.total_experience_years} {executive.total_experience_years === 1 ? 'year' : 'years'}
+                  </span>
+                ) : (
+                  <span className="text-sm text-gray-500">—</span>
+                )}
               </td>
               <td role="cell" className="px-4 py-4">
                 {executive.specialization ? (
@@ -205,17 +213,21 @@ export default function ExecutiveTable({ executives, onExecutiveClick }: Executi
                 )}
               </td>
               <td role="cell" className="px-4 py-4 text-center">
-                <span
-                  className={`inline-block px-2 py-1 rounded text-xs font-medium ${
-                    executive.tenure_risk === 'Stable'
-                      ? 'bg-vettr-accent/10 text-vettr-accent'
-                      : executive.tenure_risk === 'Watch'
-                      ? 'bg-yellow-400/10 text-yellow-400'
-                      : 'bg-red-400/10 text-red-400'
-                  }`}
-                >
-                  {executive.tenure_risk}
-                </span>
+                {executive.tenure_risk === 'Unknown' ? (
+                  <span className="text-sm text-gray-500">—</span>
+                ) : (
+                  <span
+                    className={`inline-block px-2 py-1 rounded text-xs font-medium ${
+                      executive.tenure_risk === 'Stable'
+                        ? 'bg-vettr-accent/10 text-vettr-accent'
+                        : executive.tenure_risk === 'Watch'
+                        ? 'bg-yellow-400/10 text-yellow-400'
+                        : 'bg-red-400/10 text-red-400'
+                    }`}
+                  >
+                    {executive.tenure_risk}
+                  </span>
+                )}
               </td>
             </tr>
           ))}

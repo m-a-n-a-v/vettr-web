@@ -170,7 +170,7 @@ export interface Filing {
 /**
  * Executive tenure risk level
  */
-export type TenureRisk = 'Stable' | 'Watch' | 'Flight Risk';
+export type TenureRisk = 'Stable' | 'Watch' | 'Flight Risk' | 'Unknown';
 
 /**
  * Executive entity

@@ -756,13 +756,15 @@ function StockDetailContent() {
           >
             {/* Search and Filters */}
             <div className="bg-vettr-card/30 border border-white/5 rounded-2xl p-4">
-              <h3 className="text-sm font-medium text-gray-400 mb-3">Executive Name Search</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <SearchInput
-                  value={executiveSearch}
-                  onChange={setExecutiveSearch}
-                  placeholder="Search executives by name..."
-                />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1.5">Search</label>
+                  <SearchInput
+                    value={executiveSearch}
+                    onChange={setExecutiveSearch}
+                    placeholder="Search executives by name..."
+                  />
+                </div>
                 <SelectDropdown
                   label="Filter by Title"
                   value={executiveTitleFilter}
@@ -856,7 +858,8 @@ function StockDetailContent() {
                         </div>
                       )}
 
-                      {/* Tenure risk indicator */}
+                      {/* Tenure risk indicator — hide if Unknown */}
+                      {executive.tenure_risk !== 'Unknown' && (
                       <div className="flex items-center gap-2">
                         <div
                           className={`w-2 h-2 rounded-full ${
@@ -879,6 +882,7 @@ function StockDetailContent() {
                           {executive.tenure_risk}
                         </span>
                       </div>
+                      )}
                     </div>
                   ))}
                 </div>
