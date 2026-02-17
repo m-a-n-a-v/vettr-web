@@ -29,11 +29,26 @@ export function useVetrScoreComparison({
   const { data, error, isLoading, mutate } = useSWR<VetrScoreComparison, Error>(
     shouldFetch && ticker ? `/stocks/${ticker}/vetr-score/compare` : null,
     async (url: string): Promise<VetrScoreComparison> => {
-      const response = await api.get<VetrScoreComparison>(url);
+      const response = await api.get<any>(url);
       if (!response.success || !response.data) {
         throw new Error('Failed to fetch VETTR score comparison');
       }
-      return response.data;
+
+      const raw = response.data;
+
+      // Map backend field names to frontend expected names
+      return {
+        ticker: raw.ticker,
+        score: raw.overall_score ?? raw.score ?? 0,
+        sector: raw.sector,
+        sector_average: raw.sector_average ?? 0,
+        percentile_rank: raw.percentile_rank ?? 0,
+        peers: (raw.peers || []).map((peer: any) => ({
+          ticker: peer.ticker,
+          company_name: peer.name || peer.company_name || peer.ticker,
+          score: peer.overall_score ?? peer.score ?? 0,
+        })),
+      };
     },
     {
       dedupingInterval: 120000, // Cache for 2 min — peer data rarely changes

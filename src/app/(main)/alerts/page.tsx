@@ -7,6 +7,9 @@ import { useState, useMemo, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAlertRules } from '@/hooks/useAlertRules';
+import { useAlertTriggers } from '@/hooks/useAlertTriggers';
+import { useWatchlist } from '@/hooks/useWatchlist';
+import { useSubscription } from '@/hooks/useSubscription';
 import { useToast } from '@/contexts/ToastContext';
 import type { AlertRule, AlertType } from '@/types/api';
 import { shareContent } from '@/lib/share';
@@ -15,42 +18,27 @@ import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { SkeletonAlertRule, SkeletonAlertTrigger } from '@/components/ui/SkeletonLoader';
 import Modal from '@/components/ui/Modal';
+import UpgradeModal from '@/components/UpgradeModal';
 import AlertRuleCreator from '@/components/AlertRuleCreator';
 import { BellIcon, EditIcon, TrashIcon, PlusIcon, ShareIcon, FlagIcon, AlertTriangleIcon, FilterIcon } from '@/components/icons';
 
-// Mock recent triggers - in production this would come from an API endpoint
-// The backend doesn't have a triggers endpoint yet, so we'll show placeholder data
-const mockRecentTriggers = [
-  {
-    id: '1',
-    ticker: 'AAPL',
-    alert_type: 'Red Flag' as AlertType,
-    message: 'High severity red flag detected',
-    triggered_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
-  },
-  {
-    id: '2',
-    ticker: 'TSLA',
-    alert_type: 'Financing' as AlertType,
-    message: 'New financing activity detected',
-    triggered_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), // 5 hours ago
-  },
-  {
-    id: '3',
-    ticker: 'MSFT',
-    alert_type: 'Executive Changes' as AlertType,
-    message: 'Executive team changes detected',
-    triggered_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
-  },
-];
-
 type FilterType = 'All' | 'Active' | 'Inactive';
+
+// ─── Tier limit config ──────────────────────────────────────────────────────
+const TIER_LIMITS: Record<string, number> = {
+  free: 5,
+  pro: 25,
+  premium: Infinity,
+};
 
 function AlertsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const { rules, isLoading, error, deleteRule, toggleRule, createRule, updateRule, isCreating, isUpdating, isDeleting } = useAlertRules();
+  const { triggers, isLoading: triggersLoading, markAsRead, markAllAsRead, deleteTrigger, isMarkingAllRead } = useAlertTriggers();
+  const { watchlist, isInWatchlist } = useWatchlist();
+  const { subscription } = useSubscription();
   const { showToast } = useToast();
 
   // Initialize state from URL params
@@ -61,6 +49,7 @@ function AlertsPageContent() {
   const [togglingRuleId, setTogglingRuleId] = useState<string | null>(null);
   const [showCreator, setShowCreator] = useState(false);
   const [editingRule, setEditingRule] = useState<AlertRule | null>(null);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   // Set client flag on mount
   useEffect(() => {
@@ -81,6 +70,21 @@ function AlertsPageContent() {
 
     router.replace(newUrl, { scroll: false });
   }, [filter, searchQuery, isClient, router]);
+
+  // Compute tier limit and watchlist size
+  const currentTier = subscription?.tier || 'free';
+  const watchlistLimit = TIER_LIMITS[currentTier] || 5;
+  const watchlistCount = watchlist.length;
+
+  // Determine if a trigger's stock is locked (not in watchlist + at tier limit)
+  const isTriggerLocked = (ticker: string): boolean => {
+    if (currentTier === 'premium') return false;
+    if (isInWatchlist(ticker)) return false;
+    return watchlistCount >= watchlistLimit;
+  };
+
+  // Count unread triggers
+  const unreadCount = useMemo(() => triggers.filter(t => !t.is_read).length, [triggers]);
 
   // Filter rules based on active/inactive filter and search query
   const filteredRules = useMemo(() => {
@@ -182,6 +186,23 @@ function AlertsPageContent() {
     }
   };
 
+  // Handle mark all read
+  const handleMarkAllRead = async () => {
+    const success = await markAllAsRead();
+    if (success) {
+      showToast('All alerts marked as read', 'success');
+    } else {
+      showToast('Failed to mark alerts as read', 'error');
+    }
+  };
+
+  // Handle trigger click (mark as read)
+  const handleTriggerClick = async (id: string, isRead: boolean) => {
+    if (!isRead) {
+      await markAsRead(id);
+    }
+  };
+
   // Get alert type icon and color
   const getAlertIcon = (type: AlertType) => {
     switch (type) {
@@ -220,7 +241,7 @@ function AlertsPageContent() {
   };
 
   // Share alert trigger
-  const handleShareTrigger = async (trigger: typeof mockRecentTriggers[0]) => {
+  const handleShareTrigger = async (trigger: { ticker: string; alert_type: string; message: string; triggered_at: string }) => {
     const shareText = `${trigger.ticker} Alert: ${trigger.alert_type}\n` +
       `${trigger.message}\n` +
       `Triggered: ${formatRelativeTime(trigger.triggered_at)}`;
@@ -335,51 +356,125 @@ function AlertsPageContent() {
 
       {/* Recent Triggers Section */}
       <section className="mb-8">
-        <h2 className="text-lg font-semibold text-white mb-4">Recent Triggers</h2>
-        {mockRecentTriggers.length === 0 ? (
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-white">
+            Recent Triggers
+            {unreadCount > 0 && (
+              <span className="ml-2 inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-red-500 text-white text-xs font-bold">
+                {unreadCount}
+              </span>
+            )}
+          </h2>
+          {unreadCount > 0 && (
+            <button
+              onClick={handleMarkAllRead}
+              disabled={isMarkingAllRead}
+              className="text-sm text-vettr-accent hover:text-vettr-accent/80 transition-colors disabled:opacity-50"
+            >
+              {isMarkingAllRead ? 'Marking...' : 'Mark all read'}
+            </button>
+          )}
+        </div>
+
+        {triggersLoading ? (
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => (
+              <SkeletonAlertTrigger key={i} />
+            ))}
+          </div>
+        ) : triggers.length === 0 ? (
           <EmptyState
             icon={<BellIcon className="w-16 h-16 text-gray-600" />}
             title="No recent triggers"
-            description="You haven't had any alert triggers recently."
+            description="You haven't had any alert triggers recently. Create alert rules to get notified about stock events."
           />
         ) : (
           <div className="space-y-3">
-            {mockRecentTriggers.slice(0, 5).map((trigger) => {
+            {triggers.slice(0, 10).map((trigger) => {
               const { Icon, color } = getAlertIcon(trigger.alert_type);
+              const locked = isTriggerLocked(trigger.ticker);
+
               return (
                 <div
                   key={trigger.id}
-                  className="bg-vettr-card/50 border border-white/5 rounded-xl p-4 hover:bg-vettr-card/80 transition-colors"
+                  className={`relative bg-vettr-card/50 border rounded-xl p-4 transition-colors cursor-pointer ${
+                    trigger.is_read
+                      ? 'border-white/5 hover:bg-vettr-card/80'
+                      : 'border-vettr-accent/20 bg-vettr-accent/5 hover:bg-vettr-accent/10'
+                  }`}
+                  onClick={() => handleTriggerClick(trigger.id, trigger.is_read)}
                 >
-                  <div className="flex items-start gap-3">
+                  {/* Unread indicator dot */}
+                  {!trigger.is_read && (
+                    <div className="absolute top-4 left-2 w-2 h-2 rounded-full bg-vettr-accent" />
+                  )}
+
+                  <div className="flex items-start gap-3 pl-2">
                     <Icon className={`w-5 h-5 flex-shrink-0 ${color}`} />
-                    <Link
-                      href={`/stocks/${trigger.ticker}`}
-                      className="flex-1 min-w-0"
-                    >
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-medium text-vettr-accent hover:underline font-mono">{trigger.ticker}</span>
-                        <span className="text-gray-400">•</span>
-                        <span className="text-sm text-gray-400">{trigger.alert_type}</span>
+
+                    {locked ? (
+                      /* Locked/Upgrade overlay for non-watchlist stock alerts */
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-medium text-vettr-accent font-mono">{trigger.ticker}</span>
+                          <span className="text-gray-400">&bull;</span>
+                          <span className="text-sm text-gray-400">{trigger.alert_type}</span>
+                        </div>
+                        <div className="relative">
+                          <p className="text-sm text-gray-500 blur-[4px] select-none">
+                            {trigger.message || 'Alert details are available for watchlist stocks only.'}
+                          </p>
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setShowUpgradeModal(true);
+                              }}
+                              className="px-3 py-1.5 bg-vettr-accent/10 border border-vettr-accent/30 text-vettr-accent text-xs font-semibold rounded-lg hover:bg-vettr-accent/20 transition-colors"
+                            >
+                              Upgrade for details
+                            </button>
+                          </div>
+                        </div>
                       </div>
-                      <p className="text-sm text-gray-300">{trigger.message}</p>
-                    </Link>
+                    ) : (
+                      /* Full trigger details for watchlist stocks */
+                      <Link
+                        href={`/stocks/${trigger.ticker}`}
+                        className="flex-1 min-w-0"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-medium text-vettr-accent hover:underline font-mono">{trigger.ticker}</span>
+                          <span className="text-gray-400">&bull;</span>
+                          <span className="text-sm text-gray-400">{trigger.alert_type}</span>
+                        </div>
+                        <p className="text-sm text-gray-300">{trigger.title || trigger.message}</p>
+                        {trigger.title && trigger.message && trigger.title !== trigger.message && (
+                          <p className="text-xs text-gray-500 mt-1">{trigger.message}</p>
+                        )}
+                      </Link>
+                    )}
+
                     <div className="flex items-center gap-2 flex-shrink-0">
                       <span className="text-xs text-gray-500">
                         {formatRelativeTime(trigger.triggered_at)}
                       </span>
                       {/* Share Button */}
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleShareTrigger(trigger);
-                        }}
-                        className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
-                        aria-label="Share alert"
-                        title="Share alert"
-                      >
-                        <ShareIcon className="w-4 h-4" />
-                      </button>
+                      {!locked && (
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleShareTrigger(trigger);
+                          }}
+                          className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+                          aria-label="Share alert"
+                          title="Share alert"
+                        >
+                          <ShareIcon className="w-4 h-4" />
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -452,14 +547,14 @@ function AlertsPageContent() {
                         >
                           {rule.ticker}
                         </Link>
-                        <span className="text-gray-400">•</span>
+                        <span className="text-gray-400">&bull;</span>
                         <span className="text-sm text-gray-400">{rule.alert_type}</span>
                       </div>
                       <div className="flex flex-wrap items-center gap-2 text-sm text-gray-500">
                         <span>Frequency: {rule.frequency}</span>
                         {rule.condition && Object.keys(rule.condition).length > 0 && (
                           <>
-                            <span>•</span>
+                            <span>&bull;</span>
                             <span>Custom conditions</span>
                           </>
                         )}
@@ -558,6 +653,15 @@ function AlertsPageContent() {
         onDelete={handleDeleteFromCreator}
         isDeleting={isDeleting}
       />
+
+      {/* Upgrade Modal */}
+      <UpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        currentTier={currentTier as 'free' | 'pro' | 'premium'}
+        currentCount={watchlistCount}
+        currentLimit={watchlistLimit === Infinity ? undefined : watchlistLimit}
+      />
     </div>
   );
 }
@@ -587,4 +691,3 @@ export default function AlertsPage() {
     </Suspense>
   );
 }
-

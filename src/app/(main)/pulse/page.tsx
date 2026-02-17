@@ -3,183 +3,165 @@
 import { useFilings } from '@/hooks/useFilings'
 import { useWatchlist } from '@/hooks/useWatchlist'
 import { useRedFlagTrend } from '@/hooks/useRedFlagTrend'
+import { usePulseSummary } from '@/hooks/usePulseSummary'
 import { useToast } from '@/contexts/ToastContext'
 import { useRefresh } from '@/hooks/useRefresh'
 import { usePullToRefresh } from '@/hooks/usePullToRefresh'
-import StockCard from '@/components/ui/StockCard'
-import FilingTypeIcon from '@/components/ui/FilingTypeIcon'
 import VetrScoreBadge from '@/components/ui/VetrScoreBadge'
-import PriceChangeIndicator from '@/components/ui/PriceChangeIndicator'
-import { SkeletonMetricCard, SkeletonStockCard, SkeletonFilingRow } from '@/components/ui/SkeletonLoader'
 import EmptyState from '@/components/ui/EmptyState'
 import RefreshButton from '@/components/ui/RefreshButton'
 import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator'
-import { ArrowUpIcon, ArrowDownIcon, FlagIcon, AlertTriangleIcon, DocumentIcon, TrendingUpIcon, TrophyIcon, StarIcon } from '@/components/icons'
+import { ArrowUpIcon, ArrowDownIcon, FlagIcon, AlertTriangleIcon, StarIcon } from '@/components/icons'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState, useEffect, useMemo, useCallback } from 'react'
+
+// Sector color map
+const SECTOR_COLORS: Record<string, string> = {
+  'Mining': '#F59E0B',
+  'Gold': '#F59E0B',
+  'Base Metals': '#F59E0B',
+  'Precious Metals': '#F59E0B',
+  'Energy': '#10B981',
+  'Oil & Gas': '#10B981',
+  'Technology': '#3B82F6',
+  'Cannabis': '#8B5CF6',
+  'Healthcare': '#EF4444',
+  'Real Estate': '#F97316',
+  'Financial': '#14B8A6',
+  'Uranium': '#6366F1',
+  'Lithium': '#EC4899',
+}
+
+function getSectorColor(sector: string): string {
+  return SECTOR_COLORS[sector] || '#64748B'
+}
+
+// Filing type badge
+function getFilingBadge(type: string): { label: string; color: string; bg: string } {
+  switch (type) {
+    case 'Press Release':
+      return { label: 'News Release', color: 'text-blue-400', bg: 'bg-blue-500/10' }
+    case 'MD&A':
+      return { label: 'MD&A', color: 'text-purple-400', bg: 'bg-purple-500/10' }
+    case 'Financial Statements':
+      return { label: 'Financials', color: 'text-green-400', bg: 'bg-green-500/10' }
+    case 'Material Change':
+      return { label: 'Material Change', color: 'text-yellow-400', bg: 'bg-yellow-500/10' }
+    default:
+      return { label: 'Filing', color: 'text-gray-400', bg: 'bg-gray-500/10' }
+  }
+}
 
 export default function PulsePage() {
   const router = useRouter()
   const { showToast } = useToast()
   const [isMobile, setIsMobile] = useState(false)
 
-  // Fetch watchlist stocks (primary data source)
-  const { watchlist: stocks, isLoading: isLoadingStocks, error: stocksError, mutate: mutateStocks, addToWatchlist, removeFromWatchlist, isAdding, isRemoving } = useWatchlist()
+  // Data hooks
+  const { watchlist: stocks, isLoading: isLoadingStocks, error: stocksError, mutate: mutateStocks } = useWatchlist()
+  const { filings: allRecentFilings, isLoading: isLoadingFilings, mutate: mutateFilings } = useFilings({ limit: 10 })
+  const { summary: pulseSummary, isLoading: isLoadingPulse, mutate: mutatePulse } = usePulseSummary()
+  const { trend: redFlagTrend, isLoading: isLoadingRedFlagTrend, mutate: mutateRedFlagTrend } = useRedFlagTrend()
 
-  // Fetch recent filings (limit: 10 to share SWR cache key with Discovery page)
-  const { filings: allRecentFilings, isLoading: isLoadingFilings, error: filingsError, mutate: mutateFilings } = useFilings({ limit: 10 })
+  // Watchlist tickers set
+  const watchlistTickers = useMemo(() => new Set(stocks.map(s => s.ticker)), [stocks])
 
-  // Create set of watchlist tickers for efficient filtering
-  const watchlistTickers = useMemo(() => {
-    return new Set(stocks.map(stock => stock.ticker))
-  }, [stocks])
-
-  // Filter filings to only include watchlist stock tickers, then limit to 5
+  // Filter filings to watchlist, limit 4
   const filings = useMemo(() => {
-    return allRecentFilings
-      .filter(filing => watchlistTickers.has(filing.ticker))
-      .slice(0, 5)
+    return allRecentFilings.filter(f => watchlistTickers.has(f.ticker)).slice(0, 4)
   }, [allRecentFilings, watchlistTickers])
 
-  // Fetch red flag trend data (keep as-is, it's global)
-  const { trend: redFlagTrend, isLoading: isLoadingRedFlagTrend, error: redFlagTrendError, mutate: mutateRedFlagTrend } = useRedFlagTrend()
-
-  // Create set of favorited tickers for quick lookup (all stocks are favorites now)
-  const favoritedTickers = useMemo(() => {
-    return watchlistTickers
-  }, [watchlistTickers])
-
-  // Detect mobile viewport
+  // Mobile detection
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768)
-    }
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
+    const check = () => setIsMobile(window.innerWidth < 768)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
   }, [])
 
-  // Refresh handler
+  // Refresh
   const handleRefreshData = useCallback(async () => {
     try {
-      await Promise.all([
-        mutateStocks(),
-        mutateFilings(),
-        mutateRedFlagTrend(),
-      ])
+      await Promise.all([mutateStocks(), mutateFilings(), mutateRedFlagTrend(), mutatePulse()])
       showToast('Data refreshed successfully', 'success')
-    } catch (error) {
+    } catch {
       showToast('Failed to refresh data', 'error')
-      throw error
     }
-  }, [mutateStocks, mutateFilings, mutateRedFlagTrend, showToast])
+  }, [mutateStocks, mutateFilings, mutateRedFlagTrend, mutatePulse, showToast])
 
-  // Use refresh hook with debouncing
-  const { isRefreshing, lastRefreshed, handleRefresh, canRefresh } = useRefresh({
-    onRefresh: handleRefreshData,
-    debounceMs: 5000,
-  })
+  const { isRefreshing, lastRefreshed, handleRefresh, canRefresh } = useRefresh({ onRefresh: handleRefreshData, debounceMs: 5000 })
+  const { isPulling, pullDistance } = usePullToRefresh({ onRefresh: handleRefresh, enabled: isMobile, threshold: 80 })
 
-  // Pull-to-refresh for mobile
-  const { isPulling, pullDistance } = usePullToRefresh({
-    onRefresh: handleRefresh,
-    enabled: isMobile,
-    threshold: 80,
-  })
+  // Derived data
+  const sortedByChange = useMemo(() => stocks ? [...stocks].sort((a, b) => (b.price_change_percent || 0) - (a.price_change_percent || 0)) : [], [stocks])
+  const topGainers = sortedByChange.slice(0, 2)
+  const topLosers = sortedByChange.slice(-2).reverse()
 
-  // Calculate market overview metrics
-  const stocksTracked = stocks?.length || 0
-  const avgVetrScore = stocks && stocks.length > 0
-    ? Math.round(stocks.reduce((sum, s) => sum + (s.vetr_score || 0), 0) / stocks.length)
-    : 0
+  const topScores = useMemo(() => stocks
+    ? [...stocks].filter(s => s.vetr_score != null).sort((a, b) => (b.vetr_score || 0) - (a.vetr_score || 0)).slice(0, 4)
+    : [], [stocks])
 
-  // Risk distribution based on VETR score thresholds
-  const riskDistribution = useMemo(() => {
-    if (!stocks || stocks.length === 0) return { low: 0, medium: 0, high: 0 }
-    const low = stocks.filter(s => (s.vetr_score || 0) > 60).length
-    const medium = stocks.filter(s => (s.vetr_score || 0) >= 40 && (s.vetr_score || 0) <= 60).length
-    const high = stocks.filter(s => (s.vetr_score || 0) < 40).length
-    return { low, medium, high }
-  }, [stocks])
+  const topMovers = useMemo(() => stocks
+    ? [...stocks].filter(s => s.price_change_percent != null).sort((a, b) => Math.abs(b.price_change_percent || 0) - Math.abs(a.price_change_percent || 0)).slice(0, 4)
+    : [], [stocks])
 
-  // Get top gainer and top loser
-  const sortedByChange = stocks ? [...stocks].sort((a, b) =>
-    (b.price_change_percent || 0) - (a.price_change_percent || 0)
-  ) : []
-  const topGainer = sortedByChange[0]
-  const topLoser = sortedByChange[sortedByChange.length - 1]
-
-  // Get top VETTR scores (top 5)
-  const topScores = stocks
-    ? [...stocks]
-        .filter(s => s.vetr_score !== null && s.vetr_score !== undefined)
-        .sort((a, b) => (b.vetr_score || 0) - (a.vetr_score || 0))
-        .slice(0, 5)
-    : []
-
-  // Get top movers (largest absolute price changes, max 5)
-  const topMovers = stocks
-    ? [...stocks]
-        .filter(s => s.price_change_percent !== null && s.price_change_percent !== undefined)
-        .sort((a, b) => Math.abs(b.price_change_percent || 0) - Math.abs(a.price_change_percent || 0))
-        .slice(0, 5)
-    : []
-
-  // Handle favorite toggle with optimistic UI and toast notifications
-  const handleFavoriteToggle = async (ticker: string) => {
-    try {
-      const isFavorite = favoritedTickers.has(ticker)
-      if (isFavorite) {
-        await removeFromWatchlist(ticker)
-        showToast('Removed from watchlist', 'success')
-      } else {
-        await addToWatchlist(ticker)
-        showToast('Added to watchlist', 'success')
-      }
-    } catch (error) {
-      showToast('Failed to update watchlist', 'error')
+  // Watchlist health: prefer API, fallback to client-side (5-tier)
+  const watchlistHealth = pulseSummary?.watchlist_health ?? (() => {
+    const total = stocks?.length || 0
+    const elite = stocks?.filter(s => (s.vetr_score || 0) >= 90).length || 0
+    const contender = stocks?.filter(s => (s.vetr_score || 0) >= 75 && (s.vetr_score || 0) < 90).length || 0
+    const watchlistCount = stocks?.filter(s => (s.vetr_score || 0) >= 50 && (s.vetr_score || 0) < 75).length || 0
+    const speculative = stocks?.filter(s => (s.vetr_score || 0) >= 30 && (s.vetr_score || 0) < 50).length || 0
+    const toxic = stocks?.filter(s => (s.vetr_score || 0) < 30).length || 0
+    return {
+      elite: { count: elite, pct: total > 0 ? Math.round((elite / total) * 100) : 0 },
+      contender: { count: contender, pct: total > 0 ? Math.round((contender / total) * 100) : 0 },
+      watchlist: { count: watchlistCount, pct: total > 0 ? Math.round((watchlistCount / total) * 100) : 0 },
+      speculative: { count: speculative, pct: total > 0 ? Math.round((speculative / total) * 100) : 0 },
+      toxic: { count: toxic, pct: total > 0 ? Math.round((toxic / total) * 100) : 0 },
     }
-  }
+  })()
 
-  // Check for empty watchlist (when not loading)
+  // Sector exposure: prefer API, fallback to client-side
+  const sectorExposure = pulseSummary?.sector_exposure ?? (() => {
+    if (!stocks || stocks.length === 0) return []
+    const map = new Map<string, { count: number; exchange: string }>()
+    for (const s of stocks) {
+      const sector = s.sector || 'Other'
+      const ex = map.get(sector)
+      if (ex) ex.count++
+      else map.set(sector, { count: 1, exchange: s.exchange || '' })
+    }
+    const total = stocks.length
+    return Array.from(map.entries())
+      .map(([sector, d]) => ({ sector, exchange: d.exchange, count: d.count, pct: Math.round((d.count / total) * 100) }))
+      .sort((a, b) => b.count - a.count)
+  })()
+
+  const redFlagCategories = pulseSummary?.red_flag_categories
   const isEmptyWatchlist = !isLoadingStocks && stocks.length === 0
+  const isLoadingOverview = isLoadingStocks || isLoadingPulse
 
   return (
     <div className="p-4 md:p-6 pb-20 md:pb-6">
-      {/* Pull-to-refresh indicator (mobile only) */}
-      <PullToRefreshIndicator
-        isPulling={isPulling}
-        pullDistance={pullDistance}
-        threshold={80}
-      />
+      <PullToRefreshIndicator isPulling={isPulling} pullDistance={pullDistance} threshold={80} />
 
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-white mb-1">Market Pulse</h1>
             <p className="text-sm text-gray-500">
-              Last updated: {lastRefreshed ? lastRefreshed.toLocaleString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                hour: 'numeric',
-                minute: '2-digit'
-              }) : 'Never'}
+              Last updated: {lastRefreshed ? lastRefreshed.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : 'Never'}
             </p>
           </div>
-          {/* Desktop refresh button */}
           <div className="hidden md:block">
-            <RefreshButton
-              onClick={handleRefresh}
-              isRefreshing={isRefreshing}
-              disabled={!canRefresh}
-            />
+            <RefreshButton onClick={handleRefresh} isRefreshing={isRefreshing} disabled={!canRefresh} />
           </div>
         </div>
       </div>
 
-      {/* Empty Watchlist State */}
       {isEmptyWatchlist && (
         <EmptyState
           icon={<StarIcon className="w-16 h-16 text-gray-600" />}
@@ -190,573 +172,293 @@ export default function PulsePage() {
         />
       )}
 
-      {/* Content - only show when watchlist is not empty or still loading */}
       {!isEmptyWatchlist && (
         <>
-      {/* Market Overview Section */}
-      <section className="mb-8">
-        <h2 className="text-lg font-semibold text-white mb-4">Market Overview</h2>
+          {/* ============ ROW 1: Market Overview (3 columns) ============ */}
+          <section className="mb-6">
+            <h2 className="text-lg font-semibold text-white mb-4">Market Overview</h2>
 
-        {isLoadingStocks ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <SkeletonMetricCard />
-            <SkeletonMetricCard />
-            <SkeletonMetricCard />
-            <SkeletonMetricCard />
-          </div>
-        ) : stocksError ? (
-          <EmptyState
-            icon={<AlertTriangleIcon className="w-16 h-16 text-yellow-400" />}
-            title="Error loading market data"
-            description="Unable to fetch market overview. Please try again."
-          />
-        ) : (
-          <div className="space-y-4">
-            {/* Risk Distribution Bar */}
-            <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5">
-              {/* Segmented bar */}
-              <div className="flex h-7 rounded-lg overflow-hidden gap-0.5 mb-4">
-                {stocksTracked > 0 && riskDistribution.low > 0 && (
-                  <div
-                    className="bg-green-500 rounded-md transition-all duration-500"
-                    style={{ width: `${(riskDistribution.low / stocksTracked) * 100}%` }}
-                  />
-                )}
-                {stocksTracked > 0 && riskDistribution.medium > 0 && (
-                  <div
-                    className="bg-yellow-400 rounded-md transition-all duration-500"
-                    style={{ width: `${(riskDistribution.medium / stocksTracked) * 100}%` }}
-                  />
-                )}
-                {stocksTracked > 0 && riskDistribution.high > 0 && (
-                  <div
-                    className="bg-red-500 rounded-md transition-all duration-500"
-                    style={{ width: `${(riskDistribution.high / stocksTracked) * 100}%` }}
-                  />
-                )}
+            {isLoadingOverview ? (
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5 h-48 animate-pulse" />
+                ))}
               </div>
-
-              {/* Legend */}
-              <div className="flex flex-wrap gap-x-6 gap-y-2">
-                <div>
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
-                    <span className="text-xs text-gray-400">
-                      Low Risk ({stocksTracked > 0 ? Math.round((riskDistribution.low / stocksTracked) * 100) : 0}%)
-                    </span>
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                {/* Watchlist Health */}
+                <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5">
+                  <p className="text-xs text-gray-500 uppercase tracking-wider mb-3 font-medium">Watchlist Health</p>
+                  <div className="flex h-6 rounded-lg overflow-hidden gap-0.5 mb-4">
+                    {watchlistHealth.elite.count > 0 && (
+                      <div className="rounded-md transition-all duration-500" style={{ width: `${watchlistHealth.elite.pct}%`, backgroundColor: '#10B981' }} />
+                    )}
+                    {watchlistHealth.contender.count > 0 && (
+                      <div className="rounded-md transition-all duration-500" style={{ width: `${watchlistHealth.contender.pct}%`, backgroundColor: '#14B8A6' }} />
+                    )}
+                    {watchlistHealth.watchlist.count > 0 && (
+                      <div className="rounded-md transition-all duration-500" style={{ width: `${watchlistHealth.watchlist.pct}%`, backgroundColor: '#F59E0B' }} />
+                    )}
+                    {watchlistHealth.speculative.count > 0 && (
+                      <div className="rounded-md transition-all duration-500" style={{ width: `${watchlistHealth.speculative.pct}%`, backgroundColor: '#F97316' }} />
+                    )}
+                    {watchlistHealth.toxic.count > 0 && (
+                      <div className="rounded-md transition-all duration-500" style={{ width: `${watchlistHealth.toxic.pct}%`, backgroundColor: '#EF4444' }} />
+                    )}
                   </div>
-                  <span className="text-sm font-semibold text-white pl-[18px]">{riskDistribution.low} stocks</span>
-                </div>
-                <div>
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-yellow-400" />
-                    <span className="text-xs text-gray-400">
-                      Medium Risk ({stocksTracked > 0 ? Math.round((riskDistribution.medium / stocksTracked) * 100) : 0}%)
-                    </span>
+                  <div className="space-y-1.5">
+                    {[
+                      { key: 'elite' as const, label: 'Elite (Strong Buy)', color: '#10B981' },
+                      { key: 'contender' as const, label: 'Contender (Accumulate)', color: '#14B8A6' },
+                      { key: 'watchlist' as const, label: 'Watchlist (Hold)', color: '#F59E0B' },
+                      { key: 'speculative' as const, label: 'Speculative (Avoid)', color: '#F97316' },
+                      { key: 'toxic' as const, label: 'Toxic (Strong Sell)', color: '#EF4444' },
+                    ].map(({ key, label, color }) => (
+                      <div key={key} className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: color }} />
+                          <span className="text-xs text-gray-400">{label}</span>
+                        </div>
+                        <span className="text-sm font-semibold text-white">{watchlistHealth[key].count} ({watchlistHealth[key].pct}%)</span>
+                      </div>
+                    ))}
                   </div>
-                  <span className="text-sm font-semibold text-white pl-[18px]">{riskDistribution.medium} stocks</span>
                 </div>
-                <div>
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-red-500" />
-                    <span className="text-xs text-gray-400">
-                      High Risk ({stocksTracked > 0 ? Math.round((riskDistribution.high / stocksTracked) * 100) : 0}%)
-                    </span>
-                  </div>
-                  <span className="text-sm font-semibold text-white pl-[18px]">{riskDistribution.high} stocks</span>
-                </div>
-              </div>
-            </div>
 
-            {/* Top Gainer / Top Loser */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Top Gainer */}
-              <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5">
-                <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Top Gainer</p>
-                {topGainer ? (
-                  <div>
-                    <Link
-                      href={`/stocks/${topGainer.ticker}`}
-                      className="text-lg font-bold text-white hover:text-vettr-accent transition-colors"
-                    >
-                      {topGainer.ticker}
-                    </Link>
-                    <div className="flex items-center gap-1 mt-1">
-                      <ArrowUpIcon className="w-3 h-3 text-vettr-accent" />
-                      <span className="text-sm font-medium text-vettr-accent">
-                        {Math.abs(topGainer.price_change_percent || 0).toFixed(2)}%
-                      </span>
-                    </div>
-                  </div>
-                ) : (
-                  <p className="text-gray-500">N/A</p>
-                )}
-              </div>
-
-              {/* Top Loser */}
-              <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5">
-                <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Top Loser</p>
-                {topLoser && topLoser.price_change_percent !== topGainer?.price_change_percent ? (
-                  <div>
-                    <Link
-                      href={`/stocks/${topLoser.ticker}`}
-                      className="text-lg font-bold text-white hover:text-vettr-accent transition-colors"
-                    >
-                      {topLoser.ticker}
-                    </Link>
-                    <div className="flex items-center gap-1 mt-1">
-                      <ArrowDownIcon className="w-3 h-3 text-red-400" />
-                      <span className="text-sm font-medium text-red-400">
-                        {Math.abs(topLoser.price_change_percent || 0).toFixed(2)}%
-                      </span>
-                    </div>
-                  </div>
-                ) : (
-                  <p className="text-gray-500">N/A</p>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-      </section>
-
-      {/* Red Flag Summary Section */}
-      <section className="mb-8">
-        <h2 className="text-lg font-semibold text-white mb-4">Red Flag Summary</h2>
-
-        {isLoadingRedFlagTrend ? (
-          <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-6">
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <div className="h-3 w-32 bg-white/5 rounded animate-pulse" />
-                  <div className="h-10 w-24 bg-white/5 rounded animate-pulse" />
-                </div>
-                <div className="space-y-2">
-                  <div className="h-3 w-28 bg-white/5 rounded animate-pulse" />
-                  <div className="h-3 w-full bg-white/5 rounded-full animate-pulse" />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <div className="space-y-1">
-                  <div className="h-3 w-16 bg-white/5 rounded animate-pulse" />
-                  <div className="h-6 w-12 bg-white/5 rounded animate-pulse" />
-                </div>
-                <div className="space-y-1">
-                  <div className="h-3 w-16 bg-white/5 rounded animate-pulse" />
-                  <div className="h-6 w-12 bg-white/5 rounded animate-pulse" />
-                </div>
-                <div className="space-y-1">
-                  <div className="h-3 w-20 bg-white/5 rounded animate-pulse" />
-                  <div className="h-6 w-12 bg-white/5 rounded animate-pulse" />
-                </div>
-                <div className="space-y-1">
-                  <div className="h-3 w-12 bg-white/5 rounded animate-pulse" />
-                  <div className="h-6 w-12 bg-white/5 rounded animate-pulse" />
-                </div>
-              </div>
-            </div>
-          </div>
-        ) : redFlagTrendError ? (
-          <EmptyState
-            icon={<FlagIcon className="w-16 h-16 text-red-400" />}
-            title="Error loading red flag trends"
-            description="Unable to fetch red flag trend data."
-          />
-        ) : redFlagTrend ? (
-          <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-6">
-            {/* Summary Stats */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
-              {/* Total Active Flags */}
-              <div>
-                <p className="text-sm text-gray-400 mb-2">Total Active Flags</p>
-                <div className="flex items-baseline gap-3">
-                  <p className="text-4xl font-bold text-white">{redFlagTrend.total_active_flags ?? 0}</p>
-                  {(redFlagTrend.change_30_days ?? 0) !== 0 && (
-                    <div className={`flex items-center gap-1 text-sm font-medium ${
-                      (redFlagTrend.change_30_days ?? 0) > 0 ? 'text-red-400' : 'text-vettr-accent'
-                    }`}>
-                      {(redFlagTrend.change_30_days ?? 0) > 0 ? (
-                        <ArrowUpIcon className="w-3 h-3" />
-                      ) : (
-                        <ArrowDownIcon className="w-3 h-3" />
-                      )}
-                      <span>{Math.abs(redFlagTrend.change_30_days ?? 0)}</span>
+                {/* Sector Exposure */}
+                <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5">
+                  <p className="text-xs text-gray-500 uppercase tracking-wider mb-3 font-medium">Sector Exposure</p>
+                  {sectorExposure.length === 0 ? (
+                    <p className="text-sm text-gray-500">No sectors to display</p>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-2">
+                      {sectorExposure.slice(0, 6).map((item) => (
+                        <div key={item.sector} className="rounded-xl p-3 border border-white/5" style={{ backgroundColor: `${getSectorColor(item.sector)}15` }}>
+                          <div className="text-xs font-medium truncate" style={{ color: getSectorColor(item.sector) }}>{item.sector}</div>
+                          <div className="text-lg font-bold text-white mt-0.5">{item.pct}%</div>
+                          <div className="text-[10px] text-gray-500">{item.count} stock{item.count !== 1 ? 's' : ''}</div>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>
-                <p className="text-xs text-gray-500 mt-1">Last 30 days</p>
-              </div>
 
-              {/* 30-Day Change Visualization */}
-              <div>
-                <p className="text-sm text-gray-400 mb-2">30-Day Change</p>
-                <div className="flex items-center gap-3">
-                  <div className="flex-1 bg-white/5 rounded-full h-3 overflow-hidden">
-                    <div
-                      className={`h-full transition-all duration-500 ${
-                        (redFlagTrend.change_30_days ?? 0) > 0 ? 'bg-red-400' : 'bg-vettr-accent'
-                      }`}
-                      style={{
-                        width: `${Math.min(Math.abs(redFlagTrend.change_30_days ?? 0) / Math.max(redFlagTrend.total_active_flags ?? 1, 1) * 100, 100)}%`
-                      }}
-                    />
+                {/* Top Gainers & Losers */}
+                <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5">
+                  <p className="text-xs text-gray-500 uppercase tracking-wider mb-3 font-medium">Gainers & Losers</p>
+                  <div className="space-y-2">
+                    {topGainers.map((stock) => (
+                      <Link key={stock.ticker} href={`/stocks/${stock.ticker}`} className="flex items-center justify-between p-2 rounded-lg hover:bg-white/[0.03] transition-colors">
+                        <div>
+                          <span className="text-sm font-bold text-white">{stock.ticker}</span>
+                          <p className="text-[11px] text-gray-500 truncate max-w-[120px]">{stock.company_name}</p>
+                        </div>
+                        <div className="flex items-center gap-1 text-vettr-accent">
+                          <ArrowUpIcon className="w-3 h-3" />
+                          <span className="text-sm font-semibold">{Math.abs(stock.price_change_percent || 0).toFixed(2)}%</span>
+                        </div>
+                      </Link>
+                    ))}
+                    <div className="border-t border-white/5 my-1" />
+                    {topLosers.filter(s => (s.price_change_percent || 0) < 0).map((stock) => (
+                      <Link key={stock.ticker} href={`/stocks/${stock.ticker}`} className="flex items-center justify-between p-2 rounded-lg hover:bg-white/[0.03] transition-colors">
+                        <div>
+                          <span className="text-sm font-bold text-white">{stock.ticker}</span>
+                          <p className="text-[11px] text-gray-500 truncate max-w-[120px]">{stock.company_name}</p>
+                        </div>
+                        <div className="flex items-center gap-1 text-red-400">
+                          <ArrowDownIcon className="w-3 h-3" />
+                          <span className="text-sm font-semibold">{Math.abs(stock.price_change_percent || 0).toFixed(2)}%</span>
+                        </div>
+                      </Link>
+                    ))}
+                    {topLosers.filter(s => (s.price_change_percent || 0) < 0).length === 0 && (
+                      <p className="text-xs text-gray-500 text-center py-1">No losers</p>
+                    )}
                   </div>
-                  <span className={`text-lg font-bold ${
-                    (redFlagTrend.change_30_days ?? 0) > 0 ? 'text-red-400' :
-                    (redFlagTrend.change_30_days ?? 0) < 0 ? 'text-vettr-accent' : 'text-gray-500'
-                  }`}>
-                    {(redFlagTrend.change_30_days ?? 0) > 0 ? '+' : ''}{redFlagTrend.change_30_days ?? 0}
+                </div>
+              </div>
+            )}
+          </section>
+
+          {/* ============ ROW 2: Red Flag Summary (full width) ============ */}
+          <section className="mb-6">
+            <h2 className="text-lg font-semibold text-white mb-4">Red Flag Summary</h2>
+
+            {isLoadingPulse || isLoadingRedFlagTrend ? (
+              <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-6 h-40 animate-pulse" />
+            ) : (
+              <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5">
+                {/* Badge pills */}
+                <div className="flex flex-wrap gap-3 mb-5">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-500/10 text-red-400 text-sm font-medium">
+                    <FlagIcon className="w-3.5 h-3.5" />
+                    Critical Flags ({redFlagCategories?.critical_count ?? redFlagTrend?.breakdown_by_severity?.critical ?? 0})
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-orange-500/10 text-orange-400 text-sm font-medium">
+                    <AlertTriangleIcon className="w-3.5 h-3.5" />
+                    Warnings ({redFlagCategories?.warning_count ?? redFlagTrend?.breakdown_by_severity?.moderate ?? 0})
                   </span>
                 </div>
-              </div>
-            </div>
 
-            {/* Severity Breakdown */}
-            <div>
-              <p className="text-sm text-gray-400 mb-3">Breakdown by Severity</p>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-                {/* Critical */}
-                <div className="bg-white/[0.03] rounded-xl p-4 border border-white/5">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-3 h-3 rounded-full bg-red-400" />
-                    <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Critical</p>
-                  </div>
-                  <p className="text-2xl font-bold text-red-400">{redFlagTrend.breakdown_by_severity?.critical ?? 0}</p>
-                </div>
-
-                {/* High */}
-                <div className="bg-white/[0.03] rounded-xl p-4 border border-white/5">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-3 h-3 rounded-full bg-orange-400" />
-                    <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">High</p>
-                  </div>
-                  <p className="text-2xl font-bold text-orange-400">{redFlagTrend.breakdown_by_severity?.high ?? 0}</p>
-                </div>
-
-                {/* Moderate */}
-                <div className="bg-white/[0.03] rounded-xl p-4 border border-white/5">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-3 h-3 rounded-full bg-yellow-400" />
-                    <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Moderate</p>
-                  </div>
-                  <p className="text-2xl font-bold text-yellow-400">{redFlagTrend.breakdown_by_severity?.moderate ?? 0}</p>
-                </div>
-
-                {/* Low */}
-                <div className="bg-white/[0.03] rounded-xl p-4 border border-white/5">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-3 h-3 rounded-full bg-gray-400" />
-                    <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Low</p>
-                  </div>
-                  <p className="text-2xl font-bold text-gray-400">{redFlagTrend.breakdown_by_severity?.low ?? 0}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        ) : null}
-      </section>
-
-      {/* Recent Filings Section */}
-      <section className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <h2 className="text-lg font-semibold text-white">Recent Filings</h2>
-            {filings && filings.length > 0 && (
-              <span className="px-2.5 py-0.5 bg-blue-500/10 text-blue-400 text-xs font-medium rounded-full">
-                {filings.filter(f => !f.is_read).length} unread
-              </span>
-            )}
-          </div>
-          <Link href="/stocks" className="text-sm text-vettr-accent hover:underline">
-            View All
-          </Link>
-        </div>
-
-        {isLoadingFilings ? (
-          <>
-            {/* Desktop Table Skeleton */}
-            <div className="hidden md:block bg-vettr-card/50 border border-white/5 rounded-2xl overflow-hidden">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-white/5">
-                    <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Type</th>
-                    <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Title</th>
-                    <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Ticker</th>
-                    <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Date</th>
-                    <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Material</th>
-                    <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <SkeletonFilingRow />
-                  <SkeletonFilingRow />
-                  <SkeletonFilingRow />
-                  <SkeletonFilingRow />
-                  <SkeletonFilingRow />
-                </tbody>
-              </table>
-            </div>
-
-            {/* Mobile Card Skeleton */}
-            <div className="md:hidden space-y-3">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="bg-vettr-card/50 border border-white/5 rounded-2xl p-4">
-                  <div className="flex items-start gap-3">
-                    <div className="h-10 w-10 bg-white/5 rounded-full animate-pulse" />
-                    <div className="flex-1 space-y-2">
-                      <div className="h-4 w-3/4 bg-white/5 rounded animate-pulse" />
-                      <div className="h-3 w-1/2 bg-white/5 rounded animate-pulse" />
-                      <div className="flex gap-2">
-                        <div className="h-5 w-16 bg-white/5 rounded-full animate-pulse" />
-                        <div className="h-5 w-16 bg-white/5 rounded-full animate-pulse" />
+                {/* Category cards */}
+                {redFlagCategories && redFlagCategories.categories.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+                    {redFlagCategories.categories.map((cat) => (
+                      <div key={cat.category} className={`rounded-xl p-4 border ${cat.severity === 'critical' ? 'border-red-500/20 bg-red-500/5' : 'border-orange-500/20 bg-orange-500/5'}`}>
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className={`w-2 h-2 rounded-full ${cat.severity === 'critical' ? 'bg-red-400' : 'bg-orange-400'}`} />
+                          <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">{cat.category}</span>
+                        </div>
+                        <p className="text-sm font-semibold text-white">{cat.label}</p>
+                        <p className="text-xs text-gray-500 mt-1">{cat.stock_count} stock{cat.stock_count !== 1 ? 's' : ''} affected</p>
                       </div>
-                    </div>
+                    ))}
+                    {/* Fill empty slots to always show 3 columns */}
+                    {Array.from({ length: Math.max(0, 3 - redFlagCategories.categories.length) }).map((_, i) => {
+                      const existingCats = new Set(redFlagCategories.categories.map(c => c.category))
+                      const allCats = ['Financial Risk', 'Governance', 'Momentum']
+                      const missing = allCats.filter(c => !existingCats.has(c))
+                      return (
+                        <div key={`empty-${i}`} className="rounded-xl p-4 border border-white/5 bg-white/[0.02]">
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="w-2 h-2 rounded-full bg-green-400" />
+                            <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">{missing[i] || 'Other'}</span>
+                          </div>
+                          <p className="text-sm font-semibold text-gray-500">All Clear</p>
+                          <p className="text-xs text-gray-600 mt-1">No flags detected</p>
+                        </div>
+                      )
+                    })}
                   </div>
-                </div>
-              ))}
-            </div>
-          </>
-        ) : filingsError ? (
-          <EmptyState
-            icon={<DocumentIcon className="w-16 h-16 text-yellow-400" />}
-            title="Error loading filings"
-            description="Unable to fetch recent events."
-          />
-        ) : !filings || filings.length === 0 ? (
-          <EmptyState
-            icon={<DocumentIcon className="w-16 h-16 text-gray-600" />}
-            title="No recent events"
-            description="No filings have been published recently."
-          />
-        ) : (
-          <>
-            {/* Desktop Table */}
-            <div className="hidden md:block bg-vettr-card/50 border border-white/5 rounded-2xl overflow-hidden">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-white/5">
-                    <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Type</th>
-                    <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Title</th>
-                    <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Ticker</th>
-                    <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Date</th>
-                    <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Material</th>
-                    <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filings.map((filing) => (
-                    <tr
-                      key={filing.id}
-                      onClick={() => window.location.href = `/filings/${filing.id}`}
-                      className="border-b border-white/5 hover:bg-white/[0.03] transition-colors cursor-pointer"
-                    >
-                      <td className="px-4 py-3">
-                        <FilingTypeIcon type={filing.type} size="sm" />
-                      </td>
-                      <td className="px-4 py-3 text-sm text-white max-w-md truncate">
-                        {filing.title}
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className="text-sm font-medium text-vettr-accent">{filing.ticker}</span>
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-400">
-                        {new Date(filing.date_filed).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                      </td>
-                      <td className="px-4 py-3">
-                        {filing.is_material ? (
-                          <span className="px-2 py-0.5 bg-yellow-500/10 text-yellow-400 text-xs font-medium rounded-full">
-                            Yes
-                          </span>
-                        ) : (
-                          <span className="text-xs text-gray-500">No</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3">
-                        {!filing.is_read ? (
-                          <span className="px-2 py-0.5 bg-blue-500/10 text-blue-400 text-xs font-medium rounded-full">
-                            Unread
-                          </span>
-                        ) : (
-                          <span className="text-xs text-gray-500">Read</span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+                    {['Financial Risk', 'Governance', 'Momentum'].map((cat) => (
+                      <div key={cat} className="rounded-xl p-4 border border-white/5 bg-white/[0.02]">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="w-2 h-2 rounded-full bg-green-400" />
+                          <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">{cat}</span>
+                        </div>
+                        <p className="text-sm font-semibold text-gray-500">All Clear</p>
+                        <p className="text-xs text-gray-600 mt-1">No flags detected</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
-            {/* Mobile Cards */}
-            <div className="md:hidden space-y-3">
-              {filings.map((filing) => (
-                <Link
-                  key={filing.id}
-                  href={`/filings/${filing.id}`}
-                  className="block bg-vettr-card/50 border border-white/5 rounded-2xl p-4 hover:border-vettr-accent/20 hover:bg-vettr-card/80 transition-all"
-                >
-                  <div className="flex items-start gap-3">
-                    {!filing.is_read && (
-                      <div className="w-2 h-2 rounded-full bg-blue-400 flex-shrink-0 mt-2" />
+                {/* Latest alert banner */}
+                {redFlagCategories?.latest_alert && (
+                  <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-red-500/5 border border-red-500/10">
+                    {redFlagCategories.latest_alert.is_new && (
+                      <span className="flex-shrink-0 px-2 py-0.5 text-[10px] font-bold uppercase bg-red-500 text-white rounded">New</span>
                     )}
-                    <FilingTypeIcon type={filing.type} size="md" />
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2 mb-1">
-                        <h3 className="font-semibold text-white truncate">
-                          {filing.title}
-                        </h3>
-                        {filing.is_material && (
-                          <span className="flex-shrink-0 px-2 py-0.5 bg-yellow-500/10 text-yellow-400 text-xs rounded-full">
-                            Material
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-3 text-sm text-gray-400">
-                        <span className="font-medium text-vettr-accent">{filing.ticker}</span>
-                        <span>•</span>
-                        <span>{new Date(filing.date_filed).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
-                      </div>
+                      <span className="text-sm font-medium text-white">{redFlagCategories.latest_alert.ticker}</span>
+                      <span className="text-sm text-gray-400"> — {redFlagCategories.latest_alert.label}</span>
                     </div>
+                    <Link href={`/stocks/${redFlagCategories.latest_alert.ticker}`} className="text-xs text-vettr-accent hover:underline flex-shrink-0">View</Link>
                   </div>
-                </Link>
-              ))}
-            </div>
-          </>
-        )}
-      </section>
-
-      {/* Top Movers Section */}
-      <section className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-white">Top Movers</h2>
-          <Link href="/stocks?sort=change&order=desc" className="text-sm text-vettr-accent hover:underline">
-            View All
-          </Link>
-        </div>
-
-        {isLoadingStocks ? (
-          <div className="space-y-2">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="bg-vettr-card/50 border border-white/5 rounded-2xl p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1 space-y-2">
-                    <div className="flex items-center gap-3">
-                      <div className="h-4 w-16 bg-white/5 rounded animate-pulse" />
-                      <div className="h-6 w-6 bg-white/5 rounded-full animate-pulse" />
-                    </div>
-                    <div className="h-3 w-2/3 bg-white/5 rounded animate-pulse" />
-                  </div>
-                  <div className="text-right space-y-1">
-                    <div className="h-4 w-16 bg-white/5 rounded animate-pulse ml-auto" />
-                    <div className="h-4 w-12 bg-white/5 rounded animate-pulse ml-auto" />
-                  </div>
-                </div>
+                )}
               </div>
-            ))}
-          </div>
-        ) : stocksError ? (
-          <EmptyState
-            icon={<TrendingUpIcon className="w-16 h-16 text-yellow-400" />}
-            title="Error loading movers"
-            description="Unable to fetch top movers data."
-          />
-        ) : topMovers.length === 0 ? (
-          <EmptyState
-            icon={<TrendingUpIcon className="w-16 h-16 text-gray-600" />}
-            title="No movers data"
-            description="Insufficient price data to show top movers."
-          />
-        ) : (
-          <div className="space-y-2">
-            {topMovers.map((stock) => (
-              <Link
-                key={stock.ticker}
-                href={`/stocks/${stock.ticker}`}
-                className="block bg-vettr-card/50 border border-white/5 rounded-2xl p-4 hover:border-vettr-accent/20 hover:bg-vettr-card/80 transition-all group"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-1">
-                      <span className="text-base font-bold text-white group-hover:text-vettr-accent transition-colors">
-                        {stock.ticker}
-                      </span>
-                      <VetrScoreBadge score={stock.vetr_score || 0} size="sm" />
-                    </div>
-                    <p className="text-sm text-gray-400 truncate">{stock.company_name}</p>
-                  </div>
-                  <div className="text-right ml-4">
-                    <p className="text-base font-semibold text-white">
-                      ${stock.current_price?.toFixed(2) || 'N/A'}
-                    </p>
-                    <div className={`flex items-center justify-end gap-1 mt-1 ${
-                      (stock.price_change_percent || 0) >= 0 ? 'text-vettr-accent' : 'text-red-400'
-                    }`}>
-                      {(stock.price_change_percent || 0) >= 0 ? (
-                        <ArrowUpIcon className="w-3 h-3" />
-                      ) : (
-                        <ArrowDownIcon className="w-3 h-3" />
-                      )}
-                      <span className="text-sm font-medium">
-                        {Math.abs(stock.price_change_percent || 0).toFixed(2)}%
-                      </span>
-                    </div>
-                  </div>
+            )}
+          </section>
+
+          {/* ============ ROW 3: Bottom sections (3 columns) ============ */}
+          <section>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              {/* Smart Filings (SEDAR+) */}
+              <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5">
+                <div className="flex items-center justify-between mb-4">
+                  <p className="text-xs text-gray-500 uppercase tracking-wider font-medium">Smart Filings (SEDAR+)</p>
+                  <Link href="/stocks" className="text-xs text-vettr-accent hover:underline">View All</Link>
                 </div>
-              </Link>
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* Top VETTR Scores Section */}
-      <section className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-white">Top VETTR Scores</h2>
-          <Link href="/stocks?sort=vetr_score&order=desc" className="text-sm text-vettr-accent hover:underline">
-            View All
-          </Link>
-        </div>
-
-        {isLoadingStocks ? (
-          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-            <div className="flex-shrink-0 w-full sm:w-72">
-              <SkeletonStockCard />
-            </div>
-            <div className="flex-shrink-0 w-full sm:w-72">
-              <SkeletonStockCard />
-            </div>
-            <div className="flex-shrink-0 w-full sm:w-72">
-              <SkeletonStockCard />
-            </div>
-          </div>
-        ) : stocksError ? (
-          <EmptyState
-            icon={<TrophyIcon className="w-16 h-16 text-yellow-400" />}
-            title="Error loading top scores"
-            description="Unable to fetch top VETTR scores."
-          />
-        ) : topScores.length === 0 ? (
-          <EmptyState
-            icon={<TrophyIcon className="w-16 h-16 text-gray-600" />}
-            title="No score data"
-            description="No stocks with VETTR scores available."
-          />
-        ) : (
-          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">
-            {topScores.map((stock) => (
-              <div key={stock.ticker} className="flex-shrink-0 w-full sm:w-72 snap-start">
-                <StockCard
-                  stock={stock}
-                  showFavorite={true}
-                  isFavorite={favoritedTickers.has(stock.ticker)}
-                  onFavoriteToggle={handleFavoriteToggle}
-                  isTogglingFavorite={isAdding || isRemoving}
-                />
+                {isLoadingFilings ? (
+                  <div className="space-y-3">{[1, 2, 3, 4].map(i => <div key={i} className="h-14 bg-white/5 rounded-lg animate-pulse" />)}</div>
+                ) : filings.length === 0 ? (
+                  <p className="text-sm text-gray-500 text-center py-6">No recent filings</p>
+                ) : (
+                  <div className="space-y-2">
+                    {filings.map((filing) => {
+                      const badge = getFilingBadge(filing.type)
+                      return (
+                        <Link key={filing.id} href={`/filings/${filing.id}`} className="block p-3 rounded-lg hover:bg-white/[0.03] transition-colors">
+                          <div className="flex items-start gap-2 mb-1">
+                            <span className={`flex-shrink-0 px-1.5 py-0.5 text-[10px] font-medium rounded ${badge.bg} ${badge.color}`}>{badge.label}</span>
+                            {!filing.is_read && <div className="w-1.5 h-1.5 rounded-full bg-blue-400 flex-shrink-0 mt-1" />}
+                          </div>
+                          <p className="text-sm text-white truncate">{filing.title}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-xs font-medium text-vettr-accent">{filing.ticker}</span>
+                            <span className="text-[10px] text-gray-500">{new Date(filing.date_filed).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                          </div>
+                        </Link>
+                      )
+                    })}
+                  </div>
+                )}
               </div>
-            ))}
-          </div>
-        )}
-      </section>
+
+              {/* Watchlist Movers */}
+              <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5">
+                <div className="flex items-center justify-between mb-4">
+                  <p className="text-xs text-gray-500 uppercase tracking-wider font-medium">Watchlist Movers</p>
+                  <Link href="/stocks?sort=change&order=desc" className="text-xs text-vettr-accent hover:underline">View All</Link>
+                </div>
+                {isLoadingStocks ? (
+                  <div className="space-y-3">{[1, 2, 3, 4].map(i => <div key={i} className="h-14 bg-white/5 rounded-lg animate-pulse" />)}</div>
+                ) : topMovers.length === 0 ? (
+                  <p className="text-sm text-gray-500 text-center py-6">No movers data</p>
+                ) : (
+                  <div className="space-y-2">
+                    {topMovers.map((stock) => (
+                      <Link key={stock.ticker} href={`/stocks/${stock.ticker}`} className="flex items-center justify-between p-3 rounded-lg hover:bg-white/[0.03] transition-colors group">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-bold text-white group-hover:text-vettr-accent transition-colors">{stock.ticker}</span>
+                            <VetrScoreBadge score={stock.vetr_score || 0} size="sm" />
+                          </div>
+                          <p className="text-[11px] text-gray-500 truncate mt-0.5">{stock.company_name}</p>
+                        </div>
+                        <div className={`flex items-center gap-1 ml-3 ${(stock.price_change_percent || 0) >= 0 ? 'text-vettr-accent' : 'text-red-400'}`}>
+                          {(stock.price_change_percent || 0) >= 0 ? <ArrowUpIcon className="w-3 h-3" /> : <ArrowDownIcon className="w-3 h-3" />}
+                          <span className="text-sm font-semibold">{Math.abs(stock.price_change_percent || 0).toFixed(2)}%</span>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Top VETTR Scores (vertical ranked list) */}
+              <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5">
+                <div className="flex items-center justify-between mb-4">
+                  <p className="text-xs text-gray-500 uppercase tracking-wider font-medium">Top VETTR Scores</p>
+                  <Link href="/stocks?sort=vetr_score&order=desc" className="text-xs text-vettr-accent hover:underline">View All</Link>
+                </div>
+                {isLoadingStocks ? (
+                  <div className="space-y-3">{[1, 2, 3, 4].map(i => <div key={i} className="h-14 bg-white/5 rounded-lg animate-pulse" />)}</div>
+                ) : topScores.length === 0 ? (
+                  <p className="text-sm text-gray-500 text-center py-6">No scores available</p>
+                ) : (
+                  <div className="space-y-2">
+                    {topScores.map((stock, idx) => (
+                      <Link key={stock.ticker} href={`/stocks/${stock.ticker}`} className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/[0.03] transition-colors group">
+                        <span className="text-lg font-bold text-gray-600 w-6 text-center">{idx + 1}</span>
+                        <div className="flex-1 min-w-0">
+                          <span className="text-sm font-bold text-white group-hover:text-vettr-accent transition-colors">{stock.ticker}</span>
+                          <p className="text-[11px] text-gray-500 truncate">{stock.company_name}</p>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-2xl font-bold text-vettr-accent">{((stock.vetr_score || 0) / 10).toFixed(1)}</span>
+                          <p className="text-[10px] text-gray-500">/ 10.0</p>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
         </>
       )}
     </div>

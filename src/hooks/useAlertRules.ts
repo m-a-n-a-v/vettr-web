@@ -3,7 +3,59 @@
 import { useState } from 'react';
 import useSWR from 'swr';
 import { api } from '@/lib/api-client';
-import type { AlertRule } from '@/types/api';
+import type { AlertRule, AlertType, AlertFrequency } from '@/types/api';
+
+// ─── Field Mapping Helpers ──────────────────────────────────────────────────
+// Backend uses snake_case with different field names than the web frontend.
+// These mappers bridge the gap.
+
+/** Map backend frequency → web display frequency */
+const mapFrequencyFromBackend = (freq: string): 'Real-time' | 'Daily' | 'Weekly' => {
+  switch (freq) {
+    case 'instant': return 'Real-time';
+    case 'daily': return 'Daily';
+    case 'weekly': return 'Weekly';
+    default: return 'Real-time';
+  }
+};
+
+/** Map web display frequency → backend frequency */
+const mapFrequencyToBackend = (freq: string): string => {
+  switch (freq) {
+    case 'Real-time': return 'instant';
+    case 'Daily': return 'daily';
+    case 'Weekly': return 'weekly';
+    default: return 'instant';
+  }
+};
+
+/** Map a single backend alert rule to the web frontend AlertRule shape */
+function mapRuleFromBackend(raw: Record<string, unknown>): AlertRule {
+  return {
+    id: raw.id as string,
+    user_id: (raw.user_id as string) || '',
+    ticker: (raw.stock_ticker as string) || '',
+    alert_type: ((raw.rule_type as string) || 'Red Flag') as AlertType,
+    condition: (raw.trigger_conditions as Record<string, unknown>) || {},
+    frequency: mapFrequencyFromBackend((raw.frequency as string) || 'instant') as AlertFrequency,
+    is_enabled: raw.is_active === true,
+    created_at: (raw.created_at as string) || '',
+    updated_at: (raw.created_at as string) || '',
+  };
+}
+
+/** Map frontend AlertRule partial to backend request body */
+function mapRuleToBackend(rule: Partial<AlertRule>): Record<string, unknown> {
+  const body: Record<string, unknown> = {};
+  if (rule.ticker !== undefined) body.stock_ticker = rule.ticker;
+  if (rule.alert_type !== undefined) body.rule_type = rule.alert_type;
+  if (rule.condition !== undefined) body.trigger_conditions = rule.condition;
+  if (rule.frequency !== undefined) body.frequency = mapFrequencyToBackend(rule.frequency);
+  if (rule.is_enabled !== undefined) body.is_active = rule.is_enabled;
+  return body;
+}
+
+// ─── Hook ───────────────────────────────────────────────────────────────────
 
 interface UseAlertRulesReturn {
   rules: AlertRule[];
@@ -21,8 +73,8 @@ interface UseAlertRulesReturn {
 }
 
 /**
- * Hook to fetch alert rules with create, update, delete, and toggle mutations
- * @returns Alert rules array, loading/error states, CRUD mutation functions, and mutation loading states
+ * Hook to fetch alert rules with create, update, delete, and toggle mutations.
+ * Handles field mapping between backend (snake_case) and frontend (camelCase/custom).
  */
 export function useAlertRules(): UseAlertRulesReturn {
   const [isCreating, setIsCreating] = useState(false);
@@ -33,11 +85,12 @@ export function useAlertRules(): UseAlertRulesReturn {
   const { data, error, isLoading, mutate } = useSWR<AlertRule[], Error>(
     '/alerts/rules',
     async (url: string): Promise<AlertRule[]> => {
-      const response = await api.get<AlertRule[]>(url);
+      const response = await api.get<unknown[]>(url);
       if (!response.success || !response.data) {
         throw new Error('Failed to fetch alert rules');
       }
-      return response.data;
+      // Map each backend rule object to the frontend AlertRule shape
+      return (response.data as Record<string, unknown>[]).map(mapRuleFromBackend);
     },
     {
       dedupingInterval: 30000, // Cache for 30s
@@ -45,18 +98,19 @@ export function useAlertRules(): UseAlertRulesReturn {
   );
 
   /**
-   * Create a new alert rule
+   * Create a new alert rule (maps frontend fields → backend)
    */
   const createRule = async (ruleData: Partial<AlertRule>): Promise<AlertRule | null> => {
     setIsCreating(true);
     try {
-      const response = await api.post<AlertRule>('/alerts/rules', ruleData);
+      const body = mapRuleToBackend(ruleData);
+      const response = await api.post<Record<string, unknown>>('/alerts/rules', body);
       if (!response.success || !response.data) {
         throw new Error('Failed to create alert rule');
       }
       // Revalidate the cache to include the new rule
       await mutate();
-      return response.data;
+      return mapRuleFromBackend(response.data);
     } catch (err) {
       console.error('Error creating alert rule:', err);
       return null;
@@ -66,7 +120,7 @@ export function useAlertRules(): UseAlertRulesReturn {
   };
 
   /**
-   * Update an existing alert rule
+   * Update an existing alert rule (maps frontend fields → backend)
    */
   const updateRule = async (
     id: string,
@@ -74,13 +128,14 @@ export function useAlertRules(): UseAlertRulesReturn {
   ): Promise<AlertRule | null> => {
     setIsUpdating(true);
     try {
-      const response = await api.put<AlertRule>(`/alerts/rules/${id}`, ruleData);
+      const body = mapRuleToBackend(ruleData);
+      const response = await api.put<Record<string, unknown>>(`/alerts/rules/${id}`, body);
       if (!response.success || !response.data) {
         throw new Error('Failed to update alert rule');
       }
       // Revalidate the cache
       await mutate();
-      return response.data;
+      return mapRuleFromBackend(response.data);
     } catch (err) {
       console.error('Error updating alert rule:', err);
       return null;
@@ -124,7 +179,7 @@ export function useAlertRules(): UseAlertRulesReturn {
       if (data) {
         mutate(
           data.map(rule =>
-            rule.id === id ? { ...rule, enabled } : rule
+            rule.id === id ? { ...rule, is_enabled: enabled } : rule
           ),
           false // Don't revalidate yet
         );

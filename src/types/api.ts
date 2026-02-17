@@ -522,3 +522,67 @@ export interface SyncResolveResponse {
   sync_timestamp: string;
   resolved: boolean;
 }
+
+// =============================================================================
+// Pulse Summary Types
+// =============================================================================
+
+/**
+ * Watchlist health breakdown by VETR score thresholds
+ */
+export interface WatchlistHealth {
+  elite: { count: number; pct: number };
+  contender: { count: number; pct: number };
+  watchlist: { count: number; pct: number };
+  speculative: { count: number; pct: number };
+  toxic: { count: number; pct: number };
+}
+
+/**
+ * Sector exposure item
+ */
+export interface SectorExposure {
+  sector: string;
+  exchange: string;
+  count: number;
+  pct: number;
+}
+
+/**
+ * Red flag category item
+ */
+export interface RedFlagCategoryItem {
+  category: string;
+  label: string;
+  stock_count: number;
+  severity: 'critical' | 'warning';
+}
+
+/**
+ * Latest red flag alert
+ */
+export interface LatestRedFlagAlert {
+  ticker: string;
+  label: string;
+  description: string;
+  is_new: boolean;
+}
+
+/**
+ * Red flag categories summary
+ */
+export interface RedFlagCategories {
+  critical_count: number;
+  warning_count: number;
+  categories: RedFlagCategoryItem[];
+  latest_alert: LatestRedFlagAlert | null;
+}
+
+/**
+ * Pulse dashboard summary response
+ */
+export interface PulseSummary {
+  watchlist_health: WatchlistHealth;
+  sector_exposure: SectorExposure[];
+  red_flag_categories: RedFlagCategories;
+}

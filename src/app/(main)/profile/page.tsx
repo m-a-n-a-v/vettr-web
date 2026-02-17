@@ -7,13 +7,15 @@ import { useSubscription } from '@/hooks/useSubscription';
 import { useWatchlist } from '@/hooks/useWatchlist';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import Modal from '@/components/ui/Modal';
+import UpgradeModal from '@/components/UpgradeModal';
 import { useToast } from '@/contexts/ToastContext';
 import FeedbackForm from '@/components/FeedbackForm';
 import Onboarding from '@/components/Onboarding';
 import { SkeletonUserHeader, SkeletonProfileSection } from '@/components/ui/SkeletonLoader';
+import { api } from '@/lib/api-client';
 
 export default function ProfilePage() {
-  const { user, logout } = useAuth();
+  const { user, logout, refreshUser } = useAuth();
   const { subscription, isLoading: isLoadingSubscription } = useSubscription();
   const { watchlist, isLoading: isLoadingWatchlist } = useWatchlist();
   const { showToast } = useToast();
@@ -22,6 +24,12 @@ export default function ProfilePage() {
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [showFeedbackForm, setShowFeedbackForm] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+
+  // Name editing state
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editedName, setEditedName] = useState('');
+  const [isSavingName, setIsSavingName] = useState(false);
 
   // Get user initials for avatar
   const getInitials = (name: string) => {
@@ -72,6 +80,37 @@ export default function ProfilePage() {
     }
   };
 
+  // Handle name editing
+  const handleStartEditName = () => {
+    setEditedName(user?.display_name || '');
+    setIsEditingName(true);
+  };
+
+  const handleSaveName = async () => {
+    const trimmed = editedName.trim();
+    if (!trimmed || trimmed === user?.display_name) {
+      setIsEditingName(false);
+      return;
+    }
+    setIsSavingName(true);
+    try {
+      await api.put('/users/me', { display_name: trimmed });
+      await refreshUser();
+      showToast('Display name updated', 'success');
+      setIsEditingName(false);
+    } catch (error) {
+      console.error('Failed to update name:', error);
+      showToast('Failed to update name', 'error');
+    } finally {
+      setIsSavingName(false);
+    }
+  };
+
+  const handleCancelEditName = () => {
+    setIsEditingName(false);
+    setEditedName('');
+  };
+
   // Loading state
   if (!user) {
     return (
@@ -109,9 +148,55 @@ export default function ProfilePage() {
 
             {/* User Info */}
             <div className="flex-1 min-w-0">
-              <h1 className="text-xl font-semibold text-white mb-1 truncate">
-                {user.display_name}
-              </h1>
+              {isEditingName ? (
+                <div className="flex items-center gap-2 mb-1">
+                  <input
+                    type="text"
+                    value={editedName}
+                    onChange={(e) => setEditedName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleSaveName();
+                      if (e.key === 'Escape') handleCancelEditName();
+                    }}
+                    autoFocus
+                    className="text-xl font-semibold text-white bg-white/5 border border-white/10 rounded-lg px-3 py-1 focus:outline-none focus:ring-2 focus:ring-vettr-accent/30 w-full max-w-xs"
+                    disabled={isSavingName}
+                  />
+                  <button
+                    onClick={handleSaveName}
+                    disabled={isSavingName}
+                    className="p-1.5 rounded-lg bg-vettr-accent/10 text-vettr-accent hover:bg-vettr-accent/20 transition-colors disabled:opacity-50"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={handleCancelEditName}
+                    disabled={isSavingName}
+                    className="p-1.5 rounded-lg bg-white/5 text-gray-400 hover:bg-white/10 transition-colors disabled:opacity-50"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 mb-1">
+                  <h1 className="text-xl font-semibold text-white truncate">
+                    {user.display_name}
+                  </h1>
+                  <button
+                    onClick={handleStartEditName}
+                    className="p-1 rounded-lg hover:bg-white/5 text-gray-500 hover:text-white transition-colors"
+                    title="Edit display name"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
+                    </svg>
+                  </button>
+                </div>
+              )}
               <p className="text-gray-400 text-sm truncate mb-2">{user.email}</p>
               <span className={`inline-block px-3 py-0.5 rounded-full text-xs font-medium ${getTierColor(user.tier)}`}>
                 {getTierDisplayName(user.tier)}
@@ -164,12 +249,33 @@ export default function ProfilePage() {
                 </span>
               </div>
 
-              <div className="flex items-center justify-between px-6 py-4">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
                 <span className="text-gray-400 text-sm">Stocks Tracked</span>
                 <span className="text-white font-medium text-sm">
                   {subscription.stocks_tracked_count}
                 </span>
               </div>
+
+              {/* Upgrade button - show for non-premium users */}
+              {subscription.tier !== 'premium' && (
+                <button
+                  onClick={() => setShowUpgradeModal(true)}
+                  className="w-full flex items-center justify-between px-6 py-4 hover:bg-white/5 transition-colors group focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-vettr-accent/30"
+                >
+                  <div className="flex items-center gap-3">
+                    <svg className="w-5 h-5 text-vettr-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+                    </svg>
+                    <div>
+                      <p className="text-vettr-accent text-sm font-medium">Upgrade Plan</p>
+                      <p className="text-gray-500 text-xs">Get more watchlist slots and faster updates</p>
+                    </div>
+                  </div>
+                  <svg className="w-5 h-5 text-gray-400 group-hover:text-vettr-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              )}
             </div>
           ) : (
             <div className="px-6 py-4">
@@ -259,6 +365,24 @@ export default function ProfilePage() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
               </svg>
             </Link>
+
+            <button
+              onClick={() => setShowFeedbackForm(true)}
+              className="w-full flex items-center justify-between px-6 py-4 hover:bg-white/5 transition-colors group focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-vettr-accent/30"
+            >
+              <div className="flex items-center gap-3">
+                <svg className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
+                </svg>
+                <div>
+                  <p className="text-white text-sm font-medium">Send Feedback</p>
+                  <p className="text-gray-500 text-xs">Help us improve VETTR</p>
+                </div>
+              </div>
+              <svg className="w-5 h-5 text-gray-400 group-hover:text-vettr-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
           </div>
         </div>
 
@@ -273,7 +397,7 @@ export default function ProfilePage() {
             </div>
 
             <Link
-              href="#"
+              href="/profile/terms"
               className="flex items-center justify-between px-6 py-4 border-b border-white/5 hover:bg-white/5 transition-colors group focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-vettr-accent/30"
             >
               <div className="flex items-center gap-3">
@@ -288,7 +412,7 @@ export default function ProfilePage() {
             </Link>
 
             <Link
-              href="#"
+              href="/profile/privacy"
               className="flex items-center justify-between px-6 py-4 border-b border-white/5 hover:bg-white/5 transition-colors group focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-vettr-accent/30"
             >
               <div className="flex items-center gap-3">
@@ -303,7 +427,7 @@ export default function ProfilePage() {
             </Link>
 
             <Link
-              href="#"
+              href="/profile/contact"
               className="flex items-center justify-between px-6 py-4 hover:bg-white/5 transition-colors group"
             >
               <div className="flex items-center gap-3">
@@ -383,6 +507,15 @@ export default function ProfilePage() {
       <Onboarding
         isOpen={showOnboarding}
         onClose={() => setShowOnboarding(false)}
+      />
+
+      {/* Upgrade Modal */}
+      <UpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        currentTier={subscription?.tier || user.tier || 'free'}
+        currentCount={favoritesCount}
+        currentLimit={subscription?.watchlist_limit === -1 ? undefined : (subscription?.watchlist_limit || 5)}
       />
     </div>
   );

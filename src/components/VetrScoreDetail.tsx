@@ -76,137 +76,80 @@ export default function VetrScoreDetail({ score, onClose }: VetrScoreDetailProps
           <div>
             <h3 className="text-lg font-semibold text-white mb-4">Component Breakdown</h3>
             <div className="space-y-6">
-              {/* Financial Survival */}
-              <div className="bg-white/[0.03] rounded-xl p-4">
-                <div className="flex justify-between items-center mb-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-white font-medium">Financial Survival</span>
-                    <span className="text-xs text-gray-500">(weight: {score.financial_survival.weight}%)</span>
+              {/* Dynamically render pillars with null safety */}
+              {[
+                {
+                  label: 'Financial Survival',
+                  pillar: score.financial_survival,
+                  color: 'bg-blue-400',
+                  subScores: score.financial_survival ? [
+                    { label: 'Cash Runway', value: score.financial_survival.sub_scores?.cash_runway },
+                    { label: 'Solvency', value: score.financial_survival.sub_scores?.solvency },
+                  ] : [],
+                },
+                {
+                  label: 'Operational Efficiency',
+                  pillar: score.operational_efficiency,
+                  color: 'bg-purple-400',
+                  subScores: score.operational_efficiency ? [
+                    { label: 'Efficiency Ratio', value: score.operational_efficiency.sub_scores?.efficiency_ratio },
+                  ] : [],
+                },
+                {
+                  label: 'Shareholder Structure',
+                  pillar: score.shareholder_structure,
+                  color: 'bg-vettr-accent',
+                  subScores: score.shareholder_structure ? [
+                    { label: 'Pedigree', value: score.shareholder_structure.sub_scores?.pedigree },
+                    { label: 'Dilution Penalty', value: score.shareholder_structure.sub_scores?.dilution_penalty },
+                    { label: 'Insider Alignment', value: score.shareholder_structure.sub_scores?.insider_alignment },
+                  ] : [],
+                },
+                {
+                  label: 'Market Sentiment',
+                  pillar: score.market_sentiment,
+                  color: 'bg-yellow-400',
+                  subScores: score.market_sentiment ? [
+                    { label: 'Liquidity', value: score.market_sentiment.sub_scores?.liquidity },
+                    { label: 'News Velocity', value: score.market_sentiment.sub_scores?.news_velocity },
+                  ] : [],
+                },
+              ].map(({ label, pillar, color, subScores }) => {
+                if (!pillar) return null;
+                return (
+                  <div key={label} className="bg-white/[0.03] rounded-xl p-4">
+                    <div className="flex justify-between items-center mb-3">
+                      <div className="flex items-center gap-2">
+                        <span className="text-white font-medium">{label}</span>
+                        {pillar.weight != null && (
+                          <span className="text-xs text-gray-500">(weight: {pillar.weight}%)</span>
+                        )}
+                      </div>
+                      <span className={`font-bold ${getScoreColor(pillar.score ?? 0)}`}>
+                        {pillar.score ?? 'N/A'}
+                      </span>
+                    </div>
+                    <div className="w-full bg-white/5 rounded-full h-2 overflow-hidden mb-3">
+                      <div
+                        className={`h-full ${color} transition-all duration-1000`}
+                        style={{ width: `${pillar.score ?? 0}%` }}
+                      />
+                    </div>
+                    {subScores.length > 0 && (
+                      <div className="space-y-2 text-xs">
+                        {subScores.map(({ label: subLabel, value }) => (
+                          value != null && (
+                            <div key={subLabel} className="flex justify-between text-gray-400">
+                              <span>{subLabel}:</span>
+                              <span className={getScoreColor(value)}>{value}</span>
+                            </div>
+                          )
+                        ))}
+                      </div>
+                    )}
                   </div>
-                  <span className={`font-bold ${getScoreColor(score.financial_survival.score)}`}>
-                    {score.financial_survival.score}
-                  </span>
-                </div>
-                <div className="w-full bg-white/5 rounded-full h-2 overflow-hidden mb-3">
-                  <div
-                    className="h-full bg-blue-400 transition-all duration-1000"
-                    style={{ width: `${score.financial_survival.score}%` }}
-                  />
-                </div>
-                <div className="space-y-2 text-xs">
-                  <div className="flex justify-between text-gray-400">
-                    <span>Cash Runway:</span>
-                    <span className={getScoreColor(score.financial_survival.sub_scores.cash_runway)}>
-                      {score.financial_survival.sub_scores.cash_runway}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-gray-400">
-                    <span>Solvency:</span>
-                    <span className={getScoreColor(score.financial_survival.sub_scores.solvency)}>
-                      {score.financial_survival.sub_scores.solvency}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Operational Efficiency */}
-              <div className="bg-white/[0.03] rounded-xl p-4">
-                <div className="flex justify-between items-center mb-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-white font-medium">Operational Efficiency</span>
-                    <span className="text-xs text-gray-500">(weight: {score.operational_efficiency.weight}%)</span>
-                  </div>
-                  <span className={`font-bold ${getScoreColor(score.operational_efficiency.score)}`}>
-                    {score.operational_efficiency.score}
-                  </span>
-                </div>
-                <div className="w-full bg-white/5 rounded-full h-2 overflow-hidden mb-3">
-                  <div
-                    className="h-full bg-purple-400 transition-all duration-1000"
-                    style={{ width: `${score.operational_efficiency.score}%` }}
-                  />
-                </div>
-                <div className="space-y-2 text-xs">
-                  <div className="flex justify-between text-gray-400">
-                    <span>Efficiency Ratio:</span>
-                    <span className={getScoreColor(score.operational_efficiency.sub_scores.efficiency_ratio)}>
-                      {score.operational_efficiency.sub_scores.efficiency_ratio}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Shareholder Structure */}
-              <div className="bg-white/[0.03] rounded-xl p-4">
-                <div className="flex justify-between items-center mb-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-white font-medium">Shareholder Structure</span>
-                    <span className="text-xs text-gray-500">(weight: {score.shareholder_structure.weight}%)</span>
-                  </div>
-                  <span className={`font-bold ${getScoreColor(score.shareholder_structure.score)}`}>
-                    {score.shareholder_structure.score}
-                  </span>
-                </div>
-                <div className="w-full bg-white/5 rounded-full h-2 overflow-hidden mb-3">
-                  <div
-                    className="h-full bg-vettr-accent transition-all duration-1000"
-                    style={{ width: `${score.shareholder_structure.score}%` }}
-                  />
-                </div>
-                <div className="space-y-2 text-xs">
-                  <div className="flex justify-between text-gray-400">
-                    <span>Pedigree:</span>
-                    <span className={getScoreColor(score.shareholder_structure.sub_scores.pedigree)}>
-                      {score.shareholder_structure.sub_scores.pedigree}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-gray-400">
-                    <span>Dilution Penalty:</span>
-                    <span className={getScoreColor(score.shareholder_structure.sub_scores.dilution_penalty)}>
-                      {score.shareholder_structure.sub_scores.dilution_penalty}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-gray-400">
-                    <span>Insider Alignment:</span>
-                    <span className={getScoreColor(score.shareholder_structure.sub_scores.insider_alignment)}>
-                      {score.shareholder_structure.sub_scores.insider_alignment}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Market Sentiment */}
-              <div className="bg-white/[0.03] rounded-xl p-4">
-                <div className="flex justify-between items-center mb-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-white font-medium">Market Sentiment</span>
-                    <span className="text-xs text-gray-500">(weight: {score.market_sentiment.weight}%)</span>
-                  </div>
-                  <span className={`font-bold ${getScoreColor(score.market_sentiment.score)}`}>
-                    {score.market_sentiment.score}
-                  </span>
-                </div>
-                <div className="w-full bg-white/5 rounded-full h-2 overflow-hidden mb-3">
-                  <div
-                    className="h-full bg-yellow-400 transition-all duration-1000"
-                    style={{ width: `${score.market_sentiment.score}%` }}
-                  />
-                </div>
-                <div className="space-y-2 text-xs">
-                  <div className="flex justify-between text-gray-400">
-                    <span>Liquidity:</span>
-                    <span className={getScoreColor(score.market_sentiment.sub_scores.liquidity)}>
-                      {score.market_sentiment.sub_scores.liquidity}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-gray-400">
-                    <span>News Velocity:</span>
-                    <span className={getScoreColor(score.market_sentiment.sub_scores.news_velocity)}>
-                      {score.market_sentiment.sub_scores.news_velocity}
-                    </span>
-                  </div>
-                </div>
-              </div>
+                );
+              })}
             </div>
           </div>
 

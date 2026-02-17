@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUnreadAlertCount } from '@/hooks/useUnreadAlertCount';
 import {
   PulseIcon,
   CompassIcon,
@@ -55,6 +56,7 @@ export function Navigation() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const { unreadCount } = useUnreadAlertCount();
 
   const isActive = (href: string) => {
     return pathname === href || pathname?.startsWith(href + '/');
@@ -128,7 +130,14 @@ export function Navigation() {
                       ${isSidebarCollapsed ? 'justify-center' : ''}
                     `}
                   >
-                    <IconComponent className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
+                    <span className="relative">
+                      <IconComponent className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
+                      {item.href === '/alerts' && unreadCount > 0 && (
+                        <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold px-1">
+                          {unreadCount > 99 ? '99+' : unreadCount}
+                        </span>
+                      )}
+                    </span>
                     <span
                       className={`
                         transition-opacity duration-200
@@ -215,7 +224,14 @@ export function Navigation() {
                   {active && (
                     <div className="absolute top-0 w-1 h-1 rounded-full bg-vettr-accent" />
                   )}
-                  <IconComponent className="w-5 h-5" aria-hidden="true" />
+                  <span className="relative">
+                    <IconComponent className="w-5 h-5" aria-hidden="true" />
+                    {item.href === '/alerts' && unreadCount > 0 && (
+                      <span className="absolute -top-1.5 -right-2 min-w-[16px] h-4 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold px-1">
+                        {unreadCount > 99 ? '99+' : unreadCount}
+                      </span>
+                    )}
+                  </span>
                   <span className="text-xs font-medium">{item.label}</span>
                 </Link>
               </li>

@@ -857,7 +857,8 @@ function StockDetailContent() {
             className="space-y-6"
           >
             {/* Search and Filters */}
-            <div className="bg-vettr-card/30 border border-white/5 rounded-2xl p-3">
+            <div className="bg-vettr-card/30 border border-white/5 rounded-2xl p-4">
+              <h3 className="text-sm font-medium text-gray-400 mb-3">Executive Name Search</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <SearchInput
                   value={executiveSearch}
@@ -926,21 +927,27 @@ function StockDetailContent() {
                         </div>
                       </div>
 
-                      {/* Metrics row */}
-                      <div className="grid grid-cols-2 gap-3 mb-3">
-                        <div>
-                          <p className="text-xs text-gray-500 mb-1">Tenure</p>
-                          <p className="text-sm text-white font-medium">
-                            {executive.years_at_company} {executive.years_at_company === 1 ? 'year' : 'years'}
-                          </p>
+                      {/* Metrics row - only show if data is available and non-zero */}
+                      {(executive.years_at_company > 0 || executive.total_experience_years > 0) && (
+                        <div className={`grid gap-3 mb-3 ${executive.years_at_company > 0 && executive.total_experience_years > 0 ? 'grid-cols-2' : 'grid-cols-1'}`}>
+                          {executive.years_at_company > 0 && (
+                            <div>
+                              <p className="text-xs text-gray-500 mb-1">Tenure</p>
+                              <p className="text-sm text-white font-medium">
+                                {executive.years_at_company} {executive.years_at_company === 1 ? 'year' : 'years'}
+                              </p>
+                            </div>
+                          )}
+                          {executive.total_experience_years > 0 && (
+                            <div>
+                              <p className="text-xs text-gray-500 mb-1">Experience</p>
+                              <p className="text-sm text-white font-medium">
+                                {executive.total_experience_years} {executive.total_experience_years === 1 ? 'year' : 'years'}
+                              </p>
+                            </div>
+                          )}
                         </div>
-                        <div>
-                          <p className="text-xs text-gray-500 mb-1">Experience</p>
-                          <p className="text-sm text-white font-medium">
-                            {executive.total_experience_years} {executive.total_experience_years === 1 ? 'year' : 'years'}
-                          </p>
-                        </div>
-                      </div>
+                      )}
 
                       {/* Specialization badge */}
                       {executive.specialization && (
@@ -1073,102 +1080,35 @@ function StockDetailContent() {
                     <p className="text-sm text-gray-500 mt-2">Red Flag Score</p>
                   </div>
 
-                  {/* Flag Breakdown Progress Bars */}
+                  {/* Flag Breakdown Progress Bars - colors based on severity score */}
                   <div className="space-y-3">
-                    {/* Consolidation Velocity */}
-                    <div>
-                      <div className="flex items-center justify-between mb-1.5">
-                        <div>
-                          <span className="text-sm text-gray-400">Consolidation Velocity</span>
-                          <span className="text-xs text-gray-600 ml-2">(30% weight)</span>
+                    {[
+                      { label: 'Consolidation Velocity', weight: '30%', value: redFlags.breakdown.consolidation_velocity },
+                      { label: 'Financing Velocity', weight: '25%', value: redFlags.breakdown.financing_velocity },
+                      { label: 'Executive Churn', weight: '20%', value: redFlags.breakdown.executive_churn },
+                      { label: 'Disclosure Gaps', weight: '15%', value: redFlags.breakdown.disclosure_gaps },
+                      { label: 'Debt Trend', weight: '10%', value: redFlags.breakdown.debt_trend },
+                    ].map(({ label, weight, value }) => {
+                      // Dynamic color based on severity score (higher = more critical)
+                      const barColor = value >= 80 ? '#F87171' : value >= 60 ? '#FB923C' : value >= 40 ? '#FBBF24' : '#00E676';
+                      return (
+                        <div key={label}>
+                          <div className="flex items-center justify-between mb-1.5">
+                            <div>
+                              <span className="text-sm text-gray-400">{label}</span>
+                              <span className="text-xs text-gray-600 ml-2">({weight} weight)</span>
+                            </div>
+                            <span className="text-sm font-medium text-white">{value}</span>
+                          </div>
+                          <div className="w-full bg-white/5 rounded-full h-2">
+                            <div
+                              className="h-2 rounded-full transition-all duration-1000"
+                              style={{ width: `${value}%`, backgroundColor: barColor }}
+                            />
+                          </div>
                         </div>
-                        <span className="text-sm font-medium text-white">
-                          {redFlags.breakdown.consolidation_velocity}
-                        </span>
-                      </div>
-                      <div className="w-full bg-white/5 rounded-full h-2">
-                        <div
-                          className="bg-red-400 h-2 rounded-full transition-all duration-1000"
-                          style={{ width: `${redFlags.breakdown.consolidation_velocity}%` }}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Financing Velocity */}
-                    <div>
-                      <div className="flex items-center justify-between mb-1.5">
-                        <div>
-                          <span className="text-sm text-gray-400">Financing Velocity</span>
-                          <span className="text-xs text-gray-600 ml-2">(25% weight)</span>
-                        </div>
-                        <span className="text-sm font-medium text-white">
-                          {redFlags.breakdown.financing_velocity}
-                        </span>
-                      </div>
-                      <div className="w-full bg-white/5 rounded-full h-2">
-                        <div
-                          className="bg-orange-400 h-2 rounded-full transition-all duration-1000"
-                          style={{ width: `${redFlags.breakdown.financing_velocity}%` }}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Executive Churn */}
-                    <div>
-                      <div className="flex items-center justify-between mb-1.5">
-                        <div>
-                          <span className="text-sm text-gray-400">Executive Churn</span>
-                          <span className="text-xs text-gray-600 ml-2">(20% weight)</span>
-                        </div>
-                        <span className="text-sm font-medium text-white">
-                          {redFlags.breakdown.executive_churn}
-                        </span>
-                      </div>
-                      <div className="w-full bg-white/5 rounded-full h-2">
-                        <div
-                          className="bg-yellow-400 h-2 rounded-full transition-all duration-1000"
-                          style={{ width: `${redFlags.breakdown.executive_churn}%` }}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Disclosure Gaps */}
-                    <div>
-                      <div className="flex items-center justify-between mb-1.5">
-                        <div>
-                          <span className="text-sm text-gray-400">Disclosure Gaps</span>
-                          <span className="text-xs text-gray-600 ml-2">(15% weight)</span>
-                        </div>
-                        <span className="text-sm font-medium text-white">
-                          {redFlags.breakdown.disclosure_gaps}
-                        </span>
-                      </div>
-                      <div className="w-full bg-white/5 rounded-full h-2">
-                        <div
-                          className="bg-yellow-400 h-2 rounded-full transition-all duration-1000"
-                          style={{ width: `${redFlags.breakdown.disclosure_gaps}%` }}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Debt Trend */}
-                    <div>
-                      <div className="flex items-center justify-between mb-1.5">
-                        <div>
-                          <span className="text-sm text-gray-400">Debt Trend</span>
-                          <span className="text-xs text-gray-600 ml-2">(10% weight)</span>
-                        </div>
-                        <span className="text-sm font-medium text-white">
-                          {redFlags.breakdown.debt_trend}
-                        </span>
-                      </div>
-                      <div className="w-full bg-white/5 rounded-full h-2">
-                        <div
-                          className="bg-gray-400 h-2 rounded-full transition-all duration-1000"
-                          style={{ width: `${redFlags.breakdown.debt_trend}%` }}
-                        />
-                      </div>
-                    </div>
+                      );
+                    })}
                   </div>
                 </div>
 

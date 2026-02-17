@@ -22,6 +22,7 @@ import { SkeletonStockRow, SkeletonStockCard, SkeletonFilterBar } from '@/compon
 import RefreshButton from '@/components/ui/RefreshButton'
 import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator'
 import StockCard from '@/components/ui/StockCard'
+import UpgradeModal from '@/components/UpgradeModal'
 import {
   StarIcon,
   StarFilledIcon,
@@ -61,6 +62,7 @@ function StocksPageContent() {
   const [isLoadingMore, setIsLoadingMore] = useState(false)
   const loadMoreRef = useRef<HTMLDivElement>(null)
   const { showToast } = useToast()
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false)
 
   // Load view preference from localStorage on mount
   useEffect(() => {
@@ -270,9 +272,9 @@ function StocksPageContent() {
         showToast('Added to watchlist', 'success')
       }
     } catch (error: any) {
-      // Check if it's a tier limit error
+      // Check if it's a tier limit error - show upgrade modal
       if (error?.message?.includes('TIER_LIMIT_EXCEEDED') || error?.message?.includes('Watchlist full')) {
-        showToast('Watchlist full. Upgrade your plan for more.', 'error')
+        setShowUpgradeModal(true)
       } else {
         showToast('Failed to update watchlist', 'error')
       }
@@ -318,7 +320,7 @@ function StocksPageContent() {
         {/* Desktop Table skeleton */}
         <div className="hidden md:block bg-vettr-card/50 border border-white/5 rounded-2xl overflow-hidden">
           <table className="w-full">
-            <thead className="sticky top-16 bg-vettr-dark/80 backdrop-blur-sm z-20">
+            <thead className="bg-vettr-navy border-b border-white/5">
               <tr className="border-b border-white/5">
                 <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Ticker</th>
                 <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Company</th>
@@ -542,8 +544,19 @@ function StocksPageContent() {
       <div className="mb-6 bg-vettr-card/30 border border-white/5 rounded-2xl p-5">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-white">My Watchlist</h2>
-          <div className="text-sm text-gray-400">
-            {watchlist.length} / {subscription?.watchlist_limit === -1 ? 'unlimited' : subscription?.watchlist_limit || '...'} stocks
+          <div className="flex items-center gap-3">
+            <div className="text-sm text-gray-400">
+              {watchlist.length} / {subscription?.watchlist_limit === -1 ? 'unlimited' : subscription?.watchlist_limit || '...'} stocks
+            </div>
+            {/* Show upgrade button when at or near limit (non-premium) */}
+            {subscription && subscription.tier !== 'premium' && subscription.watchlist_limit !== -1 && watchlist.length >= subscription.watchlist_limit && (
+              <button
+                onClick={() => setShowUpgradeModal(true)}
+                className="text-xs font-semibold text-vettr-accent bg-vettr-accent/10 hover:bg-vettr-accent/20 px-3 py-1.5 rounded-lg transition-colors"
+              >
+                Upgrade
+              </button>
+            )}
           </div>
         </div>
 
@@ -623,9 +636,9 @@ function StocksPageContent() {
       {/* Stock list - Responsive: Card view on mobile, Card or Table on desktop */}
       {viewMode === 'table' && !isMobile ? (
         // Table view - Desktop only (>= 768px)
-        <div className="hidden md:block overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0">
-          <table className="w-full min-w-[800px]">
-            <thead className="sticky top-16 z-20 bg-vettr-navy dark:bg-vettr-navy bg-lightBg backdrop-blur-sm">
+        <div className="hidden md:block -mx-4 md:mx-0 px-4 md:px-0">
+          <table className="w-full">
+            <thead className="bg-vettr-navy dark:bg-vettr-navy border-b border-white/5">
               <tr className="border-b border-white/5 dark:border-white/5 border-gray-200">
                 <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">
                   <button
@@ -830,9 +843,9 @@ function StocksPageContent() {
                     showToast('Added to watchlist', 'success')
                   }
                 } catch (error: any) {
-                  // Check if it's a tier limit error
+                  // Check if it's a tier limit error - show upgrade modal
                   if (error?.message?.includes('TIER_LIMIT_EXCEEDED') || error?.message?.includes('Watchlist full')) {
-                    showToast('Watchlist full. Upgrade your plan for more.', 'error')
+                    setShowUpgradeModal(true)
                   } else {
                     showToast('Failed to update watchlist', 'error')
                   }
@@ -874,6 +887,15 @@ function StocksPageContent() {
           All stocks loaded ({pagination.total} total)
         </div>
       )}
+
+      {/* Upgrade Modal */}
+      <UpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        currentTier={subscription?.tier || 'free'}
+        currentCount={watchlist.length}
+        currentLimit={subscription?.watchlist_limit === -1 ? undefined : (subscription?.watchlist_limit || 5)}
+      />
     </div>
   )
 }
