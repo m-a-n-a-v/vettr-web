@@ -489,70 +489,6 @@ function StocksPageContent() {
         </div>
       </div>
 
-      {/* Filter bar - single row design */}
-      <div className="mb-6 bg-vettr-card/30 border border-white/5 rounded-2xl p-3">
-        <div className="flex flex-col md:flex-row gap-3">
-          <SearchInput
-            value={searchInput}
-            onChange={setSearchInput}
-            placeholder="Search by ticker or company name..."
-            className="flex-1"
-          />
-
-          <SelectDropdown
-            value={sortBy}
-            onChange={handleSortChange}
-            options={[
-              { value: 'vetr_score', label: 'VETTR Score' },
-              { value: 'current_price', label: 'Price' },
-              { value: 'price_change_percent', label: 'Price Change %' },
-              { value: 'company_name', label: 'Name' },
-              { value: 'sector', label: 'Sector' },
-            ]}
-            className="w-full md:w-48"
-          />
-
-          <button
-            onClick={toggleSortOrder}
-            className="flex items-center justify-center w-10 h-10 bg-white/5 border border-white/10 text-white rounded-xl hover:bg-white/10 transition-colors"
-            title={sortOrder === 'asc' ? 'Ascending' : 'Descending'}
-            aria-label={sortOrder === 'asc' ? 'Sort ascending' : 'Sort descending'}
-          >
-            {sortOrder === 'asc' ? (
-              <ChevronUpIcon className="w-5 h-5" />
-            ) : (
-              <ChevronDownIcon className="w-5 h-5" />
-            )}
-          </button>
-
-          {/* Export button - Only shown on desktop */}
-          <button
-            onClick={handleExport}
-            disabled={filteredStocks.length === 0}
-            className="hidden md:flex items-center gap-2 px-4 h-10 bg-white/5 border border-white/10 text-white rounded-xl hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            title="Export to CSV"
-            aria-label="Export filtered stocks to CSV"
-          >
-            <DownloadIcon className="w-4 h-4" />
-            <span className="text-sm font-medium">Export</span>
-          </button>
-
-          {/* View toggle - Only shown on desktop (>= 1024px) */}
-          <button
-            onClick={toggleViewMode}
-            className="hidden lg:flex items-center justify-center w-10 h-10 bg-white/5 border border-white/10 text-white rounded-xl hover:bg-white/10 transition-colors"
-            title={viewMode === 'card' ? 'Switch to Table View' : 'Switch to Card View'}
-            aria-label={viewMode === 'card' ? 'Switch to table view' : 'Switch to card view'}
-          >
-            {viewMode === 'card' ? (
-              <TableIcon className="w-5 h-5" />
-            ) : (
-              <GridIcon className="w-5 h-5" />
-            )}
-          </button>
-        </div>
-      </div>
-
       {/* My Watchlist Section */}
       <div className="mb-6 bg-vettr-card/30 border border-white/5 rounded-2xl p-5">
         <div className="flex items-center justify-between mb-4">
@@ -636,6 +572,70 @@ function StocksPageContent() {
             ))}
           </div>
         )}
+      </div>
+
+      {/* Filter bar - single row design */}
+      <div className="mb-6 bg-vettr-card/30 border border-white/5 rounded-2xl p-3">
+        <div className="flex flex-col md:flex-row gap-3">
+          <SearchInput
+            value={searchInput}
+            onChange={setSearchInput}
+            placeholder="Search by ticker or company name..."
+            className="flex-1"
+          />
+
+          <SelectDropdown
+            value={sortBy}
+            onChange={handleSortChange}
+            options={[
+              { value: 'vetr_score', label: 'VETTR Score' },
+              { value: 'current_price', label: 'Price' },
+              { value: 'price_change_percent', label: 'Price Change %' },
+              { value: 'company_name', label: 'Name' },
+              { value: 'sector', label: 'Sector' },
+            ]}
+            className="w-full md:w-48"
+          />
+
+          <button
+            onClick={toggleSortOrder}
+            className="flex items-center justify-center w-10 h-10 bg-white/5 border border-white/10 text-white rounded-xl hover:bg-white/10 transition-colors"
+            title={sortOrder === 'asc' ? 'Ascending' : 'Descending'}
+            aria-label={sortOrder === 'asc' ? 'Sort ascending' : 'Sort descending'}
+          >
+            {sortOrder === 'asc' ? (
+              <ChevronUpIcon className="w-5 h-5" />
+            ) : (
+              <ChevronDownIcon className="w-5 h-5" />
+            )}
+          </button>
+
+          {/* Export button - Only shown on desktop */}
+          <button
+            onClick={handleExport}
+            disabled={filteredStocks.length === 0}
+            className="hidden md:flex items-center gap-2 px-4 h-10 bg-white/5 border border-white/10 text-white rounded-xl hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Export to CSV"
+            aria-label="Export filtered stocks to CSV"
+          >
+            <DownloadIcon className="w-4 h-4" />
+            <span className="text-sm font-medium">Export</span>
+          </button>
+
+          {/* View toggle - Only shown on desktop (>= 1024px) */}
+          <button
+            onClick={toggleViewMode}
+            className="hidden lg:flex items-center justify-center w-10 h-10 bg-white/5 border border-white/10 text-white rounded-xl hover:bg-white/10 transition-colors"
+            title={viewMode === 'card' ? 'Switch to Table View' : 'Switch to Card View'}
+            aria-label={viewMode === 'card' ? 'Switch to table view' : 'Switch to card view'}
+          >
+            {viewMode === 'card' ? (
+              <TableIcon className="w-5 h-5" />
+            ) : (
+              <GridIcon className="w-5 h-5" />
+            )}
+          </button>
+        </div>
       </div>
 
       {/* All Stocks Section Header */}
