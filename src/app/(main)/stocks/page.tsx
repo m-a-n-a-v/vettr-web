@@ -4,8 +4,7 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useMemo, useEffect, useCallback, useRef, Suspense } from 'react'
-import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { useStocks } from '@/hooks/useStocks'
 import { useWatchlist } from '@/hooks/useWatchlist'
 import { useSubscription } from '@/hooks/useSubscription'
@@ -44,10 +43,9 @@ import { convertStocksToCSV, downloadCSV, generateCSVFilename } from '@/lib/csv-
 type SortOption = 'vetr_score' | 'current_price' | 'price_change_percent' | 'company_name' | 'sector'
 type ViewMode = 'card' | 'table'
 
-const STOCKS_PER_PAGE = 25
+const PER_PAGE_OPTIONS = [25, 50, 100] as const
 
 function StocksPageContent() {
-  const router = useRouter()
   const searchParams = useSearchParams()
 
   // Initialize state from URL params
@@ -59,10 +57,8 @@ function StocksPageContent() {
   const [viewMode, setViewMode] = useState<ViewMode>('table') // Default to table on desktop
   const [isClient, setIsClient] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
-  const [offset, setOffset] = useState(0)
-  const [allStocks, setAllStocks] = useState<Stock[]>([])
-  const [isLoadingMore, setIsLoadingMore] = useState(false)
-  const loadMoreRef = useRef<HTMLDivElement>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [perPage, setPerPage] = useState(25)
   const hasLoadedOnce = useRef(false)
   const { showToast } = useToast()
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
@@ -104,30 +100,18 @@ function StocksPageContent() {
   // Fetch stocks with pagination
   const { stocks, pagination, isLoading: stocksLoading, isError: stocksError, mutate: mutateStocks } = useStocks({
     search: searchQuery || undefined,
-    limit: STOCKS_PER_PAGE,
-    offset: offset,
+    limit: perPage,
+    offset: (currentPage - 1) * perPage,
   })
   const { watchlist, addToWatchlist, removeFromWatchlist, isAdding, isRemoving, isLoading: watchlistLoading } = useWatchlist()
   const { subscription, isLoading: subscriptionLoading } = useSubscription()
 
-  // Accumulate stocks as we load more pages
+  // Track first load for skeleton
   useEffect(() => {
     if (stocks) {
       hasLoadedOnce.current = true
-      if (offset === 0) {
-        // First page - replace all stocks
-        setAllStocks(stocks)
-      } else if (stocks.length > 0) {
-        // Subsequent pages - append new stocks, avoiding duplicates
-        setAllStocks(prev => {
-          const existingTickers = new Set(prev.map(s => s.ticker))
-          const newStocks = stocks.filter(s => !existingTickers.has(s.ticker))
-          return [...prev, ...newStocks]
-        })
-      }
-      setIsLoadingMore(false)
     }
-  }, [stocks, offset])
+  }, [stocks])
 
   // Update URL when state changes (use history.replaceState to avoid
   // Next.js re-renders that would unmount the SearchInput and lose focus)
@@ -146,44 +130,15 @@ function StocksPageContent() {
     window.history.replaceState(null, '', newUrl)
   }, [searchQuery, sortBy, sortOrder, isClient])
 
-  // Reset offset when search/sort changes (don't clear allStocks — let the
-  // accumulator effect replace them when new data arrives to avoid unmounting the UI)
+  // Reset to page 1 when search/sort/perPage changes
   useEffect(() => {
-    setOffset(0)
-  }, [searchQuery, sortBy, sortOrder])
-
-  // Load more stocks
-  const loadMoreStocks = useCallback(() => {
-    if (!pagination || !pagination.hasMore || isLoadingMore || stocksLoading) {
-      return
-    }
-    setIsLoadingMore(true)
-    setOffset(prev => prev + STOCKS_PER_PAGE)
-  }, [pagination, isLoadingMore, stocksLoading])
-
-  // Intersection Observer for infinite scroll on mobile
-  useEffect(() => {
-    if (!isMobile || !loadMoreRef.current) return
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && pagination?.hasMore && !isLoadingMore && !stocksLoading) {
-          loadMoreStocks()
-        }
-      },
-      { threshold: 0.1 }
-    )
-
-    observer.observe(loadMoreRef.current)
-
-    return () => observer.disconnect()
-  }, [isMobile, pagination, isLoadingMore, stocksLoading, loadMoreStocks])
+    setCurrentPage(1)
+  }, [searchQuery, sortBy, sortOrder, perPage])
 
   // Refresh handler
   const handleRefreshData = useCallback(async () => {
     try {
-      setOffset(0)
-      setAllStocks([])
+      setCurrentPage(1)
       await mutateStocks()
       showToast('Data refreshed successfully', 'success')
     } catch (error) {
@@ -211,11 +166,10 @@ function StocksPageContent() {
     return new Set(watchlist.map(stock => stock.ticker))
   }, [watchlist])
 
-  // Filter and sort stocks (use allStocks for accumulated data)
+  // Sort current page of stocks (search filtering is done server-side via API)
   const filteredStocks = useMemo(() => {
-    let result = allStocks || []
+    let result = stocks || []
 
-    // Sort stocks (note: search filtering is done server-side via API)
     result = [...result].sort((a, b) => {
       let compareValue = 0
 
@@ -241,7 +195,7 @@ function StocksPageContent() {
     })
 
     return result
-  }, [allStocks, sortBy, sortOrder])
+  }, [stocks, sortBy, sortOrder])
 
   // Handle sort option change
   const handleSortChange = (value: string) => {
@@ -311,6 +265,38 @@ function StocksPageContent() {
     } catch (error) {
       showToast('Failed to export data', 'error')
     }
+  }
+
+  // Pagination computed values
+  const totalItems = pagination?.total || 0
+  const totalPages = Math.max(1, Math.ceil(totalItems / perPage))
+
+  // Generate page numbers to display (show up to 5 pages around current)
+  const pageNumbers = useMemo(() => {
+    const pages: (number | 'ellipsis')[] = []
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i)
+    } else {
+      pages.push(1)
+      if (currentPage > 3) pages.push('ellipsis')
+      const start = Math.max(2, currentPage - 1)
+      const end = Math.min(totalPages - 1, currentPage + 1)
+      for (let i = start; i <= end; i++) pages.push(i)
+      if (currentPage < totalPages - 2) pages.push('ellipsis')
+      pages.push(totalPages)
+    }
+    return pages
+  }, [currentPage, totalPages])
+
+  const handlePageChange = (page: number) => {
+    if (page < 1 || page > totalPages) return
+    setCurrentPage(page)
+    // Scroll to top of stock list
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const handlePerPageChange = (value: string) => {
+    setPerPage(Number(value))
   }
 
   // Loading state - show skeleton only on truly initial page load, not on search/sort changes
@@ -643,7 +629,7 @@ function StocksPageContent() {
 
       {/* Stock count */}
       <div className="mb-4 text-sm text-gray-500">
-        Showing {filteredStocks.length} of {pagination?.total || filteredStocks.length} stocks
+        Showing {Math.min((currentPage - 1) * perPage + 1, totalItems)}–{Math.min(currentPage * perPage, totalItems)} of {totalItems} stocks
       </div>
 
       {/* Stock list - Responsive: Card view on mobile, Card or Table on desktop */}
@@ -870,34 +856,70 @@ function StocksPageContent() {
         </div>
       )}
 
-      {/* Load More / Infinite Scroll Trigger */}
-      {pagination && pagination.hasMore && (
-        <div ref={loadMoreRef} className="mt-6 flex justify-center">
-          {/* Desktop: Load More button */}
-          <button
-            onClick={loadMoreStocks}
-            disabled={isLoadingMore || stocksLoading}
-            className="bg-white/5 border border-white/10 text-white rounded-xl px-6 py-3 hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-          >
-            {isLoadingMore || stocksLoading ? (
-              <>
-                <LoadingSpinner size="sm" />
-                <span>Loading more...</span>
-              </>
-            ) : (
-              <>
-                <span>Load More</span>
-                <ChevronDownIcon className="w-4 h-4" />
-              </>
-            )}
-          </button>
-        </div>
-      )}
+      {/* Pagination Controls */}
+      {totalPages > 0 && (
+        <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          {/* Per-page selector */}
+          <div className="flex items-center gap-2 text-sm text-gray-400">
+            <span>Show</span>
+            <select
+              value={perPage}
+              onChange={(e) => handlePerPageChange(e.target.value)}
+              className="bg-white/5 border border-white/10 text-white rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:border-vettr-accent/40"
+            >
+              {PER_PAGE_OPTIONS.map(opt => (
+                <option key={opt} value={opt} className="bg-vettr-navy">{opt}</option>
+              ))}
+            </select>
+            <span>per page</span>
+          </div>
 
-      {/* No more stocks indicator */}
-      {pagination && !pagination.hasMore && filteredStocks.length > 0 && (
-        <div className="mt-6 text-center text-sm text-gray-500">
-          All stocks loaded ({pagination.total} total)
+          {/* Page navigation */}
+          <div className="flex items-center gap-1">
+            {/* Previous */}
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="flex items-center justify-center w-9 h-9 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              aria-label="Previous page"
+            >
+              <ChevronUpIcon className="w-4 h-4 -rotate-90" />
+            </button>
+
+            {/* Page numbers */}
+            {pageNumbers.map((page, i) =>
+              page === 'ellipsis' ? (
+                <span key={`ellipsis-${i}`} className="w-9 h-9 flex items-center justify-center text-gray-500 text-sm">...</span>
+              ) : (
+                <button
+                  key={page}
+                  onClick={() => handlePageChange(page)}
+                  className={`w-9 h-9 rounded-lg text-sm font-medium transition-colors ${
+                    page === currentPage
+                      ? 'bg-vettr-accent text-white'
+                      : 'bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10 hover:text-white'
+                  }`}
+                >
+                  {page}
+                </button>
+              )
+            )}
+
+            {/* Next */}
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="flex items-center justify-center w-9 h-9 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              aria-label="Next page"
+            >
+              <ChevronDownIcon className="w-4 h-4 -rotate-90" />
+            </button>
+          </div>
+
+          {/* Total count */}
+          <div className="text-sm text-gray-500">
+            {totalItems} total
+          </div>
         </div>
       )}
 
