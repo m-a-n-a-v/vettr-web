@@ -5,8 +5,10 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useQuickSearch } from '@/contexts/QuickSearchContext';
+import { useUnreadAlertCount } from '@/hooks/useUnreadAlertCount';
+import { useAlertTriggers } from '@/hooks/useAlertTriggers';
 import { motion, AnimatePresence } from 'framer-motion';
-import { SearchIcon, RefreshIcon, BellIcon, ChevronDownIcon } from '@/components/icons';
+import { SearchIcon, RefreshIcon, BellIcon, ChevronDownIcon, CheckCircleIcon, AlertTriangleIcon, FlagIcon, DocumentIcon } from '@/components/icons';
 
 // Map pathname to page title
 const getPageTitle = (pathname: string): string => {
@@ -50,13 +52,49 @@ const getTierBadgeColor = (tier: string): string => {
   }
 };
 
+// Get icon for alert type
+const getAlertTypeIcon = (alertType: string) => {
+  switch (alertType.toLowerCase()) {
+    case 'red flag':
+    case 'red_flag':
+      return <FlagIcon className="w-4 h-4 text-red-400" />;
+    case 'financing':
+      return <DocumentIcon className="w-4 h-4 text-yellow-400" />;
+    case 'executive_changes':
+    case 'executive changes':
+      return <AlertTriangleIcon className="w-4 h-4 text-orange-400" />;
+    default:
+      return <BellIcon className="w-4 h-4 text-vettr-accent" />;
+  }
+};
+
+// Format relative time for notifications
+const formatRelativeTime = (dateStr: string): string => {
+  const now = new Date();
+  const date = new Date(dateStr);
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 1) return 'Just now';
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays < 7) return `${diffDays}d ago`;
+  return date.toLocaleDateString();
+};
+
 export function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
   const { openQuickSearch } = useQuickSearch();
+  const { unreadCount, mutate: mutateUnreadCount } = useUnreadAlertCount();
+  const { triggers, markAsRead, markAllAsRead, isMarkingAllRead, mutate: mutateTriggers } = useAlertTriggers();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const notificationsRef = useRef<HTMLDivElement>(null);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   const pageTitle = getPageTitle(pathname || '');
@@ -84,22 +122,25 @@ export function Header() {
     openQuickSearch();
   };
 
-  // Close dropdown when clicking outside
+  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false);
       }
+      if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
+        setIsNotificationsOpen(false);
+      }
     };
 
-    if (isDropdownOpen) {
+    if (isDropdownOpen || isNotificationsOpen) {
       document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isDropdownOpen]);
+  }, [isDropdownOpen, isNotificationsOpen]);
 
   const handleLogout = async () => {
     setIsDropdownOpen(false);
@@ -155,19 +196,143 @@ export function Header() {
           </button>
 
           {/* Notification bell */}
-          <button
-            className="relative p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-vettr-accent/30 active:scale-95"
-            aria-label="Notifications"
-          >
-            <BellIcon className="w-5 h-5" />
-            {/* Notification badge (optional - can be dynamic later) */}
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-vettr-accent rounded-full" />
-          </button>
+          <div className="relative" ref={notificationsRef}>
+            <button
+              onClick={() => {
+                setIsNotificationsOpen(!isNotificationsOpen);
+                setIsDropdownOpen(false);
+              }}
+              className="relative p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-vettr-accent/30 active:scale-95"
+              aria-label="Notifications"
+              aria-expanded={isNotificationsOpen}
+            >
+              <BellIcon className="w-5 h-5" />
+              {unreadCount > 0 && (
+                <span className="absolute top-1 right-1 min-w-[18px] h-[18px] flex items-center justify-center bg-vettr-accent text-white text-[10px] font-bold rounded-full px-1">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
+            </button>
+
+            {/* Notifications dropdown panel */}
+            <AnimatePresence>
+              {isNotificationsOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: prefersReducedMotion ? 0 : -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: prefersReducedMotion ? 0 : -10 }}
+                  transition={{ duration: prefersReducedMotion ? 0 : 0.15 }}
+                  className="absolute right-0 mt-2 w-80 sm:w-96 max-w-[calc(100vw-2rem)] bg-white dark:bg-vettr-card border border-gray-200 dark:border-white/10 rounded-xl shadow-xl overflow-hidden"
+                >
+                  {/* Header */}
+                  <div className="px-4 py-3 border-b border-gray-200 dark:border-white/5 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Notifications</h3>
+                      {unreadCount > 0 && (
+                        <span className="text-xs bg-vettr-accent/10 text-vettr-accent px-2 py-0.5 rounded-full font-medium">
+                          {unreadCount} new
+                        </span>
+                      )}
+                    </div>
+                    {unreadCount > 0 && (
+                      <button
+                        onClick={async () => {
+                          await markAllAsRead();
+                          mutateUnreadCount();
+                        }}
+                        disabled={isMarkingAllRead}
+                        className="text-xs text-vettr-accent hover:text-vettr-accent/80 font-medium transition-colors disabled:opacity-50"
+                      >
+                        Mark all read
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Notification list */}
+                  <div className="max-h-80 overflow-y-auto">
+                    {triggers.length === 0 ? (
+                      <div className="px-4 py-8 text-center">
+                        <BellIcon className="w-8 h-8 text-gray-400 dark:text-gray-600 mx-auto mb-2" />
+                        <p className="text-sm text-gray-500 dark:text-gray-400">No notifications yet</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                          Set up alert rules on stocks to get notified
+                        </p>
+                      </div>
+                    ) : (
+                      triggers.slice(0, 20).map((trigger) => (
+                        <button
+                          key={trigger.id}
+                          onClick={async () => {
+                            if (!trigger.is_read) {
+                              await markAsRead(trigger.id);
+                              mutateUnreadCount();
+                            }
+                            if (trigger.ticker) {
+                              setIsNotificationsOpen(false);
+                              router.push(`/stocks/${trigger.ticker}`);
+                            }
+                          }}
+                          className={`w-full text-left px-4 py-3 flex gap-3 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors border-b border-gray-100 dark:border-white/5 last:border-b-0 ${
+                            !trigger.is_read ? 'bg-vettr-accent/5 dark:bg-vettr-accent/5' : ''
+                          }`}
+                        >
+                          {/* Icon */}
+                          <div className="flex-shrink-0 mt-0.5">
+                            {getAlertTypeIcon(trigger.alert_type)}
+                          </div>
+
+                          {/* Content */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-2">
+                              <p className={`text-sm truncate ${
+                                !trigger.is_read
+                                  ? 'font-semibold text-gray-900 dark:text-white'
+                                  : 'font-medium text-gray-700 dark:text-gray-300'
+                              }`}>
+                                {trigger.title}
+                              </p>
+                              {!trigger.is_read && (
+                                <span className="flex-shrink-0 w-2 h-2 bg-vettr-accent rounded-full mt-1.5" />
+                              )}
+                            </div>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-2">
+                              {trigger.message}
+                            </p>
+                            <div className="flex items-center gap-2 mt-1">
+                              {trigger.ticker && (
+                                <span className="text-[10px] font-medium text-vettr-accent bg-vettr-accent/10 px-1.5 py-0.5 rounded">
+                                  {trigger.ticker}
+                                </span>
+                              )}
+                              <span className="text-[10px] text-gray-400 dark:text-gray-500">
+                                {formatRelativeTime(trigger.triggered_at)}
+                              </span>
+                            </div>
+                          </div>
+                        </button>
+                      ))
+                    )}
+                  </div>
+
+                  {/* Footer */}
+                  <div className="px-4 py-2.5 border-t border-gray-200 dark:border-white/5">
+                    <Link
+                      href="/alerts"
+                      onClick={() => setIsNotificationsOpen(false)}
+                      className="block text-center text-xs font-medium text-vettr-accent hover:text-vettr-accent/80 transition-colors"
+                    >
+                      View all alerts
+                    </Link>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
           {/* User avatar dropdown */}
           <div className="relative" ref={dropdownRef}>
             <button
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              onClick={() => { setIsDropdownOpen(!isDropdownOpen); setIsNotificationsOpen(false); }}
               className="flex items-center gap-2 hover:opacity-80 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-vettr-accent/30 rounded-full active:scale-95"
               aria-label="User menu"
               aria-expanded={isDropdownOpen}
