@@ -126,16 +126,16 @@ export default function UpgradeModal({
               key={tier.tier}
               className={`relative rounded-2xl p-5 border transition-all ${
                 tier.current
-                  ? 'bg-white/5 border-white/10 opacity-75'
+                  ? 'bg-gray-100 dark:bg-white/5 border-gray-200 dark:border-white/10 opacity-75'
                   : tier.highlighted
                   ? 'bg-vettr-accent/5 border-vettr-accent/30 ring-1 ring-vettr-accent/20'
-                  : 'bg-white/5 border-white/10 hover:border-white/20'
+                  : 'bg-gray-50 dark:bg-white/5 border-gray-200 dark:border-white/10 hover:border-gray-300 dark:hover:border-white/20'
               }`}
             >
               {/* Current badge */}
               {tier.current && (
                 <div className="absolute top-3 right-3">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 bg-white/10 px-2 py-0.5 rounded-full">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 bg-gray-200 dark:bg-white/10 px-2 py-0.5 rounded-full">
                     Current
                   </span>
                 </div>
@@ -152,28 +152,28 @@ export default function UpgradeModal({
 
               {/* Tier name */}
               <h3 className={`text-lg font-bold mb-1 ${
-                tier.highlighted ? 'text-vettr-accent' : 'text-white'
+                tier.highlighted ? 'text-vettr-accent' : 'text-gray-900 dark:text-white'
               }`}>
                 {tier.name}
               </h3>
 
               {/* Price */}
               <div className="flex items-baseline gap-1 mb-3">
-                <span className="text-2xl font-bold text-white">{tier.price}</span>
-                <span className="text-sm text-gray-400">{tier.period}</span>
+                <span className="text-2xl font-bold text-gray-900 dark:text-white">{tier.price}</span>
+                <span className="text-sm text-gray-500 dark:text-gray-400">{tier.period}</span>
               </div>
 
               {/* Key stats */}
               <div className="space-y-1 mb-4">
                 <div className="flex items-center gap-2 text-sm">
                   <StarFilledIcon className="w-4 h-4 text-yellow-400 flex-shrink-0" />
-                  <span className="text-white font-medium">{tier.watchlistLimit}</span>
+                  <span className="text-gray-900 dark:text-white font-medium">{tier.watchlistLimit}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <svg className="w-4 h-4 text-vettr-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <span className="text-gray-400">{tier.pulseDelay}</span>
+                  <span className="text-gray-500 dark:text-gray-400">{tier.pulseDelay}</span>
                 </div>
               </div>
 
@@ -184,7 +184,7 @@ export default function UpgradeModal({
                     <svg className="w-4 h-4 text-vettr-accent flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                     </svg>
-                    <span className="text-gray-300">{feature}</span>
+                    <span className="text-gray-600 dark:text-gray-300">{feature}</span>
                   </li>
                 ))}
               </ul>
@@ -193,7 +193,7 @@ export default function UpgradeModal({
               {tier.current ? (
                 <button
                   disabled
-                  className="w-full py-2.5 px-4 rounded-xl text-sm font-medium bg-white/5 text-gray-500 cursor-not-allowed border border-white/5"
+                  className="w-full py-2.5 px-4 rounded-xl text-sm font-medium bg-gray-100 dark:bg-white/5 text-gray-500 cursor-not-allowed border border-gray-200 dark:border-white/5"
                 >
                   Current Plan
                 </button>
@@ -207,7 +207,7 @@ export default function UpgradeModal({
                   className={`w-full py-2.5 px-4 rounded-xl text-sm font-semibold transition-all active:scale-[0.98] ${
                     tier.highlighted
                       ? 'bg-vettr-accent text-vettr-navy hover:bg-vettr-accent/90'
-                      : 'bg-white/10 text-white hover:bg-white/15 border border-white/10'
+                      : 'bg-gray-200 dark:bg-white/10 text-gray-900 dark:text-white hover:bg-gray-300 dark:hover:bg-white/15 border border-gray-200 dark:border-white/10'
                   }`}
                 >
                   Upgrade to {tier.name}

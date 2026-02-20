@@ -21,7 +21,7 @@ export default function EmptyState({
 }: EmptyStateProps) {
   const defaultIcon = (
     <svg
-      className="w-16 h-16 text-gray-600 dark:text-gray-600"
+      className="w-16 h-16 text-gray-400 dark:text-gray-600"
       fill="none"
       stroke="currentColor"
       viewBox="0 0 24 24"
@@ -43,13 +43,13 @@ export default function EmptyState({
       </div>
 
       {/* Title - text-lg font-medium text-gray-400 */}
-      <h3 className="text-lg font-medium text-gray-400 dark:text-gray-400 mb-2">
+      <h3 className="text-lg font-medium text-gray-500 dark:text-gray-400 mb-2">
         {title}
       </h3>
 
       {/* Description - text-sm text-gray-500 */}
       {description && (
-        <p className="text-sm text-gray-500 dark:text-gray-500 text-center max-w-md mb-6">
+        <p className="text-sm text-gray-400 dark:text-gray-500 text-center max-w-md mb-6">
           {description}
         </p>
       )}
@@ -59,7 +59,7 @@ export default function EmptyState({
         <button
           type="button"
           onClick={onAction}
-          className="mt-2 px-5 py-2.5 rounded-xl bg-vettr-accent text-vettr-navy font-semibold hover:bg-vettr-accent/90 transition-colors focus:outline-none focus:ring-2 focus:ring-vettr-accent/30 focus:ring-offset-2 focus:ring-offset-vettr-navy dark:focus:ring-offset-vettr-navy"
+          className="mt-2 px-5 py-2.5 rounded-xl bg-vettr-accent text-vettr-navy font-semibold hover:bg-vettr-accent/90 transition-colors focus:outline-none focus:ring-2 focus:ring-vettr-accent/30 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-vettr-navy"
         >
           {actionLabel}
         </button>

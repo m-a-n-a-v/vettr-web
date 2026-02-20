@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 /* CSS Custom Properties for Dynamic Theming */
+/* Default: dark theme (matches .dark class) */
 :root {
   /* Background colors */
   --foreground-rgb: 255, 255, 255;
@@ -11,6 +12,7 @@
 
   /* Design token CSS variables for runtime theming */
   --color-accent: #00E676;
+  --color-accent-darker: #00C853;
   --color-surface: #1E3348;
   --color-border: rgba(255, 255, 255, 0.05);
 
@@ -18,12 +20,13 @@
   --font-inter: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-/* Light theme colors */
+/* Light theme colors - applied when .dark class is NOT on html */
 html:not(.dark) {
   --foreground-rgb: 15, 23, 42;
   --background-start-rgb: 248, 250, 252;
   --background-end-rgb: 248, 250, 252;
-  --color-accent: #00E676;
+  --color-accent: #00C853;
+  --color-accent-darker: #00A844;
   --color-surface: #FFFFFF;
   --color-border: #E2E8F0;
 }
@@ -66,10 +69,14 @@ body {
 
 @layer utilities {
   .glass-panel {
-    background-color: rgba(27, 40, 56, 0.9);
+    background-color: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
     border: 1px solid var(--color-border);
+  }
+
+  .dark .glass-panel {
+    background-color: rgba(27, 40, 56, 0.9);
   }
 
   .glow-text {
@@ -183,11 +190,19 @@ body {
 
   .animate-shimmer {
     background: linear-gradient(90deg,
+        rgba(226, 232, 240, 0.8) 0%,
+        rgba(241, 245, 249, 1) 50%,
+        rgba(226, 232, 240, 0.8) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 2s ease-in-out infinite;
+  }
+
+  .dark .animate-shimmer {
+    background: linear-gradient(90deg,
         rgba(30, 51, 72, 0.8) 0%,
         rgba(42, 64, 88, 1) 50%,
         rgba(30, 51, 72, 0.8) 100%);
     background-size: 200% 100%;
-    animation: shimmer 2s ease-in-out infinite;
   }
 
   .scrollbar-hide {

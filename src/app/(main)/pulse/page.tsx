@@ -151,7 +151,7 @@ export default function PulsePage() {
       <div className="mb-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-white mb-1">Market Pulse</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">Market Pulse</h1>
             <p className="text-sm text-gray-500">
               Last updated: {lastRefreshed ? lastRefreshed.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : 'Never'}
             </p>
@@ -176,18 +176,18 @@ export default function PulsePage() {
         <>
           {/* ============ ROW 1: Market Overview (3 columns) ============ */}
           <section className="mb-6">
-            <h2 className="text-lg font-semibold text-white mb-4">Market Overview</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Market Overview</h2>
 
             {isLoadingOverview ? (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 {[1, 2, 3].map(i => (
-                  <div key={i} className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5 h-48 animate-pulse" />
+                  <div key={i} className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-5 h-48 animate-pulse" />
                 ))}
               </div>
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 {/* Watchlist Health */}
-                <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5">
+                <div className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-5">
                   <p className="text-xs text-gray-500 uppercase tracking-wider mb-3 font-medium">Watchlist Health</p>
                   <div className="flex h-6 rounded-lg overflow-hidden gap-0.5 mb-4">
                     {watchlistHealth.elite.count > 0 && (
@@ -219,23 +219,23 @@ export default function PulsePage() {
                           <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: color }} />
                           <span className="text-xs text-gray-400">{label}</span>
                         </div>
-                        <span className="text-sm font-semibold text-white">{watchlistHealth[key].count} ({watchlistHealth[key].pct}%)</span>
+                        <span className="text-sm font-semibold text-gray-900 dark:text-white">{watchlistHealth[key].count} ({watchlistHealth[key].pct}%)</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
                 {/* Sector Exposure */}
-                <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5">
+                <div className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-5">
                   <p className="text-xs text-gray-500 uppercase tracking-wider mb-3 font-medium">Sector Exposure</p>
                   {sectorExposure.length === 0 ? (
                     <p className="text-sm text-gray-500">No sectors to display</p>
                   ) : (
                     <div className="grid grid-cols-2 gap-2">
                       {sectorExposure.slice(0, 6).map((item) => (
-                        <div key={item.sector} className="rounded-xl p-3 border border-white/5" style={{ backgroundColor: `${getSectorColor(item.sector)}15` }}>
+                        <div key={item.sector} className="rounded-xl p-3 border border-gray-200 dark:border-white/5" style={{ backgroundColor: `${getSectorColor(item.sector)}15` }}>
                           <div className="text-xs font-medium truncate" style={{ color: getSectorColor(item.sector) }}>{item.sector}</div>
-                          <div className="text-lg font-bold text-white mt-0.5">{item.pct}%</div>
+                          <div className="text-lg font-bold text-gray-900 dark:text-white mt-0.5">{item.pct}%</div>
                           <div className="text-[10px] text-gray-500">{item.count} stock{item.count !== 1 ? 's' : ''}</div>
                         </div>
                       ))}
@@ -244,13 +244,13 @@ export default function PulsePage() {
                 </div>
 
                 {/* Top Gainers & Losers */}
-                <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5">
+                <div className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-5">
                   <p className="text-xs text-gray-500 uppercase tracking-wider mb-3 font-medium">Gainers & Losers</p>
                   <div className="space-y-2">
                     {topGainers.map((stock) => (
-                      <Link key={stock.ticker} href={`/stocks/${stock.ticker}`} className="flex items-center justify-between p-2 rounded-lg hover:bg-white/[0.03] transition-colors">
+                      <Link key={stock.ticker} href={`/stocks/${stock.ticker}`} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-colors">
                         <div>
-                          <span className="text-sm font-bold text-white">{stock.ticker}</span>
+                          <span className="text-sm font-bold text-gray-900 dark:text-white">{stock.ticker}</span>
                           <p className="text-[11px] text-gray-500 truncate max-w-[120px]">{stock.company_name}</p>
                         </div>
                         <div className="flex items-center gap-1 text-vettr-accent">
@@ -259,11 +259,11 @@ export default function PulsePage() {
                         </div>
                       </Link>
                     ))}
-                    <div className="border-t border-white/5 my-1" />
+                    <div className="border-t border-gray-200 dark:border-white/5 my-1" />
                     {topLosers.filter(s => (s.price_change_percent || 0) < 0).map((stock) => (
-                      <Link key={stock.ticker} href={`/stocks/${stock.ticker}`} className="flex items-center justify-between p-2 rounded-lg hover:bg-white/[0.03] transition-colors">
+                      <Link key={stock.ticker} href={`/stocks/${stock.ticker}`} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-colors">
                         <div>
-                          <span className="text-sm font-bold text-white">{stock.ticker}</span>
+                          <span className="text-sm font-bold text-gray-900 dark:text-white">{stock.ticker}</span>
                           <p className="text-[11px] text-gray-500 truncate max-w-[120px]">{stock.company_name}</p>
                         </div>
                         <div className="flex items-center gap-1 text-red-400">
@@ -283,12 +283,12 @@ export default function PulsePage() {
 
           {/* ============ ROW 2: Red Flag Summary (full width) ============ */}
           <section className="mb-6">
-            <h2 className="text-lg font-semibold text-white mb-4">Red Flag Summary</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Red Flag Summary</h2>
 
             {isLoadingPulse || isLoadingRedFlagTrend ? (
-              <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-6 h-40 animate-pulse" />
+              <div className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-6 h-40 animate-pulse" />
             ) : (
-              <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5">
+              <div className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-5">
                 {/* Badge pills */}
                 <div className="flex flex-wrap gap-3 mb-5">
                   <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-500/10 text-red-400 text-sm font-medium">
@@ -310,7 +310,7 @@ export default function PulsePage() {
                           <div className={`w-2 h-2 rounded-full ${cat.severity === 'critical' ? 'bg-red-400' : 'bg-orange-400'}`} />
                           <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">{cat.category}</span>
                         </div>
-                        <p className="text-sm font-semibold text-white">{cat.label}</p>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white">{cat.label}</p>
                         <p className="text-xs text-gray-500 mt-1">{cat.stock_count} stock{cat.stock_count !== 1 ? 's' : ''} affected</p>
                       </div>
                     ))}
@@ -320,7 +320,7 @@ export default function PulsePage() {
                       const allCats = ['Financial Risk', 'Governance', 'Momentum']
                       const missing = allCats.filter(c => !existingCats.has(c))
                       return (
-                        <div key={`empty-${i}`} className="rounded-xl p-4 border border-white/5 bg-white/[0.02]">
+                        <div key={`empty-${i}`} className="rounded-xl p-4 border border-gray-200 dark:border-white/5 bg-gray-50 dark:bg-white/[0.02]">
                           <div className="flex items-center gap-2 mb-2">
                             <div className="w-2 h-2 rounded-full bg-green-400" />
                             <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">{missing[i] || 'Other'}</span>
@@ -334,7 +334,7 @@ export default function PulsePage() {
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
                     {['Financial Risk', 'Governance', 'Momentum'].map((cat) => (
-                      <div key={cat} className="rounded-xl p-4 border border-white/5 bg-white/[0.02]">
+                      <div key={cat} className="rounded-xl p-4 border border-gray-200 dark:border-white/5 bg-gray-50 dark:bg-white/[0.02]">
                         <div className="flex items-center gap-2 mb-2">
                           <div className="w-2 h-2 rounded-full bg-green-400" />
                           <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">{cat}</span>
@@ -353,7 +353,7 @@ export default function PulsePage() {
                       <span className="flex-shrink-0 px-2 py-0.5 text-[10px] font-bold uppercase bg-red-500 text-white rounded">New</span>
                     )}
                     <div className="flex-1 min-w-0">
-                      <span className="text-sm font-medium text-white">{redFlagCategories.latest_alert.ticker}</span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">{redFlagCategories.latest_alert.ticker}</span>
                       <span className="text-sm text-gray-400"> — {redFlagCategories.latest_alert.label}</span>
                     </div>
                     <Link href={`/stocks/${redFlagCategories.latest_alert.ticker}`} className="text-xs text-vettr-accent hover:underline flex-shrink-0">View</Link>
@@ -367,13 +367,13 @@ export default function PulsePage() {
           <section>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
               {/* Smart Filings (SEDAR+) */}
-              <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5">
+              <div className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-5">
                 <div className="flex items-center justify-between mb-4">
                   <p className="text-xs text-gray-500 uppercase tracking-wider font-medium">Smart Filings (SEDAR+)</p>
                   <Link href="/stocks" className="text-xs text-vettr-accent hover:underline">View All</Link>
                 </div>
                 {isLoadingFilings ? (
-                  <div className="space-y-3">{[1, 2, 3, 4].map(i => <div key={i} className="h-14 bg-white/5 rounded-lg animate-pulse" />)}</div>
+                  <div className="space-y-3">{[1, 2, 3, 4].map(i => <div key={i} className="h-14 bg-gray-100 dark:bg-white/5 rounded-lg animate-pulse" />)}</div>
                 ) : filings.length === 0 ? (
                   <p className="text-sm text-gray-500 text-center py-6">No recent filings</p>
                 ) : (
@@ -381,12 +381,12 @@ export default function PulsePage() {
                     {filings.map((filing) => {
                       const badge = getFilingBadge(filing.type)
                       return (
-                        <Link key={filing.id} href={`/filings/${filing.id}`} className="block p-3 rounded-lg hover:bg-white/[0.03] transition-colors">
+                        <Link key={filing.id} href={`/filings/${filing.id}`} className="block p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-colors">
                           <div className="flex items-start gap-2 mb-1">
                             <span className={`flex-shrink-0 px-1.5 py-0.5 text-[10px] font-medium rounded ${badge.bg} ${badge.color}`}>{badge.label}</span>
                             {!filing.is_read && <div className="w-1.5 h-1.5 rounded-full bg-blue-400 flex-shrink-0 mt-1" />}
                           </div>
-                          <p className="text-sm text-white truncate">{filing.title}</p>
+                          <p className="text-sm text-gray-900 dark:text-white truncate">{filing.title}</p>
                           <div className="flex items-center gap-2 mt-1">
                             <span className="text-xs font-medium text-vettr-accent">{filing.ticker}</span>
                             <span className="text-[10px] text-gray-500">{new Date(filing.date_filed).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
@@ -399,22 +399,22 @@ export default function PulsePage() {
               </div>
 
               {/* Watchlist Movers */}
-              <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5">
+              <div className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-5">
                 <div className="flex items-center justify-between mb-4">
                   <p className="text-xs text-gray-500 uppercase tracking-wider font-medium">Watchlist Movers</p>
                   <Link href="/stocks?sort=change&order=desc" className="text-xs text-vettr-accent hover:underline">View All</Link>
                 </div>
                 {isLoadingStocks ? (
-                  <div className="space-y-3">{[1, 2, 3, 4].map(i => <div key={i} className="h-14 bg-white/5 rounded-lg animate-pulse" />)}</div>
+                  <div className="space-y-3">{[1, 2, 3, 4].map(i => <div key={i} className="h-14 bg-gray-100 dark:bg-white/5 rounded-lg animate-pulse" />)}</div>
                 ) : topMovers.length === 0 ? (
                   <p className="text-sm text-gray-500 text-center py-6">No movers data</p>
                 ) : (
                   <div className="space-y-2">
                     {topMovers.map((stock) => (
-                      <Link key={stock.ticker} href={`/stocks/${stock.ticker}`} className="flex items-center justify-between p-3 rounded-lg hover:bg-white/[0.03] transition-colors group">
+                      <Link key={stock.ticker} href={`/stocks/${stock.ticker}`} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-colors group">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <span className="text-sm font-bold text-white group-hover:text-vettr-accent transition-colors">{stock.ticker}</span>
+                            <span className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-vettr-accent transition-colors">{stock.ticker}</span>
                             <VetrScoreBadge score={stock.vetr_score || 0} size="sm" />
                           </div>
                           <p className="text-[11px] text-gray-500 truncate mt-0.5">{stock.company_name}</p>
@@ -430,22 +430,22 @@ export default function PulsePage() {
               </div>
 
               {/* Top VETTR Scores (vertical ranked list) */}
-              <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5">
+              <div className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-5">
                 <div className="flex items-center justify-between mb-4">
                   <p className="text-xs text-gray-500 uppercase tracking-wider font-medium">Top VETTR Scores</p>
                   <Link href="/stocks?sort=vetr_score&order=desc" className="text-xs text-vettr-accent hover:underline">View All</Link>
                 </div>
                 {isLoadingStocks ? (
-                  <div className="space-y-3">{[1, 2, 3, 4].map(i => <div key={i} className="h-14 bg-white/5 rounded-lg animate-pulse" />)}</div>
+                  <div className="space-y-3">{[1, 2, 3, 4].map(i => <div key={i} className="h-14 bg-gray-100 dark:bg-white/5 rounded-lg animate-pulse" />)}</div>
                 ) : topScores.length === 0 ? (
                   <p className="text-sm text-gray-500 text-center py-6">No scores available</p>
                 ) : (
                   <div className="space-y-2">
                     {topScores.map((stock, idx) => (
-                      <Link key={stock.ticker} href={`/stocks/${stock.ticker}`} className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/[0.03] transition-colors group">
+                      <Link key={stock.ticker} href={`/stocks/${stock.ticker}`} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-colors group">
                         <span className="text-lg font-bold text-gray-600 w-6 text-center">{idx + 1}</span>
                         <div className="flex-1 min-w-0">
-                          <span className="text-sm font-bold text-white group-hover:text-vettr-accent transition-colors">{stock.ticker}</span>
+                          <span className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-vettr-accent transition-colors">{stock.ticker}</span>
                           <p className="text-[11px] text-gray-500 truncate">{stock.company_name}</p>
                         </div>
                         <div className="text-right">

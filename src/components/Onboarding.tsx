@@ -158,7 +158,7 @@ export default function Onboarding({ isOpen, onClose }: OnboardingProps) {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-vettr-navy/95 backdrop-blur-lg">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/95 dark:bg-vettr-navy/95 backdrop-blur-lg">
           {/* Centered Content Card */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -183,12 +183,12 @@ export default function Onboarding({ isOpen, onClose }: OnboardingProps) {
                 </div>
 
                 {/* Title */}
-                <h2 className="text-2xl font-bold text-white mb-4">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
                   {slides[currentSlide].title}
                 </h2>
 
                 {/* Description */}
-                <p className="text-gray-400 text-base max-w-md mx-auto leading-relaxed">
+                <p className="text-gray-500 dark:text-gray-400 text-base max-w-md mx-auto leading-relaxed">
                   {slides[currentSlide].description}
                 </p>
               </motion.div>
@@ -207,7 +207,7 @@ export default function Onboarding({ isOpen, onClose }: OnboardingProps) {
                       ? 'w-8 bg-vettr-accent'
                       : index < currentSlide
                       ? 'w-2 bg-vettr-accent/50'
-                      : 'w-2 bg-white/20 hover:bg-white/30'}
+                      : 'w-2 bg-gray-300 dark:bg-white/20 hover:bg-gray-400 dark:hover:bg-white/30'}
                   `}
                   aria-label={`Go to slide ${index + 1}`}
                 />
@@ -221,7 +221,7 @@ export default function Onboarding({ isOpen, onClose }: OnboardingProps) {
                 <button
                   type="button"
                   onClick={handleClose}
-                  className="text-gray-500 hover:text-gray-300 transition-colors duration-200 font-medium px-4 py-2"
+                  className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-200 font-medium px-4 py-2"
                 >
                   Skip
                 </button>
@@ -229,7 +229,7 @@ export default function Onboarding({ isOpen, onClose }: OnboardingProps) {
                 <button
                   type="button"
                   onClick={handlePrevious}
-                  className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors duration-200 font-medium px-4 py-2"
+                  className="flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors duration-200 font-medium px-4 py-2"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19l-7-7 7-7" />

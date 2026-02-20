@@ -144,7 +144,7 @@ export default function Modal({
         >
           {/* Backdrop */}
           <motion.div
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -160,8 +160,8 @@ export default function Modal({
             aria-label={!title ? 'Modal dialog' : undefined}
             tabIndex={-1}
             className={`
-              relative w-full ${sizeClasses[size]} bg-vettr-card
-              border border-white/10 rounded-2xl shadow-2xl
+              relative w-full ${sizeClasses[size]} bg-white dark:bg-vettr-card
+              border border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl
               ${className}
             `}
             initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 10 }}
@@ -173,17 +173,17 @@ export default function Modal({
             {(title || showCloseButton) && (
               <div className="flex items-center justify-between px-4 sm:px-6 pt-4 sm:pt-6 pb-0">
                 {title && (
-                  <h2 id={titleId.current} className="text-base sm:text-lg font-semibold text-white">{title}</h2>
+                  <h2 id={titleId.current} className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">{title}</h2>
                 )}
                 {showCloseButton && (
                   <button
                     type="button"
                     onClick={onClose}
                     className="
-                      ml-auto text-gray-400 hover:text-white
+                      ml-auto text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white
                       transition-colors
                       focus:outline-none focus-visible:ring-2 focus-visible:ring-vettr-accent/30
-                      rounded-lg hover:bg-white/5 p-1
+                      rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 p-1
                     "
                     aria-label="Close modal"
                   >

@@ -40,13 +40,9 @@ export default function SettingsPage() {
       setAlertFinancing(settings.alert_preferences.financing);
       setAlertDrillResult(settings.alert_preferences.drill_result);
       setAlertManagementChange(settings.alert_preferences.management_change);
-      // Theme is managed by ThemeContext, sync if needed
-      if (settings.theme && settings.theme !== theme) {
-        setThemeContext(settings.theme);
-      }
       setDefaultSortOrder(settings.default_sort_order);
     }
-  }, [settings, theme, setThemeContext]);
+  }, [settings]);
 
   // Handle theme change
   const handleThemeChange = (newTheme: Theme) => {
@@ -91,7 +87,7 @@ export default function SettingsPage() {
           <p className="text-red-400 mb-4">Failed to load settings</p>
           <button
             onClick={() => router.push('/profile')}
-            className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors text-white"
+            className="px-4 py-2 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 rounded-xl transition-colors text-gray-900 dark:text-white"
           >
             Back to Profile
           </button>
@@ -120,14 +116,14 @@ export default function SettingsPage() {
             <ChevronLeftIcon className="w-4 h-4" />
             Back to Profile
           </button>
-          <h1 className="text-3xl font-bold text-white">Settings</h1>
-          <p className="text-gray-400 mt-1">Manage your notification preferences and appearance</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Settings</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Manage your notification preferences and appearance</p>
         </div>
 
         {/* Notification Settings Section */}
-        <div className="bg-vettr-card/30 border border-white/5 rounded-2xl overflow-hidden mb-4">
-          <div className="px-6 py-4 border-b border-white/5">
-            <h2 className="text-lg font-semibold text-white">Notification Settings</h2>
+        <div className="bg-white dark:bg-vettr-card/30 border border-gray-200 dark:border-white/5 rounded-2xl overflow-hidden mb-4">
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-white/5">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Notification Settings</h2>
           </div>
 
           {/* Enable Notifications Toggle */}
@@ -135,7 +131,7 @@ export default function SettingsPage() {
             <div className="flex items-center gap-3">
               <BellIcon className="w-5 h-5 text-gray-400" />
               <div>
-                <p className="text-sm font-medium text-white">Enable Notifications</p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">Enable Notifications</p>
                 <p className="text-xs text-gray-500">Receive alerts and updates</p>
               </div>
             </div>
@@ -158,18 +154,18 @@ export default function SettingsPage() {
         </div>
 
         {/* Alert Preferences Section */}
-        <div className="bg-vettr-card/30 border border-white/5 rounded-2xl overflow-hidden mb-4">
-          <div className="px-6 py-4 border-b border-white/5">
-            <h2 className="text-lg font-semibold text-white">Alert Preferences</h2>
+        <div className="bg-white dark:bg-vettr-card/30 border border-gray-200 dark:border-white/5 rounded-2xl overflow-hidden mb-4">
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-white/5">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Alert Preferences</h2>
             <p className="text-xs text-gray-500 mt-1">Choose which types of alerts you want to receive</p>
           </div>
 
           {/* Red Flag Alerts */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-white/5">
             <div className="flex items-center gap-3">
               <FlagIcon className="w-5 h-5 text-red-400" />
               <div>
-                <p className="text-sm font-medium text-white">Red Flag Alerts</p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">Red Flag Alerts</p>
                 <p className="text-xs text-gray-500">Get notified of new risk indicators</p>
               </div>
             </div>
@@ -191,11 +187,11 @@ export default function SettingsPage() {
           </div>
 
           {/* Financing Alerts */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-white/5">
             <div className="flex items-center gap-3">
               <DollarCircleIcon className="w-5 h-5 text-yellow-400" />
               <div>
-                <p className="text-sm font-medium text-white">Financing Alerts</p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">Financing Alerts</p>
                 <p className="text-xs text-gray-500">Updates on financing activities</p>
               </div>
             </div>
@@ -217,11 +213,11 @@ export default function SettingsPage() {
           </div>
 
           {/* Drill Result Alerts */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-white/5">
             <div className="flex items-center gap-3">
               <PickaxeIcon className="w-5 h-5 text-blue-400" />
               <div>
-                <p className="text-sm font-medium text-white">Drill Result Alerts</p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">Drill Result Alerts</p>
                 <p className="text-xs text-gray-500">New drilling results and updates</p>
               </div>
             </div>
@@ -247,7 +243,7 @@ export default function SettingsPage() {
             <div className="flex items-center gap-3">
               <UsersIcon className="w-5 h-5 text-purple-400" />
               <div>
-                <p className="text-sm font-medium text-white">Management Change Alerts</p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">Management Change Alerts</p>
                 <p className="text-xs text-gray-500">Executive team changes</p>
               </div>
             </div>
@@ -270,26 +266,31 @@ export default function SettingsPage() {
         </div>
 
         {/* Appearance Section */}
-        <div className="bg-vettr-card/30 border border-white/5 rounded-2xl overflow-hidden mb-4">
-          <div className="px-6 py-4 border-b border-white/5">
-            <h2 className="text-lg font-semibold text-white">Appearance</h2>
+        <div className="bg-white dark:bg-vettr-card/30 border border-gray-200 dark:border-white/5 rounded-2xl overflow-hidden mb-4">
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-white/5">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Appearance</h2>
           </div>
 
           {/* Theme Selection */}
           <div className="px-6 py-4">
-            <label className="block text-white font-medium mb-3 text-sm">Theme</label>
+            <label className="block text-gray-900 dark:text-white font-medium mb-3 text-sm">Theme</label>
             <div className="grid grid-cols-3 gap-3">
               {/* Dark Theme */}
               <button
                 onClick={() => handleThemeChange('dark')}
                 className={`px-4 py-3 rounded-xl border transition-all ${
                   theme === 'dark'
-                    ? 'bg-vettr-accent/10 border-vettr-accent text-white'
-                    : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10 hover:border-white/20'
+                    ? 'bg-vettr-accent/10 border-vettr-accent text-gray-900 dark:text-white'
+                    : 'bg-gray-100 dark:bg-white/5 border-gray-200 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/10 hover:border-gray-300 dark:hover:border-white/20'
                 }`}
               >
                 <div className="flex flex-col items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-gray-900 border border-white/20"></div>
+                  <div className="w-10 h-7 rounded-md bg-gray-900 border border-gray-700 flex items-center justify-center overflow-hidden">
+                    <div className="w-full h-full p-1 flex flex-col gap-0.5">
+                      <div className="w-full h-0.5 rounded-full bg-gray-600"></div>
+                      <div className="w-2/3 h-0.5 rounded-full bg-gray-700"></div>
+                    </div>
+                  </div>
                   <span className="text-xs font-medium">Dark</span>
                   {theme === 'dark' && (
                     <CheckCircleIcon className="w-4 h-4 text-vettr-accent" />
@@ -302,12 +303,17 @@ export default function SettingsPage() {
                 onClick={() => handleThemeChange('light')}
                 className={`px-4 py-3 rounded-xl border transition-all ${
                   theme === 'light'
-                    ? 'bg-vettr-accent/10 border-vettr-accent text-white'
-                    : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10 hover:border-white/20'
+                    ? 'bg-vettr-accent/10 border-vettr-accent text-gray-900 dark:text-white'
+                    : 'bg-gray-100 dark:bg-white/5 border-gray-200 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/10 hover:border-gray-300 dark:hover:border-white/20'
                 }`}
               >
                 <div className="flex flex-col items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-white border border-gray-300"></div>
+                  <div className="w-10 h-7 rounded-md bg-white border border-gray-300 flex items-center justify-center overflow-hidden">
+                    <div className="w-full h-full p-1 flex flex-col gap-0.5">
+                      <div className="w-full h-0.5 rounded-full bg-gray-300"></div>
+                      <div className="w-2/3 h-0.5 rounded-full bg-gray-200"></div>
+                    </div>
+                  </div>
                   <span className="text-xs font-medium">Light</span>
                   {theme === 'light' && (
                     <CheckCircleIcon className="w-4 h-4 text-vettr-accent" />
@@ -320,12 +326,21 @@ export default function SettingsPage() {
                 onClick={() => handleThemeChange('system')}
                 className={`px-4 py-3 rounded-xl border transition-all ${
                   theme === 'system'
-                    ? 'bg-vettr-accent/10 border-vettr-accent text-white'
-                    : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10 hover:border-white/20'
+                    ? 'bg-vettr-accent/10 border-vettr-accent text-gray-900 dark:text-white'
+                    : 'bg-gray-100 dark:bg-white/5 border-gray-200 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/10 hover:border-gray-300 dark:hover:border-white/20'
                 }`}
               >
                 <div className="flex flex-col items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-gray-900 to-white border border-white/20"></div>
+                  <div className="w-10 h-7 rounded-md overflow-hidden flex border border-gray-300 dark:border-gray-700">
+                    <div className="w-1/2 bg-white flex flex-col gap-0.5 p-1">
+                      <div className="w-full h-0.5 rounded-full bg-gray-300"></div>
+                      <div className="w-2/3 h-0.5 rounded-full bg-gray-200"></div>
+                    </div>
+                    <div className="w-1/2 bg-gray-900 flex flex-col gap-0.5 p-1">
+                      <div className="w-full h-0.5 rounded-full bg-gray-600"></div>
+                      <div className="w-2/3 h-0.5 rounded-full bg-gray-700"></div>
+                    </div>
+                  </div>
                   <span className="text-xs font-medium">System</span>
                   {theme === 'system' && (
                     <CheckCircleIcon className="w-4 h-4 text-vettr-accent" />
@@ -338,14 +353,14 @@ export default function SettingsPage() {
         </div>
 
         {/* Default Settings Section */}
-        <div className="bg-vettr-card/30 border border-white/5 rounded-2xl overflow-hidden mb-6">
-          <div className="px-6 py-4 border-b border-white/5">
-            <h2 className="text-lg font-semibold text-white">Default Settings</h2>
+        <div className="bg-white dark:bg-vettr-card/30 border border-gray-200 dark:border-white/5 rounded-2xl overflow-hidden mb-6">
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-white/5">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Default Settings</h2>
           </div>
 
           {/* Default Sort Order */}
           <div className="px-6 py-4">
-            <label className="block text-white font-medium mb-2 text-sm">Default Sort Order</label>
+            <label className="block text-gray-900 dark:text-white font-medium mb-2 text-sm">Default Sort Order</label>
             <SelectDropdown
               value={defaultSortOrder}
               onChange={(value) => setDefaultSortOrder(value)}
@@ -365,7 +380,7 @@ export default function SettingsPage() {
         <div className="flex justify-end gap-3">
           <button
             onClick={() => router.push('/profile')}
-            className="px-6 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors text-white font-medium"
+            className="px-6 py-2.5 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 rounded-xl transition-colors text-gray-900 dark:text-white font-medium"
             disabled={isUpdating}
           >
             Cancel

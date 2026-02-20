@@ -260,14 +260,14 @@ function AlertsPageContent() {
     return (
       <div className="p-4 md:p-6 pb-20 md:pb-6">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-white">Alerts</h1>
-          <div className="h-10 w-32 bg-white/5 rounded-xl animate-pulse"></div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Alerts</h1>
+          <div className="h-10 w-32 bg-gray-100 dark:bg-white/5 rounded-xl animate-pulse"></div>
         </div>
 
         <div className="space-y-6">
           {/* Recent Triggers skeleton */}
           <div>
-            <h2 className="text-lg font-semibold text-white mb-4">Recent Triggers</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Recent Triggers</h2>
             <div className="space-y-3">
               {[1, 2, 3].map((i) => (
                 <SkeletonAlertTrigger key={i} />
@@ -278,18 +278,18 @@ function AlertsPageContent() {
           {/* My Alert Rules skeleton */}
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-white">My Alert Rules</h2>
-              <div className="h-8 w-48 bg-white/5 rounded-xl animate-pulse"></div>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">My Alert Rules</h2>
+              <div className="h-8 w-48 bg-gray-100 dark:bg-white/5 rounded-xl animate-pulse"></div>
             </div>
 
             {/* Search bar skeleton */}
-            <div className="h-10 bg-white/5 rounded-xl animate-pulse mb-4"></div>
+            <div className="h-10 bg-gray-100 dark:bg-white/5 rounded-xl animate-pulse mb-4"></div>
 
             {/* Desktop Table Skeleton */}
-            <div className="hidden md:block bg-vettr-card/50 border border-white/5 rounded-2xl overflow-hidden">
+            <div className="hidden md:block bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl overflow-hidden">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-white/5">
+                  <tr className="border-b border-gray-200 dark:border-white/5">
                     <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Stock</th>
                     <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Type</th>
                     <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Condition</th>
@@ -309,14 +309,14 @@ function AlertsPageContent() {
             {/* Mobile Card Skeleton */}
             <div className="md:hidden space-y-3">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-vettr-card/50 border border-white/5 rounded-2xl p-4">
+                <div key={i} className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-4">
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <div className="h-4 w-16 bg-white/5 rounded animate-pulse" />
-                      <div className="h-6 w-12 bg-white/5 rounded-full animate-pulse" />
+                      <div className="h-4 w-16 bg-gray-100 dark:bg-white/5 rounded animate-pulse" />
+                      <div className="h-6 w-12 bg-gray-100 dark:bg-white/5 rounded-full animate-pulse" />
                     </div>
-                    <div className="h-3 w-3/4 bg-white/5 rounded animate-pulse" />
-                    <div className="h-3 w-1/2 bg-white/5 rounded animate-pulse" />
+                    <div className="h-3 w-3/4 bg-gray-100 dark:bg-white/5 rounded animate-pulse" />
+                    <div className="h-3 w-1/2 bg-gray-100 dark:bg-white/5 rounded animate-pulse" />
                   </div>
                 </div>
               ))}
@@ -397,9 +397,9 @@ function AlertsPageContent() {
               return (
                 <div
                   key={trigger.id}
-                  className={`relative bg-vettr-card/50 border rounded-xl p-4 transition-colors cursor-pointer ${
+                  className={`relative bg-white/80 dark:bg-vettr-card/50 border rounded-xl p-4 transition-colors cursor-pointer ${
                     trigger.is_read
-                      ? 'border-white/5 hover:bg-vettr-card/80'
+                      ? 'border-gray-200 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-vettr-card/80'
                       : 'border-vettr-accent/20 bg-vettr-accent/5 hover:bg-vettr-accent/10'
                   }`}
                   onClick={() => handleTriggerClick(trigger.id, trigger.is_read)}
@@ -449,7 +449,7 @@ function AlertsPageContent() {
                           <span className="text-gray-400">&bull;</span>
                           <span className="text-sm text-gray-400">{trigger.alert_type}</span>
                         </div>
-                        <p className="text-sm text-gray-300">{trigger.title || trigger.message}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-300">{trigger.title || trigger.message}</p>
                         {trigger.title && trigger.message && trigger.title !== trigger.message && (
                           <p className="text-xs text-gray-500 mt-1">{trigger.message}</p>
                         )}
@@ -468,7 +468,7 @@ function AlertsPageContent() {
                             e.stopPropagation();
                             handleShareTrigger(trigger);
                           }}
-                          className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+                          className="p-1.5 rounded-lg text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
                           aria-label="Share alert"
                           title="Share alert"
                         >
@@ -486,7 +486,7 @@ function AlertsPageContent() {
 
       {/* My Alert Rules Section */}
       <section>
-        <h2 className="text-lg font-semibold text-white mb-4">My Alert Rules</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">My Alert Rules</h2>
 
         {/* Filter Tabs */}
         <div className="flex gap-2 mb-4">
@@ -496,7 +496,7 @@ function AlertsPageContent() {
               onClick={() => setFilter(filterType)}
               className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${filter === filterType
                 ? 'bg-vettr-accent/10 border-vettr-accent/30 text-vettr-accent border'
-                : 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:bg-white/10 border'
+                : 'bg-gray-100 dark:bg-white/5 border-gray-200 dark:border-white/10 text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-white/10 border'
                 }`}
             >
               {filterType}
@@ -535,7 +535,7 @@ function AlertsPageContent() {
               return (
                 <div
                   key={rule.id}
-                  className="bg-vettr-card/50 border border-white/5 rounded-xl p-4"
+                  className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-xl p-4"
                 >
                   <div className="flex items-start gap-3">
                     <Icon className={`w-5 h-5 flex-shrink-0 ${color}`} />
@@ -581,7 +581,7 @@ function AlertsPageContent() {
                       {/* Edit Button */}
                       <button
                         onClick={() => handleEdit(rule)}
-                        className="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+                        className="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors"
                         title="Edit alert rule"
                       >
                         <EditIcon className="w-5 h-5" />
@@ -590,7 +590,7 @@ function AlertsPageContent() {
                       {/* Delete Button */}
                       <button
                         onClick={() => setDeleteConfirmId(rule.id)}
-                        className="p-2 text-gray-400 hover:text-red-400 hover:bg-white/5 rounded-lg transition-colors"
+                        className="p-2 text-gray-400 hover:text-red-400 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors"
                         title="Delete alert rule"
                       >
                         <TrashIcon className="w-5 h-5" />
@@ -622,13 +622,13 @@ function AlertsPageContent() {
           size="sm"
         >
           <div className="py-4">
-            <p className="text-gray-300 mb-6">
+            <p className="text-gray-600 dark:text-gray-300 mb-6">
               Are you sure you want to delete this alert rule? This action cannot be undone.
             </p>
             <div className="flex gap-3 justify-end">
               <button
                 onClick={() => setDeleteConfirmId(null)}
-                className="px-4 py-2.5 bg-white/5 border border-white/10 text-white rounded-xl font-medium hover:bg-white/10 transition-colors"
+                className="px-4 py-2.5 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl font-medium hover:bg-gray-200 dark:hover:bg-white/10 transition-colors"
               >
                 Cancel
               </button>
@@ -672,15 +672,15 @@ export default function AlertsPage() {
     <Suspense fallback={
       <div className="p-4 md:p-6 pb-20 md:pb-6">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-white">Alerts</h1>
-          <div className="h-10 w-32 bg-white/5 rounded-xl animate-pulse"></div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Alerts</h1>
+          <div className="h-10 w-32 bg-gray-100 dark:bg-white/5 rounded-xl animate-pulse"></div>
         </div>
         <div className="space-y-6">
           <div>
-            <h2 className="text-lg font-semibold text-white mb-4">Recent Triggers</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Recent Triggers</h2>
             <div className="space-y-3">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-white/5 rounded-xl h-20 animate-pulse" />
+                <div key={i} className="bg-gray-100 dark:bg-white/5 rounded-xl h-20 animate-pulse" />
               ))}
             </div>
           </div>

@@ -16,8 +16,8 @@ interface VetrScoreComparisonProps {
 export default function VetrScoreComparison({ comparison, isLoading, currentTicker }: VetrScoreComparisonProps) {
   if (isLoading) {
     return (
-      <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-6">
-        <h2 className="text-xl font-bold text-white mb-4">Sector Comparison</h2>
+      <div className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-6">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Sector Comparison</h2>
         <div className="h-64 flex items-center justify-center">
           <LoadingSpinner size="lg" color="white" />
         </div>
@@ -27,8 +27,8 @@ export default function VetrScoreComparison({ comparison, isLoading, currentTick
 
   if (!comparison || !comparison.peers || comparison.peers.length === 0) {
     return (
-      <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-6">
-        <h2 className="text-xl font-bold text-white mb-4">Sector Comparison</h2>
+      <div className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-6">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Sector Comparison</h2>
         <EmptyState
           icon={<BarChartIcon className="w-16 h-16 text-gray-600" />}
           title="No comparison data available"
@@ -59,9 +59,9 @@ export default function VetrScoreComparison({ comparison, isLoading, currentTick
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="bg-vettr-card border border-white/10 rounded-xl p-3 shadow-xl">
-          <p className="text-white font-semibold mb-1">{data.company_name}</p>
-          <p className="text-gray-400 text-sm mb-1">{data.ticker}</p>
+        <div className="bg-white dark:bg-vettr-card border border-gray-200 dark:border-white/10 rounded-xl p-3 shadow-xl">
+          <p className="text-gray-900 dark:text-white font-semibold mb-1">{data.company_name}</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mb-1">{data.ticker}</p>
           <p className="text-vettr-accent font-bold">Score: {(data.score ?? 0).toFixed(1)}</p>
           {data.isCurrent && (
             <p className="text-xs text-vettr-accent mt-1">Current Stock</p>
@@ -73,19 +73,19 @@ export default function VetrScoreComparison({ comparison, isLoading, currentTick
   };
 
   return (
-    <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-6">
+    <div className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-6">
       <div className="mb-6">
-        <h2 className="text-xl font-bold text-white mb-2">Sector Comparison</h2>
-        <p className="text-gray-400 text-sm">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Sector Comparison</h2>
+        <p className="text-gray-500 dark:text-gray-400 text-sm">
           How {comparison.ticker} compares to peers in the {comparison.sector} sector
         </p>
       </div>
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="bg-white/[0.03] rounded-xl p-4">
+        <div className="bg-gray-50 dark:bg-white/[0.03] rounded-xl p-4">
           <p className="text-gray-500 text-sm mb-1">Percentile Rank</p>
-          <p className="text-white text-2xl font-bold">
+          <p className="text-gray-900 dark:text-white text-2xl font-bold">
             {(comparison.percentile_rank ?? 0).toFixed(0)}
             <span className="text-base text-gray-400">th</span>
           </p>
@@ -100,9 +100,9 @@ export default function VetrScoreComparison({ comparison, isLoading, currentTick
           </p>
         </div>
 
-        <div className="bg-white/[0.03] rounded-xl p-4">
+        <div className="bg-gray-50 dark:bg-white/[0.03] rounded-xl p-4">
           <p className="text-gray-500 text-sm mb-1">Sector Average</p>
-          <p className="text-white text-2xl font-bold">{(comparison.sector_average ?? 0).toFixed(1)}</p>
+          <p className="text-gray-900 dark:text-white text-2xl font-bold">{(comparison.sector_average ?? 0).toFixed(1)}</p>
           <p className={`text-xs mt-1 ${
             (comparison.score ?? 0) > (comparison.sector_average ?? 0)
               ? 'text-vettr-accent'
@@ -118,9 +118,9 @@ export default function VetrScoreComparison({ comparison, isLoading, currentTick
           </p>
         </div>
 
-        <div className="bg-white/[0.03] rounded-xl p-4">
+        <div className="bg-gray-50 dark:bg-white/[0.03] rounded-xl p-4">
           <p className="text-gray-500 text-sm mb-1">Current Score</p>
-          <p className="text-white text-2xl font-bold">{(comparison.score ?? 0).toFixed(1)}</p>
+          <p className="text-gray-900 dark:text-white text-2xl font-bold">{(comparison.score ?? 0).toFixed(1)}</p>
           <p className="text-gray-400 text-xs mt-1">
             Ranked #{chartData.findIndex(d => d.ticker === comparison.ticker) + 1} of {chartData.length}
           </p>

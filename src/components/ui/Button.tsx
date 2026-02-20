@@ -26,7 +26,7 @@ export default function Button({
         primary: 'bg-accent text-primary hover:bg-accentDim shadow-[0_0_15px_rgba(0,230,118,0.3)] hover:shadow-[0_0_20px_rgba(0,230,118,0.5)]',
         secondary: 'bg-surface hover:bg-surfaceLight text-textPrimary border border-border',
         outline: 'bg-transparent border-2 border-accent text-accent hover:bg-accent/10',
-        ghost: 'bg-transparent text-textSecondary hover:text-textPrimary hover:bg-white/5',
+        ghost: 'bg-transparent text-textSecondary hover:text-textPrimary hover:bg-gray-100 dark:hover:bg-white/5',
     };
 
     const sizes = {

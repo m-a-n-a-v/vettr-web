@@ -149,12 +149,12 @@ export default function QuickSearch({ isOpen, onClose }: QuickSearchProps) {
       onClick={handleBackdropClick}
     >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm" />
 
       {/* Search Modal */}
-      <div className="relative w-full max-w-xl bg-vettr-card border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
+      <div className="relative w-full max-w-xl bg-white dark:bg-vettr-card border border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden">
         {/* Search Input */}
-        <div className="flex items-center border-b border-white/5 px-5 py-4">
+        <div className="flex items-center border-b border-gray-200 dark:border-white/5 px-5 py-4">
           {/* Search Icon */}
           <SearchIcon className="w-5 h-5 text-gray-500 mr-3 flex-shrink-0" />
 
@@ -166,7 +166,7 @@ export default function QuickSearch({ isOpen, onClose }: QuickSearchProps) {
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search stocks by ticker or name..."
             aria-label="Search stocks by ticker or name"
-            className="flex-1 bg-transparent border-none outline-none text-white placeholder-gray-500 text-lg focus:ring-0"
+            className="flex-1 bg-transparent border-none outline-none text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-lg focus:ring-0"
             autoComplete="off"
           />
 
@@ -193,7 +193,7 @@ export default function QuickSearch({ isOpen, onClose }: QuickSearchProps) {
                     onClick={() => handleSelectStock(stock)}
                     onMouseEnter={() => setSelectedIndex(index)}
                     className={`w-full flex items-center gap-3 px-5 py-3 transition-colors cursor-pointer ${
-                      index === selectedIndex ? 'bg-white/5' : 'hover:bg-white/5'
+                      index === selectedIndex ? 'bg-gray-100 dark:bg-white/5' : 'hover:bg-gray-100 dark:hover:bg-white/5'
                     }`}
                   >
                     {/* Ticker and company name */}
@@ -201,13 +201,13 @@ export default function QuickSearch({ isOpen, onClose }: QuickSearchProps) {
                       <div className="font-mono text-vettr-accent text-sm font-semibold">
                         {stock.ticker}
                       </div>
-                      <div className="text-white text-sm truncate">{stock.company_name}</div>
+                      <div className="text-gray-900 dark:text-white text-sm truncate">{stock.company_name}</div>
                     </div>
 
                     {/* Price */}
                     <div className="text-right flex-shrink-0">
                       {stock.current_price !== undefined && (
-                        <div className="text-white text-sm font-medium">
+                        <div className="text-gray-900 dark:text-white text-sm font-medium">
                           ${stock.current_price.toFixed(2)}
                         </div>
                       )}
@@ -221,31 +221,31 @@ export default function QuickSearch({ isOpen, onClose }: QuickSearchProps) {
           {/* Empty state */}
           {showEmptyState && (
             <div className="px-5 py-8 text-center">
-              <p className="text-gray-400 text-sm">No results found</p>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">No results found</p>
             </div>
           )}
 
           {/* No recent searches */}
           {!query.trim() && recentSearches.length === 0 && (
             <div className="px-5 py-8 text-center">
-              <p className="text-gray-400 text-sm">Start typing to search for stocks</p>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Start typing to search for stocks</p>
             </div>
           )}
         </div>
 
         {/* Footer with keyboard hints */}
-        <div className="px-5 py-3 border-t border-white/5 flex items-center justify-center gap-4 text-xs text-gray-600">
+        <div className="px-5 py-3 border-t border-gray-200 dark:border-white/5 flex items-center justify-center gap-4 text-xs text-gray-500 dark:text-gray-600">
           <span className="flex items-center gap-1">
-            <kbd className="px-1.5 py-0.5 bg-white/5 border border-white/10 rounded text-xs">↑</kbd>
-            <kbd className="px-1.5 py-0.5 bg-white/5 border border-white/10 rounded text-xs">↓</kbd>
+            <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded text-xs">↑</kbd>
+            <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded text-xs">↓</kbd>
             <span className="ml-1">Navigate</span>
           </span>
           <span className="flex items-center gap-1">
-            <kbd className="px-1.5 py-0.5 bg-white/5 border border-white/10 rounded text-xs">↵</kbd>
+            <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded text-xs">↵</kbd>
             <span className="ml-1">Open</span>
           </span>
           <span className="flex items-center gap-1">
-            <kbd className="px-1.5 py-0.5 bg-white/5 border border-white/10 rounded text-xs">Esc</kbd>
+            <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded text-xs">Esc</kbd>
             <span className="ml-1">Close</span>
           </span>
         </div>

@@ -42,7 +42,7 @@ export default function SectorChip({ sector, size = 'sm' }: SectorChipProps) {
     }
 
     // Default neutral color
-    return 'bg-white/5 text-gray-400';
+    return 'bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400';
   };
 
   const sizeClasses = size === 'sm'

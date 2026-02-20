@@ -48,7 +48,7 @@ const getTierBadgeColor = (tier: string): string => {
       return 'bg-yellow-500/10 text-yellow-400';
     case 'free':
     default:
-      return 'bg-white/10 text-gray-400';
+      return 'bg-gray-200 dark:bg-white/10 text-gray-500 dark:text-gray-400';
   }
 };
 

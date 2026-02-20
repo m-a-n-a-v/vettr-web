@@ -62,7 +62,7 @@ export default function ExecutiveDetail({ executive, onClose }: ExecutiveDetailP
       case 'Flight Risk':
         return 'bg-red-400/20 text-red-400 border-red-400';
       default:
-        return 'bg-white/5 text-gray-400 border-white/10';
+        return 'bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-white/10';
     }
   };
 
@@ -81,17 +81,17 @@ export default function ExecutiveDetail({ executive, onClose }: ExecutiveDetailP
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 dark:bg-black/60 backdrop-blur-sm">
       {/* Modal Container */}
-      <div className="bg-vettr-card border border-white/10 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-slideUp">
+      <div className="bg-white dark:bg-vettr-card border border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-slideUp">
         {/* Header */}
-        <div className="sticky top-0 bg-vettr-card border-b border-white/5 px-6 py-4 flex items-center justify-between z-10">
-          <h2 className="text-xl font-semibold text-white">Executive Profile</h2>
+        <div className="sticky top-0 bg-white dark:bg-vettr-card border-b border-gray-200 dark:border-white/5 px-6 py-4 flex items-center justify-between z-10">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Executive Profile</h2>
           <div className="flex gap-2">
             {/* Share Button */}
             <button
               onClick={handleShare}
-              className="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+              className="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors"
               aria-label="Share executive profile"
             >
               <ShareIcon className="w-5 h-5" />
@@ -99,7 +99,7 @@ export default function ExecutiveDetail({ executive, onClose }: ExecutiveDetailP
             {/* Close Button */}
             <button
               onClick={onClose}
-              className="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+              className="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors"
               aria-label="Close modal"
             >
               <XIcon className="w-5 h-5" />
@@ -120,18 +120,18 @@ export default function ExecutiveDetail({ executive, onClose }: ExecutiveDetailP
 
             {/* Basic Info */}
             <div className="flex-1">
-              <h3 className="text-xl font-semibold text-white mb-1">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-1">
                 {executive.name}
               </h3>
-              <p className="text-sm text-gray-400 mb-2">{executive.title}</p>
-              <p className="text-sm text-gray-400 mb-4">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">{executive.title}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
                 {executive.company} <span className="font-mono text-vettr-accent">({executive.ticker})</span>
               </p>
 
               {/* Specialization Badge */}
               {executive.specialization && (
                 <div className="mb-4">
-                  <span className="inline-block px-3 py-1 rounded-full bg-white/5 text-gray-400 text-xs font-medium">
+                  <span className="inline-block px-3 py-1 rounded-full bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400 text-xs font-medium">
                     {executive.specialization}
                   </span>
                 </div>
@@ -142,16 +142,16 @@ export default function ExecutiveDetail({ executive, onClose }: ExecutiveDetailP
           {/* Metrics Row */}
           <div className="grid grid-cols-2 gap-3">
             {/* Tenure Card */}
-            <div className="bg-white/[0.03] rounded-xl p-4">
+            <div className="bg-gray-50 dark:bg-white/[0.03] rounded-xl p-4">
               <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Tenure at Company</p>
-              <p className="text-lg font-bold text-white">
+              <p className="text-lg font-bold text-gray-900 dark:text-white">
                 {executive.years_at_company} {executive.years_at_company === 1 ? 'year' : 'years'}
               </p>
             </div>
             {/* Total Experience Card */}
-            <div className="bg-white/[0.03] rounded-xl p-4">
+            <div className="bg-gray-50 dark:bg-white/[0.03] rounded-xl p-4">
               <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Total Experience</p>
-              <p className="text-lg font-bold text-white">
+              <p className="text-lg font-bold text-gray-900 dark:text-white">
                 {executive.total_experience_years} {executive.total_experience_years === 1 ? 'year' : 'years'}
               </p>
             </div>
@@ -159,23 +159,23 @@ export default function ExecutiveDetail({ executive, onClose }: ExecutiveDetailP
 
           {/* Career Timeline */}
           {executive.career_timeline && executive.career_timeline.length > 0 && (
-            <div className="bg-vettr-card/30 rounded-2xl p-6 border border-white/5">
-              <h4 className="text-lg font-semibold text-white mb-4">Career Timeline</h4>
-              <div className="relative border-l-2 border-white/10 ml-2 space-y-6">
+            <div className="bg-gray-50 dark:bg-vettr-card/30 rounded-2xl p-6 border border-gray-200 dark:border-white/5">
+              <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Career Timeline</h4>
+              <div className="relative border-l-2 border-gray-200 dark:border-white/10 ml-2 space-y-6">
                 {executive.career_timeline.map((entry, index) => (
                   <div key={index} className="relative pl-6">
                     {/* Timeline dot */}
-                    <div className={`absolute -left-[9px] top-1 w-4 h-4 rounded-full ${index === 0 ? 'bg-vettr-accent' : 'bg-white/10 border-2 border-white/20'}`} />
+                    <div className={`absolute -left-[9px] top-1 w-4 h-4 rounded-full ${index === 0 ? 'bg-vettr-accent' : 'bg-gray-200 dark:bg-white/10 border-2 border-gray-300 dark:border-white/20'}`} />
 
                     {/* Entry details */}
                     <div>
                       <div className="flex items-baseline gap-2 mb-1">
-                        <h5 className="text-white font-medium">{entry.title}</h5>
+                        <h5 className="text-gray-900 dark:text-white font-medium">{entry.title}</h5>
                         {index === 0 && (
                           <span className="text-xs px-2 py-0.5 rounded-full bg-vettr-accent/10 text-vettr-accent">Current</span>
                         )}
                       </div>
-                      <p className="text-gray-400 text-sm mb-1">{entry.company}</p>
+                      <p className="text-gray-500 dark:text-gray-400 text-sm mb-1">{entry.company}</p>
                       <p className="text-gray-500 text-xs">
                         {entry.start_year} - {entry.end_year || 'Present'}
                         {' '}({entry.end_year ? entry.end_year - entry.start_year : new Date().getFullYear() - entry.start_year} {
@@ -191,15 +191,15 @@ export default function ExecutiveDetail({ executive, onClose }: ExecutiveDetailP
 
           {/* Education */}
           {executive.education && executive.education.length > 0 && (
-            <div className="bg-vettr-card/30 rounded-2xl p-6 border border-white/5">
-              <h4 className="text-lg font-semibold text-white mb-4">Education</h4>
+            <div className="bg-gray-50 dark:bg-vettr-card/30 rounded-2xl p-6 border border-gray-200 dark:border-white/5">
+              <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Education</h4>
               <ul className="space-y-2">
                 {executive.education.map((edu, index) => (
                   <li key={index} className="flex items-start gap-3">
                     <svg className="w-4 h-4 text-vettr-accent mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
-                    <span className="text-gray-300 text-sm">{edu}</span>
+                    <span className="text-gray-600 dark:text-gray-300 text-sm">{edu}</span>
                   </li>
                 ))}
               </ul>
@@ -208,15 +208,15 @@ export default function ExecutiveDetail({ executive, onClose }: ExecutiveDetailP
 
           {/* Social Links */}
           {executive.social_links && (executive.social_links.linkedin || executive.social_links.twitter) && (
-            <div className="bg-vettr-card/30 rounded-2xl p-6 border border-white/5">
-              <h4 className="text-lg font-semibold text-white mb-4">Social Links</h4>
+            <div className="bg-gray-50 dark:bg-vettr-card/30 rounded-2xl p-6 border border-gray-200 dark:border-white/5">
+              <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Social Links</h4>
               <div className="flex flex-wrap gap-3">
                 {executive.social_links.linkedin && (
                   <a
                     href={executive.social_links.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 bg-white/5 rounded-lg p-2 hover:bg-white/10 transition-colors"
+                    className="flex items-center gap-2 bg-gray-100 dark:bg-white/5 rounded-lg p-2 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors"
                     aria-label="LinkedIn profile"
                   >
                     <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
@@ -229,7 +229,7 @@ export default function ExecutiveDetail({ executive, onClose }: ExecutiveDetailP
                     href={executive.social_links.twitter}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 bg-white/5 rounded-lg p-2 hover:bg-white/10 transition-colors"
+                    className="flex items-center gap-2 bg-gray-100 dark:bg-white/5 rounded-lg p-2 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors"
                     aria-label="Twitter profile"
                   >
                     <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24">

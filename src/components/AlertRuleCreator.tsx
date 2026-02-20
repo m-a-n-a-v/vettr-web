@@ -236,21 +236,21 @@ export default function AlertRuleCreator({ isOpen, onClose, onSubmit, isCreating
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={handleClose} />
+      <div className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm" onClick={handleClose} />
 
       {/* Modal */}
-      <div className="relative bg-vettr-card border border-white/10 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto mx-4">
+      <div className="relative bg-white dark:bg-vettr-card border border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto mx-4">
         {/* Header */}
-        <div className="sticky top-0 bg-vettr-card border-b border-white/10 px-6 py-4 flex items-center justify-between z-10">
+        <div className="sticky top-0 bg-white dark:bg-vettr-card border-b border-gray-200 dark:border-white/10 px-6 py-4 flex items-center justify-between z-10">
           <div>
-            <h2 className="text-xl font-bold text-white">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
               {isEditMode ? 'Edit Alert Rule' : 'Create Alert Rule'}
             </h2>
-            <p className="text-sm text-gray-400 mt-1">Step {currentStep} of 5</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Step {currentStep} of 5</p>
           </div>
           <button
             onClick={handleClose}
-            className="text-gray-400 hover:text-white hover:bg-white/5 rounded-lg p-1 transition-colors"
+            className="text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg p-1 transition-colors"
             aria-label="Close modal"
           >
             <XIcon className="w-6 h-6" />
@@ -258,7 +258,7 @@ export default function AlertRuleCreator({ isOpen, onClose, onSubmit, isCreating
         </div>
 
         {/* Progress Indicator - Horizontal dots with connecting lines */}
-        <div className="px-6 py-4 border-b border-white/10">
+        <div className="px-6 py-4 border-b border-gray-200 dark:border-white/10">
           <div className="flex items-center justify-center">
             {[1, 2, 3, 4, 5].map((step, index) => (
               <div key={step} className="flex items-center">
@@ -266,7 +266,7 @@ export default function AlertRuleCreator({ isOpen, onClose, onSubmit, isCreating
                   className={`relative w-3 h-3 rounded-full transition-all ${
                     step <= currentStep
                       ? 'bg-vettr-accent'
-                      : 'bg-white/10'
+                      : 'bg-gray-200 dark:bg-white/10'
                   }`}
                 >
                   {step === currentStep && (
@@ -276,7 +276,7 @@ export default function AlertRuleCreator({ isOpen, onClose, onSubmit, isCreating
                 {index < 4 && (
                   <div
                     className={`w-16 h-0.5 mx-2 transition-all ${
-                      step < currentStep ? 'bg-vettr-accent' : 'bg-white/10'
+                      step < currentStep ? 'bg-vettr-accent' : 'bg-gray-200 dark:bg-white/10'
                     }`}
                   />
                 )}
@@ -297,8 +297,8 @@ export default function AlertRuleCreator({ isOpen, onClose, onSubmit, isCreating
           {/* Step 1: Stock Selector */}
           {currentStep === 1 && (
             <div className="animate-in fade-in duration-200">
-              <h3 className="text-lg font-bold text-white mb-2">Select Stock</h3>
-              <p className="text-sm text-gray-400 mb-4">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Select Stock</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
                 Choose which stock you want to create an alert for.
               </p>
 
@@ -316,7 +316,7 @@ export default function AlertRuleCreator({ isOpen, onClose, onSubmit, isCreating
               )}
 
               {!isSearching && searchQuery && stocks.length === 0 && (
-                <div className="py-8 text-center text-gray-400">
+                <div className="py-8 text-center text-gray-500 dark:text-gray-400">
                   No stocks found matching &quot;{searchQuery}&quot;
                 </div>
               )}
@@ -327,20 +327,20 @@ export default function AlertRuleCreator({ isOpen, onClose, onSubmit, isCreating
                     <button
                       key={stock.ticker}
                       onClick={() => handleStockSelect(stock)}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-left transition-all hover:bg-white/10 hover:border-vettr-accent/30"
+                      className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-4 text-left transition-all hover:bg-gray-100 dark:hover:bg-white/10 hover:border-vettr-accent/30"
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
                             <span className="font-bold text-vettr-accent font-mono">{stock.ticker}</span>
-                            <span className="text-sm text-gray-400 truncate">{stock.company_name}</span>
+                            <span className="text-sm text-gray-500 dark:text-gray-400 truncate">{stock.company_name}</span>
                           </div>
                           <div className="flex items-center gap-2 mt-1">
-                            <span className="text-xs text-gray-500">{stock.sector}</span>
+                            <span className="text-xs text-gray-400 dark:text-gray-500">{stock.sector}</span>
                           </div>
                         </div>
                         <div className="text-right ml-4">
-                          <div className="text-lg font-bold text-white">
+                          <div className="text-lg font-bold text-gray-900 dark:text-white">
                             ${stock.current_price?.toFixed(2)}
                           </div>
                         </div>
@@ -351,7 +351,7 @@ export default function AlertRuleCreator({ isOpen, onClose, onSubmit, isCreating
               )}
 
               {!searchQuery && (
-                <div className="py-8 text-center text-gray-400">
+                <div className="py-8 text-center text-gray-500 dark:text-gray-400">
                   Start typing to search for stocks...
                 </div>
               )}
@@ -361,8 +361,8 @@ export default function AlertRuleCreator({ isOpen, onClose, onSubmit, isCreating
           {/* Step 2: Alert Type Selection */}
           {currentStep === 2 && (
             <div className="animate-in fade-in duration-200">
-              <h3 className="text-lg font-bold text-white mb-2">Select Alert Type</h3>
-              <p className="text-sm text-gray-400 mb-4">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Select Alert Type</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
                 Choose what kind of events you want to be notified about for <span className="font-bold text-vettr-accent">{selectedStock?.ticker}</span>.
               </p>
 
@@ -373,17 +373,17 @@ export default function AlertRuleCreator({ isOpen, onClose, onSubmit, isCreating
                     <button
                       key={type.value}
                       onClick={() => handleAlertTypeSelect(type.value)}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-left transition-all hover:bg-vettr-accent/5 hover:border-vettr-accent group"
+                      className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-4 text-left transition-all hover:bg-vettr-accent/5 hover:border-vettr-accent group"
                     >
                       <div className="flex items-start gap-3">
                         <div className={`${type.iconColor} flex-shrink-0`}>
                           <Icon className="w-6 h-6" />
                         </div>
                         <div className="flex-1">
-                          <div className="font-bold text-white group-hover:text-vettr-accent transition-colors">
+                          <div className="font-bold text-gray-900 dark:text-white group-hover:text-vettr-accent transition-colors">
                             {type.label}
                           </div>
-                          <div className="text-sm text-gray-400 mt-1">
+                          <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                             {type.description}
                           </div>
                         </div>
@@ -399,14 +399,14 @@ export default function AlertRuleCreator({ isOpen, onClose, onSubmit, isCreating
           {/* Step 3: Condition Configuration */}
           {currentStep === 3 && (
             <div className="animate-in fade-in duration-200">
-              <h3 className="text-lg font-bold text-white mb-2">Configure Conditions</h3>
-              <p className="text-sm text-gray-400 mb-4">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Configure Conditions</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
                 Set specific conditions for your <span className="font-bold text-vettr-accent">{selectedAlertType}</span> alert.
               </p>
 
               {selectedAlertType === 'Red Flag' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
                     Minimum Severity Level
                   </label>
                   <SelectDropdown
@@ -428,7 +428,7 @@ export default function AlertRuleCreator({ isOpen, onClose, onSubmit, isCreating
 
               {selectedAlertType === 'Financing' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
                     Minimum Amount (CAD, optional)
                   </label>
                   <input
@@ -436,7 +436,7 @@ export default function AlertRuleCreator({ isOpen, onClose, onSubmit, isCreating
                     value={threshold}
                     onChange={(e) => setThreshold(e.target.value)}
                     placeholder="e.g., 1000000"
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-gray-500 focus:border-vettr-accent/40 focus:ring-1 focus:ring-vettr-accent/20 transition-all"
+                    className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-vettr-accent/40 focus:ring-1 focus:ring-vettr-accent/20 transition-all"
                   />
                   <p className="text-xs text-gray-500 mt-2">
                     Leave blank to be notified of all financing events, or set a minimum amount.
@@ -445,11 +445,11 @@ export default function AlertRuleCreator({ isOpen, onClose, onSubmit, isCreating
               )}
 
               {selectedAlertType === 'Executive Changes' && (
-                <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                  <p className="text-sm text-gray-300">
+                <div className="bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-4">
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
                     You&apos;ll be notified of all executive changes including:
                   </p>
-                  <ul className="list-disc list-inside text-sm text-gray-400 mt-2 space-y-1">
+                  <ul className="list-disc list-inside text-sm text-gray-500 dark:text-gray-400 mt-2 space-y-1">
                     <li>New appointments</li>
                     <li>Departures</li>
                     <li>Role changes</li>
@@ -461,8 +461,8 @@ export default function AlertRuleCreator({ isOpen, onClose, onSubmit, isCreating
               )}
 
               {selectedAlertType === 'Consolidation' && (
-                <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                  <p className="text-sm text-gray-300">
+                <div className="bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-4">
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
                     You&apos;ll be notified when share consolidation events occur.
                   </p>
                   <p className="text-xs text-gray-500 mt-3">
@@ -472,8 +472,8 @@ export default function AlertRuleCreator({ isOpen, onClose, onSubmit, isCreating
               )}
 
               {selectedAlertType === 'Drill Results' && (
-                <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                  <p className="text-sm text-gray-300">
+                <div className="bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-4">
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
                     You&apos;ll be notified when new drill result announcements are made.
                   </p>
                   <p className="text-xs text-gray-500 mt-3">
@@ -487,8 +487,8 @@ export default function AlertRuleCreator({ isOpen, onClose, onSubmit, isCreating
           {/* Step 4: Frequency Selection */}
           {currentStep === 4 && (
             <div className="animate-in fade-in duration-200">
-              <h3 className="text-lg font-bold text-white mb-2">Select Frequency</h3>
-              <p className="text-sm text-gray-400 mb-4">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Select Frequency</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
                 Choose how often you want to receive these alerts.
               </p>
 
@@ -500,13 +500,13 @@ export default function AlertRuleCreator({ isOpen, onClose, onSubmit, isCreating
                     className={`w-full border rounded-xl p-4 text-left transition-all ${
                       selectedFrequency === freq.value
                         ? 'bg-vettr-accent/10 border-vettr-accent'
-                        : 'bg-white/5 border-white/10 hover:bg-white/10'
+                        : 'bg-gray-50 dark:bg-white/5 border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/10'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <div>
-                        <div className="font-bold text-white">{freq.label}</div>
-                        <div className="text-sm text-gray-400 mt-1">{freq.description}</div>
+                        <div className="font-bold text-gray-900 dark:text-white">{freq.label}</div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">{freq.description}</div>
                       </div>
                       {selectedFrequency === freq.value && (
                         <CheckCircleIcon className="w-6 h-6 text-vettr-accent flex-shrink-0" />
@@ -521,23 +521,23 @@ export default function AlertRuleCreator({ isOpen, onClose, onSubmit, isCreating
           {/* Step 5: Review and Confirm */}
           {currentStep === 5 && (
             <div className="animate-in fade-in duration-200">
-              <h3 className="text-lg font-bold text-white mb-2">Review Alert Rule</h3>
-              <p className="text-sm text-gray-400 mb-4">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Review Alert Rule</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
                 Please review your alert configuration before {isEditMode ? 'updating' : 'creating'} it.
               </p>
 
               <div className="space-y-3">
                 {/* Stock */}
-                <div className="bg-white/[0.03] border border-white/10 rounded-xl p-4">
+                <div className="bg-gray-50 dark:bg-white/[0.03] border border-gray-200 dark:border-white/10 rounded-xl p-4">
                   <div className="text-xs text-gray-500 uppercase tracking-wider mb-2">Stock</div>
-                  <div className="font-bold text-white">
+                  <div className="font-bold text-gray-900 dark:text-white">
                     {selectedStock?.ticker} - {selectedStock?.company_name}
                   </div>
-                  <div className="text-sm text-gray-400 mt-1">{selectedStock?.sector}</div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">{selectedStock?.sector}</div>
                 </div>
 
                 {/* Alert Type */}
-                <div className="bg-white/[0.03] border border-white/10 rounded-xl p-4">
+                <div className="bg-gray-50 dark:bg-white/[0.03] border border-gray-200 dark:border-white/10 rounded-xl p-4">
                   <div className="text-xs text-gray-500 uppercase tracking-wider mb-2">Alert Type</div>
                   <div className="flex items-center gap-2">
                     {(() => {
@@ -550,7 +550,7 @@ export default function AlertRuleCreator({ isOpen, onClose, onSubmit, isCreating
                               <Icon className="w-5 h-5" />
                             </div>
                           )}
-                          <span className="font-bold text-white">{selectedAlertType}</span>
+                          <span className="font-bold text-gray-900 dark:text-white">{selectedAlertType}</span>
                         </>
                       )
                     })()}
@@ -559,18 +559,18 @@ export default function AlertRuleCreator({ isOpen, onClose, onSubmit, isCreating
 
                 {/* Conditions */}
                 {Object.keys(condition).length > 0 && (
-                  <div className="bg-white/[0.03] border border-white/10 rounded-xl p-4">
+                  <div className="bg-gray-50 dark:bg-white/[0.03] border border-gray-200 dark:border-white/10 rounded-xl p-4">
                     <div className="text-xs text-gray-500 uppercase tracking-wider mb-2">Conditions</div>
-                    <div className="text-sm text-gray-300">
+                    <div className="text-sm text-gray-600 dark:text-gray-300">
                       {(() => {
                         if (selectedAlertType === 'Red Flag' && condition.min_severity && typeof condition.min_severity === 'string') {
-                          return <span>Minimum severity: <span className="font-bold text-white">{condition.min_severity}</span></span>
+                          return <span>Minimum severity: <span className="font-bold text-gray-900 dark:text-white">{condition.min_severity}</span></span>
                         }
                         if (selectedAlertType === 'Financing' && condition.min_amount && typeof condition.min_amount === 'number') {
-                          return <span>Minimum amount: <span className="font-bold text-white">${condition.min_amount.toLocaleString()} CAD</span></span>
+                          return <span>Minimum amount: <span className="font-bold text-gray-900 dark:text-white">${condition.min_amount.toLocaleString()} CAD</span></span>
                         }
                         if (condition.threshold && typeof condition.threshold === 'string') {
-                          return <span>Threshold: <span className="font-bold text-white">{condition.threshold}</span></span>
+                          return <span>Threshold: <span className="font-bold text-gray-900 dark:text-white">{condition.threshold}</span></span>
                         }
                         return null
                       })()}
@@ -579,10 +579,10 @@ export default function AlertRuleCreator({ isOpen, onClose, onSubmit, isCreating
                 )}
 
                 {/* Frequency */}
-                <div className="bg-white/[0.03] border border-white/10 rounded-xl p-4">
+                <div className="bg-gray-50 dark:bg-white/[0.03] border border-gray-200 dark:border-white/10 rounded-xl p-4">
                   <div className="text-xs text-gray-500 uppercase tracking-wider mb-2">Frequency</div>
-                  <div className="font-bold text-white">{selectedFrequency}</div>
-                  <div className="text-sm text-gray-400 mt-1">
+                  <div className="font-bold text-gray-900 dark:text-white">{selectedFrequency}</div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                     {FREQUENCY_OPTIONS.find((f) => f.value === selectedFrequency)?.description}
                   </div>
                 </div>
@@ -600,7 +600,7 @@ export default function AlertRuleCreator({ isOpen, onClose, onSubmit, isCreating
                     >
                       <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
                     </svg>
-                    <p className="text-sm text-gray-300">
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
                       This alert rule will be enabled immediately after creation. You can disable it anytime from the Alerts page.
                     </p>
                   </div>
@@ -611,11 +611,11 @@ export default function AlertRuleCreator({ isOpen, onClose, onSubmit, isCreating
         </div>
 
         {/* Footer */}
-        <div className="sticky bottom-0 bg-vettr-card border-t border-white/10 px-6 py-4 flex items-center justify-between">
+        <div className="sticky bottom-0 bg-white dark:bg-vettr-card border-t border-gray-200 dark:border-white/10 px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
               onClick={currentStep === 1 ? handleClose : handleBack}
-              className="px-4 py-2 text-gray-400 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={isCreating || isDeleting}
             >
               {currentStep === 1 ? 'Cancel' : 'Back'}
@@ -693,17 +693,17 @@ export default function AlertRuleCreator({ isOpen, onClose, onSubmit, isCreating
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowDeleteConfirm(false)} />
-          <div className="relative bg-vettr-card border border-white/10 rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6">
-            <h3 className="text-lg font-bold text-white mb-2">Delete Alert Rule</h3>
-            <p className="text-gray-400 mb-6">
+          <div className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm" onClick={() => setShowDeleteConfirm(false)} />
+          <div className="relative bg-white dark:bg-vettr-card border border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Delete Alert Rule</h3>
+            <p className="text-gray-500 dark:text-gray-400 mb-6">
               Are you sure you want to delete this alert rule? This action cannot be undone.
             </p>
             <div className="flex gap-3 justify-end">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
                 disabled={isDeleting}
-                className="px-4 py-2 bg-white/5 border border-white/10 text-white rounded-xl font-medium hover:bg-white/10 transition-colors disabled:opacity-50"
+                className="px-4 py-2 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl font-medium hover:bg-gray-200 dark:hover:bg-white/10 transition-colors disabled:opacity-50"
               >
                 Cancel
               </button>

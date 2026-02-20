@@ -330,16 +330,16 @@ function StockDetailContent() {
 
   if (stockLoading) {
     return (
-      <div className="min-h-screen bg-vettr-navy">
+      <div className="min-h-screen bg-lightBg dark:bg-vettr-navy">
         <div className="max-w-6xl mx-auto px-6 pt-6 pb-20 md:pb-6">
           {/* Stock Detail Header Skeleton */}
           <SkeletonStockDetailHeader className="mb-6" />
 
           {/* Tab navigation skeleton */}
-          <div className="flex gap-6 border-b border-white/5 mb-6 sticky top-16 bg-vettr-navy/80 backdrop-blur-sm z-30 -mx-6 px-6 py-3">
-            <div className="h-8 w-24 bg-white/5 rounded animate-pulse"></div>
-            <div className="h-8 w-24 bg-white/5 rounded animate-pulse"></div>
-            <div className="h-8 w-24 bg-white/5 rounded animate-pulse"></div>
+          <div className="flex gap-6 border-b border-gray-200 dark:border-white/5 mb-6 sticky top-16 bg-lightBg/80 dark:bg-vettr-navy/80 backdrop-blur-sm z-30 -mx-6 px-6 py-3">
+            <div className="h-8 w-24 bg-gray-100 dark:bg-white/5 rounded animate-pulse"></div>
+            <div className="h-8 w-24 bg-gray-100 dark:bg-white/5 rounded animate-pulse"></div>
+            <div className="h-8 w-24 bg-gray-100 dark:bg-white/5 rounded animate-pulse"></div>
           </div>
 
           {/* Content skeleton - Overview Tab */}
@@ -348,7 +348,7 @@ function StockDetailContent() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <SkeletonVetrScoreSection />
               <div>
-                <div className="h-6 w-32 bg-white/5 rounded animate-pulse mb-4"></div>
+                <div className="h-6 w-32 bg-gray-100 dark:bg-white/5 rounded animate-pulse mb-4"></div>
                 <div className="grid grid-cols-2 gap-4">
                   <SkeletonMetricCard />
                   <SkeletonMetricCard />
@@ -359,9 +359,9 @@ function StockDetailContent() {
             </div>
 
               {/* Recent Filings */}
-              <div className="bg-vettr-card/50 border border-white/5 rounded-2xl overflow-hidden">
-                <div className="px-6 py-4 border-b border-white/5">
-                  <div className="h-6 w-32 bg-white/5 rounded animate-pulse"></div>
+              <div className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl overflow-hidden">
+                <div className="px-6 py-4 border-b border-gray-200 dark:border-white/5">
+                  <div className="h-6 w-32 bg-gray-100 dark:bg-white/5 rounded animate-pulse"></div>
                 </div>
                 <table className="w-full">
                   <tbody>
@@ -384,7 +384,7 @@ function StockDetailContent() {
   }
 
   return (
-    <div className="min-h-screen bg-vettr-navy">
+    <div className="min-h-screen bg-lightBg dark:bg-vettr-navy">
       <div className="max-w-6xl mx-auto px-6 pt-6 pb-20 md:pb-6">
         {/* Breadcrumb */}
         <Breadcrumb
@@ -399,13 +399,13 @@ function StockDetailContent() {
           <div className="flex items-start justify-between mb-4">
             {/* Title and badges */}
             <div className="flex-1">
-              <h1 className="text-2xl font-bold text-white mb-3">{stock.company_name}</h1>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">{stock.company_name}</h1>
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="bg-vettr-accent/10 text-vettr-accent rounded-lg px-2 py-0.5 text-sm font-mono font-semibold">
                   {stock.ticker}
                 </span>
                 {stock.exchange && (
-                  <span className="bg-white/5 text-gray-400 rounded-lg px-2 py-0.5 text-xs">
+                  <span className="bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400 rounded-lg px-2 py-0.5 text-xs">
                     {stock.exchange}
                   </span>
                 )}
@@ -414,11 +414,11 @@ function StockDetailContent() {
             </div>
 
             {/* Action buttons */}
-            <div className="flex items-center gap-2 bg-white/5 rounded-xl p-2">
+            <div className="flex items-center gap-2 bg-gray-100 dark:bg-white/5 rounded-xl p-2">
               <button
                 onClick={handleFavoriteToggle}
                 disabled={isTogglingFavorite}
-                className="p-2 text-gray-400 hover:text-yellow-400 hover:bg-white/5 rounded-lg transition-colors disabled:opacity-50"
+                className="p-2 text-gray-400 hover:text-yellow-400 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors disabled:opacity-50"
                 aria-label={isInWatchlist ? 'Remove from watchlist' : 'Add to watchlist'}
               >
                 {isTogglingFavorite ? (
@@ -431,20 +431,20 @@ function StockDetailContent() {
               </button>
               <button
                 onClick={handleShare}
-                className="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+                className="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors"
                 aria-label="Share stock"
               >
                 <ShareIcon className="w-5 h-5" />
               </button>
               <button
                 onClick={handlePrint}
-                className="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors print-hide"
+                className="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors print-hide"
                 aria-label="Print stock report"
               >
                 <PrinterIcon className="w-5 h-5" />
               </button>
               <button
-                className="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+                className="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors"
                 aria-label="More options"
               >
                 <MoreHorizontalIcon className="w-5 h-5" />
@@ -454,7 +454,7 @@ function StockDetailContent() {
 
           {/* Price Display */}
           <div className="flex items-end gap-4">
-            <span className="text-4xl font-bold text-white">
+            <span className="text-4xl font-bold text-gray-900 dark:text-white">
               ${stock.current_price?.toFixed(2) || 'N/A'}
             </span>
             {stock.price_change_percent !== null && stock.price_change_percent !== undefined && (
@@ -480,7 +480,7 @@ function StockDetailContent() {
         </div>
 
         {/* Tab navigation */}
-        <div className="sticky top-16 z-30 bg-vettr-navy dark:bg-vettr-navy bg-lightBg py-3 -mx-6 px-6 flex gap-6 border-b border-white/5 mb-6" role="tablist" aria-label="Stock information tabs">
+        <div className="sticky top-16 z-30 bg-lightBg dark:bg-vettr-navy py-3 -mx-6 px-6 flex gap-6 border-b border-gray-200 dark:border-white/5 mb-6" role="tablist" aria-label="Stock information tabs">
           <button
             role="tab"
             aria-selected={activeTab === 'overview'}
@@ -491,8 +491,8 @@ function StockDetailContent() {
             onKeyDown={(e) => handleTabKeyDown(e, 'overview')}
             className={`px-1 py-3 font-medium text-sm transition-colors border-b-2 ${
               activeTab === 'overview'
-                ? 'text-white border-vettr-accent'
-                : 'text-gray-500 border-transparent hover:text-gray-300'
+                ? 'text-gray-900 dark:text-white border-vettr-accent'
+                : 'text-gray-500 border-transparent hover:text-gray-600 dark:hover:text-gray-300'
             }`}
           >
             Overview
@@ -507,8 +507,8 @@ function StockDetailContent() {
             onKeyDown={(e) => handleTabKeyDown(e, 'pedigree')}
             className={`px-1 py-3 font-medium text-sm transition-colors border-b-2 ${
               activeTab === 'pedigree'
-                ? 'text-white border-vettr-accent'
-                : 'text-gray-500 border-transparent hover:text-gray-300'
+                ? 'text-gray-900 dark:text-white border-vettr-accent'
+                : 'text-gray-500 border-transparent hover:text-gray-600 dark:hover:text-gray-300'
             }`}
           >
             Pedigree
@@ -523,8 +523,8 @@ function StockDetailContent() {
             onKeyDown={(e) => handleTabKeyDown(e, 'red-flags')}
             className={`px-1 py-3 font-medium text-sm transition-colors border-b-2 ${
               activeTab === 'red-flags'
-                ? 'text-white border-vettr-accent'
-                : 'text-gray-500 border-transparent hover:text-gray-300'
+                ? 'text-gray-900 dark:text-white border-vettr-accent'
+                : 'text-gray-500 border-transparent hover:text-gray-600 dark:hover:text-gray-300'
             }`}
           >
             Red Flags
@@ -549,9 +549,9 @@ function StockDetailContent() {
             {/* VETTR Score + Key Metrics — 2-column layout */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* VETTR Score section */}
-              <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-6 print-avoid-break">
+              <div className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-6 print-avoid-break">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-lg font-semibold text-white">VETTR Score</h2>
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">VETTR Score</h2>
                   {trend && (
                     <div className="flex items-center gap-1">
                       {trend.direction === 'Improving' ? (
@@ -565,7 +565,7 @@ function StockDetailContent() {
                           <span className="text-sm font-medium text-red-400">Declining</span>
                         </>
                       ) : (
-                        <span className="text-sm font-medium text-gray-400">Stable</span>
+                        <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Stable</span>
                       )}
                     </div>
                   )}
@@ -577,7 +577,7 @@ function StockDetailContent() {
                 ) : score ? (
                   <button
                     onClick={() => setShowScoreDetail(true)}
-                    className="w-full flex flex-col items-center justify-center cursor-pointer hover:bg-white/[0.03] rounded-xl p-4 transition-colors group"
+                    className="w-full flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 dark:hover:bg-white/[0.03] rounded-xl p-4 transition-colors group"
                     aria-label="View score details"
                   >
                     <VetrScoreBadge score={score.overall_score} size="lg" animate={true} showLabel={false} />
@@ -594,10 +594,10 @@ function StockDetailContent() {
                         ].map(({ label, pillar, weight }) => (
                           <div key={label}>
                             <div className="flex items-center justify-between mb-1">
-                              <span className="text-xs text-gray-400">{label} <span className="text-gray-600">({weight})</span></span>
-                              <span className="text-xs font-medium text-white">{pillar?.score ?? 'N/A'}</span>
+                              <span className="text-xs text-gray-500 dark:text-gray-400">{label} <span className="text-gray-400 dark:text-gray-600">({weight})</span></span>
+                              <span className="text-xs font-medium text-gray-900 dark:text-white">{pillar?.score ?? 'N/A'}</span>
                             </div>
-                            <div className="w-full bg-white/5 rounded-full h-1.5">
+                            <div className="w-full bg-gray-100 dark:bg-white/5 rounded-full h-1.5">
                               <div
                                 className="h-1.5 rounded-full transition-all duration-1000"
                                 style={{
@@ -618,38 +618,38 @@ function StockDetailContent() {
                       </div>
                     )}
 
-                    <p className="text-gray-500 text-xs mt-4 group-hover:text-gray-300 transition-colors">
+                    <p className="text-gray-500 text-xs mt-4 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors">
                       Click to view detailed breakdown
                     </p>
                   </button>
                 ) : (
-                  <p className="text-gray-400 text-center py-4">Score not available</p>
+                  <p className="text-gray-500 dark:text-gray-400 text-center py-4">Score not available</p>
                 )}
               </div>
 
               {/* Key Metrics */}
-              <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-6 print-avoid-break print-page-break">
-                <h2 className="text-lg font-semibold text-white mb-4">Key Metrics</h2>
+              <div className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-6 print-avoid-break print-page-break">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Key Metrics</h2>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-white/[0.03] rounded-xl p-4">
-                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Market Cap</p>
-                    <p className="text-white font-semibold">
+                  <div className="bg-gray-50 dark:bg-white/[0.03] rounded-xl p-4">
+                    <p className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Market Cap</p>
+                    <p className="text-gray-900 dark:text-white font-semibold">
                       {stock.market_cap
                         ? `$${(stock.market_cap / 1000000000).toFixed(1)}B`
                         : 'N/A'}
                     </p>
                   </div>
-                  <div className="bg-white/[0.03] rounded-xl p-4">
-                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Exchange</p>
-                    <p className="text-white font-semibold">{stock.exchange || 'N/A'}</p>
+                  <div className="bg-gray-50 dark:bg-white/[0.03] rounded-xl p-4">
+                    <p className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Exchange</p>
+                    <p className="text-gray-900 dark:text-white font-semibold">{stock.exchange || 'N/A'}</p>
                   </div>
-                  <div className="bg-white/[0.03] rounded-xl p-4">
-                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Sector</p>
-                    <p className="text-white font-semibold">{stock.sector}</p>
+                  <div className="bg-gray-50 dark:bg-white/[0.03] rounded-xl p-4">
+                    <p className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Sector</p>
+                    <p className="text-gray-900 dark:text-white font-semibold">{stock.sector}</p>
                   </div>
-                  <div className="bg-white/[0.03] rounded-xl p-4">
-                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Recent Filings</p>
-                    <p className="text-white font-semibold">
+                  <div className="bg-gray-50 dark:bg-white/[0.03] rounded-xl p-4">
+                    <p className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Recent Filings</p>
+                    <p className="text-gray-900 dark:text-white font-semibold">
                       {filings?.length || 0}
                     </p>
                   </div>
@@ -665,14 +665,14 @@ function StockDetailContent() {
             />
 
             {/* Recent Filings */}
-            <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-6 print-avoid-break">
-              <h2 className="text-lg font-semibold text-white mb-4">Recent Filings</h2>
+            <div className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-6 print-avoid-break">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Recent Filings</h2>
               {filingsLoading ? (
                 <div className="space-y-3">
                   {[1, 2, 3].map(i => (
                     <div
                       key={i}
-                      className="h-20 bg-white/5 rounded-xl animate-pulse"
+                      className="h-20 bg-gray-100 dark:bg-white/5 rounded-xl animate-pulse"
                     />
                   ))}
                 </div>
@@ -680,11 +680,11 @@ function StockDetailContent() {
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-white/5">
-                        <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-3 py-3 text-left">Type</th>
-                        <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-3 py-3 text-left">Title</th>
-                        <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-3 py-3 text-left">Date</th>
-                        <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-3 py-3 text-left">Status</th>
+                      <tr className="border-b border-gray-200 dark:border-white/5">
+                        <th className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider font-medium px-3 py-3 text-left">Type</th>
+                        <th className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider font-medium px-3 py-3 text-left">Title</th>
+                        <th className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider font-medium px-3 py-3 text-left">Date</th>
+                        <th className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider font-medium px-3 py-3 text-left">Status</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -692,7 +692,7 @@ function StockDetailContent() {
                         <tr
                           key={filing.id}
                           onClick={() => window.location.href = `/filings/${filing.id}`}
-                          className="border-b border-white/5 hover:bg-white/[0.03] transition-colors cursor-pointer"
+                          className="border-b border-gray-200 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-colors cursor-pointer"
                         >
                           <td className="px-3 py-3">
                             <FilingTypeIcon type={filing.type} />
@@ -702,7 +702,7 @@ function StockDetailContent() {
                               {!filing.is_read && (
                                 <div className="w-2 h-2 rounded-full bg-blue-400 flex-shrink-0" />
                               )}
-                              <span className="text-sm text-white truncate max-w-xs">{filing.title}</span>
+                              <span className="text-sm text-gray-900 dark:text-white truncate max-w-xs">{filing.title}</span>
                               {filing.is_material && (
                                 <span className="px-2 py-0.5 rounded-full bg-yellow-400/10 text-yellow-400 text-xs font-medium flex-shrink-0">
                                   Material
@@ -710,7 +710,7 @@ function StockDetailContent() {
                               )}
                             </div>
                           </td>
-                          <td className="px-3 py-3 text-sm text-gray-400 whitespace-nowrap">
+                          <td className="px-3 py-3 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
                             {new Date(filing.date_filed).toLocaleDateString('en-US', {
                               month: 'short',
                               day: 'numeric',
@@ -720,7 +720,7 @@ function StockDetailContent() {
                           <td className="px-3 py-3">
                             <span className={`text-xs px-2 py-0.5 rounded-full ${
                               filing.is_read
-                                ? 'bg-white/5 text-gray-500'
+                                ? 'bg-gray-100 dark:bg-white/5 text-gray-500'
                                 : 'bg-blue-400/10 text-blue-400'
                             }`}>
                               {filing.is_read ? 'Read' : 'Unread'}
@@ -755,10 +755,10 @@ function StockDetailContent() {
             className="space-y-6"
           >
             {/* Search and Filters */}
-            <div className="bg-vettr-card/30 border border-white/5 rounded-2xl p-4">
+            <div className="bg-gray-50 dark:bg-vettr-card/30 border border-gray-200 dark:border-white/5 rounded-2xl p-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1.5">Search</label>
+                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1.5">Search</label>
                   <SearchInput
                     value={executiveSearch}
                     onChange={setExecutiveSearch}
@@ -795,7 +795,7 @@ function StockDetailContent() {
                   {[1, 2, 3].map(i => (
                     <div
                       key={i}
-                      className="h-48 bg-vettr-card/50 border border-white/5 rounded-2xl animate-pulse"
+                      className="h-48 bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl animate-pulse"
                     />
                   ))}
                 </div>
@@ -805,7 +805,7 @@ function StockDetailContent() {
                     <div
                       key={executive.id}
                       onClick={() => setSelectedExecutive(executive)}
-                      className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5 hover:border-vettr-accent/20 hover:bg-vettr-card/80 transition-all duration-300 cursor-pointer"
+                      className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-5 hover:border-vettr-accent/20 hover:bg-gray-50 dark:hover:bg-vettr-card/80 transition-all duration-300 cursor-pointer"
                     >
                       {/* Header with initials avatar */}
                       <div className="flex items-start gap-3 mb-4">
@@ -820,10 +820,10 @@ function StockDetailContent() {
                           </span>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-white mb-1 truncate">
+                          <h3 className="font-semibold text-gray-900 dark:text-white mb-1 truncate">
                             {executive.name}
                           </h3>
-                          <p className="text-sm text-gray-400 line-clamp-2">{executive.title}</p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2">{executive.title}</p>
                         </div>
                       </div>
 
@@ -832,16 +832,16 @@ function StockDetailContent() {
                         <div className={`grid gap-3 mb-3 ${executive.years_at_company > 0 && executive.total_experience_years > 0 ? 'grid-cols-2' : 'grid-cols-1'}`}>
                           {executive.years_at_company > 0 && (
                             <div>
-                              <p className="text-xs text-gray-500 mb-1">Tenure</p>
-                              <p className="text-sm text-white font-medium">
+                              <p className="text-xs text-gray-400 dark:text-gray-500 mb-1">Tenure</p>
+                              <p className="text-sm text-gray-900 dark:text-white font-medium">
                                 {executive.years_at_company} {executive.years_at_company === 1 ? 'year' : 'years'}
                               </p>
                             </div>
                           )}
                           {executive.total_experience_years > 0 && (
                             <div>
-                              <p className="text-xs text-gray-500 mb-1">Experience</p>
-                              <p className="text-sm text-white font-medium">
+                              <p className="text-xs text-gray-400 dark:text-gray-500 mb-1">Experience</p>
+                              <p className="text-sm text-gray-900 dark:text-white font-medium">
                                 {executive.total_experience_years} {executive.total_experience_years === 1 ? 'year' : 'years'}
                               </p>
                             </div>
@@ -852,7 +852,7 @@ function StockDetailContent() {
                       {/* Specialization badge */}
                       {executive.specialization && (
                         <div className="mb-3">
-                          <span className="inline-block bg-white/5 text-gray-400 rounded-full px-2 py-0.5 text-xs">
+                          <span className="inline-block bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400 rounded-full px-2 py-0.5 text-xs">
                             {executive.specialization}
                           </span>
                         </div>
@@ -918,21 +918,21 @@ function StockDetailContent() {
                 {[1, 2, 3].map(i => (
                   <div
                     key={i}
-                    className="h-48 bg-vettr-card/50 border border-white/5 rounded-2xl animate-pulse"
+                    className="h-48 bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl animate-pulse"
                   />
                 ))}
               </div>
             ) : redFlags ? (
               <>
                 {/* Overall Red Flag Score — left-right layout */}
-                <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-6">
+                <div className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-6">
                   <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-lg font-semibold text-white">Red Flag Score</h2>
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Red Flag Score</h2>
                     {redFlags.detected_flags.some(flag => !flag.is_acknowledged) && (
                       <button
                         onClick={handleAcknowledgeAll}
                         disabled={isAcknowledgingAll}
-                        className="px-4 py-2 bg-white/5 border border-white/10 text-white rounded-xl hover:bg-white/10 transition-colors disabled:opacity-50"
+                        className="px-4 py-2 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl hover:bg-gray-200 dark:hover:bg-white/10 transition-colors disabled:opacity-50"
                       >
                         {isAcknowledgingAll ? 'Acknowledging...' : 'Acknowledge All'}
                       </button>
@@ -973,7 +973,7 @@ function StockDetailContent() {
                           />
                         </svg>
                         <div className="absolute inset-0 flex flex-col items-center justify-center">
-                          <span className="text-3xl font-bold text-white tabular-nums">
+                          <span className="text-3xl font-bold text-gray-900 dark:text-white tabular-nums">
                             {redFlags.overall_score}
                           </span>
                         </div>
@@ -1006,12 +1006,12 @@ function StockDetailContent() {
                           <div key={label}>
                             <div className="flex items-center justify-between mb-1">
                               <div>
-                                <span className="text-sm text-gray-400">{label}</span>
-                                <span className="text-xs text-gray-600 ml-2">({weight})</span>
+                                <span className="text-sm text-gray-500 dark:text-gray-400">{label}</span>
+                                <span className="text-xs text-gray-400 dark:text-gray-600 ml-2">({weight})</span>
                               </div>
-                              <span className="text-sm font-medium text-white tabular-nums">{value}</span>
+                              <span className="text-sm font-medium text-gray-900 dark:text-white tabular-nums">{value}</span>
                             </div>
-                            <div className="w-full bg-white/5 rounded-full h-1.5">
+                            <div className="w-full bg-gray-100 dark:bg-white/5 rounded-full h-1.5">
                               <div
                                 className="h-1.5 rounded-full transition-all duration-1000"
                                 style={{ width: `${value}%`, backgroundColor: barColor }}
@@ -1028,8 +1028,8 @@ function StockDetailContent() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
                 {/* Detected Flags List */}
-                <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-6">
-                  <h2 className="text-lg font-semibold text-white mb-4">Detected Flags</h2>
+                <div className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-6">
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Detected Flags</h2>
                   {redFlags.detected_flags.length > 0 ? (
                     <div className="space-y-3">
                       {redFlags.detected_flags.map(flag => (
@@ -1037,8 +1037,8 @@ function StockDetailContent() {
                           key={flag.id}
                           className={`p-4 rounded-xl border transition-all ${
                             flag.is_acknowledged
-                              ? 'bg-white/[0.015] border-white/5 opacity-60'
-                              : 'bg-white/[0.03] border-white/5 hover:border-white/10 cursor-pointer'
+                              ? 'bg-gray-50/50 dark:bg-white/[0.015] border-gray-200 dark:border-white/5 opacity-60'
+                              : 'bg-gray-50 dark:bg-white/[0.03] border-gray-200 dark:border-white/5 hover:border-gray-300 dark:hover:border-white/10 cursor-pointer'
                           }`}
                           onClick={() => !flag.is_acknowledged && setSelectedFlag(flag)}
                         >
@@ -1059,7 +1059,7 @@ function StockDetailContent() {
 
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-2 flex-wrap">
-                                  <h3 className={`font-medium ${flag.is_acknowledged ? 'text-gray-500 line-through' : 'text-white'}`}>
+                                  <h3 className={`font-medium ${flag.is_acknowledged ? 'text-gray-500 line-through' : 'text-gray-900 dark:text-white'}`}>
                                     {flag.name}
                                   </h3>
                                   {/* Severity Badge */}
@@ -1089,7 +1089,7 @@ function StockDetailContent() {
                                     </span>
                                   )}
                                 </div>
-                                <p className={`text-sm mb-2 ${flag.is_acknowledged ? 'text-gray-500' : 'text-gray-400'}`}>
+                                <p className={`text-sm mb-2 ${flag.is_acknowledged ? 'text-gray-500' : 'text-gray-500 dark:text-gray-400'}`}>
                                   {flag.explanation}
                                 </p>
                                 <p className="text-xs text-gray-600">
@@ -1110,7 +1110,7 @@ function StockDetailContent() {
                                   handleAcknowledgeFlag(flag.id);
                                 }}
                                 disabled={acknowledgingFlagId === flag.id}
-                                className="px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded text-xs text-gray-400 hover:text-vettr-accent transition-colors disabled:opacity-50"
+                                className="px-3 py-1.5 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 rounded text-xs text-gray-400 hover:text-vettr-accent transition-colors disabled:opacity-50"
                               >
                                 {acknowledgingFlagId === flag.id ? 'Acknowledging...' : 'Acknowledge'}
                               </button>
@@ -1130,21 +1130,21 @@ function StockDetailContent() {
                 </div>
 
                 {/* Flag History Timeline */}
-                <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-6">
-                  <h2 className="text-lg font-semibold text-white mb-4">Flag History</h2>
+                <div className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-6">
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Flag History</h2>
                   {flagHistoryLoading ? (
                     <div className="space-y-3">
                       {[1, 2, 3].map(i => (
                         <div
                           key={i}
-                          className="h-16 bg-white/5 rounded-xl animate-pulse"
+                          className="h-16 bg-gray-100 dark:bg-white/5 rounded-xl animate-pulse"
                         />
                       ))}
                     </div>
                   ) : flagHistory && flagHistory.length > 0 ? (
                     <div className="relative pl-6">
                       {/* Vertical timeline line */}
-                      <div className="absolute left-2 top-0 bottom-0 w-0.5 bg-white/10" />
+                      <div className="absolute left-2 top-0 bottom-0 w-0.5 bg-gray-200 dark:bg-white/10" />
 
                       <div className="space-y-6">
                         {flagHistory.flatMap((item) => item.history).map((entry, index) => (
@@ -1165,7 +1165,7 @@ function StockDetailContent() {
 
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-1">
-                                <h4 className="text-white font-medium text-sm">{entry.flag_name}</h4>
+                                <h4 className="text-gray-900 dark:text-white font-medium text-sm">{entry.flag_name}</h4>
                                 <span
                                   className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                                     entry.severity === 'Critical' || entry.severity === 'High'
@@ -1235,17 +1235,17 @@ function StockDetailContent() {
       {/* Flag Detail Modal */}
       {selectedFlag && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+          className="fixed inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50"
           onClick={() => setSelectedFlag(null)}
         >
           <div
-            className="bg-vettr-card border border-white/10 rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto"
+            className="bg-white dark:bg-vettr-card border border-gray-200 dark:border-white/10 rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="sticky top-0 bg-vettr-card border-b border-white/5 px-6 pt-6 pb-0 flex items-start justify-between">
+            <div className="sticky top-0 bg-white dark:bg-vettr-card border-b border-gray-200 dark:border-white/5 px-6 pt-6 pb-0 flex items-start justify-between">
               <div className="flex-1 mb-4">
-                <h2 className="text-lg font-semibold text-white mb-3">{selectedFlag.name}</h2>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{selectedFlag.name}</h2>
                 <div className="flex items-center gap-2">
                   <span
                     className={`px-2 py-0.5 rounded-full text-xs font-medium ${
@@ -1261,7 +1261,7 @@ function StockDetailContent() {
                     {selectedFlag.severity} Severity
                   </span>
                   {selectedFlag.is_acknowledged && (
-                    <span className="px-2 py-0.5 rounded-full bg-white/5 text-gray-500 text-xs flex items-center gap-1">
+                    <span className="px-2 py-0.5 rounded-full bg-gray-100 dark:bg-white/5 text-gray-500 text-xs flex items-center gap-1">
                       <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                         <path
                           fillRule="evenodd"
@@ -1276,7 +1276,7 @@ function StockDetailContent() {
               </div>
               <button
                 onClick={() => setSelectedFlag(null)}
-                className="text-gray-400 hover:text-white hover:bg-white/5 rounded-lg p-1 transition-colors"
+                className="text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg p-1 transition-colors"
                 aria-label="Close"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
@@ -1289,16 +1289,16 @@ function StockDetailContent() {
             <div className="px-6 py-4 space-y-4">
               {/* Explanation */}
               <div>
-                <h3 className="text-sm font-semibold text-white mb-2">Explanation</h3>
-                <p className="text-sm text-gray-400 leading-relaxed">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Explanation</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
                   {selectedFlag.explanation}
                 </p>
               </div>
 
               {/* Detection Date */}
               <div>
-                <h3 className="text-sm font-semibold text-white mb-2">Detection Date</h3>
-                <p className="text-sm text-gray-400">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Detection Date</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   {new Date(selectedFlag.detected_at).toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'long',
@@ -1311,7 +1311,7 @@ function StockDetailContent() {
 
               {/* Actions */}
               {!selectedFlag.is_acknowledged && (
-                <div className="flex gap-3 pt-4 border-t border-white/5">
+                <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-white/5">
                   <button
                     onClick={() => {
                       handleAcknowledgeFlag(selectedFlag.id);
@@ -1324,7 +1324,7 @@ function StockDetailContent() {
                   </button>
                   <button
                     onClick={() => setSelectedFlag(null)}
-                    className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-xl transition-colors"
+                    className="px-4 py-2 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 text-gray-900 dark:text-white rounded-xl transition-colors"
                   >
                     Close
                   </button>
@@ -1343,10 +1343,10 @@ export default function StockDetailPage() {
   return (
     <Suspense fallback={
       <div className="p-4 md:p-6 pb-20 md:pb-6">
-        <div className="h-10 bg-white/5 rounded-xl animate-pulse mb-6 w-48"></div>
+        <div className="h-10 bg-gray-100 dark:bg-white/5 rounded-xl animate-pulse mb-6 w-48"></div>
         <div className="space-y-6">
-          <div className="h-32 bg-white/5 rounded-2xl animate-pulse"></div>
-          <div className="h-64 bg-white/5 rounded-2xl animate-pulse"></div>
+          <div className="h-32 bg-gray-100 dark:bg-white/5 rounded-2xl animate-pulse"></div>
+          <div className="h-64 bg-gray-100 dark:bg-white/5 rounded-2xl animate-pulse"></div>
         </div>
       </div>
     }>

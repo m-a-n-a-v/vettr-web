@@ -65,9 +65,9 @@ export default function SearchInput({
         aria-label="Search"
         className={`
           w-full pl-9 sm:pl-11 pr-9 sm:pr-10 py-2.5 rounded-xl text-sm
-          bg-white/5 border border-white/10
-          text-white placeholder:text-gray-500
-          focus:outline-none focus:border-vettr-accent/40 focus:ring-1 focus:ring-vettr-accent/20 focus:bg-white/[0.07]
+          bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10
+          text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500
+          focus:outline-none focus:border-vettr-accent/40 focus:ring-1 focus:ring-vettr-accent/20 focus:bg-gray-100 dark:focus:bg-white/[0.07]
           transition-all
           disabled:opacity-50 disabled:cursor-not-allowed
         `}
@@ -80,7 +80,7 @@ export default function SearchInput({
           onClick={handleClear}
           className="
             absolute right-3 top-1/2 transform -translate-y-1/2
-            text-gray-500 hover:text-white
+            text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white
             transition-colors
             focus:outline-none focus-visible:ring-2 focus-visible:ring-vettr-accent/30 rounded-lg
             p-1

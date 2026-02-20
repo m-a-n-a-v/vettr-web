@@ -107,7 +107,7 @@ export function Toast({ toast, onDismiss }: ToastProps) {
       aria-atomic="true"
       className={`
         relative overflow-hidden
-        bg-vettr-card border border-white/10 rounded-xl shadow-xl
+        bg-white dark:bg-vettr-card border border-gray-200 dark:border-white/10 rounded-xl shadow-xl
         min-w-[320px] flex items-start gap-3 px-4 py-3
         border-l-2 ${config.borderColor}
       `}
@@ -123,9 +123,9 @@ export function Toast({ toast, onDismiss }: ToastProps) {
 
       {/* Content */}
       <div className="flex-1 min-w-0">
-        <p className="text-sm text-white font-medium">{toast.message}</p>
+        <p className="text-sm text-gray-900 dark:text-white font-medium">{toast.message}</p>
         {toast.description && (
-          <p className="text-sm text-gray-400 mt-0.5">{toast.description}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{toast.description}</p>
         )}
       </div>
 
@@ -134,7 +134,7 @@ export function Toast({ toast, onDismiss }: ToastProps) {
         type="button"
         onClick={handleDismiss}
         className="
-          flex-shrink-0 text-gray-500 hover:text-white
+          flex-shrink-0 text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white
           transition-colors duration-200
           focus:outline-none focus-visible:ring-2 focus-visible:ring-vettr-accent/30 rounded
           p-0.5
@@ -146,7 +146,7 @@ export function Toast({ toast, onDismiss }: ToastProps) {
 
       {/* Progress Bar */}
       {toast.duration && (
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/5">
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-100 dark:bg-white/5">
           <div
             className={`h-full ${config.progressColor} transition-all duration-50 ease-linear`}
             style={{ width: `${progress}%` }}

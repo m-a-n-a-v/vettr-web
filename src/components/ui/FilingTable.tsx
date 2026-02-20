@@ -85,12 +85,12 @@ export default function FilingTable({ filings, showStock = true }: FilingTablePr
   return (
     <div className="overflow-x-auto">
       <table className="w-full min-w-[700px] border-collapse" role="table" aria-label="Filings">
-        <thead className="bg-vettr-navy">
-          <tr role="row" className="border-b border-white/5">
+        <thead className="bg-lightBg dark:bg-vettr-navy">
+          <tr role="row" className="border-b border-gray-200 dark:border-white/5">
             <th
               role="columnheader"
               aria-sort={sortField === 'type' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
-              className="px-4 py-3 text-left text-xs text-gray-500 uppercase tracking-wider font-medium hover:text-white cursor-pointer group"
+              className="px-4 py-3 text-left text-xs text-gray-600 dark:text-gray-500 uppercase tracking-wider font-medium hover:text-gray-900 dark:hover:text-white cursor-pointer group"
               onClick={() => handleSort('type')}
             >
               <div className="flex items-center gap-2">
@@ -101,7 +101,7 @@ export default function FilingTable({ filings, showStock = true }: FilingTablePr
             <th
               role="columnheader"
               aria-sort={sortField === 'title' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
-              className="px-4 py-3 text-left text-xs text-gray-500 uppercase tracking-wider font-medium hover:text-white cursor-pointer group"
+              className="px-4 py-3 text-left text-xs text-gray-600 dark:text-gray-500 uppercase tracking-wider font-medium hover:text-gray-900 dark:hover:text-white cursor-pointer group"
               onClick={() => handleSort('title')}
             >
               <div className="flex items-center gap-2">
@@ -113,7 +113,7 @@ export default function FilingTable({ filings, showStock = true }: FilingTablePr
               <th
                 role="columnheader"
                 aria-sort={sortField === 'ticker' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
-                className="px-4 py-3 text-left text-xs text-gray-500 uppercase tracking-wider font-medium hover:text-white cursor-pointer group"
+                className="px-4 py-3 text-left text-xs text-gray-600 dark:text-gray-500 uppercase tracking-wider font-medium hover:text-gray-900 dark:hover:text-white cursor-pointer group"
                 onClick={() => handleSort('ticker')}
               >
                 <div className="flex items-center gap-2">
@@ -125,7 +125,7 @@ export default function FilingTable({ filings, showStock = true }: FilingTablePr
             <th
               role="columnheader"
               aria-sort={sortField === 'date' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
-              className="px-4 py-3 text-left text-xs text-gray-500 uppercase tracking-wider font-medium hover:text-white cursor-pointer group"
+              className="px-4 py-3 text-left text-xs text-gray-600 dark:text-gray-500 uppercase tracking-wider font-medium hover:text-gray-900 dark:hover:text-white cursor-pointer group"
               onClick={() => handleSort('date')}
             >
               <div className="flex items-center gap-2">
@@ -136,7 +136,7 @@ export default function FilingTable({ filings, showStock = true }: FilingTablePr
             <th
               role="columnheader"
               aria-sort={sortField === 'material' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
-              className="hidden md:table-cell px-4 py-3 text-center text-xs text-gray-500 uppercase tracking-wider font-medium hover:text-white cursor-pointer group"
+              className="hidden md:table-cell px-4 py-3 text-center text-xs text-gray-600 dark:text-gray-500 uppercase tracking-wider font-medium hover:text-gray-900 dark:hover:text-white cursor-pointer group"
               onClick={() => handleSort('material')}
             >
               <div className="flex items-center justify-center gap-2">
@@ -147,7 +147,7 @@ export default function FilingTable({ filings, showStock = true }: FilingTablePr
             <th
               role="columnheader"
               aria-sort={sortField === 'status' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
-              className="px-4 py-3 text-center text-xs text-gray-500 uppercase tracking-wider font-medium hover:text-white cursor-pointer group"
+              className="px-4 py-3 text-center text-xs text-gray-600 dark:text-gray-500 uppercase tracking-wider font-medium hover:text-gray-900 dark:hover:text-white cursor-pointer group"
               onClick={() => handleSort('status')}
             >
               <div className="flex items-center justify-center gap-2">
@@ -162,13 +162,13 @@ export default function FilingTable({ filings, showStock = true }: FilingTablePr
             <tr
               key={filing.id}
               role="row"
-              className="border-b border-white/5 hover:bg-white/[0.03] transition-colors cursor-pointer"
+              className="border-b border-gray-200 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-colors cursor-pointer"
               onClick={() => window.location.href = `/filings/${filing.id}`}
             >
               <td role="cell" className="px-4 py-3">
                 <div className="flex items-center gap-3">
                   <FilingTypeIcon type={filing.type as FilingType} size="sm" />
-                  <span className="text-sm text-gray-400">{filing.type}</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">{filing.type}</span>
                 </div>
               </td>
               <td role="cell" className="px-4 py-3">
@@ -176,7 +176,7 @@ export default function FilingTable({ filings, showStock = true }: FilingTablePr
                   {!filing.is_read && (
                     <div className="w-2 h-2 rounded-full bg-blue-400 flex-shrink-0" aria-label="Unread filing" />
                   )}
-                  <span className="text-sm text-white font-medium line-clamp-2">
+                  <span className="text-sm text-gray-900 dark:text-white font-medium line-clamp-2">
                     {filing.title}
                   </span>
                   {filing.is_material && (
@@ -198,7 +198,7 @@ export default function FilingTable({ filings, showStock = true }: FilingTablePr
                 </td>
               )}
               <td role="cell" className="px-4 py-3">
-                <span className="text-sm text-gray-400">
+                <span className="text-sm text-gray-500 dark:text-gray-400">
                   {new Date(filing.date_filed).toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'short',
@@ -219,7 +219,7 @@ export default function FilingTable({ filings, showStock = true }: FilingTablePr
                 <span
                   className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-medium ${
                     filing.is_read
-                      ? 'bg-white/5 text-gray-500'
+                      ? 'bg-gray-100 dark:bg-white/5 text-gray-400 dark:text-gray-500'
                       : 'bg-vettr-accent/10 text-vettr-accent'
                   }`}
                 >

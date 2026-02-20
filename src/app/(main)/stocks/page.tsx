@@ -285,21 +285,21 @@ function StocksPageContent() {
     return (
       <div className="p-4 md:p-6 pb-20 md:pb-6">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-white">Stocks</h1>
-          <div className="h-10 w-10 bg-white/5 rounded-lg animate-pulse hidden md:block"></div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Stocks</h1>
+          <div className="h-10 w-10 bg-gray-100 dark:bg-white/5 rounded-lg animate-pulse hidden md:block"></div>
         </div>
 
         {/* Filters skeleton */}
         <SkeletonFilterBar className="mb-6" />
 
         {/* Result count skeleton */}
-        <div className="mb-4 h-5 w-32 bg-white/5 rounded animate-pulse"></div>
+        <div className="mb-4 h-5 w-32 bg-gray-100 dark:bg-white/5 rounded animate-pulse"></div>
 
         {/* Desktop Table skeleton */}
-        <div className="hidden md:block bg-vettr-card/50 border border-white/5 rounded-2xl overflow-hidden">
+        <div className="hidden md:block bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl overflow-hidden">
           <table className="w-full">
-            <thead className="bg-vettr-navy border-b border-white/5">
-              <tr className="border-b border-white/5">
+            <thead className="bg-lightBg dark:bg-vettr-navy border-b border-gray-200 dark:border-white/5">
+              <tr className="border-b border-gray-200 dark:border-white/5">
                 <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Ticker</th>
                 <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Company</th>
                 <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-right">Price</th>
@@ -332,7 +332,7 @@ function StocksPageContent() {
   if (stocksError) {
     return (
       <div className="p-4 md:p-6 pb-20 md:pb-6">
-        <h1 className="text-2xl font-bold text-white mb-6">Stocks</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Stocks</h1>
         <EmptyState
           icon={<AlertTriangleIcon className="w-16 h-16 text-yellow-400" />}
           title="Error loading stocks"
@@ -346,10 +346,10 @@ function StocksPageContent() {
   if (filteredStocks.length === 0 && !stocksLoading) {
     return (
       <div className="p-4 md:p-6 pb-20 md:pb-6">
-        <h1 className="text-2xl font-bold text-white mb-6">Stocks</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Stocks</h1>
 
         {/* Filter bar */}
-        <div className="mb-6 bg-vettr-card/30 border border-white/5 rounded-2xl p-3">
+        <div className="mb-6 bg-gray-50 dark:bg-vettr-card/30 border border-gray-200 dark:border-white/5 rounded-2xl p-3">
           <div className="flex flex-col md:flex-row gap-3">
             <SearchInput
               value={searchInput}
@@ -373,7 +373,7 @@ function StocksPageContent() {
 
             <button
               onClick={toggleSortOrder}
-              className="flex items-center justify-center w-10 h-10 bg-white/5 border border-white/10 text-white rounded-xl hover:bg-white/10 transition-colors"
+              className="flex items-center justify-center w-10 h-10 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl hover:bg-gray-200 dark:hover:bg-white/10 transition-colors"
               title={sortOrder === 'asc' ? 'Ascending' : 'Descending'}
               aria-label={sortOrder === 'asc' ? 'Sort ascending' : 'Sort descending'}
             >
@@ -387,7 +387,7 @@ function StocksPageContent() {
             {/* View toggle - Only shown on desktop (>= 1024px) */}
             <button
               onClick={toggleViewMode}
-              className="hidden lg:flex items-center justify-center w-10 h-10 bg-white/5 border border-white/10 text-white rounded-xl hover:bg-white/10 transition-colors"
+              className="hidden lg:flex items-center justify-center w-10 h-10 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl hover:bg-gray-200 dark:hover:bg-white/10 transition-colors"
               title={viewMode === 'card' ? 'Switch to Table View' : 'Switch to Card View'}
               aria-label={viewMode === 'card' ? 'Switch to table view' : 'Switch to card view'}
             >
@@ -432,7 +432,7 @@ function StocksPageContent() {
       />
 
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-white">Stocks</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Stocks</h1>
         {/* Desktop refresh button */}
         <div className="hidden md:block">
           <RefreshButton
@@ -444,11 +444,11 @@ function StocksPageContent() {
       </div>
 
       {/* My Watchlist Section */}
-      <div className="mb-6 bg-vettr-card/30 border border-white/5 rounded-2xl p-5">
+      <div className="mb-6 bg-gray-50 dark:bg-vettr-card/30 border border-gray-200 dark:border-white/5 rounded-2xl p-5">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-white">My Watchlist</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">My Watchlist</h2>
           <div className="flex items-center gap-3">
-            <div className="text-sm text-gray-400">
+            <div className="text-sm text-gray-500 dark:text-gray-400">
               {watchlist.length} / {subscription?.watchlist_limit === -1 ? 'unlimited' : subscription?.watchlist_limit || '...'} stocks
             </div>
             {/* Show upgrade button when at or near limit (non-premium) */}
@@ -464,7 +464,7 @@ function StocksPageContent() {
         </div>
 
         {watchlist.length === 0 ? (
-          <p className="text-sm text-gray-500 text-center py-4">
+          <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-4">
             No stocks in your watchlist yet. Star a stock to add it.
           </p>
         ) : (
@@ -472,16 +472,16 @@ function StocksPageContent() {
             {watchlist.map(stock => (
               <div
                 key={stock.ticker}
-                className="flex items-center gap-3 p-3 bg-vettr-card/50 border border-white/5 rounded-xl hover:border-vettr-accent/20 hover:bg-vettr-card/80 transition-all cursor-pointer group"
+                className="flex items-center gap-3 p-3 bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-xl hover:border-vettr-accent/20 hover:bg-gray-50 dark:hover:bg-vettr-card/80 transition-all cursor-pointer group"
                 onClick={() => window.location.href = `/stocks/${stock.ticker}`}
               >
                 {/* Ticker and Company */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="font-mono text-sm font-bold text-vettr-accent">{stock.ticker}</span>
-                    <span className="text-xs text-gray-500 truncate">{stock.company_name}</span>
+                    <span className="text-xs text-gray-400 dark:text-gray-500 truncate">{stock.company_name}</span>
                   </div>
-                  <div className="flex items-center gap-3 text-xs text-gray-400">
+                  <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
                     <span>${stock.current_price?.toFixed(2) || 'N/A'}</span>
                     {stock.price_change_percent !== undefined && stock.price_change_percent !== null && (
                       <div className="flex items-center gap-1">
@@ -529,7 +529,7 @@ function StocksPageContent() {
       </div>
 
       {/* Filter bar - single row design */}
-      <div className="mb-6 bg-vettr-card/30 border border-white/5 rounded-2xl p-3">
+      <div className="mb-6 bg-gray-50 dark:bg-vettr-card/30 border border-gray-200 dark:border-white/5 rounded-2xl p-3">
         <div className="flex flex-col md:flex-row gap-3">
           <SearchInput
             value={searchInput}
@@ -553,7 +553,7 @@ function StocksPageContent() {
 
           <button
             onClick={toggleSortOrder}
-            className="flex items-center justify-center w-10 h-10 bg-white/5 border border-white/10 text-white rounded-xl hover:bg-white/10 transition-colors"
+            className="flex items-center justify-center w-10 h-10 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl hover:bg-gray-200 dark:hover:bg-white/10 transition-colors"
             title={sortOrder === 'asc' ? 'Ascending' : 'Descending'}
             aria-label={sortOrder === 'asc' ? 'Sort ascending' : 'Sort descending'}
           >
@@ -567,7 +567,7 @@ function StocksPageContent() {
           {/* View toggle - Only shown on desktop (>= 1024px) */}
           <button
             onClick={toggleViewMode}
-            className="hidden lg:flex items-center justify-center w-10 h-10 bg-white/5 border border-white/10 text-white rounded-xl hover:bg-white/10 transition-colors"
+            className="hidden lg:flex items-center justify-center w-10 h-10 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl hover:bg-gray-200 dark:hover:bg-white/10 transition-colors"
             title={viewMode === 'card' ? 'Switch to Table View' : 'Switch to Card View'}
             aria-label={viewMode === 'card' ? 'Switch to table view' : 'Switch to card view'}
           >
@@ -581,10 +581,10 @@ function StocksPageContent() {
       </div>
 
       {/* All Stocks Section Header */}
-      <h2 className="text-lg font-semibold text-white mb-3">All Stocks</h2>
+      <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">All Stocks</h2>
 
       {/* Stock count */}
-      <div className="mb-4 text-sm text-gray-500">
+      <div className="mb-4 text-sm text-gray-400 dark:text-gray-500">
         Showing {Math.min((currentPage - 1) * perPage + 1, totalItems)}–{Math.min(currentPage * perPage, totalItems)} of {totalItems} stocks
       </div>
 
@@ -593,13 +593,13 @@ function StocksPageContent() {
         // Table view - Desktop only (>= 768px)
         <div className="hidden md:block -mx-4 md:mx-0 px-4 md:px-0">
           <table className="w-full">
-            <thead className="bg-vettr-navy dark:bg-vettr-navy border-b border-white/5">
-              <tr className="border-b border-white/5 dark:border-white/5 border-gray-200">
+            <thead className="bg-lightBg dark:bg-vettr-navy border-b border-gray-200 dark:border-white/5">
+              <tr className="border-b border-gray-200 dark:border-white/5">
                 <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">
                   <button
                     onClick={() => handleColumnSort('company_name')}
                     className={`flex items-center gap-2 transition-colors ${
-                      sortBy === 'company_name' ? 'text-white' : 'hover:text-gray-300'
+                      sortBy === 'company_name' ? 'text-gray-900 dark:text-white' : 'hover:text-gray-600 dark:hover:text-gray-300'
                     }`}
                   >
                     Ticker
@@ -616,7 +616,7 @@ function StocksPageContent() {
                   <button
                     onClick={() => handleColumnSort('company_name')}
                     className={`flex items-center gap-2 transition-colors ${
-                      sortBy === 'company_name' ? 'text-white' : 'hover:text-gray-300'
+                      sortBy === 'company_name' ? 'text-gray-900 dark:text-white' : 'hover:text-gray-600 dark:hover:text-gray-300'
                     }`}
                   >
                     Company
@@ -633,7 +633,7 @@ function StocksPageContent() {
                   <button
                     onClick={() => handleColumnSort('current_price')}
                     className={`flex items-center gap-2 ml-auto transition-colors ${
-                      sortBy === 'current_price' ? 'text-white' : 'hover:text-gray-300'
+                      sortBy === 'current_price' ? 'text-gray-900 dark:text-white' : 'hover:text-gray-600 dark:hover:text-gray-300'
                     }`}
                   >
                     Price
@@ -650,7 +650,7 @@ function StocksPageContent() {
                   <button
                     onClick={() => handleColumnSort('price_change_percent')}
                     className={`flex items-center gap-2 ml-auto transition-colors ${
-                      sortBy === 'price_change_percent' ? 'text-white' : 'hover:text-gray-300'
+                      sortBy === 'price_change_percent' ? 'text-gray-900 dark:text-white' : 'hover:text-gray-600 dark:hover:text-gray-300'
                     }`}
                   >
                     Change
@@ -667,7 +667,7 @@ function StocksPageContent() {
                   <button
                     onClick={() => handleColumnSort('vetr_score')}
                     className={`flex items-center gap-2 mx-auto transition-colors ${
-                      sortBy === 'vetr_score' ? 'text-white' : 'hover:text-gray-300'
+                      sortBy === 'vetr_score' ? 'text-gray-900 dark:text-white' : 'hover:text-gray-600 dark:hover:text-gray-300'
                     }`}
                   >
                     VETTR Score
@@ -684,7 +684,7 @@ function StocksPageContent() {
                   <button
                     onClick={() => handleColumnSort('sector')}
                     className={`flex items-center gap-2 transition-colors ${
-                      sortBy === 'sector' ? 'text-white' : 'hover:text-gray-300'
+                      sortBy === 'sector' ? 'text-gray-900 dark:text-white' : 'hover:text-gray-600 dark:hover:text-gray-300'
                     }`}
                   >
                     Sector
@@ -709,17 +709,17 @@ function StocksPageContent() {
               {filteredStocks.map(stock => (
                 <tr
                   key={stock.ticker}
-                  className="border-b border-white/5 hover:bg-white/[0.03] transition-colors cursor-pointer group"
+                  className="border-b border-gray-200 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-colors cursor-pointer group"
                   onClick={() => window.location.href = `/stocks/${stock.ticker}`}
                 >
                   <td className="px-4 py-3">
                     <span className="font-mono text-sm font-bold text-vettr-accent">{stock.ticker}</span>
                   </td>
                   <td className="px-4 py-3">
-                    <span className="text-sm text-white">{stock.company_name}</span>
+                    <span className="text-sm text-gray-900 dark:text-white">{stock.company_name}</span>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <span className="text-sm font-semibold text-white">
+                    <span className="text-sm font-semibold text-gray-900 dark:text-white">
                       ${stock.current_price?.toFixed(2) || 'N/A'}
                     </span>
                   </td>
@@ -749,10 +749,10 @@ function StocksPageContent() {
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <span className="text-sm text-gray-400">{stock.sector || 'N/A'}</span>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">{stock.sector || 'N/A'}</span>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <span className="text-sm text-gray-400">
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
                       {stock.market_cap ? `$${(stock.market_cap / 1_000_000_000).toFixed(1)}B` : 'N/A'}
                     </span>
                   </td>
@@ -816,15 +816,15 @@ function StocksPageContent() {
       {totalPages > 0 && (
         <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           {/* Per-page selector */}
-          <div className="flex items-center gap-2 text-sm text-gray-400">
+          <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
             <span>Show</span>
             <select
               value={perPage}
               onChange={(e) => handlePerPageChange(e.target.value)}
-              className="bg-white/5 border border-white/10 text-white rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:border-vettr-accent/40"
+              className="bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:border-vettr-accent/40"
             >
               {PER_PAGE_OPTIONS.map(opt => (
-                <option key={opt} value={opt} className="bg-vettr-navy">{opt}</option>
+                <option key={opt} value={opt} className="bg-white dark:bg-vettr-navy">{opt}</option>
               ))}
             </select>
             <span>per page</span>
@@ -836,7 +836,7 @@ function StocksPageContent() {
             <button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className="flex items-center justify-center w-9 h-9 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              className="flex items-center justify-center w-9 h-9 rounded-lg bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-400 hover:bg-gray-200 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               aria-label="Previous page"
             >
               <ChevronUpIcon className="w-4 h-4 -rotate-90" />
@@ -853,7 +853,7 @@ function StocksPageContent() {
                   className={`w-9 h-9 rounded-lg text-sm font-medium transition-colors ${
                     page === currentPage
                       ? 'bg-vettr-accent text-white'
-                      : 'bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10 hover:text-white'
+                      : 'bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-400 hover:bg-gray-200 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white'
                   }`}
                 >
                   {page}
@@ -865,7 +865,7 @@ function StocksPageContent() {
             <button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="flex items-center justify-center w-9 h-9 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              className="flex items-center justify-center w-9 h-9 rounded-lg bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-400 hover:bg-gray-200 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               aria-label="Next page"
             >
               <ChevronDownIcon className="w-4 h-4 -rotate-90" />
@@ -896,10 +896,10 @@ export default function StocksPage() {
   return (
     <Suspense fallback={
       <div className="p-4 md:p-6 pb-20 md:pb-6">
-        <h1 className="text-2xl font-bold text-white mb-6">Stocks</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Stocks</h1>
         <div className="space-y-4">
           {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="h-24 bg-white/5 rounded-xl animate-pulse"></div>
+            <div key={i} className="h-24 bg-gray-100 dark:bg-white/5 rounded-xl animate-pulse"></div>
           ))}
         </div>
       </div>

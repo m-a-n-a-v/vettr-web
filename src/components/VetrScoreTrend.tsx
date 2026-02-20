@@ -56,9 +56,9 @@ export default function VetrScoreTrend({ trend }: VetrScoreTrendProps) {
   };
 
   return (
-    <div className={`bg-vettr-card/50 border ${config.borderColor} ${config.bgColor} rounded-2xl p-5
-                    hover:border-vettr-accent/20 hover:bg-vettr-card/80 transition-all duration-300`}>
-      <h3 className="text-lg font-semibold text-white mb-4">Score Trend</h3>
+    <div className={`bg-white/80 dark:bg-vettr-card/50 border ${config.borderColor} ${config.bgColor} rounded-2xl p-5
+                    hover:border-vettr-accent/20 hover:bg-white dark:hover:bg-vettr-card/80 transition-all duration-300`}>
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Score Trend</h3>
 
       <div className="space-y-4">
         {/* Direction and Momentum */}
@@ -71,7 +71,7 @@ export default function VetrScoreTrend({ trend }: VetrScoreTrendProps) {
               <div className={`text-base font-semibold ${config.color}`}>
                 {trend.direction}
               </div>
-              <div className="text-sm text-gray-400">
+              <div className="text-sm text-gray-500 dark:text-gray-400">
                 Momentum: <span className={config.color}>{formatMomentum(trend.momentum)}</span>
               </div>
             </div>
@@ -81,12 +81,12 @@ export default function VetrScoreTrend({ trend }: VetrScoreTrendProps) {
         {/* Recent Changes */}
         {trend.recent_changes && trend.recent_changes.length > 0 && (
           <div className="mt-4">
-            <h4 className="text-sm font-semibold text-gray-400 mb-2">Recent Changes</h4>
+            <h4 className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2">Recent Changes</h4>
             <div className="space-y-2">
               {trend.recent_changes.map((change, index) => (
                 <div
                   key={index}
-                  className="flex items-start gap-3 text-sm border-l-2 border-white/10 pl-3 py-1"
+                  className="flex items-start gap-3 text-sm border-l-2 border-gray-200 dark:border-white/10 pl-3 py-1"
                 >
                   <div className="flex-shrink-0 w-24 text-gray-500">
                     {formatDate(change.date)}
@@ -95,7 +95,7 @@ export default function VetrScoreTrend({ trend }: VetrScoreTrendProps) {
                     <div className={`font-medium ${change.change >= 0 ? 'text-vettr-accent' : 'text-red-400'}`}>
                       {(change.change ?? 0) >= 0 ? '+' : ''}{(change.change ?? 0).toFixed(1)} points
                     </div>
-                    <div className="text-gray-400">{change.reason}</div>
+                    <div className="text-gray-500 dark:text-gray-400">{change.reason}</div>
                   </div>
                 </div>
               ))}

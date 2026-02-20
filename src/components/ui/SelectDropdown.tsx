@@ -33,7 +33,7 @@ export default function SelectDropdown({
     <div className={`${className}`}>
       {/* Label */}
       {label && (
-        <label className="block text-sm font-medium text-gray-300 mb-1.5">
+        <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1.5">
           {label}
         </label>
       )}
@@ -46,11 +46,11 @@ export default function SelectDropdown({
           disabled={disabled}
           className={`
             w-full px-4 py-2.5 pr-10 rounded-xl appearance-none text-sm
-            bg-white/5 border transition-all
-            text-white
+            bg-gray-100 dark:bg-white/5 border transition-all
+            text-gray-900 dark:text-white
             focus:outline-none focus:border-vettr-accent/40 focus:ring-1 focus:ring-vettr-accent/20
             disabled:opacity-50 disabled:cursor-not-allowed
-            ${error ? 'border-red-400' : 'border-white/10'}
+            ${error ? 'border-red-400' : 'border-gray-200 dark:border-white/10'}
           `}
         >
           {placeholder && (

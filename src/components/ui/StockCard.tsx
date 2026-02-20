@@ -32,7 +32,7 @@ export default function StockCard({
 
   return (
     <Link href={`/stocks/${stock.ticker}`}>
-      <div className="relative bg-vettr-card/50 border border-white/5 rounded-2xl p-5 cursor-pointer group hover:border-vettr-accent/20 hover:bg-vettr-card/80 hover:shadow-lg hover:shadow-vettr-accent/5 transition-all duration-300">
+      <div className="relative bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-5 cursor-pointer group hover:border-vettr-accent/20 hover:bg-gray-50 dark:hover:bg-vettr-card/80 hover:shadow-lg hover:shadow-vettr-accent/5 transition-all duration-300">
         {/* Header Row: Ticker, Company Name, Favorite Star */}
         <div className="flex items-start justify-between gap-3 mb-4">
           <div className="flex-1 min-w-0">
@@ -52,19 +52,19 @@ export default function StockCard({
                   ) : isFavorite ? (
                     <StarFilledIcon className="w-4 h-4 text-yellow-400" />
                   ) : (
-                    <StarIcon className="w-4 h-4 text-gray-500 group-hover:text-gray-400" />
+                    <StarIcon className="w-4 h-4 text-gray-400 dark:text-gray-500 group-hover:text-gray-300 dark:group-hover:text-gray-400" />
                   )}
                 </button>
               )}
             </div>
-            <p className="text-sm text-gray-400 truncate">{stock.company_name}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{stock.company_name}</p>
           </div>
         </div>
 
         {/* Price Row */}
         <div className="mb-4">
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-bold text-white">
+            <span className="text-2xl font-bold text-gray-900 dark:text-white">
               ${(stock.current_price ?? 0).toFixed(2)}
             </span>
             <PriceChangeIndicator change={stock.price_change_percent} size="sm" />

@@ -126,7 +126,7 @@ export default function VetrScoreBadge({
       </svg>
 
       {/* Score number centered */}
-      <div className={`absolute inset-0 flex items-center justify-center ${config.fontSize} font-bold text-white tabular-nums`}>
+      <div className={`absolute inset-0 flex items-center justify-center ${config.fontSize} font-bold text-gray-900 dark:text-white tabular-nums`}>
         {animatedScore}
       </div>
     </div>
@@ -136,7 +136,7 @@ export default function VetrScoreBadge({
     return (
       <div className="flex flex-col items-center gap-2">
         {badge}
-        <span className={`${config.labelSize} text-gray-500 font-medium`}>
+        <span className={`${config.labelSize} text-gray-400 dark:text-gray-500 font-medium`}>
           VETTR Score
         </span>
       </div>

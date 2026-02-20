@@ -13,18 +13,19 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>('dark');
+  const [theme, setThemeState] = useState<Theme>(() => {
+    // Read from localStorage synchronously to avoid flicker
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('vettr_theme') as Theme | null;
+      if (saved === 'dark' || saved === 'light' || saved === 'system') {
+        return saved;
+      }
+    }
+    return 'dark';
+  });
   const [resolvedTheme, setResolvedTheme] = useState<'dark' | 'light'>('dark');
 
-  // Initialize theme from localStorage on mount
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('vettr_theme') as Theme | null;
-    if (savedTheme && (savedTheme === 'dark' || savedTheme === 'light' || savedTheme === 'system')) {
-      setThemeState(savedTheme);
-    }
-  }, []);
-
-  // Handle theme changes
+  // Apply theme to DOM and persist to localStorage
   useEffect(() => {
     const root = document.documentElement;
 

@@ -13,7 +13,7 @@ export default function SkeletonLoader({
   height,
   className = ''
 }: SkeletonLoaderProps) {
-  const baseClasses = 'animate-pulse bg-white/5';
+  const baseClasses = 'animate-pulse bg-gray-100 dark:bg-white/5';
 
   const getVariantClasses = () => {
     switch (variant) {
@@ -24,7 +24,7 @@ export default function SkeletonLoader({
       case 'rectangular':
         return 'rounded-xl';
       case 'card':
-        return 'rounded-xl p-4 border border-white/5';
+        return 'rounded-xl p-4 border border-gray-200 dark:border-white/5';
       default:
         return 'rounded-xl';
     }
@@ -63,7 +63,7 @@ export function SkeletonText({ lines = 3, className = '' }: { lines?: number; cl
 
 export function SkeletonCard({ className = '' }: { className?: string }) {
   return (
-    <div className={`bg-white/5 rounded-xl p-4 ${className}`}>
+    <div className={`bg-gray-100 dark:bg-white/5 rounded-xl p-4 ${className}`}>
       <div className="flex items-start gap-3 mb-3">
         <SkeletonLoader variant="circular" width="3rem" height="3rem" />
         <div className="flex-1 space-y-2">
@@ -82,7 +82,7 @@ export function SkeletonCard({ className = '' }: { className?: string }) {
 // V2 Metric Card Skeleton - for Pulse page metric cards
 export function SkeletonMetricCard({ className = '' }: { className?: string }) {
   return (
-    <div className={`bg-vettr-card/50 border border-white/5 rounded-2xl p-5 ${className}`}>
+    <div className={`bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-5 ${className}`}>
       <SkeletonLoader variant="text" width="60%" height="0.75rem" className="mb-2" />
       <SkeletonLoader variant="text" width="40%" height="2rem" />
     </div>
@@ -92,7 +92,7 @@ export function SkeletonMetricCard({ className = '' }: { className?: string }) {
 // V2 Stock Card Skeleton - matches StockCard component
 export function SkeletonStockCard({ className = '' }: { className?: string }) {
   return (
-    <div className={`bg-vettr-card/50 border border-white/5 rounded-2xl p-5 ${className}`}>
+    <div className={`bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-5 ${className}`}>
       {/* Header row: ticker + company + favorite */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1 space-y-1">
@@ -130,7 +130,7 @@ export function SkeletonList({ count = 5, className = '' }: { count?: number; cl
 // V2 Filing Table Row Skeleton - for table view
 export function SkeletonFilingRow({ className = '' }: { className?: string }) {
   return (
-    <tr className={`border-b border-white/5 ${className}`}>
+    <tr className={`border-b border-gray-200 dark:border-white/5 ${className}`}>
       <td className="px-4 py-3">
         <SkeletonLoader variant="circular" width="2rem" height="2rem" />
       </td>
@@ -156,7 +156,7 @@ export function SkeletonFilingRow({ className = '' }: { className?: string }) {
 // V2 Stock Table Row Skeleton - for table view on Stocks page
 export function SkeletonStockRow({ className = '' }: { className?: string }) {
   return (
-    <tr className={`border-b border-white/5 ${className}`}>
+    <tr className={`border-b border-gray-200 dark:border-white/5 ${className}`}>
       <td className="px-4 py-3">
         <SkeletonLoader variant="text" width="3rem" height="0.875rem" />
       </td>
@@ -188,7 +188,7 @@ export function SkeletonStockRow({ className = '' }: { className?: string }) {
 // V2 Alert Rule Row Skeleton - for table view
 export function SkeletonAlertRule({ className = '' }: { className?: string }) {
   return (
-    <tr className={`border-b border-white/5 ${className}`}>
+    <tr className={`border-b border-gray-200 dark:border-white/5 ${className}`}>
       <td className="px-4 py-3">
         <SkeletonLoader variant="text" width="4rem" height="0.875rem" />
       </td>
@@ -217,7 +217,7 @@ export function SkeletonAlertRule({ className = '' }: { className?: string }) {
 // V2 Alert Trigger Card Skeleton
 export function SkeletonAlertTrigger({ className = '' }: { className?: string }) {
   return (
-    <div className={`bg-white/[0.03] border border-white/5 rounded-xl p-4 ${className}`}>
+    <div className={`bg-gray-50 dark:bg-white/[0.03] border border-gray-200 dark:border-white/5 rounded-xl p-4 ${className}`}>
       <div className="flex items-start gap-3">
         <SkeletonLoader variant="circular" width="2rem" height="2rem" />
         <div className="flex-1 space-y-2">
@@ -261,7 +261,7 @@ export function SkeletonStockDetailHeader({ className = '' }: { className?: stri
 // V2 VETTR Score Section Skeleton
 export function SkeletonVetrScoreSection({ className = '' }: { className?: string }) {
   return (
-    <div className={`bg-vettr-card/50 border border-white/5 rounded-2xl p-6 ${className}`}>
+    <div className={`bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-6 ${className}`}>
       <SkeletonLoader variant="text" width="40%" height="1rem" className="mb-4" />
       <div className="flex items-center justify-center mb-6">
         <SkeletonLoader variant="circular" width="8rem" height="8rem" />
@@ -297,13 +297,13 @@ export function SkeletonUserHeader({ className = '' }: { className?: string }) {
 // V2 Profile Section Skeleton - for grouped cards
 export function SkeletonProfileSection({ className = '' }: { className?: string }) {
   return (
-    <div className={`bg-vettr-card/30 border border-white/5 rounded-2xl overflow-hidden ${className}`}>
+    <div className={`bg-gray-50 dark:bg-vettr-card/30 border border-gray-200 dark:border-white/5 rounded-2xl overflow-hidden ${className}`}>
       <div className="space-y-0">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-white/5">
           <SkeletonLoader variant="text" width="30%" height="0.875rem" />
           <SkeletonLoader variant="text" width="20%" height="0.875rem" />
         </div>
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-white/5">
           <SkeletonLoader variant="text" width="35%" height="0.875rem" />
           <SkeletonLoader variant="text" width="25%" height="0.875rem" />
         </div>
@@ -319,7 +319,7 @@ export function SkeletonProfileSection({ className = '' }: { className?: string 
 // V2 Chart Skeleton - for Recharts placeholders
 export function SkeletonChart({ className = '' }: { className?: string }) {
   return (
-    <div className={`bg-vettr-card/30 border border-white/5 rounded-2xl p-6 ${className}`}>
+    <div className={`bg-gray-50 dark:bg-vettr-card/30 border border-gray-200 dark:border-white/5 rounded-2xl p-6 ${className}`}>
       <SkeletonLoader variant="text" width="40%" height="1rem" className="mb-4" />
       <div className="flex items-end gap-2 h-64">
         {Array.from({ length: 12 }).map((_, i) => (
@@ -338,7 +338,7 @@ export function SkeletonChart({ className = '' }: { className?: string }) {
 // V2 Filter Bar Skeleton - for Stocks/Discovery pages
 export function SkeletonFilterBar({ className = '' }: { className?: string }) {
   return (
-    <div className={`bg-vettr-card/30 border border-white/5 rounded-2xl p-3 flex items-center gap-3 ${className}`}>
+    <div className={`bg-gray-50 dark:bg-vettr-card/30 border border-gray-200 dark:border-white/5 rounded-2xl p-3 flex items-center gap-3 ${className}`}>
       <SkeletonLoader variant="rectangular" width="16rem" height="2.5rem" className="rounded-xl" />
       <SkeletonLoader variant="rectangular" width="10rem" height="2.5rem" className="rounded-xl" />
       <SkeletonLoader variant="rectangular" width="8rem" height="2.5rem" className="rounded-xl" />

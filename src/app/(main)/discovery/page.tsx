@@ -242,7 +242,7 @@ function DiscoveryPageContent() {
   };
 
   return (
-    <div className="min-h-screen bg-vettr-navy pb-20 md:pb-6">
+    <div className="min-h-screen bg-lightBg dark:bg-vettr-navy pb-20 md:pb-6">
       {/* Pull-to-refresh indicator (mobile only) */}
       <PullToRefreshIndicator
         isPulling={isPulling}
@@ -251,10 +251,10 @@ function DiscoveryPageContent() {
       />
 
       {/* Page Header */}
-      <div className="bg-vettr-card/30 border-b border-white/5 px-4 py-6 md:px-6">
+      <div className="bg-white dark:bg-vettr-card/30 border-b border-gray-200 dark:border-white/5 px-4 py-6 md:px-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-white mb-2">Discovery</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Discovery</h1>
             <p className="text-sm text-gray-400">
               Explore stocks and recent filings by sector
             </p>
@@ -304,7 +304,7 @@ function DiscoveryPageContent() {
                     transition-all duration-300
                     ${isSelected
                       ? 'bg-vettr-accent/10 border border-vettr-accent/30 text-vettr-accent'
-                      : 'bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10'
+                      : 'bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-white/10'
                     }
                   `}
                 >
@@ -319,7 +319,7 @@ function DiscoveryPageContent() {
         {(isLoadingCollections || collections.length > 0) && (
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-white">Featured Collections</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Featured Collections</h2>
             </div>
 
             {isLoadingCollections ? (
@@ -345,7 +345,7 @@ function DiscoveryPageContent() {
         {/* Featured Stocks Section */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-white">Featured Stocks</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Featured Stocks</h2>
             <button
               onClick={() => router.push('/stocks')}
               className="flex items-center gap-1 text-sm text-vettr-accent hover:text-vettr-accent/80 transition-colors"
@@ -399,7 +399,7 @@ function DiscoveryPageContent() {
         {/* Recent Filings Section */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-white">Recent Filings</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Recent Filings</h2>
             <button
               onClick={() => router.push('/filings')}
               className="text-sm text-vettr-accent hover:text-vettr-accent/80 transition-colors"
@@ -412,10 +412,10 @@ function DiscoveryPageContent() {
           {isLoadingFilings ? (
             <>
               {/* Desktop Table Skeleton */}
-              <div className="hidden md:block bg-vettr-card/30 border border-white/5 rounded-2xl overflow-hidden">
+              <div className="hidden md:block bg-white dark:bg-vettr-card/30 border border-gray-200 dark:border-white/5 rounded-2xl overflow-hidden">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-white/5">
+                    <tr className="border-b border-gray-200 dark:border-white/5">
                       <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Type</th>
                       <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Title</th>
                       <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Ticker</th>
@@ -435,15 +435,15 @@ function DiscoveryPageContent() {
               {/* Mobile Card Skeleton */}
               <div className="md:hidden space-y-3">
                 {[...Array(5)].map((_, i) => (
-                  <div key={i} className="bg-vettr-card/50 border border-white/5 rounded-2xl p-4">
+                  <div key={i} className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-4">
                     <div className="flex items-start gap-4">
-                      <div className="h-10 w-10 bg-white/5 rounded-full animate-pulse" />
+                      <div className="h-10 w-10 bg-gray-100 dark:bg-white/5 rounded-full animate-pulse" />
                       <div className="flex-1 space-y-2">
-                        <div className="h-4 w-3/4 bg-white/5 rounded animate-pulse" />
-                        <div className="h-3 w-1/2 bg-white/5 rounded animate-pulse" />
+                        <div className="h-4 w-3/4 bg-gray-100 dark:bg-white/5 rounded animate-pulse" />
+                        <div className="h-3 w-1/2 bg-gray-100 dark:bg-white/5 rounded animate-pulse" />
                         <div className="flex gap-2">
-                          <div className="h-5 w-16 bg-white/5 rounded-full animate-pulse" />
-                          <div className="h-5 w-16 bg-white/5 rounded-full animate-pulse" />
+                          <div className="h-5 w-16 bg-gray-100 dark:bg-white/5 rounded-full animate-pulse" />
+                          <div className="h-5 w-16 bg-gray-100 dark:bg-white/5 rounded-full animate-pulse" />
                         </div>
                       </div>
                     </div>
@@ -470,7 +470,7 @@ function DiscoveryPageContent() {
           ) : (
             <>
               {/* Desktop: Table View */}
-              <div className="hidden md:block bg-vettr-card/30 border border-white/5 rounded-2xl overflow-hidden">
+              <div className="hidden md:block bg-white dark:bg-vettr-card/30 border border-gray-200 dark:border-white/5 rounded-2xl overflow-hidden">
                 <FilingTable filings={filteredFilings} showStock={true} />
               </div>
               {/* Mobile: Card View */}
@@ -507,8 +507,8 @@ function FilingRow({ filing }: FilingRowProps) {
     <a
       href={`/filings/${filing.id}`}
       className="
-        block bg-vettr-card/50 border border-white/5 rounded-2xl p-4
-        hover:bg-vettr-card/80 hover:border-vettr-accent/20 transition-all duration-300
+        block bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-4
+        hover:bg-gray-50 dark:hover:bg-vettr-card/80 hover:border-vettr-accent/20 transition-all duration-300
       "
     >
       <div className="flex items-start gap-4">
@@ -525,7 +525,7 @@ function FilingRow({ filing }: FilingRowProps) {
         {/* Filing Details */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-4 mb-2">
-            <h3 className="text-base font-semibold text-white line-clamp-2">
+            <h3 className="text-base font-semibold text-gray-900 dark:text-white line-clamp-2">
               {filing.title}
             </h3>
             {filing.is_material && (
@@ -569,14 +569,14 @@ function CollectionCard({ collection, onClick }: CollectionCardProps) {
   return (
     <div
       onClick={onClick}
-      className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5 hover:border-vettr-accent/20 hover:bg-vettr-card/80 transition-all duration-300 cursor-pointer"
+      className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-5 hover:border-vettr-accent/20 hover:bg-gray-50 dark:hover:bg-vettr-card/80 transition-all duration-300 cursor-pointer"
     >
       {/* Icon in circle */}
       <div className="w-10 h-10 rounded-full bg-vettr-accent/10 flex items-center justify-center mb-3">
         <span className="text-xl">{icon}</span>
       </div>
       {/* Title */}
-      <h3 className="text-base font-semibold text-white mb-1">{collection.name}</h3>
+      <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1">{collection.name}</h3>
       {/* Tagline */}
       <p className="text-xs text-gray-400 mb-3 line-clamp-2">{collection.tagline}</p>
       {/* Criteria summary */}
@@ -592,16 +592,16 @@ function CollectionCard({ collection, onClick }: CollectionCardProps) {
  */
 function SkeletonCollectionCard() {
   return (
-    <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5">
+    <div className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-5">
       {/* Icon skeleton */}
-      <div className="w-10 h-10 rounded-full bg-white/5 animate-pulse mb-3" />
+      <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-white/5 animate-pulse mb-3" />
       {/* Title skeleton */}
-      <div className="h-4 w-3/4 bg-white/5 rounded animate-pulse mb-1" />
+      <div className="h-4 w-3/4 bg-gray-100 dark:bg-white/5 rounded animate-pulse mb-1" />
       {/* Tagline skeleton */}
-      <div className="h-3 w-full bg-white/5 rounded animate-pulse mb-1" />
-      <div className="h-3 w-2/3 bg-white/5 rounded animate-pulse mb-3" />
+      <div className="h-3 w-full bg-gray-100 dark:bg-white/5 rounded animate-pulse mb-1" />
+      <div className="h-3 w-2/3 bg-gray-100 dark:bg-white/5 rounded animate-pulse mb-3" />
       {/* Criteria skeleton */}
-      <div className="h-3 w-1/2 bg-white/5 rounded animate-pulse" />
+      <div className="h-3 w-1/2 bg-gray-100 dark:bg-white/5 rounded animate-pulse" />
     </div>
   );
 }
@@ -610,15 +610,15 @@ function SkeletonCollectionCard() {
 export default function DiscoveryPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-vettr-navy pb-20 md:pb-6">
-        <div className="bg-vettr-card/30 border-b border-white/5 px-4 py-6 md:px-6">
-          <h1 className="text-2xl font-bold text-white">Discovery</h1>
+      <div className="min-h-screen bg-lightBg dark:bg-vettr-navy pb-20 md:pb-6">
+        <div className="bg-white dark:bg-vettr-card/30 border-b border-gray-200 dark:border-white/5 px-4 py-6 md:px-6">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Discovery</h1>
         </div>
         <div className="px-4 py-6 md:px-6">
-          <div className="h-10 bg-white/5 rounded-xl animate-pulse mb-6 max-w-2xl mx-auto"></div>
+          <div className="h-10 bg-gray-100 dark:bg-white/5 rounded-xl animate-pulse mb-6 max-w-2xl mx-auto"></div>
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-32 bg-white/5 rounded-xl animate-pulse"></div>
+              <div key={i} className="h-32 bg-gray-100 dark:bg-white/5 rounded-xl animate-pulse"></div>
             ))}
           </div>
         </div>
