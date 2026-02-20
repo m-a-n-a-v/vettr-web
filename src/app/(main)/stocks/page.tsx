@@ -51,6 +51,8 @@ function StocksPageContent() {
   const searchParams = useSearchParams()
 
   // Initialize state from URL params
+  // Separate display value (updates instantly on keystroke) from debounced query (triggers API calls)
+  const [searchInput, setSearchInput] = useState(searchParams.get('search') || '')
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '')
   const [sortBy, setSortBy] = useState<SortOption>((searchParams.get('sort') as SortOption) || 'vetr_score')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>((searchParams.get('order') as 'asc' | 'desc') || 'desc')
@@ -61,6 +63,7 @@ function StocksPageContent() {
   const [allStocks, setAllStocks] = useState<Stock[]>([])
   const [isLoadingMore, setIsLoadingMore] = useState(false)
   const loadMoreRef = useRef<HTMLDivElement>(null)
+  const hasLoadedOnce = useRef(false)
   const { showToast } = useToast()
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
 
@@ -90,6 +93,14 @@ function StocksPageContent() {
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
+  // Debounce search input → searchQuery (300ms)
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setSearchQuery(searchInput)
+    }, 300)
+    return () => clearTimeout(handler)
+  }, [searchInput])
+
   // Fetch stocks with pagination
   const { stocks, pagination, isLoading: stocksLoading, isError: stocksError, mutate: mutateStocks } = useStocks({
     search: searchQuery || undefined,
@@ -101,11 +112,12 @@ function StocksPageContent() {
 
   // Accumulate stocks as we load more pages
   useEffect(() => {
-    if (stocks && stocks.length > 0) {
+    if (stocks) {
+      hasLoadedOnce.current = true
       if (offset === 0) {
         // First page - replace all stocks
         setAllStocks(stocks)
-      } else {
+      } else if (stocks.length > 0) {
         // Subsequent pages - append new stocks, avoiding duplicates
         setAllStocks(prev => {
           const existingTickers = new Set(prev.map(s => s.ticker))
@@ -300,9 +312,8 @@ function StocksPageContent() {
     }
   }
 
-  // Loading state - show skeleton when initial data is loading
-  // Use allStocks.length === 0 to also catch the case where stocks were cleared by a filter/sort change
-  const isInitialLoading = (stocksLoading && allStocks.length === 0) || watchlistLoading || subscriptionLoading
+  // Loading state - show skeleton only on truly initial page load, not on search/sort changes
+  const isInitialLoading = (!hasLoadedOnce.current && stocksLoading) || watchlistLoading || subscriptionLoading
   if (isInitialLoading) {
     return (
       <div className="p-4 md:p-6 pb-20 md:pb-6">
@@ -438,14 +449,15 @@ function StocksPageContent() {
           icon={<SearchIcon className="w-16 h-16 text-gray-600" />}
           title="No stocks match your filters"
           description={
-            searchQuery
+            searchInput
               ? 'Try adjusting your filters or search query.'
               : 'No stocks available at this time.'
           }
-          actionLabel={searchQuery ? 'Clear Filters' : undefined}
+          actionLabel={searchInput ? 'Clear Filters' : undefined}
           onAction={
-            searchQuery
+            searchInput
               ? () => {
+                setSearchInput('')
                 setSearchQuery('')
               }
               : undefined
@@ -480,8 +492,8 @@ function StocksPageContent() {
       <div className="mb-6 bg-vettr-card/30 border border-white/5 rounded-2xl p-3">
         <div className="flex flex-col md:flex-row gap-3">
           <SearchInput
-            value={searchQuery}
-            onChange={setSearchQuery}
+            value={searchInput}
+            onChange={setSearchInput}
             placeholder="Search by ticker or company name..."
             className="flex-1"
           />
