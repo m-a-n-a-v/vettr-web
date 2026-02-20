@@ -129,7 +129,8 @@ function StocksPageContent() {
     }
   }, [stocks, offset])
 
-  // Update URL when state changes
+  // Update URL when state changes (use history.replaceState to avoid
+  // Next.js re-renders that would unmount the SearchInput and lose focus)
   useEffect(() => {
     if (!isClient) return
 
@@ -142,8 +143,8 @@ function StocksPageContent() {
     const queryString = params.toString()
     const newUrl = queryString ? `/stocks?${queryString}` : '/stocks'
 
-    router.replace(newUrl, { scroll: false })
-  }, [searchQuery, sortBy, sortOrder, isClient, router])
+    window.history.replaceState(null, '', newUrl)
+  }, [searchQuery, sortBy, sortOrder, isClient])
 
   // Reset offset when search/sort changes (don't clear allStocks — let the
   // accumulator effect replace them when new data arrives to avoid unmounting the UI)

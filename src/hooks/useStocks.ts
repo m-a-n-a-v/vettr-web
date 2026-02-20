@@ -59,7 +59,7 @@ export function useStocks(options: UseStocksOptions = {}): UseStocksResult {
   params.set('limit', limit.toString());
   params.set('offset', offset.toString());
 
-  if (search) params.set('q', search);
+  if (search) params.set('search', search);
   if (sector) params.set('sector', sector);
   if (sort) params.set('sort', sort);
   if (order) params.set('order', order);
