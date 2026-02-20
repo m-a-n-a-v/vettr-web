@@ -145,10 +145,10 @@ function StocksPageContent() {
     router.replace(newUrl, { scroll: false })
   }, [searchQuery, sortBy, sortOrder, isClient, router])
 
-  // Reset offset when search/sort changes
+  // Reset offset when search/sort changes (don't clear allStocks — let the
+  // accumulator effect replace them when new data arrives to avoid unmounting the UI)
   useEffect(() => {
     setOffset(0)
-    setAllStocks([])
   }, [searchQuery, sortBy, sortOrder])
 
   // Load more stocks
@@ -385,8 +385,8 @@ function StocksPageContent() {
         <div className="mb-6 bg-vettr-card/30 border border-white/5 rounded-2xl p-3">
           <div className="flex flex-col md:flex-row gap-3">
             <SearchInput
-              value={searchQuery}
-              onChange={setSearchQuery}
+              value={searchInput}
+              onChange={setSearchInput}
               placeholder="Search by ticker or company name..."
               className="flex-1"
             />
