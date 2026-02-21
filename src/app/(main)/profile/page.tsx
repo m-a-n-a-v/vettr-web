@@ -31,6 +31,14 @@ export default function ProfilePage() {
   const [editedName, setEditedName] = useState('');
   const [isSavingName, setIsSavingName] = useState(false);
 
+  // Change password state
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+
   // Get user initials for avatar
   const getInitials = (name: string) => {
     const words = name.split(' ');
@@ -109,6 +117,66 @@ export default function ProfilePage() {
   const handleCancelEditName = () => {
     setIsEditingName(false);
     setEditedName('');
+  };
+
+  // Handle change password
+  const handleChangePassword = async () => {
+    setPasswordError('');
+
+    if (!currentPassword) {
+      setPasswordError('Current password is required');
+      return;
+    }
+    if (!newPassword) {
+      setPasswordError('New password is required');
+      return;
+    }
+    if (newPassword.length < 8) {
+      setPasswordError('Password must be at least 8 characters');
+      return;
+    }
+    if (!/[A-Z]/.test(newPassword)) {
+      setPasswordError('Password must contain at least one uppercase letter');
+      return;
+    }
+    if (!/[0-9]/.test(newPassword)) {
+      setPasswordError('Password must contain at least one number');
+      return;
+    }
+    if (newPassword !== confirmNewPassword) {
+      setPasswordError('Passwords do not match');
+      return;
+    }
+
+    setIsChangingPassword(true);
+
+    try {
+      const response = await api.post('/auth/change-password', {
+        current_password: currentPassword,
+        new_password: newPassword,
+      });
+      if (!response.success) {
+        setPasswordError(response.error?.message || 'Failed to change password');
+        return;
+      }
+      showToast('Password changed successfully', 'success');
+      setShowChangePassword(false);
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmNewPassword('');
+    } catch (err) {
+      setPasswordError(err instanceof Error ? err.message : 'Failed to change password');
+    } finally {
+      setIsChangingPassword(false);
+    }
+  };
+
+  const handleCancelChangePassword = () => {
+    setShowChangePassword(false);
+    setCurrentPassword('');
+    setNewPassword('');
+    setConfirmNewPassword('');
+    setPasswordError('');
   };
 
   // Loading state
@@ -283,6 +351,117 @@ export default function ProfilePage() {
             </div>
           )}
         </div>
+
+        {/* Security Section — Change Password */}
+        {user.auth_provider === 'email' && (
+          <div className="bg-white dark:bg-vettr-card/30 border border-gray-200 dark:border-white/5 rounded-2xl overflow-hidden">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white px-6 py-4 border-b border-gray-200 dark:border-white/5">Security</h2>
+
+            {showChangePassword ? (
+              <div className="px-6 py-4 space-y-4">
+                {passwordError && (
+                  <div role="alert" className="rounded-xl bg-red-500/10 border border-red-500/30 p-3 text-sm text-red-400">
+                    {passwordError}
+                  </div>
+                )}
+
+                <div>
+                  <label htmlFor="current-password" className="block text-sm font-medium text-gray-900 dark:text-white mb-1.5">
+                    Current Password
+                  </label>
+                  <input
+                    id="current-password"
+                    type="password"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-gray-900 dark:text-white text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:border-vettr-accent/50 focus:ring-1 focus:ring-vettr-accent/20 transition-all"
+                    placeholder="Enter current password"
+                    disabled={isChangingPassword}
+                    autoComplete="current-password"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="new-password" className="block text-sm font-medium text-gray-900 dark:text-white mb-1.5">
+                    New Password
+                  </label>
+                  <input
+                    id="new-password"
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-gray-900 dark:text-white text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:border-vettr-accent/50 focus:ring-1 focus:ring-vettr-accent/20 transition-all"
+                    placeholder="Min 8 chars, 1 uppercase, 1 number"
+                    disabled={isChangingPassword}
+                    autoComplete="new-password"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="confirm-new-password" className="block text-sm font-medium text-gray-900 dark:text-white mb-1.5">
+                    Confirm New Password
+                  </label>
+                  <input
+                    id="confirm-new-password"
+                    type="password"
+                    value={confirmNewPassword}
+                    onChange={(e) => setConfirmNewPassword(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') handleChangePassword(); }}
+                    className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-gray-900 dark:text-white text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:border-vettr-accent/50 focus:ring-1 focus:ring-vettr-accent/20 transition-all"
+                    placeholder="Re-enter new password"
+                    disabled={isChangingPassword}
+                    autoComplete="new-password"
+                  />
+                </div>
+
+                <div className="flex gap-3 pt-1">
+                  <button
+                    onClick={handleCancelChangePassword}
+                    disabled={isChangingPassword}
+                    className="flex-1 px-4 py-2.5 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 text-gray-900 dark:text-white rounded-xl transition-colors disabled:opacity-50 border border-gray-200 dark:border-white/10 text-sm font-medium"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleChangePassword}
+                    disabled={isChangingPassword}
+                    className="flex-1 px-4 py-2.5 bg-vettr-accent hover:bg-vettr-accent/90 text-vettr-navy rounded-xl transition-colors disabled:opacity-50 text-sm font-semibold flex items-center justify-center"
+                  >
+                    {isChangingPassword ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        </svg>
+                        Saving...
+                      </>
+                    ) : (
+                      'Update Password'
+                    )}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={() => setShowChangePassword(true)}
+                className="w-full flex items-center justify-between px-6 py-4 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-vettr-accent/30 text-left"
+              >
+                <div className="flex items-center gap-3">
+                  <svg className="w-5 h-5 text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                  </svg>
+                  <div>
+                    <p className="text-gray-900 dark:text-white text-sm font-medium">Change Password</p>
+                    <p className="text-gray-500 text-xs">Update your account password</p>
+                  </div>
+                </div>
+                <svg className="w-5 h-5 text-gray-400 group-hover:text-vettr-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Data Section */}
         <div className="bg-white dark:bg-vettr-card/30 border border-gray-200 dark:border-white/5 rounded-2xl overflow-hidden">

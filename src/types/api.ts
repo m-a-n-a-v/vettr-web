@@ -55,6 +55,7 @@ export interface User {
   created_at: string;
   updated_at: string;
   tier: 'free' | 'pro' | 'premium';
+  auth_provider?: 'email' | 'google' | 'apple';
 }
 
 /**
