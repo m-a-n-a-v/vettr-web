@@ -46,7 +46,7 @@ export function useMarketNews(limit: number = 10): UseMarketNewsReturn {
   return {
     news: (data?.items ?? []).slice(0, limit),
     source: data?.source ?? 'BNN Bloomberg',
-    sourceUrl: data?.source_url ?? 'https://www.bnnbloomberg.ca/markets/',
+    sourceUrl: data?.source_url ?? 'https://www.bnnbloomberg.ca/',
     isLoading,
     error: error ?? null,
     mutate,

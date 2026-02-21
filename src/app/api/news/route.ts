@@ -9,8 +9,8 @@ export interface NewsItem {
   imageUrl: string | null;
 }
 
-// BNN Bloomberg Markets RSS feed (Canadian-focused financial news)
-const RSS_URL = 'https://www.bnnbloomberg.ca/arc/outboundfeeds/rss/category/markets/';
+// BNN Bloomberg main RSS feed (Canadian-focused financial news — ~80+ articles)
+const RSS_URL = 'https://www.bnnbloomberg.ca/arc/outboundfeeds/rss/';
 
 // Cache the response for 10 minutes (600 seconds)
 export const revalidate = 600;
@@ -41,7 +41,7 @@ export async function GET() {
 
     return NextResponse.json({
       source: 'BNN Bloomberg',
-      source_url: 'https://www.bnnbloomberg.ca/markets/',
+      source_url: 'https://www.bnnbloomberg.ca/',
       fetched_at: new Date().toISOString(),
       items,
     });

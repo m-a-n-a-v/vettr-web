@@ -11,7 +11,7 @@ import EmptyState from '@/components/ui/EmptyState';
  * Used on the Discovery page alongside Recent Filings.
  */
 export default function MarketNews() {
-  const { news, source, sourceUrl, isLoading, error } = useMarketNews(10);
+  const { news, source, sourceUrl, isLoading, error } = useMarketNews(20);
 
   return (
     <div className="flex flex-col">
@@ -27,11 +27,11 @@ export default function MarketNews() {
         </a>
       </div>
 
-      {/* Wrapper matches sibling filings panel height — scrollable on overflow */}
-      <div className="bg-white dark:bg-vettr-card/30 border border-gray-200 dark:border-white/5 rounded-2xl overflow-hidden">
+      {/* Fixed height panel matching filings — scrollable */}
+      <div className="bg-white dark:bg-vettr-card/30 border border-gray-200 dark:border-white/5 rounded-2xl overflow-hidden lg:h-[600px] lg:flex lg:flex-col">
         {isLoading ? (
-          <div className="space-y-0 divide-y divide-gray-100 dark:divide-white/5">
-            {[...Array(7)].map((_, i) => (
+          <div className="overflow-y-auto flex-1 divide-y divide-gray-100 dark:divide-white/5">
+            {[...Array(8)].map((_, i) => (
               <SkeletonNewsItem key={i} />
             ))}
           </div>
@@ -52,7 +52,7 @@ export default function MarketNews() {
             />
           </div>
         ) : (
-          <div className="divide-y divide-gray-100 dark:divide-white/5">
+          <div className="overflow-y-auto flex-1 divide-y divide-gray-100 dark:divide-white/5">
             {news.map((item, i) => (
               <NewsItem key={`${item.link}-${i}`} item={item} />
             ))}

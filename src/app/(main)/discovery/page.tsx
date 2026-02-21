@@ -400,7 +400,7 @@ function DiscoveryPageContent() {
         {/* Recent Filings + Market News — 2 Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left: Recent Filings */}
-          <div>
+          <div className="flex flex-col">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Recent Filings</h2>
               <button
@@ -411,79 +411,85 @@ function DiscoveryPageContent() {
               </button>
             </div>
 
-            {/* Filings List - Responsive: Cards on mobile, Table on desktop */}
-            {isLoadingFilings ? (
-              <>
-                {/* Desktop Table Skeleton */}
-                <div className="hidden md:block bg-white dark:bg-vettr-card/30 border border-gray-200 dark:border-white/5 rounded-2xl overflow-hidden">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-gray-200 dark:border-white/5">
-                        <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Type</th>
-                        <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Title</th>
-                        <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Ticker</th>
-                        <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Date</th>
-                        <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Material</th>
-                        <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {[...Array(5)].map((_, i) => (
-                        <SkeletonFilingRow key={i} />
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+            {/* Filings panel — fixed height with scroll */}
+            <div className="bg-white dark:bg-vettr-card/30 border border-gray-200 dark:border-white/5 rounded-2xl overflow-hidden lg:h-[600px] lg:flex lg:flex-col">
+              {isLoadingFilings ? (
+                <div className="overflow-y-auto flex-1">
+                  {/* Desktop Table Skeleton */}
+                  <div className="hidden md:block">
+                    <table className="w-full">
+                      <thead className="sticky top-0 bg-white dark:bg-vettr-card/30 z-10">
+                        <tr className="border-b border-gray-200 dark:border-white/5">
+                          <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Type</th>
+                          <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Title</th>
+                          <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Ticker</th>
+                          <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Date</th>
+                          <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Material</th>
+                          <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {[...Array(8)].map((_, i) => (
+                          <SkeletonFilingRow key={i} />
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
 
-                {/* Mobile Card Skeleton */}
-                <div className="md:hidden space-y-3">
-                  {[...Array(5)].map((_, i) => (
-                    <div key={i} className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-4">
-                      <div className="flex items-start gap-4">
-                        <div className="h-10 w-10 bg-gray-100 dark:bg-white/5 rounded-full animate-pulse" />
-                        <div className="flex-1 space-y-2">
-                          <div className="h-4 w-3/4 bg-gray-100 dark:bg-white/5 rounded animate-pulse" />
-                          <div className="h-3 w-1/2 bg-gray-100 dark:bg-white/5 rounded animate-pulse" />
-                          <div className="flex gap-2">
-                            <div className="h-5 w-16 bg-gray-100 dark:bg-white/5 rounded-full animate-pulse" />
-                            <div className="h-5 w-16 bg-gray-100 dark:bg-white/5 rounded-full animate-pulse" />
+                  {/* Mobile Card Skeleton */}
+                  <div className="md:hidden space-y-3 p-4">
+                    {[...Array(5)].map((_, i) => (
+                      <div key={i} className="bg-gray-50 dark:bg-white/5 rounded-xl p-4">
+                        <div className="flex items-start gap-4">
+                          <div className="h-10 w-10 bg-gray-100 dark:bg-white/5 rounded-full animate-pulse" />
+                          <div className="flex-1 space-y-2">
+                            <div className="h-4 w-3/4 bg-gray-100 dark:bg-white/5 rounded animate-pulse" />
+                            <div className="h-3 w-1/2 bg-gray-100 dark:bg-white/5 rounded animate-pulse" />
+                            <div className="flex gap-2">
+                              <div className="h-5 w-16 bg-gray-100 dark:bg-white/5 rounded-full animate-pulse" />
+                              <div className="h-5 w-16 bg-gray-100 dark:bg-white/5 rounded-full animate-pulse" />
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </>
-            ) : filingsError ? (
-              <EmptyState
-                icon={<AlertTriangleIcon className="w-16 h-16 text-yellow-400" />}
-                title="Failed to load filings"
-                description="Unable to fetch recent filings. Please try again later."
-              />
-            ) : filteredFilings.length === 0 ? (
-              <EmptyState
-                icon={<DocumentIcon className="w-16 h-16 text-gray-600" />}
-                title="No filings found"
-                description={
-                  selectedSectors.size > 0
-                    ? `No recent filings in the selected sector${selectedSectors.size > 1 ? 's' : ''}.`
-                    : 'No recent filings available.'
-                }
-              />
-            ) : (
-              <>
-                {/* Desktop: Table View */}
-                <div className="hidden lg:block bg-white dark:bg-vettr-card/30 border border-gray-200 dark:border-white/5 rounded-2xl overflow-hidden">
-                  <FilingTable filings={filteredFilings} showStock={true} />
+              ) : filingsError ? (
+                <div className="p-8">
+                  <EmptyState
+                    icon={<AlertTriangleIcon className="w-16 h-16 text-yellow-400" />}
+                    title="Failed to load filings"
+                    description="Unable to fetch recent filings. Please try again later."
+                  />
                 </div>
-                {/* Mobile / Tablet: Card View */}
-                <div className="lg:hidden space-y-3">
-                  {filteredFilings.map((filing) => (
-                    <FilingRow key={filing.id} filing={filing} />
-                  ))}
+              ) : filteredFilings.length === 0 ? (
+                <div className="p-8">
+                  <EmptyState
+                    icon={<DocumentIcon className="w-16 h-16 text-gray-600" />}
+                    title="No filings found"
+                    description={
+                      selectedSectors.size > 0
+                        ? `No recent filings in the selected sector${selectedSectors.size > 1 ? 's' : ''}.`
+                        : 'No recent filings available.'
+                    }
+                  />
                 </div>
-              </>
-            )}
+              ) : (
+                <div className="overflow-y-auto flex-1">
+                  {/* Desktop: Table View */}
+                  <div className="hidden lg:block">
+                    <FilingTable filings={filteredFilings} showStock={true} />
+                  </div>
+                  {/* Mobile / Tablet: Card View */}
+                  <div className="lg:hidden space-y-3 p-4">
+                    {filteredFilings.map((filing) => (
+                      <FilingRow key={filing.id} filing={filing} />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Right: Market News */}
