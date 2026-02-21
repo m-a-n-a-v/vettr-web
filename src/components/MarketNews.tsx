@@ -11,10 +11,10 @@ import EmptyState from '@/components/ui/EmptyState';
  * Used on the Discovery page alongside Recent Filings.
  */
 export default function MarketNews() {
-  const { news, source, sourceUrl, isLoading, error } = useMarketNews(8);
+  const { news, source, sourceUrl, isLoading, error } = useMarketNews(10);
 
   return (
-    <div>
+    <div className="flex flex-col">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Market News</h2>
         <a
@@ -27,31 +27,38 @@ export default function MarketNews() {
         </a>
       </div>
 
-      {isLoading ? (
-        <div className="space-y-3">
-          {[...Array(5)].map((_, i) => (
-            <SkeletonNewsItem key={i} />
-          ))}
-        </div>
-      ) : error ? (
-        <EmptyState
-          icon={<AlertTriangleIcon className="w-12 h-12 text-yellow-400" />}
-          title="Failed to load news"
-          description="Unable to fetch market news. Please try again later."
-        />
-      ) : news.length === 0 ? (
-        <EmptyState
-          icon={<NewspaperIcon className="w-12 h-12 text-gray-500" />}
-          title="No news available"
-          description="Market news will appear here when available."
-        />
-      ) : (
-        <div className="space-y-2">
-          {news.map((item, i) => (
-            <NewsItem key={`${item.link}-${i}`} item={item} />
-          ))}
-        </div>
-      )}
+      {/* Wrapper matches sibling filings panel height — scrollable on overflow */}
+      <div className="bg-white dark:bg-vettr-card/30 border border-gray-200 dark:border-white/5 rounded-2xl overflow-hidden">
+        {isLoading ? (
+          <div className="space-y-0 divide-y divide-gray-100 dark:divide-white/5">
+            {[...Array(7)].map((_, i) => (
+              <SkeletonNewsItem key={i} />
+            ))}
+          </div>
+        ) : error ? (
+          <div className="p-8">
+            <EmptyState
+              icon={<AlertTriangleIcon className="w-12 h-12 text-yellow-400" />}
+              title="Failed to load news"
+              description="Unable to fetch market news. Please try again later."
+            />
+          </div>
+        ) : news.length === 0 ? (
+          <div className="p-8">
+            <EmptyState
+              icon={<NewspaperIcon className="w-12 h-12 text-gray-500" />}
+              title="No news available"
+              description="Market news will appear here when available."
+            />
+          </div>
+        ) : (
+          <div className="divide-y divide-gray-100 dark:divide-white/5">
+            {news.map((item, i) => (
+              <NewsItem key={`${item.link}-${i}`} item={item} />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -66,17 +73,14 @@ function NewsItem({ item }: { item: { title: string; link: string; description: 
       target="_blank"
       rel="noopener noreferrer"
       className="
-        flex gap-3 p-3 rounded-xl
-        bg-white/80 dark:bg-vettr-card/50
-        border border-gray-200 dark:border-white/5
-        hover:bg-gray-50 dark:hover:bg-vettr-card/80
-        hover:border-vettr-accent/20
-        transition-all duration-300 group
+        flex gap-3 px-4 py-3
+        hover:bg-gray-50 dark:hover:bg-white/[0.03]
+        transition-colors duration-200 group
       "
     >
-      {/* Thumbnail (if available) */}
+      {/* Thumbnail */}
       {item.imageUrl && (
-        <div className="flex-shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden bg-gray-100 dark:bg-white/5">
+        <div className="flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden bg-gray-100 dark:bg-white/5">
           <img
             src={item.imageUrl}
             alt=""
@@ -88,16 +92,13 @@ function NewsItem({ item }: { item: { title: string; link: string; description: 
 
       {/* Content */}
       <div className="flex-1 min-w-0">
-        <h3 className="text-sm font-medium text-gray-900 dark:text-white line-clamp-2 group-hover:text-vettr-accent transition-colors">
+        <h3 className="text-sm font-medium text-gray-900 dark:text-white line-clamp-2 group-hover:text-vettr-accent transition-colors leading-snug">
           {item.title}
         </h3>
-        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 line-clamp-1">
-          {item.description}
-        </p>
-        <div className="mt-1.5 flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500">
-          <span>{item.source}</span>
+        <div className="mt-1 flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500">
+          <span className="truncate">{item.source}</span>
           <span>&middot;</span>
-          <span>{timeAgo}</span>
+          <span className="whitespace-nowrap">{timeAgo}</span>
         </div>
       </div>
     </a>
@@ -107,9 +108,9 @@ function NewsItem({ item }: { item: { title: string; link: string; description: 
 /** Skeleton loading state for a single news row */
 function SkeletonNewsItem() {
   return (
-    <div className="flex gap-3 p-3 rounded-xl bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5">
-      <div className="flex-shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-lg bg-gray-100 dark:bg-white/5 animate-pulse" />
-      <div className="flex-1 space-y-2 py-1">
+    <div className="flex gap-3 px-4 py-3">
+      <div className="flex-shrink-0 w-14 h-14 rounded-lg bg-gray-100 dark:bg-white/5 animate-pulse" />
+      <div className="flex-1 space-y-2 py-0.5">
         <div className="h-3.5 w-full bg-gray-100 dark:bg-white/5 rounded animate-pulse" />
         <div className="h-3.5 w-3/4 bg-gray-100 dark:bg-white/5 rounded animate-pulse" />
         <div className="h-3 w-1/3 bg-gray-100 dark:bg-white/5 rounded animate-pulse" />

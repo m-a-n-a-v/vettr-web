@@ -74,9 +74,9 @@ function parseRSS(xml: string): NewsItem[] {
     const pubDate = extractTag(block, 'pubDate') || '';
     const creator = extractCDATA(block, 'dc:creator') || extractTag(block, 'dc:creator') || 'BNN Bloomberg';
 
-    // Extract media:content image URL
+    // Extract media:content image URL and decode XML entities
     const mediaMatch = block.match(/<media:content[^>]+url="([^"]+)"/);
-    const imageUrl = mediaMatch ? mediaMatch[1] : null;
+    const imageUrl = mediaMatch ? cleanText(mediaMatch[1]) : null;
 
     if (title && link) {
       items.push({
