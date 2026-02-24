@@ -348,3 +348,78 @@ export function SkeletonFilterBar({ className = '' }: { className?: string }) {
     </div>
   );
 }
+
+// V2 Fundamentals Tab Skeleton - for Fundamentals tab loading state
+export function SkeletonFundamentals({ className = '' }: { className?: string }) {
+  return (
+    <div className={`space-y-8 ${className}`}>
+      {/* Financial Health Dashboard Skeleton */}
+      <div className="space-y-4">
+        <SkeletonLoader variant="text" width="12rem" height="1.5rem" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-5 space-y-3">
+              <SkeletonLoader variant="text" width="60%" height="0.75rem" />
+              <SkeletonLoader variant="text" width="40%" height="2rem" />
+              <SkeletonLoader variant="text" width="50%" height="1rem" className="rounded-full" />
+            </div>
+          ))}
+        </div>
+        <div className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-5">
+          <SkeletonLoader variant="text" width="10rem" height="1rem" className="mb-3" />
+          <SkeletonLoader variant="rectangular" width="100%" height="5rem" />
+        </div>
+      </div>
+
+      {/* Earnings Quality + Analyst Consensus Grid Skeleton */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Earnings Quality Skeleton */}
+        <div className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-5 space-y-4">
+          <SkeletonLoader variant="text" width="10rem" height="1.5rem" />
+          <div className="flex justify-center">
+            <SkeletonLoader variant="circular" width="5rem" height="5rem" />
+          </div>
+          <div className="space-y-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i}>
+                <SkeletonLoader variant="text" width="40%" height="0.75rem" className="mb-2" />
+                <SkeletonLoader variant="rectangular" width="100%" height="1.5rem" className="rounded-full" />
+              </div>
+            ))}
+          </div>
+          <SkeletonLoader variant="rectangular" width="100%" height="8rem" />
+        </div>
+
+        {/* Analyst Consensus Skeleton */}
+        <div className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-5 space-y-4">
+          <SkeletonLoader variant="text" width="12rem" height="1.5rem" />
+          <div className="space-y-2">
+            <SkeletonLoader variant="text" width="50%" height="1.5rem" />
+            <SkeletonLoader variant="rectangular" width="100%" height="2rem" className="rounded-full" />
+          </div>
+          <div>
+            <SkeletonLoader variant="text" width="8rem" height="1rem" className="mb-2" />
+            <SkeletonLoader variant="rectangular" width="100%" height="3rem" />
+          </div>
+          <SkeletonLoader variant="rectangular" width="100%" height="8rem" />
+        </div>
+      </div>
+
+      {/* Peer Comparison Skeleton */}
+      <div className="space-y-4">
+        <SkeletonLoader variant="text" width="12rem" height="1.5rem" />
+        <div className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-5 space-y-4">
+          <SkeletonLoader variant="rectangular" width="100%" height="18.75rem" />
+          <div className="overflow-x-auto">
+            <div className="space-y-2">
+              <SkeletonLoader variant="rectangular" width="100%" height="2.5rem" />
+              {Array.from({ length: 5 }).map((_, i) => (
+                <SkeletonLoader key={i} variant="rectangular" width="100%" height="2.5rem" />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
