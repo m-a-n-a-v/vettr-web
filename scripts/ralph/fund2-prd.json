@@ -1,0 +1,149 @@
+{
+  "project": "VETTR Web App - Fundamentals Phase 2",
+  "phase": "P3/P4 Enhancements (Insider Signals, Short Interest, Sparklines)",
+  "branchName": "ralph/fundamentals-ui",
+  "description": "Enhance fundamentals features with P3 Insider Signal Tracker (smart money indicators, ownership concentration risk), P3 Short Interest Signal (trend, squeeze potential), and P4 Trend Sparklines (mini charts next to key metrics everywhere). Builds on top of the existing fundamentals components. All data continues to use dummy values.",
+  "totalStories": 8,
+  "userStories": [
+    {
+      "id": "FUND2-001",
+      "title": "Enhance Insider Activity with Smart Money signal and accumulation/distribution indicator",
+      "description": "Upgrade the existing InsiderActivity component to show whether institutions are accumulating or distributing shares, and add ownership concentration risk assessment.",
+      "acceptanceCriteria": [
+        "Update InsiderActivity interface in src/types/fundamentals.ts to add: institutionChangePercent (3-month change in institutional ownership), topHoldersConcentration (% owned by top 5 holders), smartMoneySignal ('accumulating' | 'neutral' | 'distributing'), quarterlyOwnershipHistory (array of {quarter, insidersPercent, institutionsPercent})",
+        "Update dummy data generator to produce these new fields with realistic values",
+        "Enhance src/components/fundamentals/InsiderActivity.tsx:",
+        "  - Add 'Smart Money Signal' badge at top: green 'Accumulating' / gray 'Neutral' / red 'Distributing' with animated pulse on accumulating",
+        "  - Add 'Institutional Flow' indicator: +/-% change in institutional ownership over 3 months with arrow direction",
+        "  - Add 'Concentration Risk' metric: shows top-5 holders % with risk level badge (Low <30%, Moderate 30-60%, High >60%)",
+        "  - Add small area chart showing quarterly ownership split (insiders vs institutions) over last 4 quarters using Recharts",
+        "All new elements follow existing design system patterns",
+        "npm run build passes"
+      ],
+      "priority": 1,
+      "passes": false
+    },
+    {
+      "id": "FUND2-002",
+      "title": "Enhance Short Interest with trend chart and squeeze potential indicator",
+      "description": "Upgrade the Short Interest badge into a more comprehensive section with historical trend and short squeeze probability.",
+      "acceptanceCriteria": [
+        "Update ShortInterest interface in src/types/fundamentals.ts to add: shortInterestHistory (array of {date, shortInterest, shortInterestPercent}), squeezePotential ('high' | 'moderate' | 'low'), shortInterestChange (1-month change in %)",
+        "Update dummy data generator to produce 6 months of historical short interest data and squeeze potential",
+        "Create src/components/fundamentals/ShortInterestSection.tsx (a larger section, not just a badge):",
+        "  - Keep the existing badge display at top (short interest %, days to cover)",
+        "  - Add '1-Month Change' indicator: +/- change in short interest % with color (green if declining = less bearish, red if rising = more bearish)",
+        "  - Add 'Squeeze Potential' badge: High (green pulse), Moderate (yellow), Low (gray) — based on high SI + improving fundamentals",
+        "  - Add mini area chart showing 6-month short interest % trend using Recharts",
+        "  - Tooltip explaining squeeze potential criteria",
+        "Replace ShortInterestBadge usage in Overview tab with this new ShortInterestSection component",
+        "npm run build passes"
+      ],
+      "priority": 2,
+      "passes": false
+    },
+    {
+      "id": "FUND2-003",
+      "title": "Create reusable Sparkline component",
+      "description": "Build a lightweight, reusable sparkline component that can be placed inline next to any metric value to show its trend direction.",
+      "acceptanceCriteria": [
+        "Create src/components/ui/Sparkline.tsx",
+        "Props: data (array of numbers), width (default 60px), height (default 20px), color (optional, auto-detects trend direction if not provided), showDot (show dot on last point, default true)",
+        "Auto-color logic: if last value > first value → green, if declining → red, if flat → gray",
+        "Renders a tiny SVG line chart (no axes, no labels, no grid — just the line)",
+        "Last data point shown as a small dot",
+        "Smooth line rendering (not jagged) — use SVG path with basic interpolation or polyline",
+        "Component is very lightweight — no Recharts dependency, pure SVG",
+        "Accepts className prop for positioning",
+        "npm run build passes"
+      ],
+      "priority": 3,
+      "passes": false
+    },
+    {
+      "id": "FUND2-004",
+      "title": "Add sparklines to Key Metrics cards in Overview tab",
+      "description": "Enhance the 6 key metrics cards (Market Cap, Exchange, Sector, Filings, P/E, Div Yield) by adding trend sparklines where applicable.",
+      "acceptanceCriteria": [
+        "Add metricTrends to FundamentalsData type: { marketCap: number[], peRatio: number[], dividendYield: number[], revenueGrowth: number[], price: number[] } — each is 8 data points representing last 8 quarters",
+        "Update dummy data generator to produce trend data for each metric",
+        "Add sparklines to applicable metric cards in Overview tab:",
+        "  - Market Cap card: sparkline showing 8-quarter market cap trend",
+        "  - P/E Ratio card: sparkline showing 8-quarter PE trend",
+        "  - Div Yield card: sparkline showing 8-quarter yield trend (skip if N/A)",
+        "  - Exchange and Sector cards don't get sparklines (they're categorical)",
+        "  - Filings card doesn't get sparkline (it's a count)",
+        "Sparkline positioned in bottom-right corner of each card, small and subtle",
+        "npm run build passes"
+      ],
+      "priority": 4,
+      "passes": false
+    },
+    {
+      "id": "FUND2-005",
+      "title": "Add sparklines to Financial Health Dashboard metrics",
+      "description": "Add trend sparklines to the 6 financial health metric cards showing directional trends.",
+      "acceptanceCriteria": [
+        "Add healthTrends to FinancialHealth type: { cashRunway: number[], debtCoverage: number[], fcfYield: number[], currentRatio: number[], debtToEquity: number[], altmanZ: number[] } — each is 6 data points (6 quarters)",
+        "Update dummy data generator to produce health trend data with realistic patterns (e.g., declining cash runway, improving debt ratios, etc.)",
+        "Add Sparkline component to each of the 6 health metric cards in FinancialHealthDashboard.tsx:",
+        "  - Positioned below the main value, above the status badge",
+        "  - Small and subtle (width 80px, height 24px)",
+        "  - Auto-colored based on trend direction",
+        "  - For debt-to-equity, invert the color logic (declining = green, rising = red)",
+        "npm run build passes"
+      ],
+      "priority": 5,
+      "passes": false
+    },
+    {
+      "id": "FUND2-006",
+      "title": "Add sparklines to earnings and valuation metrics in Fundamentals tab",
+      "description": "Add sparklines to the Earnings Quality section and the Peer Comparison table showing metric trends.",
+      "acceptanceCriteria": [
+        "In EarningsQualityCard: add sparkline next to the overall EQ Score showing last 6 quarters of EQ score trend",
+        "Add eqScoreHistory (6 numbers) to EarningsQuality type and dummy data",
+        "In PeerComparisonFinancials table: add a 'Trend' column showing a sparkline for each peer stock's VETTR score trend (last 6 quarters)",
+        "Add scoreTrend (6 numbers) to each peer in PeerFinancials type and dummy data",
+        "Sparklines in the table are compact (50px wide) to fit in a table cell",
+        "npm run build passes"
+      ],
+      "priority": 6,
+      "passes": false
+    },
+    {
+      "id": "FUND2-007",
+      "title": "Add trend direction badges to Financial Statements accordion headers",
+      "description": "Show a visual trend direction on each financial statement accordion header, so users can see the direction at a glance without expanding.",
+      "acceptanceCriteria": [
+        "In FinancialStatements.tsx, update each accordion section header to include:",
+        "  - Revenue trend badge on Income Statement header: shows YoY revenue growth (e.g., '+12.3%' in green or '-5.1%' in red) comparing latest 2 years",
+        "  - Total Assets trend badge on Balance Sheet header: shows YoY change",
+        "  - Free Cash Flow trend badge on Cash Flow header: shows YoY change",
+        "  - Small sparkline (4 points) next to each badge showing 4-year trend of the key metric",
+        "Badges positioned to the right of the section title, before the expand chevron",
+        "Use Sparkline component created in FUND2-003",
+        "npm run build passes"
+      ],
+      "priority": 7,
+      "passes": false
+    },
+    {
+      "id": "FUND2-008",
+      "title": "Final polish: consistent sparkline sizing, responsive checks, build verification",
+      "description": "Ensure all sparklines are consistently sized, properly responsive, and the entire app builds cleanly.",
+      "acceptanceCriteria": [
+        "All sparklines use consistent sizing: 60-80px wide in cards, 50px in tables, 60px in badges",
+        "Sparklines are hidden on very small screens (< 375px) if they cause overflow",
+        "All new components responsive at 375px, 768px, 1024px, 1440px",
+        "No horizontal overflow on any viewport",
+        "All new ARIA labels and tooltips in place",
+        "npm run build passes with zero errors",
+        "npm run lint passes",
+        "No TypeScript errors"
+      ],
+      "priority": 8,
+      "passes": false
+    }
+  ]
+}

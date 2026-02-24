@@ -132,6 +132,14 @@ export interface InsiderActivity {
   institutionsPercent: number; // Institutional ownership percentage
   publicPercent: number; // Public ownership percentage
   netBuySellRatio: number; // Net buy/sell ratio (positive = net buying, negative = net selling)
+  institutionChangePercent: number; // 3-month change in institutional ownership
+  topHoldersConcentration: number; // Percentage owned by top 5 holders
+  smartMoneySignal: 'accumulating' | 'neutral' | 'distributing'; // Smart money signal
+  quarterlyOwnershipHistory: Array<{
+    quarter: string; // e.g., "Q1 '24"
+    insidersPercent: number;
+    institutionsPercent: number;
+  }>;
   recentTransactions: Array<{
     name: string; // Insider name
     relation: string; // Relation to company (e.g., "CEO", "Director", "Officer")

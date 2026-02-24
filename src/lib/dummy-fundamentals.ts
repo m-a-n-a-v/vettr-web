@@ -387,6 +387,43 @@ function generateInsiderActivity(rng: SeededRandom): InsiderActivity {
   // Positive = net buying, negative = net selling
   const netBuySellRatio = parseFloat(rng.range(-1.0, 1.0).toFixed(2));
 
+  // 3-month change in institutional ownership (-15% to +15%)
+  const institutionChangePercent = parseFloat(rng.range(-15, 15).toFixed(1));
+
+  // Top 5 holders concentration (20% to 80%)
+  const topHoldersConcentration = parseFloat(rng.range(20, 80).toFixed(1));
+
+  // Smart money signal based on institutional change
+  let smartMoneySignal: 'accumulating' | 'neutral' | 'distributing';
+  if (institutionChangePercent > 5) {
+    smartMoneySignal = 'accumulating';
+  } else if (institutionChangePercent < -5) {
+    smartMoneySignal = 'distributing';
+  } else {
+    smartMoneySignal = 'neutral';
+  }
+
+  // Generate quarterly ownership history (4 quarters)
+  const quarterlyOwnershipHistory = [];
+  const quarters = ['Q1 \'24', 'Q2 \'24', 'Q3 \'24', 'Q4 \'24'];
+
+  // Work backwards from current ownership
+  for (let i = 3; i >= 0; i--) {
+    const quarterlyInsidersPercent = i === 3
+      ? insidersPercent
+      : parseFloat((insidersPercent + rng.range(-3, 3)).toFixed(1));
+
+    const quarterlyInstitutionsPercent = i === 3
+      ? institutionsPercent
+      : parseFloat((institutionsPercent - (institutionChangePercent / 4) * (3 - i)).toFixed(1));
+
+    quarterlyOwnershipHistory.push({
+      quarter: quarters[i],
+      insidersPercent: quarterlyInsidersPercent,
+      institutionsPercent: quarterlyInstitutionsPercent,
+    });
+  }
+
   // Generate recent transactions (5 transactions)
   const insiderNames = [
     'John McDonald',
@@ -439,6 +476,10 @@ function generateInsiderActivity(rng: SeededRandom): InsiderActivity {
     institutionsPercent,
     publicPercent,
     netBuySellRatio,
+    institutionChangePercent,
+    topHoldersConcentration,
+    smartMoneySignal,
+    quarterlyOwnershipHistory,
     recentTransactions,
   };
 }
