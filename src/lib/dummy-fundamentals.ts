@@ -4,7 +4,7 @@
  * Data is deterministic (same ticker always returns same values) using ticker string hash as seed
  */
 
-import { FundamentalsData, FinancialHealth, EarningsQuality, AnalystConsensus, PeerFinancials } from '@/types/fundamentals';
+import { FundamentalsData, FinancialHealth, EarningsQuality, AnalystConsensus, PeerFinancials, FinancialStatements } from '@/types/fundamentals';
 
 /**
  * Simple hash function to generate a seed from ticker string
@@ -276,6 +276,72 @@ function generatePeerFinancials(rng: SeededRandom, ticker: string): PeerFinancia
 }
 
 /**
+ * Generate dummy Financial Statements data
+ * Creates 4 years of annual data (2021-2024) with realistic growth patterns
+ */
+function generateFinancialStatements(rng: SeededRandom): FinancialStatements {
+  const annualData = [];
+
+  // Base year (2021) starting values in millions
+  const baseRevenue = rng.range(50, 500); // $50M - $500M
+  const baseGrossMargin = rng.range(0.25, 0.55); // 25% - 55%
+  const baseOperatingMargin = rng.range(0.05, 0.25); // 5% - 25%
+  const baseNetMargin = rng.range(0.02, 0.15); // 2% - 15%
+
+  // Annual growth rates (can be negative)
+  const revenueGrowthRate = rng.range(-0.10, 0.25); // -10% to +25% per year
+  const marginExpansion = rng.range(-0.02, 0.03); // Margin expansion/contraction per year
+
+  for (let i = 0; i < 4; i++) {
+    const year = 2021 + i;
+    const growthFactor = Math.pow(1 + revenueGrowthRate, i);
+
+    // Income Statement
+    const revenue = baseRevenue * growthFactor;
+    const grossMargin = Math.min(0.75, Math.max(0.10, baseGrossMargin + (marginExpansion * i)));
+    const operatingMargin = Math.min(0.45, Math.max(-0.05, baseOperatingMargin + (marginExpansion * i)));
+    const netMargin = Math.min(0.30, Math.max(-0.10, baseNetMargin + (marginExpansion * i)));
+
+    const grossProfit = revenue * grossMargin;
+    const costOfRevenue = revenue - grossProfit;
+    const operatingIncome = revenue * operatingMargin;
+    const netIncome = revenue * netMargin;
+
+    // Balance Sheet (scaled to revenue)
+    const assetMultiple = rng.range(1.2, 2.5);
+    const totalAssets = revenue * assetMultiple;
+    const liabilityRatio = rng.range(0.30, 0.65);
+    const totalLiabilities = totalAssets * liabilityRatio;
+    const totalEquity = totalAssets - totalLiabilities;
+
+    // Cash Flow (related to net income)
+    const cashConversion = rng.range(0.8, 1.3);
+    const operatingCashFlow = netIncome * cashConversion;
+    const capexRatio = rng.range(0.05, 0.20);
+    const capex = revenue * capexRatio;
+    const freeCashFlow = operatingCashFlow - capex;
+
+    annualData.push({
+      date: year.toString(),
+      revenue: parseFloat(revenue.toFixed(2)),
+      costOfRevenue: parseFloat(costOfRevenue.toFixed(2)),
+      grossProfit: parseFloat(grossProfit.toFixed(2)),
+      operatingIncome: parseFloat(operatingIncome.toFixed(2)),
+      netIncome: parseFloat(netIncome.toFixed(2)),
+      totalAssets: parseFloat(totalAssets.toFixed(2)),
+      totalLiabilities: parseFloat(totalLiabilities.toFixed(2)),
+      totalEquity: parseFloat(totalEquity.toFixed(2)),
+      operatingCashFlow: parseFloat(operatingCashFlow.toFixed(2)),
+      capex: parseFloat(capex.toFixed(2)),
+      freeCashFlow: parseFloat(freeCashFlow.toFixed(2)),
+    });
+  }
+
+  // Reverse to show most recent first
+  return { annualData: annualData.reverse() };
+}
+
+/**
  * Main function to generate complete dummy fundamentals data for a ticker
  * Data is deterministic based on ticker hash
  */
@@ -289,5 +355,6 @@ export function getDummyFundamentals(ticker: string): FundamentalsData {
     earningsQuality: generateEarningsQuality(rng),
     analystConsensus: generateAnalystConsensus(rng, ticker),
     peerFinancials: generatePeerFinancials(rng, ticker),
+    financialStatements: generateFinancialStatements(rng),
   };
 }

@@ -92,6 +92,29 @@ export interface PeerFinancials {
 }
 
 /**
+ * Financial Statements data for Income Statement, Balance Sheet, and Cash Flow
+ */
+export interface FinancialStatements {
+  annualData: Array<{
+    date: string; // e.g., "2024", "2023"
+    // Income Statement
+    revenue: number;
+    costOfRevenue: number;
+    grossProfit: number;
+    operatingIncome: number;
+    netIncome: number;
+    // Balance Sheet
+    totalAssets: number;
+    totalLiabilities: number;
+    totalEquity: number;
+    // Cash Flow
+    operatingCashFlow: number;
+    capex: number;
+    freeCashFlow: number;
+  }>;
+}
+
+/**
  * Umbrella type containing all fundamentals data for a stock
  */
 export interface FundamentalsData {
@@ -100,4 +123,5 @@ export interface FundamentalsData {
   earningsQuality: EarningsQuality;
   analystConsensus: AnalystConsensus;
   peerFinancials: PeerFinancials;
+  financialStatements: FinancialStatements;
 }
