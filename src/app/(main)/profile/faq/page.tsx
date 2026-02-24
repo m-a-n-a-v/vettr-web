@@ -162,19 +162,19 @@ export default function FAQPage() {
   const categories = Object.keys(groupedItems)
 
   return (
-    <div className="min-h-screen bg-vettr-navy text-white pb-20 md:pb-6">
+    <div className="min-h-screen pb-20 md:pb-6">
       {/* Header */}
-      <div className="bg-vettr-dark border-b border-white/5 sticky top-16 z-20">
+      <div className="bg-white/95 dark:bg-vettr-dark border-b border-gray-200 dark:border-white/5 backdrop-blur-sm sticky top-16 z-20">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center gap-4 mb-4">
             <button
               onClick={() => router.push('/profile')}
-              className="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+              className="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors"
               aria-label="Back to Profile"
             >
               <ChevronLeftIcon className="w-5 h-5" />
             </button>
-            <h1 className="text-2xl font-bold">Frequently Asked Questions</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Frequently Asked Questions</h1>
           </div>
 
           {/* Search */}
@@ -229,27 +229,27 @@ export default function FAQPage() {
           <div key={category} className="mb-8">
             {/* Category Header */}
             <div className="flex items-center gap-3 mb-4">
-              <h2 className="text-lg font-semibold text-white">{category}</h2>
-              <div className="flex-1 h-px bg-white/5" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{category}</h2>
+              <div className="flex-1 h-px bg-gray-200 dark:bg-white/5" />
             </div>
 
             {/* Questions in this category - Accordion */}
-            <div className="border-b border-white/5">
+            <div className="border-b border-gray-200 dark:border-white/5">
               {groupedItems[category].map((item) => {
                 const isExpanded = expandedQuestions.has(item.question)
 
                 return (
                   <div
                     key={item.question}
-                    className="border-b border-white/5 last:border-b-0"
+                    className="border-b border-gray-200 dark:border-white/5 last:border-b-0"
                   >
                     {/* Question Header (clickable) */}
                     <button
                       onClick={() => toggleQuestion(item.question)}
-                      className="w-full text-left px-4 py-4 flex items-start justify-between gap-3 hover:bg-white/[0.03] transition-colors"
+                      className="w-full text-left px-4 py-4 flex items-start justify-between gap-3 hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-colors"
                     >
                       <div className="flex-1">
-                        <h3 className="text-sm font-medium text-white">
+                        <h3 className="text-sm font-medium text-gray-900 dark:text-white">
                           {item.question}
                         </h3>
                       </div>
@@ -265,7 +265,7 @@ export default function FAQPage() {
                     {/* Answer (expandable) */}
                     {isExpanded && (
                       <div className="px-4 pb-4 animate-in fade-in duration-200">
-                        <p className="text-sm text-gray-400 leading-relaxed">
+                        <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
                           {item.answer}
                         </p>
                       </div>

@@ -58,7 +58,7 @@ export function InsiderActivityComponent({ data }: InsiderActivityProps) {
                           data.topHoldersConcentration < 60 ? 'bg-yellow-400/10' : 'bg-red-400/10';
 
   return (
-    <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5 hover:border-vettr-accent/20 hover:bg-vettr-card/80 transition-all duration-300">
+    <div className="bg-white/50 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-5 hover:border-vettr-accent/20 hover:bg-gray-50 dark:hover:bg-vettr-card/80 transition-all duration-300">
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-2">
@@ -76,7 +76,7 @@ export function InsiderActivityComponent({ data }: InsiderActivityProps) {
               d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"
             />
           </svg>
-          <h2 className="text-lg font-semibold text-white">Insider Activity</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Insider Activity</h2>
         </div>
 
         {/* Smart Money Signal Badge */}
@@ -128,7 +128,7 @@ export function InsiderActivityComponent({ data }: InsiderActivityProps) {
               {data.institutionChangePercent > 0 ? '+' : ''}{data.institutionChangePercent.toFixed(1)}%
             </span>
           </div>
-          <div className="text-xs text-gray-400 mt-0.5">3-month change</div>
+          <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">3-month change</div>
         </div>
 
         {/* Concentration Risk */}
@@ -144,7 +144,7 @@ export function InsiderActivityComponent({ data }: InsiderActivityProps) {
               {concentrationRisk}
             </span>
           </div>
-          <div className="text-xs text-gray-400 mt-0.5">Top 5 holders</div>
+          <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Top 5 holders</div>
         </div>
 
         {/* Net Activity */}
@@ -170,7 +170,7 @@ export function InsiderActivityComponent({ data }: InsiderActivityProps) {
               {netActivityText}
             </span>
           </div>
-          <div className="text-xs text-gray-400 mt-0.5">
+          <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
             {Math.abs(data.netBuySellRatio).toFixed(2)} ratio
           </div>
         </div>
@@ -183,7 +183,7 @@ export function InsiderActivityComponent({ data }: InsiderActivityProps) {
         </div>
 
         {/* Stacked Bar */}
-        <div className="flex h-8 rounded-lg overflow-hidden bg-white/5 mb-2" role="img" aria-label={`Ownership: ${data.insidersPercent.toFixed(1)}% insiders, ${data.institutionsPercent.toFixed(1)}% institutions, ${data.publicPercent.toFixed(1)}% public`}>
+        <div className="flex h-8 rounded-lg overflow-hidden bg-gray-100 dark:bg-white/5 mb-2" role="img" aria-label={`Ownership: ${data.insidersPercent.toFixed(1)}% insiders, ${data.institutionsPercent.toFixed(1)}% institutions, ${data.publicPercent.toFixed(1)}% public`}>
           <div
             className="bg-vettr-accent transition-all duration-1000 ease-out flex items-center justify-center"
             style={{ width: animateWidths ? `${data.insidersPercent}%` : '0%' }}
@@ -220,15 +220,15 @@ export function InsiderActivityComponent({ data }: InsiderActivityProps) {
         <div className="flex items-center gap-4 text-xs">
           <div className="flex items-center gap-1.5">
             <div className="w-2.5 h-2.5 rounded-full bg-vettr-accent" />
-            <span className="text-gray-400">Insiders ({data.insidersPercent.toFixed(1)}%)</span>
+            <span className="text-gray-500 dark:text-gray-400">Insiders ({data.insidersPercent.toFixed(1)}%)</span>
           </div>
           <div className="flex items-center gap-1.5">
             <div className="w-2.5 h-2.5 rounded-full bg-blue-500" />
-            <span className="text-gray-400">Institutions ({data.institutionsPercent.toFixed(1)}%)</span>
+            <span className="text-gray-500 dark:text-gray-400">Institutions ({data.institutionsPercent.toFixed(1)}%)</span>
           </div>
           <div className="flex items-center gap-1.5">
             <div className="w-2.5 h-2.5 rounded-full bg-gray-600" />
-            <span className="text-gray-400">Public ({data.publicPercent.toFixed(1)}%)</span>
+            <span className="text-gray-500 dark:text-gray-400">Public ({data.publicPercent.toFixed(1)}%)</span>
           </div>
         </div>
       </div>
@@ -300,7 +300,7 @@ export function InsiderActivityComponent({ data }: InsiderActivityProps) {
         <div className="overflow-x-auto">
           <table className="w-full min-w-max">
             <thead>
-              <tr className="border-b border-white/5">
+              <tr className="border-b border-gray-200 dark:border-white/5">
                 <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-3 py-2 text-left">
                   Name
                 </th>
@@ -319,10 +319,10 @@ export function InsiderActivityComponent({ data }: InsiderActivityProps) {
               {data.recentTransactions.map((transaction, index) => (
                 <tr
                   key={index}
-                  className="border-b border-white/5 hover:bg-white/[0.03] transition-colors"
+                  className="border-b border-gray-200 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-colors"
                 >
                   <td className="px-3 py-3">
-                    <div className="text-sm text-white font-medium">{transaction.name}</div>
+                    <div className="text-sm text-gray-900 dark:text-white font-medium">{transaction.name}</div>
                     <div className="text-xs text-gray-500 mt-0.5">{transaction.relation}</div>
                   </td>
                   <td className="px-3 py-3">
@@ -336,10 +336,10 @@ export function InsiderActivityComponent({ data }: InsiderActivityProps) {
                       {transaction.type === 'buy' ? 'Buy' : 'Sell'}
                     </span>
                   </td>
-                  <td className="px-3 py-3 text-right text-sm text-white">
+                  <td className="px-3 py-3 text-right text-sm text-gray-900 dark:text-white">
                     {transaction.shares.toLocaleString()}
                   </td>
-                  <td className="px-3 py-3 text-right text-sm text-gray-400">
+                  <td className="px-3 py-3 text-right text-sm text-gray-500 dark:text-gray-400">
                     {new Date(transaction.date).toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric',

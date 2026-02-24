@@ -547,7 +547,7 @@ export default function ProfilePage() {
 
             <button
               onClick={() => setShowFeedbackForm(true)}
-              className="w-full flex items-center justify-between px-6 py-4 hover:bg-white/5 transition-colors group focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-vettr-accent/30 text-left"
+              className="w-full flex items-center justify-between px-6 py-4 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-vettr-accent/30 text-left"
             >
               <div className="flex items-center gap-3">
                 <svg className="w-5 h-5 text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>

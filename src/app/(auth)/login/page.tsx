@@ -65,23 +65,23 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-vettr-navy">
+    <div className="flex min-h-screen bg-lightBg dark:bg-vettr-navy transition-colors duration-200">
       {/* Background gradient - subtle accent glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(0,230,118,0.08)_0%,_transparent_50%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_rgba(68,138,255,0.05)_0%,_transparent_50%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(0,230,118,0.04)_0%,_transparent_50%)] dark:bg-[radial-gradient(ellipse_at_top_right,_rgba(0,230,118,0.08)_0%,_transparent_50%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_rgba(68,138,255,0.03)_0%,_transparent_50%)] dark:bg-[radial-gradient(ellipse_at_bottom_left,_rgba(68,138,255,0.05)_0%,_transparent_50%)]" />
 
       {/* Desktop: Split layout */}
       <div className="relative z-10 flex w-full flex-col lg:flex-row">
         {/* Left side - Branding (desktop only) */}
         <div className="hidden lg:flex lg:w-1/2 lg:flex-col lg:items-center lg:justify-center lg:px-12">
           <div className="max-w-md">
-            <h1 className="text-5xl font-bold text-white">
+            <h1 className="text-5xl font-bold text-gray-900 dark:text-white">
               <span className="text-vettr-accent">V</span>ETTR
             </h1>
-            <p className="mt-4 text-xl text-gray-300">
+            <p className="mt-4 text-xl text-gray-600 dark:text-gray-300">
               Canadian Small-Cap Stock Analysis
             </p>
-            <p className="mt-6 text-gray-400 leading-relaxed">
+            <p className="mt-6 text-gray-500 dark:text-gray-400 leading-relaxed">
               Gain insight into emerging Canadian companies with our comprehensive analysis platform.
             </p>
           </div>
@@ -92,17 +92,17 @@ export default function LoginPage() {
           <div className="w-full max-w-md">
             {/* Mobile logo */}
             <div className="mb-8 text-center lg:hidden">
-              <h1 className="text-4xl font-bold text-white">
+              <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
                 <span className="text-vettr-accent">V</span>ETTR
               </h1>
-              <p className="mt-2 text-gray-400">
+              <p className="mt-2 text-gray-500 dark:text-gray-400">
                 Canadian Small-Cap Stock Analysis
               </p>
             </div>
 
             {/* Login Card */}
-            <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-8">
-              <h2 className="mb-6 text-2xl font-bold text-white">
+            <div className="bg-white dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-8 shadow-sm dark:shadow-none">
+              <h2 className="mb-6 text-2xl font-bold text-gray-900 dark:text-white">
                 Sign In
               </h2>
 
@@ -123,7 +123,7 @@ export default function LoginPage() {
                 <div>
                   <label
                     htmlFor="email"
-                    className="block text-sm font-medium text-white mb-2"
+                    className="block text-sm font-medium text-gray-900 dark:text-white mb-2"
                   >
                     Email
                   </label>
@@ -132,7 +132,7 @@ export default function LoginPage() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-500 focus:border-vettr-accent/50 focus:ring-1 focus:ring-vettr-accent/20 transition-all"
+                    className="w-full bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:border-vettr-accent/50 focus:ring-1 focus:ring-vettr-accent/20 transition-all"
                     placeholder="you@example.com"
                     disabled={isLoading}
                     autoComplete="email"
@@ -146,13 +146,13 @@ export default function LoginPage() {
                   <div className="flex items-center justify-between mb-2">
                     <label
                       htmlFor="password"
-                      className="block text-sm font-medium text-white"
+                      className="block text-sm font-medium text-gray-900 dark:text-white"
                     >
                       Password
                     </label>
                     <Link
                       href="/forgot-password"
-                      className="text-xs text-gray-400 hover:text-vettr-accent transition-colors"
+                      className="text-xs text-gray-500 dark:text-gray-400 hover:text-vettr-accent transition-colors"
                     >
                       Forgot password?
                     </Link>
@@ -162,7 +162,7 @@ export default function LoginPage() {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-500 focus:border-vettr-accent/50 focus:ring-1 focus:ring-vettr-accent/20 transition-all"
+                    className="w-full bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:border-vettr-accent/50 focus:ring-1 focus:ring-vettr-accent/20 transition-all"
                     placeholder="Enter your password"
                     disabled={isLoading}
                     autoComplete="current-password"
@@ -209,11 +209,11 @@ export default function LoginPage() {
 
               {/* Signup Link */}
               <div className="mt-6 text-center">
-                <p className="text-sm text-gray-400">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   Don&apos;t have an account?{' '}
                   <Link
                     href="/signup"
-                    className="text-gray-400 hover:text-vettr-accent transition-colors font-medium"
+                    className="text-gray-500 dark:text-gray-400 hover:text-vettr-accent transition-colors font-medium"
                   >
                     Sign Up
                   </Link>

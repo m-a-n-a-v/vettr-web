@@ -7,24 +7,24 @@ export default function ContactPage() {
   const router = useRouter()
 
   return (
-    <div className="min-h-screen bg-vettr-navy">
+    <div className="min-h-screen">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-vettr-navy/95 backdrop-blur-sm border-b border-white/5">
+      <div className="sticky top-0 z-10 bg-white/95 dark:bg-vettr-navy/95 backdrop-blur-sm border-b border-gray-200 dark:border-white/5">
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center gap-3">
           <button
             onClick={() => router.back()}
-            className="p-2 -ml-2 rounded-lg hover:bg-white/5 transition-colors"
+            className="p-2 -ml-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
           >
-            <ChevronLeftIcon className="w-5 h-5 text-white" />
+            <ChevronLeftIcon className="w-5 h-5 text-gray-900 dark:text-white" />
           </button>
-          <h1 className="text-lg font-semibold text-white">Contact & Support</h1>
+          <h1 className="text-lg font-semibold text-gray-900 dark:text-white">Contact & Support</h1>
         </div>
       </div>
 
       {/* Content */}
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
         {/* Email Support */}
-        <div className="bg-vettr-card/30 border border-white/5 rounded-2xl p-6 space-y-4">
+        <div className="bg-white dark:bg-vettr-card/30 border border-gray-200 dark:border-white/5 shadow-sm dark:shadow-none rounded-2xl p-6 space-y-4">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 bg-vettr-accent/10 rounded-xl flex items-center justify-center">
               <svg className="w-5 h-5 text-vettr-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
@@ -32,7 +32,7 @@ export default function ContactPage() {
               </svg>
             </div>
             <div>
-              <h2 className="text-white font-semibold">Email Support</h2>
+              <h2 className="text-gray-900 dark:text-white font-semibold">Email Support</h2>
               <p className="text-gray-500 text-xs">We typically respond within 24 hours</p>
             </div>
           </div>
@@ -46,7 +46,7 @@ export default function ContactPage() {
         </div>
 
         {/* Feedback */}
-        <div className="bg-vettr-card/30 border border-white/5 rounded-2xl p-6 space-y-4">
+        <div className="bg-white dark:bg-vettr-card/30 border border-gray-200 dark:border-white/5 shadow-sm dark:shadow-none rounded-2xl p-6 space-y-4">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center">
               <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
@@ -54,7 +54,7 @@ export default function ContactPage() {
               </svg>
             </div>
             <div>
-              <h2 className="text-white font-semibold">Send Feedback</h2>
+              <h2 className="text-gray-900 dark:text-white font-semibold">Send Feedback</h2>
               <p className="text-gray-500 text-xs">Help us improve VETTR</p>
             </div>
           </div>
@@ -68,42 +68,42 @@ export default function ContactPage() {
         </div>
 
         {/* Common Topics */}
-        <div className="bg-vettr-card/30 border border-white/5 rounded-2xl p-6 space-y-4">
-          <h2 className="text-white font-semibold">Common Topics</h2>
+        <div className="bg-white dark:bg-vettr-card/30 border border-gray-200 dark:border-white/5 shadow-sm dark:shadow-none rounded-2xl p-6 space-y-4">
+          <h2 className="text-gray-900 dark:text-white font-semibold">Common Topics</h2>
 
           <div className="space-y-3">
-            <div className="flex items-start gap-3 p-3 rounded-xl bg-white/5">
+            <div className="flex items-start gap-3 p-3 rounded-xl bg-gray-50 dark:bg-white/5">
               <div className="w-8 h-8 bg-yellow-400/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
                 <svg className="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
                 </svg>
               </div>
               <div>
-                <p className="text-white text-sm font-medium">Account & Billing</p>
+                <p className="text-gray-900 dark:text-white text-sm font-medium">Account & Billing</p>
                 <p className="text-gray-500 text-xs">Subscription changes, account deletion, data requests</p>
               </div>
             </div>
 
-            <div className="flex items-start gap-3 p-3 rounded-xl bg-white/5">
+            <div className="flex items-start gap-3 p-3 rounded-xl bg-gray-50 dark:bg-white/5">
               <div className="w-8 h-8 bg-red-400/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
                 <svg className="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
                 </svg>
               </div>
               <div>
-                <p className="text-white text-sm font-medium">Bug Reports</p>
+                <p className="text-gray-900 dark:text-white text-sm font-medium">Bug Reports</p>
                 <p className="text-gray-500 text-xs">Report issues with the app or data</p>
               </div>
             </div>
 
-            <div className="flex items-start gap-3 p-3 rounded-xl bg-white/5">
+            <div className="flex items-start gap-3 p-3 rounded-xl bg-gray-50 dark:bg-white/5">
               <div className="w-8 h-8 bg-green-400/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
                 <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
                 </svg>
               </div>
               <div>
-                <p className="text-white text-sm font-medium">Feature Requests</p>
+                <p className="text-gray-900 dark:text-white text-sm font-medium">Feature Requests</p>
                 <p className="text-gray-500 text-xs">Suggest new features or improvements</p>
               </div>
             </div>

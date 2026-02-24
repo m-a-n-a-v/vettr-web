@@ -63,9 +63,9 @@ function getSqueezePotentialStyles(potential: 'high' | 'moderate' | 'low'): {
     };
   } else {
     return {
-      bg: 'bg-white/5',
-      text: 'text-gray-400',
-      border: 'border-white/5',
+      bg: 'bg-gray-100 dark:bg-white/5',
+      text: 'text-gray-500 dark:text-gray-400',
+      border: 'border-gray-200 dark:border-white/5',
       pulse: false,
     };
   }
@@ -91,7 +91,7 @@ export function ShortInterestSection({ shortInterest }: ShortInterestSectionProp
   const changeColor = isDecreasing ? 'text-emerald-400' : 'text-red-400';
 
   return (
-    <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5 hover:border-vettr-accent/20 hover:bg-vettr-card/80 transition-all duration-300">
+    <div className="bg-white/50 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-5 hover:border-vettr-accent/20 hover:bg-gray-50 dark:hover:bg-vettr-card/80 transition-all duration-300">
       {/* Header with main badge */}
       <div className="flex items-center gap-3 mb-4">
         <div
@@ -128,7 +128,7 @@ export function ShortInterestSection({ shortInterest }: ShortInterestSectionProp
           </span>
 
           {/* Days to Cover */}
-          <span className="text-xs text-gray-400">
+          <span className="text-xs text-gray-500 dark:text-gray-400">
             ({shortInterest.daysToCover.toFixed(1)} days)
           </span>
         </div>
@@ -150,11 +150,11 @@ export function ShortInterestSection({ shortInterest }: ShortInterestSectionProp
 
       {/* Tooltip */}
       {showTooltip && (
-        <div className="absolute z-50 w-64 p-3 bg-vettr-card border border-white/10 rounded-lg shadow-lg -mt-2">
-          <div className="text-xs text-white font-semibold mb-1">
+        <div className="absolute z-50 w-64 p-3 bg-white dark:bg-vettr-card border border-gray-200 dark:border-white/10 rounded-lg shadow-lg -mt-2">
+          <div className="text-xs text-gray-900 dark:text-white font-semibold mb-1">
             What is Short Interest?
           </div>
-          <div className="text-xs text-gray-400 leading-relaxed">
+          <div className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
             Short interest shows the percentage of shares being bet against. Higher percentages indicate more bearish sentiment. Days to cover shows how many days it would take to close all short positions.
           </div>
           <div className="text-xs text-gray-500 mt-2">
@@ -186,7 +186,7 @@ export function ShortInterestSection({ shortInterest }: ShortInterestSectionProp
               <path d="M12 5v14M19 12l-7 7-7-7" />
             </svg>
           </div>
-          <div className="text-xs text-gray-400 mt-1">
+          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
             {isDecreasing ? 'Shorts covering (less bearish)' : 'Shorts increasing (more bearish)'}
           </div>
         </div>
@@ -196,7 +196,7 @@ export function ShortInterestSection({ shortInterest }: ShortInterestSectionProp
           <div className="text-xs text-gray-500 uppercase tracking-wider font-medium mb-1">
             Squeeze Criteria
           </div>
-          <div className="text-xs text-gray-400 leading-relaxed">
+          <div className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
             {shortInterest.squeezePotential === 'high' && (
               <>High short interest (&gt;8%), declining trend, and/or high days to cover (&gt;5) indicate strong squeeze potential.</>
             )}

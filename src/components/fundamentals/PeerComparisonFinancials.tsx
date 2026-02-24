@@ -113,13 +113,13 @@ export function PeerComparisonFinancials({ data, currentTicker }: PeerComparison
   const RadarTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-vettr-card border border-white/10 rounded-xl p-3 shadow-xl">
-          <p className="text-white text-sm font-semibold mb-2">{payload[0].payload.metric}</p>
+        <div className="bg-white dark:bg-vettr-card border border-gray-200 dark:border-white/10 rounded-xl p-3 shadow-xl">
+          <p className="text-gray-900 dark:text-white text-sm font-semibold mb-2">{payload[0].payload.metric}</p>
           {payload.map((entry: any, index: number) => (
             <div key={index} className="flex items-center gap-2 text-xs">
               <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: entry.color }}></span>
-              <span className="text-gray-400">{entry.name === 'current' ? currentTicker : 'Peer Avg'}</span>
-              <span className="text-white font-semibold ml-auto">{entry.value.toFixed(0)}</span>
+              <span className="text-gray-500 dark:text-gray-400">{entry.name === 'current' ? currentTicker : 'Peer Avg'}</span>
+              <span className="text-gray-900 dark:text-white font-semibold ml-auto">{entry.value.toFixed(0)}</span>
             </div>
           ))}
         </div>
@@ -132,8 +132,8 @@ export function PeerComparisonFinancials({ data, currentTicker }: PeerComparison
     <div>
       {/* Radar Chart */}
       {currentStock && (
-        <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5 mb-6">
-          <h3 className="text-sm font-semibold text-white mb-4">Financial Metrics Comparison</h3>
+        <div className="bg-white/50 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-5 mb-6">
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Financial Metrics Comparison</h3>
 
           <ResponsiveContainer width="100%" height={300}>
             <RadarChart data={radarData}>
@@ -182,15 +182,15 @@ export function PeerComparisonFinancials({ data, currentTicker }: PeerComparison
       )}
 
       {/* Comparison Table */}
-      <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5 overflow-x-auto">
-        <h3 className="text-sm font-semibold text-white mb-4">Peer Comparison Table</h3>
+      <div className="bg-white/50 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-5 overflow-x-auto">
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Peer Comparison Table</h3>
 
         <div className="overflow-x-auto">
           <table className="w-full min-w-max">
             <thead>
-              <tr className="border-b border-white/5">
+              <tr className="border-b border-gray-200 dark:border-white/5">
                 <th
-                  className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left cursor-pointer hover:text-gray-400 transition-colors sticky left-0 bg-vettr-dark/80 backdrop-blur-sm"
+                  className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left cursor-pointer hover:text-gray-400 transition-colors sticky left-0 bg-white/80 dark:bg-vettr-dark/80 backdrop-blur-sm"
                   onClick={() => handleSort('ticker')}
                 >
                   <div className="flex items-center gap-1">
@@ -316,53 +316,53 @@ export function PeerComparisonFinancials({ data, currentTicker }: PeerComparison
                 return (
                   <tr
                     key={peer.ticker}
-                    className={`border-b border-white/5 hover:bg-white/[0.03] transition-colors ${
+                    className={`border-b border-gray-200 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-colors ${
                       isCurrent ? 'bg-vettr-accent/5 border-l-2 border-l-vettr-accent' : ''
                     }`}
                   >
-                    <td className="px-4 py-3 text-sm text-white font-medium sticky left-0 bg-vettr-card/80 backdrop-blur-sm">
+                    <td className="px-4 py-3 text-sm text-gray-900 dark:text-white font-medium sticky left-0 bg-white/80 dark:bg-vettr-card/80 backdrop-blur-sm">
                       <div>
                         <div className="font-semibold">{peer.ticker}</div>
-                        <div className="text-xs text-gray-400 truncate max-w-[120px]">{peer.name}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[120px]">{peer.name}</div>
                       </div>
                     </td>
                     <td
-                      className={`px-4 py-3 text-sm text-white text-right ${
+                      className={`px-4 py-3 text-sm text-gray-900 dark:text-white text-right ${
                         peer.peRatio === peRatioBest ? 'font-bold' : ''
                       }`}
                     >
                       {peer.peRatio.toFixed(1)}
                     </td>
                     <td
-                      className={`px-4 py-3 text-sm text-white text-right ${
+                      className={`px-4 py-3 text-sm text-gray-900 dark:text-white text-right ${
                         peer.evEbitda === evEbitdaBest ? 'font-bold' : ''
                       }`}
                     >
                       {peer.evEbitda.toFixed(1)}
                     </td>
                     <td
-                      className={`px-4 py-3 text-sm text-white text-right ${
+                      className={`px-4 py-3 text-sm text-gray-900 dark:text-white text-right ${
                         peer.grossMargin === grossMarginBest ? 'font-bold' : ''
                       }`}
                     >
                       {peer.grossMargin.toFixed(1)}%
                     </td>
                     <td
-                      className={`px-4 py-3 text-sm text-white text-right ${
+                      className={`px-4 py-3 text-sm text-gray-900 dark:text-white text-right ${
                         peer.operatingMargin === operatingMarginBest ? 'font-bold' : ''
                       }`}
                     >
                       {peer.operatingMargin.toFixed(1)}%
                     </td>
                     <td
-                      className={`px-4 py-3 text-sm text-white text-right ${
+                      className={`px-4 py-3 text-sm text-gray-900 dark:text-white text-right ${
                         peer.revenueGrowth === revenueGrowthBest ? 'font-bold' : ''
                       }`}
                     >
                       {peer.revenueGrowth > 0 ? '+' : ''}{peer.revenueGrowth.toFixed(1)}%
                     </td>
                     <td
-                      className={`px-4 py-3 text-sm text-white text-right ${
+                      className={`px-4 py-3 text-sm text-gray-900 dark:text-white text-right ${
                         peer.debtToEquity === debtToEquityBest ? 'font-bold' : ''
                       }`}
                     >

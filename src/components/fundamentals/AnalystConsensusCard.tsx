@@ -46,7 +46,7 @@ export function AnalystConsensusCard({ data }: AnalystConsensusCardProps) {
   };
 
   return (
-    <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5 hover:border-vettr-accent/20 hover:bg-vettr-card/80 transition-all duration-300">
+    <div className="bg-white/50 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-5 hover:border-vettr-accent/20 hover:bg-gray-50 dark:hover:bg-vettr-card/80 transition-all duration-300">
       {/* Header */}
       <div className="flex items-center gap-2 mb-5">
         {/* Chart icon */}
@@ -63,15 +63,15 @@ export function AnalystConsensusCard({ data }: AnalystConsensusCardProps) {
             d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"
           />
         </svg>
-        <h2 className="text-lg font-semibold text-white">Analyst Consensus</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Analyst Consensus</h2>
       </div>
 
       {/* Consensus Summary */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-3">
           <div>
-            <div className="text-2xl font-bold text-white">{data.consensus}</div>
-            <div className="text-xs text-gray-400 mt-1">
+            <div className="text-2xl font-bold text-gray-900 dark:text-white">{data.consensus}</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               {data.totalAnalysts} analyst{data.totalAnalysts !== 1 ? 's' : ''} covering
             </div>
           </div>
@@ -79,14 +79,14 @@ export function AnalystConsensusCard({ data }: AnalystConsensusCardProps) {
             <div className="text-xs text-gray-500 uppercase tracking-wider font-medium mb-1">
               Distribution
             </div>
-            <div className="text-sm text-gray-300">
+            <div className="text-sm text-gray-600 dark:text-gray-300">
               {data.buyCount}B / {data.holdCount}H / {data.sellCount}S
             </div>
           </div>
         </div>
 
         {/* Stacked Bar */}
-        <div className="flex h-3 rounded-full overflow-hidden bg-white/5" role="img" aria-label={`Analyst ratings: ${buyPercent.toFixed(0)}% buy, ${holdPercent.toFixed(0)}% hold, ${sellPercent.toFixed(0)}% sell`}>
+        <div className="flex h-3 rounded-full overflow-hidden bg-gray-100 dark:bg-white/5" role="img" aria-label={`Analyst ratings: ${buyPercent.toFixed(0)}% buy, ${holdPercent.toFixed(0)}% hold, ${sellPercent.toFixed(0)}% sell`}>
           <div
             className="bg-emerald-500 transition-all duration-1000 ease-out"
             style={{ width: animateWidths ? `${buyPercent}%` : '0%' }}
@@ -105,33 +105,33 @@ export function AnalystConsensusCard({ data }: AnalystConsensusCardProps) {
         <div className="flex items-center gap-4 mt-3 text-xs">
           <div className="flex items-center gap-1.5">
             <div className="w-2 h-2 rounded-full bg-emerald-500" />
-            <span className="text-gray-400">Buy ({data.buyCount})</span>
+            <span className="text-gray-500 dark:text-gray-400">Buy ({data.buyCount})</span>
           </div>
           <div className="flex items-center gap-1.5">
             <div className="w-2 h-2 rounded-full bg-gray-500" />
-            <span className="text-gray-400">Hold ({data.holdCount})</span>
+            <span className="text-gray-500 dark:text-gray-400">Hold ({data.holdCount})</span>
           </div>
           <div className="flex items-center gap-1.5">
             <div className="w-2 h-2 rounded-full bg-red-500" />
-            <span className="text-gray-400">Sell ({data.sellCount})</span>
+            <span className="text-gray-500 dark:text-gray-400">Sell ({data.sellCount})</span>
           </div>
         </div>
       </div>
 
       {/* Price Target Section */}
-      <div className="mb-6 pb-6 border-b border-white/5">
+      <div className="mb-6 pb-6 border-b border-gray-200 dark:border-white/5">
         <div className="text-xs text-gray-500 uppercase tracking-wider font-medium mb-3">
           Price Target
         </div>
 
-        <div className="flex items-center justify-between mb-2 text-xs text-gray-400">
+        <div className="flex items-center justify-between mb-2 text-xs text-gray-500 dark:text-gray-400">
           <span>${data.priceTargetLow.toFixed(2)}</span>
-          <span className="font-semibold text-white">${data.priceTargetMedian.toFixed(2)}</span>
+          <span className="font-semibold text-gray-900 dark:text-white">${data.priceTargetMedian.toFixed(2)}</span>
           <span>${data.priceTargetHigh.toFixed(2)}</span>
         </div>
 
         {/* Range Indicator */}
-        <div className="relative h-2 bg-white/5 rounded-full mb-3">
+        <div className="relative h-2 bg-gray-100 dark:bg-white/5 rounded-full mb-3">
           {/* Green range bar */}
           <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/30 via-emerald-500/50 to-emerald-500/30 rounded-full" />
 
@@ -146,7 +146,7 @@ export function AnalystConsensusCard({ data }: AnalystConsensusCardProps) {
               }%`,
             }}
           >
-            <div className="absolute -top-5 left-1/2 -translate-x-1/2 text-xs font-semibold text-white whitespace-nowrap">
+            <div className="absolute -top-5 left-1/2 -translate-x-1/2 text-xs font-semibold text-gray-900 dark:text-white whitespace-nowrap">
               ${data.currentPrice.toFixed(2)}
             </div>
           </div>
@@ -211,7 +211,7 @@ export function AnalystConsensusCard({ data }: AnalystConsensusCardProps) {
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-white/5">
+              <tr className="border-b border-gray-200 dark:border-white/5">
                 <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-3 py-2 text-left">
                   Date
                 </th>
@@ -230,10 +230,10 @@ export function AnalystConsensusCard({ data }: AnalystConsensusCardProps) {
               {data.recentUpgrades.slice(0, 5).map((upgrade, index) => (
                 <tr
                   key={index}
-                  className="border-b border-white/5 hover:bg-white/[0.03] transition-colors"
+                  className="border-b border-gray-200 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-colors"
                 >
-                  <td className="px-3 py-3 text-sm text-gray-400">{upgrade.date}</td>
-                  <td className="px-3 py-3 text-sm text-white font-medium">{upgrade.firm}</td>
+                  <td className="px-3 py-3 text-sm text-gray-500 dark:text-gray-400">{upgrade.date}</td>
+                  <td className="px-3 py-3 text-sm text-gray-900 dark:text-white font-medium">{upgrade.firm}</td>
                   <td className="px-3 py-3">
                     <span
                       className={`${getActionBadge(
@@ -243,7 +243,7 @@ export function AnalystConsensusCard({ data }: AnalystConsensusCardProps) {
                       {upgrade.action}
                     </span>
                   </td>
-                  <td className="px-3 py-3 text-sm text-gray-300">
+                  <td className="px-3 py-3 text-sm text-gray-600 dark:text-gray-300">
                     {upgrade.fromGrade && upgrade.toGrade ? (
                       <>
                         {upgrade.fromGrade}{' '}

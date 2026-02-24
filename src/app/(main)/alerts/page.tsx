@@ -330,7 +330,7 @@ function AlertsPageContent() {
   if (error) {
     return (
       <div className="p-4 md:p-6 pb-20 md:pb-6">
-        <h1 className="text-2xl font-bold text-white mb-6">Alerts</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Alerts</h1>
         <EmptyState
           icon={<AlertTriangleIcon className="w-16 h-16 text-yellow-400" />}
           title="Failed to load alerts"
@@ -343,7 +343,7 @@ function AlertsPageContent() {
   return (
     <div className="p-4 md:p-6 pb-20 md:pb-6">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-white">Alerts</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Alerts</h1>
         {/* Create New Alert Button - Desktop */}
         <button
           className="hidden md:flex items-center gap-2 px-4 py-2.5 bg-vettr-accent text-vettr-navy rounded-xl font-medium hover:bg-vettr-accent/90 transition-colors"
@@ -357,7 +357,7 @@ function AlertsPageContent() {
       {/* Recent Triggers Section */}
       <section className="mb-8">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-white">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
             Recent Triggers
             {unreadCount > 0 && (
               <span className="ml-2 inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-red-500 text-white text-xs font-bold">
@@ -568,7 +568,7 @@ function AlertsPageContent() {
                         aria-label={rule.is_enabled ? 'Disable alert' : 'Enable alert'}
                         onClick={() => handleToggle(rule.id, rule.is_enabled)}
                         disabled={togglingRuleId === rule.id}
-                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-vettr-accent/30 ${rule.is_enabled ? 'bg-vettr-accent' : 'bg-white/10'
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-vettr-accent/30 ${rule.is_enabled ? 'bg-vettr-accent' : 'bg-gray-300 dark:bg-white/10'
                           } ${togglingRuleId === rule.id ? 'opacity-50 cursor-not-allowed' : ''}`}
                         title={rule.is_enabled ? 'Disable alert' : 'Enable alert'}
                       >

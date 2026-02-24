@@ -81,9 +81,9 @@ export function EarningsQualityCard({ data }: EarningsQualityCardProps) {
   const strokeDashoffset = circumference - (animatedScore / 100) * circumference;
 
   return (
-    <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5 hover:border-vettr-accent/20 hover:bg-vettr-card/80 transition-all duration-300">
+    <div className="bg-white/50 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-5 hover:border-vettr-accent/20 hover:bg-gray-50 dark:hover:bg-vettr-card/80 transition-all duration-300">
       {/* Header */}
-      <h3 className="text-lg font-semibold text-white mb-6 flex items-center gap-2">
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
         <svg className="w-5 h-5 text-vettr-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
@@ -120,12 +120,12 @@ export function EarningsQualityCard({ data }: EarningsQualityCardProps) {
           </svg>
 
           {/* Score number centered */}
-          <div className="absolute inset-0 flex items-center justify-center text-2xl font-bold text-white tabular-nums">
+          <div className="absolute inset-0 flex items-center justify-center text-2xl font-bold text-gray-900 dark:text-white tabular-nums">
             {animatedScore}
           </div>
         </div>
         <div className="flex flex-col items-center mt-2 gap-1">
-          <span className="text-sm text-gray-400 font-medium">EQ Score</span>
+          <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">EQ Score</span>
           {data.eqScoreHistory && data.eqScoreHistory.length > 0 && (
             <Sparkline
               data={data.eqScoreHistory}
@@ -143,9 +143,9 @@ export function EarningsQualityCard({ data }: EarningsQualityCardProps) {
         <div>
           <div className="flex justify-between items-baseline mb-2">
             <span className="text-xs text-gray-500 uppercase tracking-wider font-medium">Cash Conversion</span>
-            <span className="text-sm font-semibold text-white">{data.cashConversion.toFixed(2)}x</span>
+            <span className="text-sm font-semibold text-gray-900 dark:text-white">{data.cashConversion.toFixed(2)}x</span>
           </div>
-          <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+          <div className="h-2 bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden">
             <div
               className="h-full rounded-full transition-all duration-1000 ease-out"
               style={{
@@ -161,9 +161,9 @@ export function EarningsQualityCard({ data }: EarningsQualityCardProps) {
         <div>
           <div className="flex justify-between items-baseline mb-2">
             <span className="text-xs text-gray-500 uppercase tracking-wider font-medium">Accruals Ratio</span>
-            <span className="text-sm font-semibold text-white">{data.accrualsRatio.toFixed(3)}</span>
+            <span className="text-sm font-semibold text-gray-900 dark:text-white">{data.accrualsRatio.toFixed(3)}</span>
           </div>
-          <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+          <div className="h-2 bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden">
             <div
               className="h-full rounded-full transition-all duration-1000 ease-out"
               style={{
@@ -179,9 +179,9 @@ export function EarningsQualityCard({ data }: EarningsQualityCardProps) {
         <div>
           <div className="flex justify-between items-baseline mb-2">
             <span className="text-xs text-gray-500 uppercase tracking-wider font-medium">Revenue Quality</span>
-            <span className="text-sm font-semibold text-white">{data.revenueToReceivables.toFixed(2)}x</span>
+            <span className="text-sm font-semibold text-gray-900 dark:text-white">{data.revenueToReceivables.toFixed(2)}x</span>
           </div>
-          <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+          <div className="h-2 bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden">
             <div
               className="h-full rounded-full transition-all duration-1000 ease-out"
               style={{
@@ -226,11 +226,11 @@ export function EarningsQualityCard({ data }: EarningsQualityCardProps) {
 
       {/* Earnings Surprise History Table */}
       <div>
-        <h4 className="text-sm font-semibold text-white mb-3">Earnings Surprise History</h4>
+        <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Earnings Surprise History</h4>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-white/5">
+              <tr className="border-b border-gray-200 dark:border-white/5">
                 <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-3 py-2 text-left">
                   Quarter
                 </th>
@@ -254,13 +254,13 @@ export function EarningsQualityCard({ data }: EarningsQualityCardProps) {
                 return (
                   <tr
                     key={index}
-                    className="border-b border-white/5 hover:bg-white/[0.03] transition-colors"
+                    className="border-b border-gray-200 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-colors"
                   >
-                    <td className="px-3 py-3 text-sm text-gray-300">{item.quarter}</td>
-                    <td className="px-3 py-3 text-sm text-white text-right font-medium tabular-nums">
+                    <td className="px-3 py-3 text-sm text-gray-600 dark:text-gray-300">{item.quarter}</td>
+                    <td className="px-3 py-3 text-sm text-gray-900 dark:text-white text-right font-medium tabular-nums">
                       ${item.epsActual.toFixed(2)}
                     </td>
-                    <td className="px-3 py-3 text-sm text-gray-400 text-right tabular-nums">
+                    <td className="px-3 py-3 text-sm text-gray-500 dark:text-gray-400 text-right tabular-nums">
                       ${item.epsEstimate.toFixed(2)}
                     </td>
                     <td

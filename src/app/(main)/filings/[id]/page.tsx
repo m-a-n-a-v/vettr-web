@@ -148,7 +148,7 @@ export default function FilingDetailPage() {
                 {/* Share Button */}
                 <button
                   onClick={handleShare}
-                  className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors flex-shrink-0"
+                  className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition-colors flex-shrink-0"
                   aria-label="Share filing"
                   title="Share filing"
                 >

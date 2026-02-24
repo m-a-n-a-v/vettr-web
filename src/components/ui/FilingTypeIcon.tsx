@@ -70,8 +70,8 @@ export default function FilingTypeIcon({
           Icon: FilingIcons.Other,
           label: 'Other',
           color: 'text-gray-400',
-          bgColor: 'bg-white/5',
-          borderColor: 'border-white/10'
+          bgColor: 'bg-gray-100 dark:bg-white/5',
+          borderColor: 'border-gray-200 dark:border-white/10'
         };
     }
   };

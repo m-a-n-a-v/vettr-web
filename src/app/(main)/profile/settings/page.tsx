@@ -141,7 +141,7 @@ export default function SettingsPage() {
               aria-label="Enable notifications"
               onClick={() => setNotificationsEnabled(!notificationsEnabled)}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus-visible:ring-2 focus-visible:ring-vettr-accent/30 focus-visible:outline-none ${
-                notificationsEnabled ? 'bg-vettr-accent' : 'bg-white/10'
+                notificationsEnabled ? 'bg-vettr-accent' : 'bg-gray-300 dark:bg-white/10'
               }`}
             >
               <span
@@ -175,7 +175,7 @@ export default function SettingsPage() {
               aria-label="Red flag alerts"
               onClick={() => setAlertRedFlag(!alertRedFlag)}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus-visible:ring-2 focus-visible:ring-vettr-accent/30 focus-visible:outline-none ${
-                alertRedFlag ? 'bg-vettr-accent' : 'bg-white/10'
+                alertRedFlag ? 'bg-vettr-accent' : 'bg-gray-300 dark:bg-white/10'
               }`}
             >
               <span
@@ -201,7 +201,7 @@ export default function SettingsPage() {
               aria-label="Financing alerts"
               onClick={() => setAlertFinancing(!alertFinancing)}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus-visible:ring-2 focus-visible:ring-vettr-accent/30 focus-visible:outline-none ${
-                alertFinancing ? 'bg-vettr-accent' : 'bg-white/10'
+                alertFinancing ? 'bg-vettr-accent' : 'bg-gray-300 dark:bg-white/10'
               }`}
             >
               <span
@@ -227,7 +227,7 @@ export default function SettingsPage() {
               aria-label="Drill result alerts"
               onClick={() => setAlertDrillResult(!alertDrillResult)}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus-visible:ring-2 focus-visible:ring-vettr-accent/30 focus-visible:outline-none ${
-                alertDrillResult ? 'bg-vettr-accent' : 'bg-white/10'
+                alertDrillResult ? 'bg-vettr-accent' : 'bg-gray-300 dark:bg-white/10'
               }`}
             >
               <span
@@ -253,7 +253,7 @@ export default function SettingsPage() {
               aria-label="Management change alerts"
               onClick={() => setAlertManagementChange(!alertManagementChange)}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus-visible:ring-2 focus-visible:ring-vettr-accent/30 focus-visible:outline-none ${
-                alertManagementChange ? 'bg-vettr-accent' : 'bg-white/10'
+                alertManagementChange ? 'bg-vettr-accent' : 'bg-gray-300 dark:bg-white/10'
               }`}
             >
               <span

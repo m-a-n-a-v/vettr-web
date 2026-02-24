@@ -44,7 +44,7 @@ function StockRow({ stock, onClick }: StockRowProps) {
             <span className="text-xs text-gray-400 truncate">{stock.name}</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xs px-2 py-0.5 bg-white/5 text-gray-400 rounded-full">
+            <span className="text-xs px-2 py-0.5 bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400 rounded-full">
               {stock.sector}
             </span>
           </div>
@@ -91,18 +91,18 @@ export default function CollectionDetailPage() {
       <div className="min-h-screen bg-vettr-navy pb-20 md:pb-6">
         <div className="px-4 py-6 md:px-6 space-y-6">
           {/* Back button skeleton */}
-          <div className="h-4 w-32 bg-white/5 rounded animate-pulse" />
+          <div className="h-4 w-32 bg-gray-200 dark:bg-white/5 rounded animate-pulse" />
 
           {/* Header skeleton */}
           <div className="bg-vettr-card/30 border border-white/5 rounded-2xl p-6">
             <div className="flex items-center gap-4 mb-4">
-              <div className="w-14 h-14 rounded-full bg-white/5 animate-pulse" />
+              <div className="w-14 h-14 rounded-full bg-gray-200 dark:bg-white/5 animate-pulse" />
               <div className="flex-1 space-y-2">
-                <div className="h-6 w-2/3 bg-white/5 rounded animate-pulse" />
-                <div className="h-4 w-1/2 bg-white/5 rounded animate-pulse" />
+                <div className="h-6 w-2/3 bg-gray-200 dark:bg-white/5 rounded animate-pulse" />
+                <div className="h-4 w-1/2 bg-gray-200 dark:bg-white/5 rounded animate-pulse" />
               </div>
             </div>
-            <div className="h-4 w-1/3 bg-white/5 rounded animate-pulse" />
+            <div className="h-4 w-1/3 bg-gray-200 dark:bg-white/5 rounded animate-pulse" />
           </div>
 
           {/* Stock list skeleton */}
@@ -111,12 +111,12 @@ export default function CollectionDetailPage() {
               <div key={i} className="bg-vettr-card/50 border border-white/5 rounded-xl p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex-1 space-y-2">
-                    <div className="h-4 w-1/3 bg-white/5 rounded animate-pulse" />
-                    <div className="h-3 w-1/4 bg-white/5 rounded animate-pulse" />
+                    <div className="h-4 w-1/3 bg-gray-200 dark:bg-white/5 rounded animate-pulse" />
+                    <div className="h-3 w-1/4 bg-gray-200 dark:bg-white/5 rounded animate-pulse" />
                   </div>
                   <div className="flex items-center gap-4">
-                    <div className="h-4 w-16 bg-white/5 rounded animate-pulse" />
-                    <div className="h-10 w-10 rounded-full bg-white/5 animate-pulse" />
+                    <div className="h-4 w-16 bg-gray-200 dark:bg-white/5 rounded animate-pulse" />
+                    <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-white/5 animate-pulse" />
                   </div>
                 </div>
               </div>
@@ -191,7 +191,7 @@ export default function CollectionDetailPage() {
               <span className="text-3xl">{icon}</span>
             </div>
             <div className="flex-1 min-w-0">
-              <h1 className="text-2xl font-bold text-white mb-1">{collection.name}</h1>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{collection.name}</h1>
               <p className="text-sm text-gray-400">{collection.tagline}</p>
             </div>
           </div>
@@ -200,7 +200,7 @@ export default function CollectionDetailPage() {
 
         {/* Stocks List */}
         <div>
-          <h2 className="text-lg font-semibold text-white mb-4">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
             Stocks ({collection.stocks.length})
           </h2>
           {collection.stocks.length === 0 ? (

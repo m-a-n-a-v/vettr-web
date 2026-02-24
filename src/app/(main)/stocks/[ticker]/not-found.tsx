@@ -16,10 +16,10 @@ export default function StockNotFound() {
 
         {/* Error Message */}
         <div className="mb-8">
-          <h2 className="text-3xl font-bold text-white mb-2">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
             Stock Not Found
           </h2>
-          <p className="text-gray-400 mb-4">
+          <p className="text-gray-500 dark:text-gray-400 mb-4">
             The stock ticker you&apos;re looking for doesn&apos;t exist in our database or may have been delisted.
           </p>
         </div>
@@ -35,7 +35,7 @@ export default function StockNotFound() {
           </Link>
           <Link
             href="/discovery"
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white/5 border border-white/10 text-white font-semibold rounded-xl hover:bg-white/10 transition-colors"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white font-semibold rounded-xl hover:bg-gray-200 dark:hover:bg-white/10 transition-colors"
           >
             <SearchIcon className="w-4 h-4" />
             Search

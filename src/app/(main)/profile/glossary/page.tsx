@@ -194,20 +194,20 @@ export default function GlossaryPage() {
   const alphabeticalLetters = Object.keys(groupedTerms).sort()
 
   return (
-    <div className="min-h-screen bg-vettr-navy text-white pb-20 md:pb-6">
+    <div className="min-h-screen pb-20 md:pb-6">
       {/* Header */}
-      <div className="bg-vettr-dark border-b border-white/5 sticky top-16 z-20">
+      <div className="bg-white/95 dark:bg-vettr-dark border-b border-gray-200 dark:border-white/5 backdrop-blur-sm sticky top-16 z-20">
         <div className="max-w-4xl mx-auto px-4 py-4">
           {/* Back button and Title */}
           <div className="flex items-center gap-4 mb-4">
             <button
               onClick={() => router.push('/profile')}
-              className="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+              className="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors"
               aria-label="Back to Profile"
             >
               <ChevronLeftIcon className="w-5 h-5" />
             </button>
-            <h1 className="text-2xl font-bold">Glossary</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Glossary</h1>
           </div>
 
           {/* Search */}
@@ -261,11 +261,11 @@ export default function GlossaryPage() {
         {alphabeticalLetters.map((letter) => (
           <div key={letter} className="mb-8">
             {/* Letter Header - sticky divider */}
-            <div className="flex items-center gap-3 mb-4 sticky top-36 bg-vettr-navy py-2 z-10">
+            <div className="flex items-center gap-3 mb-4 sticky top-36 bg-gray-50 dark:bg-vettr-navy py-2 z-10">
               <div className="w-10 h-10 rounded-full bg-vettr-accent/20 flex items-center justify-center">
                 <span className="text-vettr-accent font-bold text-lg">{letter}</span>
               </div>
-              <div className="flex-1 h-px bg-white/5" />
+              <div className="flex-1 h-px bg-gray-200 dark:bg-white/5" />
             </div>
 
             {/* Terms in this letter group */}
@@ -276,15 +276,15 @@ export default function GlossaryPage() {
                 return (
                   <div
                     key={item.term}
-                    className="bg-vettr-card/30 border border-white/5 rounded-xl overflow-hidden transition-all hover:border-vettr-accent/20"
+                    className="bg-white dark:bg-vettr-card/30 border border-gray-200 dark:border-white/5 shadow-sm dark:shadow-none rounded-xl overflow-hidden transition-all hover:border-vettr-accent/20"
                   >
                     {/* Term Header (clickable) */}
                     <button
                       onClick={() => toggleTerm(item.term)}
-                      className="w-full text-left px-4 py-3 flex items-center justify-between gap-3 hover:bg-white/5 transition-colors"
+                      className="w-full text-left px-4 py-3 flex items-center justify-between gap-3 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
                     >
                       <div className="flex-1">
-                        <h3 className="font-medium text-white mb-1">
+                        <h3 className="font-medium text-gray-900 dark:text-white mb-1">
                           {item.term}
                         </h3>
                         {item.category && (
@@ -305,12 +305,12 @@ export default function GlossaryPage() {
                     {/* Definition (expandable) */}
                     {isExpanded && (
                       <div
-                        className="px-4 pb-4 pt-2 border-t border-white/5 animate-in fade-in duration-200"
+                        className="px-4 pb-4 pt-2 border-t border-gray-200 dark:border-white/5 animate-in fade-in duration-200"
                         style={{
                           animation: 'slideDown 200ms ease-out'
                         }}
                       >
-                        <p className="text-sm text-gray-400 leading-relaxed">
+                        <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
                           {item.definition}
                         </p>
                       </div>

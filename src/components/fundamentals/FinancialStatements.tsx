@@ -80,16 +80,16 @@ function StatementSection({
   sparklineData?: number[];
 }) {
   return (
-    <div className="bg-vettr-card/50 border border-white/5 rounded-2xl overflow-hidden hover:border-vettr-accent/20 transition-all duration-300">
+    <div className="bg-white/50 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl overflow-hidden hover:border-vettr-accent/20 transition-all duration-300">
       {/* Header - Clickable */}
       <button
         onClick={onToggle}
-        className="w-full px-5 py-4 flex items-center justify-between hover:bg-white/[0.03] transition-colors"
+        className="w-full px-5 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-colors"
         aria-expanded={isOpen}
       >
         <div className="flex items-center gap-2">
           {icon}
-          <h3 className="text-sm font-semibold text-white">{title}</h3>
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{title}</h3>
         </div>
         <div className="flex items-center gap-3">
           {/* Trend Badge and Sparkline */}
@@ -116,7 +116,7 @@ function StatementSection({
             </div>
           )}
           <svg
-            className={`w-5 h-5 text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+            className={`w-5 h-5 text-gray-500 dark:text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -136,8 +136,8 @@ function StatementSection({
         <div className="px-5 pb-5 overflow-x-auto">
           <table className="w-full min-w-max">
             <thead>
-              <tr className="border-b border-white/10">
-                <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left sticky left-0 bg-vettr-card/80 backdrop-blur-sm">
+              <tr className="border-b border-gray-200 dark:border-white/10">
+                <th className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-left sticky left-0 bg-white/80 dark:bg-vettr-card/80 backdrop-blur-sm">
                   Line Item
                 </th>
                 {periods.map((period) => (
@@ -155,11 +155,11 @@ function StatementSection({
                 return (
                   <tr
                     key={item.label}
-                    className={`border-b border-white/5 ${
+                    className={`border-b border-gray-200 dark:border-white/5 ${
                       idx === items.length - 1 ? 'border-b-0' : ''
                     }`}
                   >
-                    <td className="px-4 py-3 text-sm text-white sticky left-0 bg-vettr-card/80 backdrop-blur-sm">
+                    <td className="px-4 py-3 text-sm text-gray-900 dark:text-white sticky left-0 bg-white/80 dark:bg-vettr-card/80 backdrop-blur-sm">
                       {item.label}
                     </td>
                     {periods.map((period, periodIdx) => {
@@ -175,7 +175,7 @@ function StatementSection({
                           className="px-4 py-3 text-sm text-right"
                         >
                           <div className="flex flex-col items-end gap-0.5">
-                            <span className="text-white font-medium">
+                            <span className="text-gray-900 dark:text-white font-medium">
                               {formatValue(value)}
                             </span>
                             {growth !== null && (

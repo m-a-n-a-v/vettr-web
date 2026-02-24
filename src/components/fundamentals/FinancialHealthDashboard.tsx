@@ -71,7 +71,7 @@ function MetricCard({ label, value, subtitle, status, gauge, sparklineData, inve
   };
 
   return (
-    <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5 hover:border-vettr-accent/20 hover:bg-vettr-card/80 transition-all duration-300">
+    <div className="bg-white/50 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-5 hover:border-vettr-accent/20 hover:bg-gray-50 dark:hover:bg-vettr-card/80 transition-all duration-300">
       <div className="flex items-start justify-between mb-3">
         <div className="text-xs text-gray-500 uppercase tracking-wider font-medium">
           {label}
@@ -106,7 +106,7 @@ function MetricCard({ label, value, subtitle, status, gauge, sparklineData, inve
         )}
       </div>
 
-      <div className="text-2xl font-bold text-white mb-2">
+      <div className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
         {value}
       </div>
 
@@ -255,9 +255,9 @@ export function FinancialHealthDashboard({ data }: FinancialHealthDashboardProps
       </div>
 
       {/* Working Capital Trend */}
-      <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5">
+      <div className="bg-white/50 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-5">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold text-white">Working Capital Trend</h3>
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Working Capital Trend</h3>
           <span className="text-xs text-gray-500">Last 4 Quarters</span>
         </div>
 
@@ -278,7 +278,7 @@ export function FinancialHealthDashboard({ data }: FinancialHealthDashboardProps
           {data.workingCapitalTrend.map((point, idx) => (
             <div key={idx} className="text-center">
               <div className="mb-1">{point.period}</div>
-              <div className="text-white font-medium">
+              <div className="text-gray-900 dark:text-white font-medium">
                 ${(point.value / 1000000).toFixed(1)}M
               </div>
             </div>
