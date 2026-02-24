@@ -56,6 +56,7 @@ function generateFinancialHealth(rng: SeededRandom): FinancialHealth {
   const freeCashFlowYield = parseFloat(rng.range(-2, 12).toFixed(2));
   const debtCoverageRatio = parseFloat(rng.range(0.5, 8.0).toFixed(2));
   const interestCoverage = parseFloat(rng.range(1.0, 15.0).toFixed(2));
+  const grossMargin = parseFloat(rng.range(0.15, 0.65).toFixed(3)); // 15% to 65%
 
   // Generate working capital trend (4 periods)
   const baseWorkingCapital = rng.range(5, 50); // $M
@@ -80,6 +81,7 @@ function generateFinancialHealth(rng: SeededRandom): FinancialHealth {
     interestCoverage,
     debtToEquity,
     debtToAssets,
+    grossMargin,
   };
 }
 

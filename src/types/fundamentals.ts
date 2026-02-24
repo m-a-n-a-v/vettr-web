@@ -20,6 +20,7 @@ export interface FinancialHealth {
   interestCoverage: number;
   debtToEquity: number;
   debtToAssets: number;
+  grossMargin: number; // Percentage (0-1, e.g., 0.382 for 38.2%)
 }
 
 /**

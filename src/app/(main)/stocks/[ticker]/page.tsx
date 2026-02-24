@@ -56,6 +56,7 @@ import { FinancialHealthDashboard } from '@/components/fundamentals/FinancialHea
 import { EarningsQualityCard } from '@/components/fundamentals/EarningsQualityCard';
 import { AnalystConsensusCard } from '@/components/fundamentals/AnalystConsensusCard';
 import { PeerComparisonFinancials } from '@/components/fundamentals/PeerComparisonFinancials';
+import { ScoreDrivers } from '@/components/fundamentals/ScoreDrivers';
 import { SkeletonStockDetailHeader, SkeletonVetrScoreSection, SkeletonFilingRow, SkeletonMetricCard, SkeletonFundamentals } from '@/components/ui/SkeletonLoader';
 import Breadcrumb from '@/components/ui/Breadcrumb';
 import { StarIcon, StarFilledIcon, ShareIcon, MoreHorizontalIcon, ArrowUpIcon, ArrowDownIcon, UsersIcon, FlagIcon, ShieldCheckIcon, BarChartIcon, DocumentIcon, PrinterIcon } from '@/components/icons';
@@ -600,53 +601,60 @@ function StockDetailContent() {
                     <LoadingSpinner size="lg" color="white" />
                   </div>
                 ) : score ? (
-                  <button
-                    onClick={() => setShowScoreDetail(true)}
-                    className="w-full flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 dark:hover:bg-white/[0.03] rounded-xl p-4 transition-colors group"
-                    aria-label="View score details"
-                  >
-                    <VetrScoreBadge score={score.overall_score} size="lg" animate={true} showLabel={false} />
-                    <p className="text-xs text-gray-500 mt-2">VETTR Score</p>
+                  <>
+                    <button
+                      onClick={() => setShowScoreDetail(true)}
+                      className="w-full flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 dark:hover:bg-white/[0.03] rounded-xl p-4 transition-colors group"
+                      aria-label="View score details"
+                    >
+                      <VetrScoreBadge score={score.overall_score} size="lg" animate={true} showLabel={false} />
+                      <p className="text-xs text-gray-500 mt-2">VETTR Score</p>
 
-                    {/* Component breakdown bars */}
-                    {score.financial_survival && (
-                      <div className="w-full max-w-md mt-6 space-y-3">
-                        {[
-                          { label: 'Financial Survival', pillar: score.financial_survival, weight: '35%' },
-                          { label: 'Operational Efficiency', pillar: score.operational_efficiency, weight: '25%' },
-                          { label: 'Shareholder Structure', pillar: score.shareholder_structure, weight: '25%' },
-                          { label: 'Market Sentiment', pillar: score.market_sentiment, weight: '15%' },
-                        ].map(({ label, pillar, weight }) => (
-                          <div key={label}>
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="text-xs text-gray-500 dark:text-gray-400">{label} <span className="text-gray-400 dark:text-gray-600">({weight})</span></span>
-                              <span className="text-xs font-medium text-gray-900 dark:text-white">{pillar?.score ?? 'N/A'}</span>
+                      {/* Component breakdown bars */}
+                      {score.financial_survival && (
+                        <div className="w-full max-w-md mt-6 space-y-3">
+                          {[
+                            { label: 'Financial Survival', pillar: score.financial_survival, weight: '35%' },
+                            { label: 'Operational Efficiency', pillar: score.operational_efficiency, weight: '25%' },
+                            { label: 'Shareholder Structure', pillar: score.shareholder_structure, weight: '25%' },
+                            { label: 'Market Sentiment', pillar: score.market_sentiment, weight: '15%' },
+                          ].map(({ label, pillar, weight }) => (
+                            <div key={label}>
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="text-xs text-gray-500 dark:text-gray-400">{label} <span className="text-gray-400 dark:text-gray-600">({weight})</span></span>
+                                <span className="text-xs font-medium text-gray-900 dark:text-white">{pillar?.score ?? 'N/A'}</span>
+                              </div>
+                              <div className="w-full bg-gray-100 dark:bg-white/5 rounded-full h-1.5">
+                                <div
+                                  className="h-1.5 rounded-full transition-all duration-1000"
+                                  style={{
+                                    width: `${pillar?.score ?? 0}%`,
+                                    backgroundColor: getScoreColor(pillar?.score ?? 0),
+                                  }}
+                                />
+                              </div>
                             </div>
-                            <div className="w-full bg-gray-100 dark:bg-white/5 rounded-full h-1.5">
-                              <div
-                                className="h-1.5 rounded-full transition-all duration-1000"
-                                style={{
-                                  width: `${pillar?.score ?? 0}%`,
-                                  backgroundColor: getScoreColor(pillar?.score ?? 0),
-                                }}
-                              />
-                            </div>
-                          </div>
-                        ))}
+                          ))}
 
-                        {/* Null pillars notice */}
-                        {score.null_pillars && score.null_pillars.length > 0 && (
-                          <p className="text-xs text-yellow-400/70 mt-2">
-                            ⚠ Weight redistributed — insufficient data for: {score.null_pillars.join(', ')}
-                          </p>
-                        )}
-                      </div>
+                          {/* Null pillars notice */}
+                          {score.null_pillars && score.null_pillars.length > 0 && (
+                            <p className="text-xs text-yellow-400/70 mt-2">
+                              ⚠ Weight redistributed — insufficient data for: {score.null_pillars.join(', ')}
+                            </p>
+                          )}
+                        </div>
+                      )}
+
+                      <p className="text-gray-500 text-xs mt-4 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors">
+                        Click to view detailed breakdown
+                      </p>
+                    </button>
+
+                    {/* Score Drivers - fundamentals indicators */}
+                    {fundamentals && !fundamentalsLoading && (
+                      <ScoreDrivers ticker={ticker} fundamentals={fundamentals} />
                     )}
-
-                    <p className="text-gray-500 text-xs mt-4 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors">
-                      Click to view detailed breakdown
-                    </p>
-                  </button>
+                  </>
                 ) : (
                   <p className="text-gray-500 dark:text-gray-400 text-center py-4">Score not available</p>
                 )}
