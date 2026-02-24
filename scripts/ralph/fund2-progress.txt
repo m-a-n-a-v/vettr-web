@@ -82,3 +82,70 @@ Details:
 - Edge case handling (empty arrays, single points) is critical for reusable components
 - className prop enables flexible positioning (inline, absolute, etc.) for different use cases
 ---
+## FUND2-004: Add sparklines to Key Metrics cards in Overview tab
+Status: COMPLETE
+Date: Mon Feb 24 2026
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Added metricTrends field to FundamentalsData interface in src/types/fundamentals.ts with 8-quarter trends for: marketCap, peRatio, dividendYield, revenueGrowth, and price
+- Enhanced dummy data generator (src/lib/dummy-fundamentals.ts) to produce realistic 8-quarter trend data:
+  - Each metric has a deterministic trend pattern (rising, declining, volatile, improving, etc.) based on ticker seed
+  - Market cap trends show 5% quarterly growth (rising), 3% decline, or ±10% volatility
+  - P/E ratio trends show expanding/contracting multiples or volatility (±15%)
+  - Dividend yield trends show increasing/decreasing yields or stable ±5% (only for stocks with dividends)
+  - Revenue growth trends show improving (+2%/qtr), declining (-1.5%/qtr), or volatile patterns
+  - Price trends show uptrends (+6%/qtr), downtrends (-4%/qtr), or sideways movement (±8%)
+  - All trends maintain realistic bounds (market cap >$10M, PE 3-100, div yield 0-10%, etc.)
+- Integrated Sparkline component into Overview tab Key Metrics section (src/app/(main)/stocks/[ticker]/page.tsx):
+  - Added Sparkline import
+  - Enhanced Market Cap card with sparkline in bottom-right corner showing 8-quarter market cap trend
+  - Enhanced P/E Ratio card with sparkline showing 8-quarter PE trend
+  - Enhanced Div Yield card with sparkline showing 8-quarter yield trend (only displayed when dividendYield > 0)
+  - All sparklines positioned absolutely in bottom-right corner at 60px wide × 20px tall
+  - Sparklines use auto-color detection (green for rising trends, red for declining)
+- Exchange, Sector, and Filings cards intentionally excluded from sparklines as specified (categorical/count data)
+- npm run build passes successfully with zero errors
+
+**Learnings for future iterations:**
+- Deterministic trend patterns in dummy data create more realistic and meaningful sparklines than random walks
+- Bottom-right absolute positioning works well for metric cards without interfering with main values
+- Optional chaining (?.) is essential when accessing nested trend data to prevent runtime errors
+- Sparkline component's auto-color feature works perfectly for metric trends - green for growth, red for decline
+- 8 quarters of data provides good visual trend context without cluttering small sparklines
+- Conditional rendering based on dividend yield (>0) prevents showing flat zero-value sparklines for non-dividend stocks
+- Pure SVG sparklines integrate seamlessly into existing card layouts without layout shift
+---
+## FUND2-005: Add sparklines to Financial Health Dashboard metrics
+Status: COMPLETE
+Date: Mon Feb 24 2026
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Added healthTrends field to FinancialHealth interface in src/types/fundamentals.ts containing 6-quarter trend data for: cashRunway, debtCoverage, fcfYield, currentRatio, debtToEquity, and altmanZ
+- Enhanced dummy data generator (src/lib/dummy-fundamentals.ts) to produce 6 quarters of health trend data with realistic patterns:
+  - Each metric follows a deterministic trend pattern (improving, declining, stable, worsening) based on ticker seed
+  - Cash runway trends show declining (burning cash), stable, or improving patterns
+  - Debt coverage trends show improving, stable, or declining coverage ability
+  - FCF yield trends show improving, volatile, or declining free cash flow generation
+  - Current ratio trends show improving liquidity, stable, or declining
+  - Debt-to-equity trends show improving (declining ratio), stable, or worsening leverage
+  - Altman Z-Score trends show improving financial health, stable, or declining
+  - All trends maintain realistic bounds (runway 3-36mo, debt coverage 0.5-10x, FCF yield -5% to 15%, etc.)
+- Updated FinancialHealthDashboard.tsx component:
+  - Added Sparkline import and integration
+  - Enhanced MetricCard component to accept sparklineData and invertSparklineColors props
+  - Added sparkline rendering positioned below main value, above status badge at 80px wide × 24px tall
+  - Implemented inverted color logic for debt-to-equity metric (declining = green, rising = red) since lower is better
+  - All 6 metric cards now display trend sparklines: Cash Runway, Altman Z-Score, Debt Coverage, FCF Yield, Current Ratio, Debt/Equity
+  - Sparklines use auto-color detection with optional inversion for metrics where lower is better
+- All components follow VETTR design system patterns: consistent sizing, proper positioning, clean integration
+- npm run build passes successfully with zero errors
+
+**Learnings for future iterations:**
+- Inverted color logic for "lower is better" metrics (debt ratios) is essential for correct visual communication
+- Positioning sparklines between main value and status badge creates clear visual hierarchy without crowding
+- 6 quarters of trend data provides meaningful context for health metrics without overwhelming the sparkline
+- Optional chaining (?.) when accessing healthTrends prevents runtime errors if data structure evolves
+- Deterministic trend patterns in dummy data (improving/declining/stable) create realistic and consistent visualizations
+- The invertSparklineColors prop pattern allows flexible sparkline color semantics based on metric characteristics
+- 80px × 24px sizing for health metric sparklines balances visibility with card real estate
+---
