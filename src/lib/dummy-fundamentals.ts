@@ -566,6 +566,90 @@ export function getDummyFundamentals(ticker: string): FundamentalsData {
   const hasDividend = rng.next() > 0.4; // 60% chance of having a dividend
   const dividendYield = hasDividend ? parseFloat(rng.range(0.5, 8.0).toFixed(2)) : 0;
 
+  // Generate 8 quarters of metric trends for sparklines
+  const metricTrends = {
+    marketCap: [] as number[],
+    peRatio: [] as number[],
+    dividendYield: [] as number[],
+    revenueGrowth: [] as number[],
+    price: [] as number[],
+  };
+
+  // Determine trend direction for each metric
+  const marketCapTrend = rng.choice(['rising', 'declining', 'volatile']);
+  const peTrend = rng.choice(['rising', 'declining', 'volatile']);
+  const divYieldTrend = rng.choice(['rising', 'declining', 'stable']);
+  const revenueGrowthTrend = rng.choice(['improving', 'declining', 'volatile']);
+  const priceTrend = rng.choice(['uptrend', 'downtrend', 'sideways']);
+
+  // Base values for trend generation
+  const baseMarketCap = rng.range(50, 5000); // $50M - $5B
+  const basePE = peRatio;
+  const baseDivYield = dividendYield;
+  const baseRevenueGrowth = parseFloat(rng.range(-10, 25).toFixed(1)); // -10% to +25%
+  const basePrice = parseFloat(rng.range(2, 50).toFixed(2));
+
+  for (let i = 0; i < 8; i++) {
+    // Market Cap trend
+    let marketCapValue: number;
+    if (marketCapTrend === 'rising') {
+      marketCapValue = baseMarketCap * (1 + (i * 0.05)); // Growing 5% per quarter
+    } else if (marketCapTrend === 'declining') {
+      marketCapValue = baseMarketCap * (1 - (i * 0.03)); // Declining 3% per quarter
+    } else {
+      marketCapValue = baseMarketCap * (1 + rng.range(-0.1, 0.1)); // Volatile ±10%
+    }
+    metricTrends.marketCap.push(parseFloat(Math.max(10, marketCapValue).toFixed(2)));
+
+    // P/E Ratio trend
+    let peValue: number;
+    if (peTrend === 'rising') {
+      peValue = basePE * (1 + (i * 0.04)); // Expanding P/E
+    } else if (peTrend === 'declining') {
+      peValue = basePE * (1 - (i * 0.03)); // Contracting P/E
+    } else {
+      peValue = basePE * (1 + rng.range(-0.15, 0.15)); // Volatile
+    }
+    metricTrends.peRatio.push(parseFloat(Math.max(3, Math.min(100, peValue)).toFixed(1)));
+
+    // Dividend Yield trend
+    let divYieldValue: number;
+    if (hasDividend) {
+      if (divYieldTrend === 'rising') {
+        divYieldValue = baseDivYield * (1 + (i * 0.03)); // Increasing yield
+      } else if (divYieldTrend === 'declining') {
+        divYieldValue = baseDivYield * (1 - (i * 0.02)); // Decreasing yield
+      } else {
+        divYieldValue = baseDivYield * (1 + rng.range(-0.05, 0.05)); // Stable ±5%
+      }
+      metricTrends.dividendYield.push(parseFloat(Math.max(0, Math.min(10, divYieldValue)).toFixed(2)));
+    } else {
+      metricTrends.dividendYield.push(0);
+    }
+
+    // Revenue Growth trend
+    let revenueGrowthValue: number;
+    if (revenueGrowthTrend === 'improving') {
+      revenueGrowthValue = baseRevenueGrowth + (i * 2); // Improving by 2% per quarter
+    } else if (revenueGrowthTrend === 'declining') {
+      revenueGrowthValue = baseRevenueGrowth - (i * 1.5); // Declining by 1.5% per quarter
+    } else {
+      revenueGrowthValue = baseRevenueGrowth + rng.range(-5, 5); // Volatile
+    }
+    metricTrends.revenueGrowth.push(parseFloat(Math.max(-20, Math.min(50, revenueGrowthValue)).toFixed(1)));
+
+    // Price trend
+    let priceValue: number;
+    if (priceTrend === 'uptrend') {
+      priceValue = basePrice * (1 + (i * 0.06)); // Rising 6% per quarter
+    } else if (priceTrend === 'downtrend') {
+      priceValue = basePrice * (1 - (i * 0.04)); // Declining 4% per quarter
+    } else {
+      priceValue = basePrice * (1 + rng.range(-0.08, 0.08)); // Sideways ±8%
+    }
+    metricTrends.price.push(parseFloat(Math.max(0.5, priceValue).toFixed(2)));
+  }
+
   return {
     ticker,
     financialHealth: generateFinancialHealth(rng),
@@ -578,5 +662,6 @@ export function getDummyFundamentals(ticker: string): FundamentalsData {
     dividendYield,
     shortInterest: generateShortInterest(rng),
     insiderActivity: generateInsiderActivity(rng),
+    metricTrends,
   };
 }

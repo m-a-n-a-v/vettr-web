@@ -171,4 +171,11 @@ export interface FundamentalsData {
   dividendYield: number; // Dividend yield percentage (0-10)
   shortInterest: ShortInterest;
   insiderActivity: InsiderActivity;
+  metricTrends: {
+    marketCap: number[]; // 8 quarters of market cap values
+    peRatio: number[]; // 8 quarters of P/E ratio values
+    dividendYield: number[]; // 8 quarters of dividend yield values
+    revenueGrowth: number[]; // 8 quarters of revenue growth % values
+    price: number[]; // 8 quarters of stock price values
+  };
 }

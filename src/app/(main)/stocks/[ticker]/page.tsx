@@ -58,6 +58,7 @@ import { AnalystConsensusCard } from '@/components/fundamentals/AnalystConsensus
 import { PeerComparisonFinancials } from '@/components/fundamentals/PeerComparisonFinancials';
 import { ScoreDrivers } from '@/components/fundamentals/ScoreDrivers';
 import { FinancialStatements } from '@/components/fundamentals/FinancialStatements';
+import { Sparkline } from '@/components/ui/Sparkline';
 import { ShortInterestSection } from '@/components/fundamentals/ShortInterestSection';
 import { InsiderActivityComponent } from '@/components/fundamentals/InsiderActivity';
 import { SkeletonStockDetailHeader, SkeletonVetrScoreSection, SkeletonFilingRow, SkeletonMetricCard, SkeletonFundamentals } from '@/components/ui/SkeletonLoader';
@@ -669,13 +670,22 @@ function StockDetailContent() {
               <div className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-6 print-avoid-break print-page-break">
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Key Metrics</h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                  <div className="bg-gray-50 dark:bg-white/[0.03] rounded-xl p-4">
+                  <div className="bg-gray-50 dark:bg-white/[0.03] rounded-xl p-4 relative">
                     <p className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Market Cap</p>
                     <p className="text-gray-900 dark:text-white font-semibold">
                       {stock.market_cap
                         ? `$${(stock.market_cap / 1000000000).toFixed(1)}B`
                         : 'N/A'}
                     </p>
+                    {fundamentals?.metricTrends?.marketCap && fundamentals.metricTrends.marketCap.length > 0 && (
+                      <div className="absolute bottom-3 right-3">
+                        <Sparkline
+                          data={fundamentals.metricTrends.marketCap}
+                          width={60}
+                          height={20}
+                        />
+                      </div>
+                    )}
                   </div>
                   <div className="bg-gray-50 dark:bg-white/[0.03] rounded-xl p-4">
                     <p className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Exchange</p>
@@ -699,7 +709,7 @@ function StockDetailContent() {
                       <div className="h-5 w-16 bg-gray-200 dark:bg-white/5 rounded"></div>
                     </div>
                   ) : fundamentals ? (
-                    <div className="bg-gray-50 dark:bg-white/[0.03] rounded-xl p-4">
+                    <div className="bg-gray-50 dark:bg-white/[0.03] rounded-xl p-4 relative">
                       <p className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">P/E Ratio</p>
                       <p className="text-gray-900 dark:text-white font-semibold">
                         {fundamentals.peRatio.toFixed(1)}
@@ -707,6 +717,15 @@ function StockDetailContent() {
                       <p className="text-xs text-gray-500 mt-1">
                         Fwd: {fundamentals.peRatioForward.toFixed(1)}
                       </p>
+                      {fundamentals.metricTrends?.peRatio && fundamentals.metricTrends.peRatio.length > 0 && (
+                        <div className="absolute bottom-3 right-3">
+                          <Sparkline
+                            data={fundamentals.metricTrends.peRatio}
+                            width={60}
+                            height={20}
+                          />
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <div className="bg-gray-50 dark:bg-white/[0.03] rounded-xl p-4">
@@ -722,11 +741,20 @@ function StockDetailContent() {
                       <div className="h-5 w-16 bg-gray-200 dark:bg-white/5 rounded"></div>
                     </div>
                   ) : fundamentals ? (
-                    <div className="bg-gray-50 dark:bg-white/[0.03] rounded-xl p-4">
+                    <div className="bg-gray-50 dark:bg-white/[0.03] rounded-xl p-4 relative">
                       <p className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Div Yield</p>
                       <p className="text-gray-900 dark:text-white font-semibold">
                         {fundamentals.dividendYield > 0 ? `${fundamentals.dividendYield.toFixed(2)}%` : 'N/A'}
                       </p>
+                      {fundamentals.dividendYield > 0 && fundamentals.metricTrends?.dividendYield && fundamentals.metricTrends.dividendYield.length > 0 && (
+                        <div className="absolute bottom-3 right-3">
+                          <Sparkline
+                            data={fundamentals.metricTrends.dividendYield}
+                            width={60}
+                            height={20}
+                          />
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <div className="bg-gray-50 dark:bg-white/[0.03] rounded-xl p-4">
