@@ -678,7 +678,7 @@ function StockDetailContent() {
                         : 'N/A'}
                     </p>
                     {fundamentals?.metricTrends?.marketCap && fundamentals.metricTrends.marketCap.length > 0 && (
-                      <div className="absolute bottom-3 right-3">
+                      <div className="absolute bottom-3 right-3 hidden min-[375px]:block">
                         <Sparkline
                           data={fundamentals.metricTrends.marketCap}
                           width={60}
@@ -718,7 +718,7 @@ function StockDetailContent() {
                         Fwd: {fundamentals.peRatioForward.toFixed(1)}
                       </p>
                       {fundamentals.metricTrends?.peRatio && fundamentals.metricTrends.peRatio.length > 0 && (
-                        <div className="absolute bottom-3 right-3">
+                        <div className="absolute bottom-3 right-3 hidden min-[375px]:block">
                           <Sparkline
                             data={fundamentals.metricTrends.peRatio}
                             width={60}
@@ -747,7 +747,7 @@ function StockDetailContent() {
                         {fundamentals.dividendYield > 0 ? `${fundamentals.dividendYield.toFixed(2)}%` : 'N/A'}
                       </p>
                       {fundamentals.dividendYield > 0 && fundamentals.metricTrends?.dividendYield && fundamentals.metricTrends.dividendYield.length > 0 && (
-                        <div className="absolute bottom-3 right-3">
+                        <div className="absolute bottom-3 right-3 hidden min-[375px]:block">
                           <Sparkline
                             data={fundamentals.metricTrends.dividendYield}
                             width={60}

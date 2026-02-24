@@ -112,7 +112,7 @@ function MetricCard({ label, value, subtitle, status, gauge, sparklineData, inve
 
       {/* Sparkline positioned below value, above status badge */}
       {sparklineData && sparklineData.length > 0 && (
-        <div className="mb-2">
+        <div className="mb-2 hidden min-[375px]:block">
           <Sparkline
             data={sparklineData}
             width={80}

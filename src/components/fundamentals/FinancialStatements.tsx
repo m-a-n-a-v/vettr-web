@@ -110,7 +110,7 @@ function StatementSection({
                   data={sparklineData}
                   width={60}
                   height={20}
-                  className="opacity-70"
+                  className="opacity-70 hidden min-[375px]:inline-block"
                 />
               )}
             </div>

@@ -390,7 +390,7 @@ export function PeerComparisonFinancials({ data, currentTicker }: PeerComparison
                             data={peer.scoreTrend}
                             width={50}
                             height={20}
-                            className="opacity-70"
+                            className="opacity-70 hidden min-[375px]:inline-block"
                           />
                         </div>
                       )}

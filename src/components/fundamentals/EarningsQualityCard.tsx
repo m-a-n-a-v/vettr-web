@@ -131,7 +131,7 @@ export function EarningsQualityCard({ data }: EarningsQualityCardProps) {
               data={data.eqScoreHistory}
               width={60}
               height={20}
-              className="opacity-70"
+              className="opacity-70 hidden min-[375px]:block"
             />
           )}
         </div>

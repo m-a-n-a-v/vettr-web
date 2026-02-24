@@ -7,6 +7,7 @@ interface SparklineProps {
   color?: string;
   showDot?: boolean;
   className?: string;
+  ariaLabel?: string;
 }
 
 export function Sparkline({
@@ -15,7 +16,8 @@ export function Sparkline({
   height = 20,
   color,
   showDot = true,
-  className = ''
+  className = '',
+  ariaLabel
 }: SparklineProps) {
   // Handle edge cases
   if (!data || data.length === 0) {
@@ -67,7 +69,9 @@ export function Sparkline({
       className={`inline-block ${className}`}
       viewBox={`0 0 ${width} ${height}`}
       preserveAspectRatio="none"
-      aria-hidden="true"
+      aria-hidden={ariaLabel ? 'false' : 'true'}
+      aria-label={ariaLabel}
+      role={ariaLabel ? 'img' : undefined}
     >
       {/* Sparkline path */}
       <polyline

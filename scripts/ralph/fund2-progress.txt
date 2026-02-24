@@ -220,3 +220,51 @@ Details:
 - Positioning trend elements in a flex container with gap-3 between badge, sparkline, and chevron creates clean visual hierarchy
 - Opacity on sparklines (opacity-70) keeps them informative but not visually dominant
 ---
+## FUND2-008: Final polish: consistent sparkline sizing, responsive checks, build verification
+Status: COMPLETE
+Date: Mon Feb 24 2026
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Audited all sparkline usage across the application and verified consistent sizing:
+  - Overview tab Key Metrics cards: 60px × 20px ✓
+  - Financial Health Dashboard metric cards: 80px × 24px ✓
+  - Earnings Quality EQ Score: 60px × 20px ✓
+  - Peer Comparison table cells: 50px × 20px ✓
+  - Financial Statements accordion headers: 60px × 20px ✓
+  - All sizes match acceptance criteria: 60-80px in cards, 50px in tables, 60px in badges
+- Added responsive breakpoints to hide sparklines on screens < 375px to prevent overflow:
+  - Added `hidden min-[375px]:block` class to all absolutely positioned sparklines in Overview cards
+  - Added `hidden min-[375px]:block` to Financial Health sparklines
+  - Added `hidden min-[375px]:inline-block` to Financial Statements header sparklines
+  - Added `hidden min-[375px]:block` to Earnings Quality sparkline
+  - Added `hidden min-[375px]:inline-block` to Peer Comparison table sparklines
+  - Uses Tailwind's arbitrary value breakpoints (min-[375px]) to target exact 375px threshold
+- Enhanced Sparkline component accessibility:
+  - Added optional `ariaLabel` prop to SparklineProps interface
+  - Updated component to conditionally set aria-hidden based on ariaLabel presence
+  - When ariaLabel provided: aria-hidden="false", role="img", and aria-label set
+  - When no ariaLabel (default): aria-hidden="true" for decorative use
+  - Current usage keeps sparklines decorative (aria-hidden) since actual data is in surrounding text
+- Verified responsive behavior:
+  - All sparklines use proper responsive classes to hide < 375px
+  - Tables already have overflow-x-auto for horizontal scrolling protection
+  - Cards use absolute positioning or inline-block without causing layout shift
+  - No horizontal overflow at any viewport size
+- Build and lint verification:
+  - npm run build passes with zero errors ✓
+  - npm run lint passes (1 pre-existing warning in unrelated MarketNews.tsx file)
+  - No TypeScript compilation errors ✓
+  - All components type-safe and production-ready
+- Updated PRD to mark FUND2-008 as passes: true
+- ALL 8 STORIES IN FUND2 PHASE NOW COMPLETE
+
+**Learnings for future iterations:**
+- Tailwind's arbitrary value breakpoints (min-[375px], max-[375px]) are perfect for custom responsive thresholds not covered by default breakpoints
+- Consistent sparkline sizing across the app creates visual cohesion and predictable layout behavior
+- Responsive hiding of decorative elements (sparklines) on very small screens prevents overflow without losing essential information
+- ARIA patterns for charts: decorative charts should use aria-hidden="true", while informative charts need role="img" and aria-label
+- The pattern of conditional aria-hidden based on whether aria-label is provided creates flexible accessibility
+- Build verification catches integration issues that individual component testing might miss
+- Polish stories are critical for production quality - they catch edge cases and ensure consistent UX across all viewports
+- Using hidden + min-[375px]:block ensures graceful degradation on tiny screens while showing full experience on normal phones
+---
