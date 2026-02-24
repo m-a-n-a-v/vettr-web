@@ -303,3 +303,86 @@ Details:
 - Sort indicators (arrows) rendered inline with flex justify-end for right-aligned headers
 - min-w-max prevents table collapse during horizontal scroll on narrow viewports
 ---
+## FUND-008: Compose Fundamentals tab with all sections
+Status: COMPLETE
+Date: Sun Feb 23 2026
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Created src/components/ui/SkeletonFundamentals.tsx with comprehensive loading skeletons
+  - Financial Health Dashboard skeleton: 6 metric cards in grid + working capital trend section
+  - Earnings Quality skeleton: circular badge, 3 metric bars, surprise history table
+  - Analyst Consensus skeleton: consensus summary, price target range, recommendation trend chart
+  - Peer Comparison skeleton: radar chart area + comparison table with rows
+- Modified src/app/(main)/stocks/[ticker]/page.tsx to wire up all fundamentals sections:
+  - Added useFundamentals hook import and call with { ticker } parameter
+  - Added imports for all 4 fundamentals components (FinancialHealthDashboard, EarningsQualityCard, AnalystConsensusCard, PeerComparisonFinancials)
+  - Added SkeletonFundamentals import from SkeletonLoader
+  - Replaced placeholder Fundamentals tab content with complete implementation
+- Fundamentals tab structure (all acceptance criteria met):
+  1. Financial Health Dashboard (full width) with "Financial Health" heading + dollar/coin icon
+  2. Earnings Quality (left) + Analyst Consensus (right) in lg:grid-cols-2 responsive grid
+     - "Earnings Quality" heading with checkmark circle icon
+     - "Analyst Consensus" heading with bar chart icon
+  3. Peer Comparison (full width) with "Peer Comparison" heading + chart square icon
+- All sections separated by consistent spacing (space-y-8)
+- Section headings follow design system: flex items-center gap-2, text-lg font-semibold text-white
+- SVG icons inline (w-5 h-5 text-vettr-accent) for all section headings
+- Data loaded via useFundamentals({ ticker }) hook
+- Loading state shows SkeletonFundamentals component with proper structure
+- Empty state handled with EmptyState component + BarChartIcon
+- Tab content has smooth entrance animation (framer-motion with opacity fade, 0.15s duration, easeOut)
+- Responsive layout: 2-col grid stacks to single column on mobile via lg:grid-cols-2
+- Build and lint checks passed successfully
+- Committed as: feat: FUND-008 - Compose Fundamentals tab with all sections
+
+**Learnings for future iterations:**
+- SkeletonFundamentals component mirrors the actual layout structure for realistic loading states
+- Each skeleton section uses appropriate heights and spacing matching the real components
+- Hook call pattern must use object destructuring: useFundamentals({ ticker }) not useFundamentals(ticker)
+- Section icons chosen to represent content: dollar/coin (financial), checkmark (quality), bar chart (consensus), chart square (comparison)
+- Grid-based layout (lg:grid-cols-2) automatically stacks sections on mobile without additional media queries
+- EmptyState component provides graceful fallback when fundamentals data is unavailable
+- Framer-motion animation duration matches other tabs (prefersReducedMotion ? 0 : 0.15)
+- space-y-8 provides consistent vertical rhythm between major sections
+- All 4 fundamentals components created in previous stories work seamlessly together
+- Loading skeleton structure: space-y-8 wrapper → section containers → internal skeleton elements
+---
+## FUND-009: Enhance VETTR Score breakdown with fundamentals indicators
+Status: COMPLETE
+Date: Sun Feb 23 2026
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Created src/components/fundamentals/ScoreDrivers.tsx with 4 score driver indicators
+- Component displays 4 compact indicator rows aligned with the 4 VETTR Score pillars:
+  1. Financial Survival → Cash Runway (months) with color dot based on value
+  2. Operational Efficiency → Gross Margin (%) with color dot
+  3. Shareholder Structure → Insider Ownership (%) with color dot
+  4. Market Sentiment → Analyst Consensus (e.g., "Buy (8)") with color dot
+- Each row is clickable and navigates to the Fundamentals tab (?tab=fundamentals)
+- Rows have hover effects (bg-gray-100 dark:bg-white/[0.03]) for visual feedback
+- Color dots use the 5-tier color scale from getScoreColor function
+- Includes "View all fundamentals →" link at bottom with arrow icon and hover animation
+- Layout: pillar icon (left), pillar name, spacer, colored dot + metric value + metric label (right)
+- Integrated into Overview tab VETTR Score section after the 4-pillar breakdown bars
+- Used React fragment (<>) to wrap both the score detail button and ScoreDrivers component
+- ScoreDrivers only renders when fundamentals data is available (!fundamentalsLoading && fundamentals)
+- Added grossMargin field to FinancialHealth interface in src/types/fundamentals.ts
+- Updated dummy data generator (src/lib/dummy-fundamentals.ts) to include grossMargin (0.15-0.65 range)
+- Helper function getConsensusScore converts analyst consensus string to 0-100 score for color coding
+- Icons use inline SVG matching existing icon style (w-4 h-4, stroke currentColor, strokeWidth 1.5)
+- Build and lint checks passed successfully
+- Committed as: feat: FUND-009 - Enhance VETTR Score breakdown with fundamentals indicators
+
+**Learnings for future iterations:**
+- Placing components after a button inside a ternary requires wrapping in a React fragment (<>)
+- The ternary structure was: scoreLoading ? ... : score ? <button>... + <ScoreDrivers> : ...
+- Without fragment, syntax error occurs because ScoreDrivers appears after </button> but is part of score ? branch
+- Each driver row normalized to 0-100 scale for consistent color coding across different metric types
+- Cash runway normalized by dividing by 36 months (max) * 100
+- Gross margin already in 0-1 range, multiply by 100 for percentage display
+- Insider ownership normalized by multiplying by 5 (20% insider = 100 score)
+- Analyst consensus mapped to score based on string matching (Strong Buy=95, Buy=80, Hold=60, Sell=40, Strong Sell=20)
+- Router.push with query param (?tab=fundamentals) enables direct navigation to specific tab
+- Hover animation on arrow icon uses translate-x-0.5 for subtle rightward movement
+- Component gracefully handles missing fundamentals data with early return null
+---
