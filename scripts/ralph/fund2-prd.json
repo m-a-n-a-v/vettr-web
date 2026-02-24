@@ -109,7 +109,7 @@
         "npm run build passes"
       ],
       "priority": 6,
-      "passes": false
+      "passes": true
     },
     {
       "id": "FUND2-007",
@@ -126,7 +126,7 @@
         "npm run build passes"
       ],
       "priority": 7,
-      "passes": false
+      "passes": true
     },
     {
       "id": "FUND2-008",

@@ -149,3 +149,74 @@ Details:
 - The invertSparklineColors prop pattern allows flexible sparkline color semantics based on metric characteristics
 - 80px × 24px sizing for health metric sparklines balances visibility with card real estate
 ---
+## FUND2-006: Add sparklines to earnings and valuation metrics in Fundamentals tab
+Status: COMPLETE
+Date: Mon Feb 24 2026
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Added eqScoreHistory field to EarningsQuality interface in src/types/fundamentals.ts with 6 quarters of EQ score history
+- Added scoreTrend field to PeerFinancials peers interface in src/types/fundamentals.ts with 6 quarters of VETTR score trend for each peer
+- Enhanced dummy data generator (src/lib/dummy-fundamentals.ts) to produce:
+  - EQ score history with 4 trend patterns (improving, declining, stable, volatile) using deterministic logic
+  - Peer score trends for each peer stock with realistic 6-quarter historical patterns
+  - Each trend type follows a distinct mathematical pattern to create visually distinct sparklines
+- Updated EarningsQualityCard.tsx:
+  - Added Sparkline import
+  - Integrated sparkline below "EQ Score" label showing 6 quarters of quality score trend
+  - Sparkline positioned at 60px × 20px with opacity to maintain subtle appearance
+  - Used conditional rendering with optional chaining to handle missing data gracefully
+- Updated PeerComparisonFinancials.tsx:
+  - Added Sparkline import
+  - Added new "Trend" column in table header (non-sortable, centered)
+  - Added sparkline cell for each peer row showing 6-quarter VETTR score trend
+  - Sparklines compact at 50px wide to fit table cell layout
+  - Conditional rendering ensures sparklines only show when data is available
+- All sparklines use auto-color detection (green for improving, red for declining, gray for flat)
+- npm run build passes successfully with zero errors
+- npm run lint passes (1 pre-existing warning in unrelated file)
+
+**Learnings for future iterations:**
+- Trend pattern generation in dummy data (improving/declining/stable/volatile) creates more meaningful sparklines than pure random walk
+- Different mathematical formulas for each trend type (0.7 + i*0.05 for improving, 1.3 - i*0.05 for declining) produce visually distinct patterns
+- 6 quarters of data is ideal for showing trends in compact table cells and next to badges
+- Table sparklines work best at 50px width to maintain table readability while showing clear trends
+- Conditional rendering with optional chaining (?.) prevents crashes when data structure is missing fields
+- Sparkline auto-color detection reduces prop complexity and makes component usage simpler
+- Positioning sparklines directly below labels in centered layouts creates clean visual hierarchy
+- Using opacity (opacity-70) on sparklines keeps them subtle and non-distracting in busy UIs
+---
+## FUND2-007: Add trend direction badges to Financial Statements accordion headers
+Status: COMPLETE
+Date: Mon Feb 24 2026
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Added trends field to FinancialStatements interface in src/types/fundamentals.ts containing 4-year trend arrays for revenue, totalAssets, and freeCashFlow
+- Enhanced dummy data generator (src/lib/dummy-fundamentals.ts) to extract and return 4-year trends for sparklines:
+  - Revenue trend (4 years oldest to newest)
+  - Total Assets trend (4 years oldest to newest)
+  - Free Cash Flow trend (4 years oldest to newest)
+  - Trends are extracted from existing 4-year annualData and reversed to oldest-to-newest for sparkline display
+- Completely redesigned FinancialStatements.tsx accordion headers:
+  - Added Sparkline import
+  - Enhanced StatementSection component to accept trendBadge and sparklineData props
+  - Income Statement header: displays Revenue YoY % badge (green for positive, red for negative) + 4-year revenue sparkline
+  - Balance Sheet header: displays Total Assets YoY % badge + 4-year assets sparkline
+  - Cash Flow Statement header: displays Free Cash Flow YoY % badge + 4-year FCF sparkline
+  - All badges and sparklines positioned to the right of section title, before the expand chevron
+  - YoY calculations compare latest 2 years of data with proper null/zero handling
+  - Sparklines at 60px × 20px with opacity-70 for subtle appearance
+  - Conditional rendering ensures sparklines only display when valid trend data exists (2+ points)
+- All components follow VETTR design system: emerald/red badge colors, proper spacing, smooth transitions
+- npm run build passes successfully with zero errors
+
+**Learnings for future iterations:**
+- Accordion headers benefit greatly from inline trend indicators - users can gauge direction without expanding
+- YoY calculation requires careful null checking when previous period data might be missing
+- Color semantics for badges: green = growth/improvement, red = decline/contraction
+- Small sparklines (60px × 20px) work perfectly in accordion headers without crowding the layout
+- Optional chaining (?.) on trends data prevents errors if field is missing during data structure evolution
+- Extracting trend arrays from reversed annual data requires double-reverse (.slice().reverse()) to get chronological order
+- 4 data points is the minimum for meaningful sparkline patterns while keeping file size minimal
+- Positioning trend elements in a flex container with gap-3 between badge, sparkline, and chevron creates clean visual hierarchy
+- Opacity on sparklines (opacity-70) keeps them informative but not visually dominant
+---
