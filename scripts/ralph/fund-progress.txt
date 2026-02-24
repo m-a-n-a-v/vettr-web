@@ -564,3 +564,124 @@ Details:
 - Using inline-flex instead of flex allows badge to size to content width, not full parent width
 ---
 
+## FUND-013: Add Insider Activity summary to Fundamentals tab
+Status: COMPLETE
+Date: Sun Feb 23 2026
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Added InsiderActivity interface to src/types/fundamentals.ts
+  - Fields: insidersPercent, institutionsPercent, publicPercent, netBuySellRatio
+  - recentTransactions array with name, relation, type ('buy'|'sell'), shares, date
+- Updated FundamentalsData umbrella type to include insiderActivity field
+- Enhanced dummy data generator (src/lib/dummy-fundamentals.ts) with generateInsiderActivity function:
+  - Insider ownership: 5-35% (Canadian mining companies often have significant insider ownership)
+  - Institutional ownership: 10-60%
+  - Public ownership: calculated remainder (ensures total is 100%)
+  - Net buy/sell ratio: -1.0 to +1.0 (positive = net buying, negative = net selling)
+  - 5 recent transactions with realistic Canadian insider names and company relations
+  - Transaction dates within last 90 days, sorted most recent first
+  - Buy/sell bias based on netBuySellRatio (70% buy when net buying, 30% buy when net selling)
+  - Share amounts: 1,000 to 500,000 shares per transaction
+- Created src/components/fundamentals/InsiderActivity.tsx component:
+  - Ownership Breakdown section with horizontal stacked bar chart
+    - Three segments: Insiders (vettr-accent green), Institutions (blue), Public (gray)
+    - Percentages displayed inline when segment >10% width
+    - Animated width transitions (1000ms duration with ease-out)
+    - Legend below bar with colored dots showing exact percentages
+  - Net Activity badge showing buy/sell direction:
+    - Green background with up arrow for net buying
+    - Red background with down arrow for net selling
+    - Arrow rotates 180° for selling (reused up arrow icon)
+    - Shows ratio value in parentheses
+  - Recent Transactions table (5 transactions):
+    - Columns: Name (with relation subtitle), Type (badge), Shares, Date
+    - Buy badges: emerald-400/10 background with emerald-400 text
+    - Sell badges: red-400/10 background with red-400 text
+    - Shares formatted with toLocaleString() for comma separators
+    - Dates formatted with toLocaleDateString() (MMM DD, YYYY format)
+    - Hover effect on rows (bg-white/[0.03])
+- Integrated InsiderActivityComponent into Fundamentals tab (src/app/(main)/stocks/[ticker]/page.tsx):
+  - Added import for InsiderActivityComponent
+  - Positioned after Analyst Consensus section within the lg:grid-cols-2 grid
+  - Placed as third item in the 2-column grid (renders below Earnings Quality + Analyst Consensus on desktop)
+  - No separate heading - component includes its own header with users icon
+- All styling follows design system patterns:
+  - bg-vettr-card/50 with border-white/5
+  - rounded-2xl with p-5 padding
+  - Hover effects with vettr-accent border
+  - Users icon (group of people SVG) in header
+  - Proper typography hierarchy and spacing
+- Build and lint checks passed successfully
+- Committed as: feat: FUND-013 - Add Insider Activity summary to Fundamentals tab
+
+**Learnings for future iterations:**
+- Stacked ownership bar uses three colored segments with smooth width animations on mount
+- Displaying percentages inline within bar segments (when >10%) provides immediate context
+- Net activity uses single up arrow icon, rotated 180° for down direction (DRY principle)
+- Transaction table combines name and relation in same cell (name as main, relation as subtitle)
+- Buy/sell type badges use same color pattern as net activity badge for visual consistency
+- Component placed in grid alongside Analyst Consensus creates balanced 2-column layout
+- InsiderActivity has its own header (unlike some components that rely on parent section headers)
+- Canadian mining sector typically has higher insider ownership (5-35%) vs. typical US companies
+- netBuySellRatio determines transaction type distribution in dummy data generator
+- Sorting transactions by date (most recent first) ensures table shows latest activity
+- Using Math.abs() on netBuySellRatio for display handles negative values cleanly
+- toLocaleString() for shares provides automatic comma formatting (e.g., "125,000")
+- Grid placement: third div in grid creates natural flow (EQ left, AC right, IA below in single column)
+---
+
+## FUND-014: Polish, responsive testing, and accessibility pass
+Status: COMPLETE
+Date: 2026-02-23
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Conducted comprehensive accessibility audit of all fundamentals components
+- Added ARIA labels and roles to interactive elements:
+  - Circular gauges in FinancialHealthDashboard: role="img" with descriptive aria-label
+  - EQ Score badge in EarningsQualityCard: role="img" with score context
+  - Stacked bars in AnalystConsensusCard and InsiderActivity: role="img" with percentage breakdown
+  - ShortInterestBadge: tabIndex={0}, role="button", onFocus/onBlur for keyboard tooltip access
+  - ScoreDrivers buttons: aria-label with full context for each metric
+- Enhanced keyboard accessibility:
+  - ShortInterestBadge tooltip now accessible via keyboard (onFocus/onBlur in addition to hover)
+  - All navigation buttons have proper aria-labels
+  - Tab keyboard navigation already includes Fundamentals tab (verified in handleTabKeyDown)
+- Verified responsive design:
+  - All grids use responsive breakpoints (grid-cols-2 md:grid-cols-3 lg:grid-cols-X)
+  - Tables have overflow-x-auto for horizontal scrolling on mobile
+  - PeerComparisonFinancials table uses min-w-max to prevent column squashing
+  - Financial statements tables have sticky left column (backdrop-blur-sm)
+  - All Recharts wrapped in ResponsiveContainer for automatic sizing
+- Verified skeleton loading:
+  - SkeletonFundamentals component exists and matches all section layouts
+  - Used correctly in stock detail page (fundamentalsLoading check)
+- Text contrast verified:
+  - All text uses proper color hierarchy (white, gray-300, gray-400, gray-500)
+  - Status indicators use high-contrast colors (emerald-400, yellow-400, red-400)
+- Build quality checks:
+  - npm run build: ✓ Passed with zero errors
+  - npm run lint: ✓ Passed (1 warning in unrelated MarketNews.tsx file)
+- Files modified:
+  - src/components/fundamentals/FinancialHealthDashboard.tsx (added gauge aria-labels)
+  - src/components/fundamentals/EarningsQualityCard.tsx (added score badge aria-label)
+  - src/components/fundamentals/AnalystConsensusCard.tsx (added stacked bar aria-label)
+  - src/components/fundamentals/InsiderActivity.tsx (added ownership bar aria-label)
+  - src/components/fundamentals/ShortInterestBadge.tsx (added keyboard accessibility)
+  - src/components/fundamentals/ScoreDrivers.tsx (added button aria-labels)
+
+**Learnings for future iterations:**
+- ARIA labels for visual elements like gauges and stacked bars provide critical context for screen readers
+- role="img" is appropriate for data visualizations that convey information visually
+- Keyboard accessibility requires both tabIndex and focus handlers, not just hover states
+- Tooltips should be accessible via both mouse and keyboard (onFocus/onBlur in addition to onMouseEnter/onMouseLeave)
+- ResponsiveContainer from Recharts handles all chart responsiveness automatically
+- Sticky columns (sticky left-0) need backdrop-blur-sm to work properly over scrolling content
+- overflow-x-auto on table containers prevents mobile layout breaking
+- Grid responsive patterns: grid-cols-2 md:grid-cols-3 for metric cards, lg:grid-cols-2 for major sections
+- All fundamentals components already followed the design system patterns for responsive design
+- Tab keyboard navigation was already implemented correctly in stock detail page
+- SkeletonFundamentals component comprehensively mirrors the actual layout structure
+- Text contrast ratios met WCAG standards using the VETTR design system color palette
+- Component-level accessibility is easier to maintain than page-level accessibility retrofitting
+---
+
