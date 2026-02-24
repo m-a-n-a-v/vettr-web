@@ -122,6 +122,12 @@ export interface FinancialStatements {
     capex: number;
     freeCashFlow: number;
   }>;
+  // 4-year trends for accordion header sparklines
+  trends: {
+    revenue: number[]; // 4 years of revenue values
+    totalAssets: number[]; // 4 years of total assets values
+    freeCashFlow: number[]; // 4 years of FCF values
+  };
 }
 
 /**

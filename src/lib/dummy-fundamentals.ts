@@ -477,7 +477,16 @@ function generateFinancialStatements(rng: SeededRandom): FinancialStatements {
   }
 
   // Reverse to show most recent first
-  return { annualData: annualData.reverse() };
+  const reversedData = annualData.reverse();
+
+  // Extract 4-year trends for sparklines (oldest to newest)
+  const trends = {
+    revenue: reversedData.slice().reverse().map((d) => d.revenue),
+    totalAssets: reversedData.slice().reverse().map((d) => d.totalAssets),
+    freeCashFlow: reversedData.slice().reverse().map((d) => d.freeCashFlow),
+  };
+
+  return { annualData: reversedData, trends };
 }
 
 /**
