@@ -85,3 +85,106 @@ Details:
 - The bar-chart icon (3 vertical bars) was chosen to represent financial data visually
 - Using flex items-center gap-1.5 allows icon and text to align properly in the tab button
 ---
+
+## FUND-004: Build Financial Health Dashboard component
+Status: COMPLETE
+Date: Sun Feb 23 2026
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Created src/components/fundamentals/FinancialHealthDashboard.tsx with comprehensive financial health metrics display
+- Component includes 6 metric cards in responsive grid (2 cols mobile, 3 cols desktop):
+  1. Cash Runway: Shows months remaining with circular gauge (green >18mo, yellow 6-18mo, red <6mo)
+  2. Altman Z-Score: Shows value with status badge (Safe >2.99, Grey Zone 1.81-2.99, Distress <1.81)
+  3. Debt Coverage (EBITDA/Interest): Shows ratio with circular gauge and color coding (green >3x, yellow 1.5-3x, red <1.5x)
+  4. Free Cash Flow Yield: Shows percentage with circular gauge (green >5%, yellow 2-5%, red <2%)
+  5. Current Ratio: Shows value with circular gauge and status (green >1.5, yellow 1.0-1.5, red <1.0)
+  6. Debt/Equity: Shows ratio with circular gauge (green <0.5, yellow 0.5-1.0, red >1.0)
+- Each metric card features:
+  - Upper-case small label with tracking-wider
+  - Large bold value display (text-2xl)
+  - Status badge with colored dot and label (e.g., "Healthy", "Monitor", "Critical")
+  - Optional circular gauge visualization (48px SVG with stroke animation)
+  - Hover effects (border color change, background brightness)
+- Working Capital Trend section:
+  - Displays last 4 quarters of working capital data
+  - Uses Recharts LineChart with responsive container (height: 80px)
+  - Green accent line (#00E676) with smooth curve (monotone)
+  - Period labels and values displayed below chart ($M format)
+- All cards follow design system patterns:
+  - bg-vettr-card/50 with border-white/5
+  - rounded-2xl with p-5 padding
+  - Hover states with vettr-accent border and background transition
+  - 3-tier status colors: emerald-400 (good), yellow-400 (warning), red-400 (critical)
+- Circular gauges reuse VetrScoreBadge pattern but integrated inline into cards
+- Component accepts FinancialHealth interface as props
+- All helper functions for status determination follow acceptance criteria thresholds exactly
+- Build and lint checks passed successfully
+- Committed as: feat: FUND-004 - Build Financial Health Dashboard component
+
+**Learnings for future iterations:**
+- Circular gauge SVG pattern can be reused across multiple metrics by abstracting size and colors
+- Working capital trend uses minimal chart configuration (no axes, no tooltip) for clean sparkline look
+- Status badge design uses inline dot with bg and border to create subtle but clear visual indicators
+- Gauge normalization varies by metric (e.g., /36 for cash runway, /5 for debt coverage, /10 for FCF yield)
+- Debt/Equity gauge is inverted (100 - value) since lower is better
+- ResponsiveContainer height of 80px works well for compact sparklines without overwhelming the layout
+- Period labels below chart provide context without cluttering the visualization
+- Each metric card is self-contained and reusable through the MetricCard subcomponent
+---
+## FUND-005: Build Earnings Quality Score component
+Status: COMPLETE
+Date: Sun Feb 23 2026
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Created src/components/fundamentals/EarningsQualityCard.tsx with comprehensive earnings quality assessment
+- Component includes EQ Score badge (80px) using VetrScoreBadge circular gauge pattern:
+  - Large circular SVG gauge with 5-tier color scale matching VETTR score
+  - Animated score counter (0→score over 1s with ease-out)
+  - "EQ Score" label below badge
+- 3 quality metrics displayed as horizontal progress bars with color coding:
+  1. Cash Conversion: Shows operating cash flow to net income ratio
+     - Green >1.0, yellow 0.7-1.0, red <0.7
+     - Normalized to 0-100% for bar width (max at 2.0x)
+     - Displays value (e.g., "1.23x") and explanation
+  2. Accruals Ratio: Lower is better metric for earnings manipulation detection
+     - Green <0.05, yellow 0.05-0.10, red >0.10
+     - Bar inverted since lower is better
+     - Shows 3 decimal places for precision
+  3. Revenue Quality: Revenue to receivables trend indicator
+     - Green ≥1.2, yellow 0.8-1.2, red <0.8
+     - Normalized to 0-100% for bar width (max at 2.0x)
+     - Displays value with 2 decimal places
+- Consecutive Beats/Misses badge showing earnings streak:
+  - Green badge with checkmark icon for consecutive beats
+  - Red badge with X icon for consecutive misses
+  - Dynamic text: "N Consecutive Beats/Misses"
+- Earnings Surprise History table:
+  - Shows last 4 quarters of earnings data
+  - Columns: Quarter, Actual EPS, Estimate EPS, Surprise %, Result icon
+  - Beat/miss icons (checkmark/X) in the result column
+  - Color-coded surprise percentage (green for positive, red for negative)
+  - Hover effect on rows (bg-white/[0.03])
+  - Proper table styling with sticky header pattern
+- All animations use 1000ms duration with ease-out easing
+- Component follows design system patterns:
+  - bg-vettr-card/50 with border-white/5
+  - rounded-2xl with p-5 padding
+  - Hover effects with vettr-accent border
+  - Proper typography hierarchy and spacing
+  - SVG icons only (no emoji)
+- Earnings Quality header with checkmark shield icon
+- Build and lint checks passed successfully
+- Committed as: feat: FUND-005 - Build Earnings Quality Score component
+
+**Learnings for future iterations:**
+- EQ Score badge reuses the VetrScoreBadge SVG circular gauge pattern (80px size, 5px stroke)
+- All three metric bars animate their width on mount using inline styles with transition-all
+- Bar normalization strategies vary: some cap at 100%, some invert for "lower is better"
+- Consecutive beats/misses uses Math.abs() to handle negative values (misses)
+- Table structure uses border-b on rows for clean separation without full borders
+- Surprise percentage formatting uses toFixed(1) for single decimal precision
+- Color functions return hex codes for inline style backgroundColor (better for animations)
+- Using emerald-500 (#10b981) instead of emerald-400 for slightly richer green in bars
+- Table is mobile-friendly with overflow-x-auto wrapper
+- Each metric bar includes a subtitle explaining what it measures
+---
