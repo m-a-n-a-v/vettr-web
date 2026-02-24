@@ -70,6 +70,92 @@ function generateFinancialHealth(rng: SeededRandom): FinancialHealth {
     });
   }
 
+  // Generate 6 quarters of health trend data for sparklines
+  const healthTrends = {
+    cashRunway: [] as number[],
+    debtCoverage: [] as number[],
+    fcfYield: [] as number[],
+    currentRatio: [] as number[],
+    debtToEquity: [] as number[],
+    altmanZ: [] as number[],
+  };
+
+  // Determine trend patterns for each metric
+  const cashRunwayPattern = rng.choice(['declining', 'stable', 'improving']);
+  const debtCoveragePattern = rng.choice(['improving', 'stable', 'declining']);
+  const fcfYieldPattern = rng.choice(['improving', 'volatile', 'declining']);
+  const currentRatioPattern = rng.choice(['improving', 'stable', 'declining']);
+  const debtToEquityPattern = rng.choice(['improving', 'stable', 'worsening']); // improving = declining ratio
+  const altmanZPattern = rng.choice(['improving', 'stable', 'declining']);
+
+  for (let i = 0; i < 6; i++) {
+    // Cash Runway trend (declining is common for smaller companies)
+    let runwayValue: number;
+    if (cashRunwayPattern === 'declining') {
+      runwayValue = cashRunwayMonths * (1 + (i * 0.08)); // Getting worse (burning cash)
+    } else if (cashRunwayPattern === 'improving') {
+      runwayValue = cashRunwayMonths * (1 + ((5 - i) * 0.06)); // Getting better
+    } else {
+      runwayValue = cashRunwayMonths * (1 + rng.range(-0.05, 0.05)); // Stable ±5%
+    }
+    healthTrends.cashRunway.push(parseFloat(Math.max(3, Math.min(36, runwayValue)).toFixed(1)));
+
+    // Debt Coverage trend (higher is better)
+    let debtCovValue: number;
+    if (debtCoveragePattern === 'improving') {
+      debtCovValue = debtCoverageRatio * (1 - (i * 0.05)); // Improving from lower
+    } else if (debtCoveragePattern === 'declining') {
+      debtCovValue = debtCoverageRatio * (1 + (i * 0.04)); // Declining from higher
+    } else {
+      debtCovValue = debtCoverageRatio * (1 + rng.range(-0.08, 0.08)); // Stable ±8%
+    }
+    healthTrends.debtCoverage.push(parseFloat(Math.max(0.5, Math.min(10, debtCovValue)).toFixed(2)));
+
+    // FCF Yield trend (higher is better)
+    let fcfValue: number;
+    if (fcfYieldPattern === 'improving') {
+      fcfValue = freeCashFlowYield * (1 - (i * 0.07)); // Improving from lower
+    } else if (fcfYieldPattern === 'declining') {
+      fcfValue = freeCashFlowYield * (1 + (i * 0.06)); // Declining from higher
+    } else {
+      fcfValue = freeCashFlowYield * (1 + rng.range(-0.15, 0.15)); // Volatile
+    }
+    healthTrends.fcfYield.push(parseFloat(Math.max(-5, Math.min(15, fcfValue)).toFixed(2)));
+
+    // Current Ratio trend (higher is better)
+    let currentRatioValue: number;
+    if (currentRatioPattern === 'improving') {
+      currentRatioValue = currentRatio * (1 - (i * 0.04)); // Improving from lower
+    } else if (currentRatioPattern === 'declining') {
+      currentRatioValue = currentRatio * (1 + (i * 0.05)); // Declining from higher
+    } else {
+      currentRatioValue = currentRatio * (1 + rng.range(-0.06, 0.06)); // Stable
+    }
+    healthTrends.currentRatio.push(parseFloat(Math.max(0.3, Math.min(4, currentRatioValue)).toFixed(2)));
+
+    // Debt-to-Equity trend (lower is better, so improving = declining ratio)
+    let debtEquityValue: number;
+    if (debtToEquityPattern === 'improving') {
+      debtEquityValue = debtToEquity * (1 + (i * 0.06)); // Improving = was higher before
+    } else if (debtToEquityPattern === 'worsening') {
+      debtEquityValue = debtToEquity * (1 - (i * 0.05)); // Worsening = was lower before
+    } else {
+      debtEquityValue = debtToEquity * (1 + rng.range(-0.05, 0.05)); // Stable
+    }
+    healthTrends.debtToEquity.push(parseFloat(Math.max(0.05, Math.min(3, debtEquityValue)).toFixed(2)));
+
+    // Altman Z-Score trend (higher is better)
+    let altmanValue: number;
+    if (altmanZPattern === 'improving') {
+      altmanValue = altmanZScore * (1 - (i * 0.08)); // Improving from lower
+    } else if (altmanZPattern === 'declining') {
+      altmanValue = altmanZScore * (1 + (i * 0.07)); // Declining from higher
+    } else {
+      altmanValue = altmanZScore * (1 + rng.range(-0.1, 0.1)); // Stable
+    }
+    healthTrends.altmanZ.push(parseFloat(Math.max(0.3, Math.min(6, altmanValue)).toFixed(2)));
+  }
+
   return {
     cashRunwayMonths,
     debtCoverageRatio,
@@ -82,6 +168,7 @@ function generateFinancialHealth(rng: SeededRandom): FinancialHealth {
     debtToEquity,
     debtToAssets,
     grossMargin,
+    healthTrends,
   };
 }
 

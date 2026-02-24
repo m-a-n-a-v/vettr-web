@@ -2,6 +2,7 @@
 
 import { FinancialHealth } from '@/types/fundamentals';
 import { LineChart, Line, ResponsiveContainer } from 'recharts';
+import { Sparkline } from '@/components/ui/Sparkline';
 
 interface FinancialHealthDashboardProps {
   data: FinancialHealth;
@@ -13,9 +14,11 @@ interface MetricCardProps {
   subtitle?: string;
   status: 'good' | 'warning' | 'critical';
   gauge?: number; // 0-100 for circular gauge
+  sparklineData?: number[]; // Trend data for sparkline
+  invertSparklineColors?: boolean; // For metrics where lower is better (debt-to-equity)
 }
 
-function MetricCard({ label, value, subtitle, status, gauge }: MetricCardProps) {
+function MetricCard({ label, value, subtitle, status, gauge, sparklineData, invertSparklineColors }: MetricCardProps) {
   const statusColors = {
     good: {
       text: 'text-emerald-400',
@@ -48,6 +51,24 @@ function MetricCard({ label, value, subtitle, status, gauge }: MetricCardProps) 
   const strokeDashoffset = gauge !== undefined
     ? circumference - (gauge / 100) * circumference
     : circumference;
+
+  // Calculate sparkline color based on inverted logic if needed
+  const getSparklineColor = () => {
+    if (!sparklineData || sparklineData.length < 2) return undefined;
+
+    const firstValue = sparklineData[0];
+    const lastValue = sparklineData[sparklineData.length - 1];
+
+    if (invertSparklineColors) {
+      // For debt-to-equity: declining = good (green), rising = bad (red)
+      if (lastValue < firstValue) return '#00E676'; // green
+      if (lastValue > firstValue) return '#F87171'; // red
+      return '#64748b'; // gray
+    }
+
+    // Default behavior is handled by Sparkline component
+    return undefined;
+  };
 
   return (
     <div className="bg-vettr-card/50 border border-white/5 rounded-2xl p-5 hover:border-vettr-accent/20 hover:bg-vettr-card/80 transition-all duration-300">
@@ -88,6 +109,19 @@ function MetricCard({ label, value, subtitle, status, gauge }: MetricCardProps) 
       <div className="text-2xl font-bold text-white mb-2">
         {value}
       </div>
+
+      {/* Sparkline positioned below value, above status badge */}
+      {sparklineData && sparklineData.length > 0 && (
+        <div className="mb-2">
+          <Sparkline
+            data={sparklineData}
+            width={80}
+            height={24}
+            color={getSparklineColor()}
+            showDot={true}
+          />
+        </div>
+      )}
 
       {subtitle && (
         <div className={`inline-flex items-center gap-1.5 ${colors.bg} ${colors.border} border rounded-full px-2.5 py-0.5`}>
@@ -171,6 +205,7 @@ export function FinancialHealthDashboard({ data }: FinancialHealthDashboardProps
           subtitle={cashRunwayStatus === 'good' ? 'Healthy' : cashRunwayStatus === 'warning' ? 'Monitor' : 'Critical'}
           status={cashRunwayStatus}
           gauge={cashRunwayGauge}
+          sparklineData={data.healthTrends?.cashRunway}
         />
 
         <MetricCard
@@ -178,6 +213,7 @@ export function FinancialHealthDashboard({ data }: FinancialHealthDashboardProps
           value={data.altmanZScore.toFixed(2)}
           subtitle={altmanZ.label}
           status={altmanZ.status}
+          sparklineData={data.healthTrends?.altmanZ}
         />
 
         <MetricCard
@@ -186,6 +222,7 @@ export function FinancialHealthDashboard({ data }: FinancialHealthDashboardProps
           subtitle={debtCoverageStatus === 'good' ? 'Strong' : debtCoverageStatus === 'warning' ? 'Adequate' : 'Weak'}
           status={debtCoverageStatus}
           gauge={debtCoverageGauge}
+          sparklineData={data.healthTrends?.debtCoverage}
         />
 
         <MetricCard
@@ -194,6 +231,7 @@ export function FinancialHealthDashboard({ data }: FinancialHealthDashboardProps
           subtitle={fcfYieldStatus === 'good' ? 'Excellent' : fcfYieldStatus === 'warning' ? 'Moderate' : 'Low'}
           status={fcfYieldStatus}
           gauge={fcfYieldGauge}
+          sparklineData={data.healthTrends?.fcfYield}
         />
 
         <MetricCard
@@ -202,6 +240,7 @@ export function FinancialHealthDashboard({ data }: FinancialHealthDashboardProps
           subtitle={currentRatioStatus === 'good' ? 'Liquid' : currentRatioStatus === 'warning' ? 'Adequate' : 'Stressed'}
           status={currentRatioStatus}
           gauge={currentRatioGauge}
+          sparklineData={data.healthTrends?.currentRatio}
         />
 
         <MetricCard
@@ -210,6 +249,8 @@ export function FinancialHealthDashboard({ data }: FinancialHealthDashboardProps
           subtitle={debtEquityStatus === 'good' ? 'Conservative' : debtEquityStatus === 'warning' ? 'Moderate' : 'High Leverage'}
           status={debtEquityStatus}
           gauge={debtEquityGauge}
+          sparklineData={data.healthTrends?.debtToEquity}
+          invertSparklineColors={true}
         />
       </div>
 

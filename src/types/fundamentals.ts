@@ -21,6 +21,14 @@ export interface FinancialHealth {
   debtToEquity: number;
   debtToAssets: number;
   grossMargin: number; // Percentage (0-1, e.g., 0.382 for 38.2%)
+  healthTrends: {
+    cashRunway: number[]; // 6 quarters of cash runway in months
+    debtCoverage: number[]; // 6 quarters of debt coverage ratio
+    fcfYield: number[]; // 6 quarters of FCF yield percentage
+    currentRatio: number[]; // 6 quarters of current ratio
+    debtToEquity: number[]; // 6 quarters of debt-to-equity ratio
+    altmanZ: number[]; // 6 quarters of Altman Z-Score
+  };
 }
 
 /**
