@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { EarningsQuality } from '@/types/fundamentals';
 import { getScoreColor } from '@/lib/chart-theme';
+import { Sparkline } from '@/components/ui/Sparkline';
 
 interface EarningsQualityCardProps {
   data: EarningsQuality;
@@ -123,7 +124,17 @@ export function EarningsQualityCard({ data }: EarningsQualityCardProps) {
             {animatedScore}
           </div>
         </div>
-        <span className="text-sm text-gray-400 font-medium mt-2">EQ Score</span>
+        <div className="flex flex-col items-center mt-2 gap-1">
+          <span className="text-sm text-gray-400 font-medium">EQ Score</span>
+          {data.eqScoreHistory && data.eqScoreHistory.length > 0 && (
+            <Sparkline
+              data={data.eqScoreHistory}
+              width={60}
+              height={20}
+              className="opacity-70"
+            />
+          )}
+        </div>
       </div>
 
       {/* Quality Metrics Bars */}

@@ -216,6 +216,30 @@ function generateEarningsQuality(rng: SeededRandom): EarningsQuality {
   const consistencyScore = Math.min(100, consecutiveBeats * 25 + 40);
   const overallScore = Math.round((cashScore + accrualsScore + consistencyScore) / 3);
 
+  // Generate 6 quarters of EQ score history for sparkline
+  const eqScoreHistory: number[] = [];
+  const eqScoreTrend = rng.choice(['improving', 'declining', 'stable', 'volatile']);
+
+  for (let i = 0; i < 6; i++) {
+    let historicalScore: number;
+
+    if (eqScoreTrend === 'improving') {
+      // Improving trend: lower scores in the past, building toward current score
+      historicalScore = overallScore * (0.7 + (i * 0.05)); // Start at 70%, improve to 100%
+    } else if (eqScoreTrend === 'declining') {
+      // Declining trend: higher scores in the past, declining to current
+      historicalScore = overallScore * (1.3 - (i * 0.05)); // Start at 130%, decline to 100%
+    } else if (eqScoreTrend === 'volatile') {
+      // Volatile: fluctuates around current score
+      historicalScore = overallScore * (1 + rng.range(-0.15, 0.15));
+    } else {
+      // Stable: minor fluctuations around current score
+      historicalScore = overallScore * (1 + rng.range(-0.05, 0.05));
+    }
+
+    eqScoreHistory.push(Math.round(Math.max(20, Math.min(100, historicalScore))));
+  }
+
   return {
     accrualsRatio,
     cashConversion,
@@ -223,6 +247,7 @@ function generateEarningsQuality(rng: SeededRandom): EarningsQuality {
     consecutiveBeats,
     surpriseHistory,
     overallScore,
+    eqScoreHistory,
   };
 }
 
@@ -344,6 +369,32 @@ function generatePeerFinancials(rng: SeededRandom, ticker: string): PeerFinancia
   for (let i = 0; i < peerCount; i++) {
     const peer = allPeers[i % allPeers.length];
     if (peer.ticker !== ticker) {
+      const currentScore = Math.round(rng.range(30, 95));
+
+      // Generate 6 quarters of score trend for this peer
+      const scoreTrend: number[] = [];
+      const peerTrendType = rng.choice(['improving', 'declining', 'stable', 'volatile']);
+
+      for (let j = 0; j < 6; j++) {
+        let historicalScore: number;
+
+        if (peerTrendType === 'improving') {
+          // Improving: lower scores in the past, building toward current
+          historicalScore = currentScore * (0.75 + (j * 0.042)); // Start at 75%, improve to 100%
+        } else if (peerTrendType === 'declining') {
+          // Declining: higher scores in the past, declining to current
+          historicalScore = currentScore * (1.25 - (j * 0.042)); // Start at 125%, decline to 100%
+        } else if (peerTrendType === 'volatile') {
+          // Volatile: fluctuates around current score
+          historicalScore = currentScore * (1 + rng.range(-0.2, 0.2));
+        } else {
+          // Stable: minor fluctuations around current score
+          historicalScore = currentScore * (1 + rng.range(-0.08, 0.08));
+        }
+
+        scoreTrend.push(Math.round(Math.max(20, Math.min(100, historicalScore))));
+      }
+
       selectedPeers.push({
         ticker: peer.ticker,
         name: peer.name,
@@ -354,7 +405,8 @@ function generatePeerFinancials(rng: SeededRandom, ticker: string): PeerFinancia
         revenueGrowth: parseFloat(rng.range(-15, 45).toFixed(1)),
         roic: parseFloat(rng.range(-5, 25).toFixed(1)),
         debtToEquity: parseFloat(rng.range(0.1, 2.5).toFixed(2)),
-        currentScore: Math.round(rng.range(30, 95)),
+        currentScore,
+        scoreTrend,
       });
     }
   }

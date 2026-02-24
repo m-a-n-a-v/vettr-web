@@ -47,6 +47,7 @@ export interface EarningsQuality {
     surprisePercent: number;
   }>;
   overallScore: number; // 0-100
+  eqScoreHistory: number[]; // 6 quarters of EQ score history
 }
 
 /**
@@ -96,6 +97,7 @@ export interface PeerFinancials {
     roic: number; // Return on Invested Capital, percentage
     debtToEquity: number;
     currentScore: number; // VETTR Score 0-100
+    scoreTrend: number[]; // 6 quarters of VETTR score history
   }>;
 }
 

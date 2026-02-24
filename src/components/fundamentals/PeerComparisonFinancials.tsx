@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Legend } from 'recharts';
 import { PeerFinancials } from '@/types/fundamentals';
 import { getScoreColor } from '@/lib/chart-theme';
+import { Sparkline } from '@/components/ui/Sparkline';
 
 interface PeerComparisonFinancialsProps {
   data: PeerFinancials;
@@ -292,6 +293,13 @@ export function PeerComparisonFinancials({ data, currentTicker }: PeerComparison
                     )}
                   </div>
                 </th>
+                <th
+                  className="text-xs text-gray-500 uppercase tracking-wider font-medium px-4 py-3 text-center"
+                >
+                  <div className="flex items-center justify-center gap-1">
+                    Trend
+                  </div>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -374,6 +382,18 @@ export function PeerComparisonFinancials({ data, currentTicker }: PeerComparison
                       >
                         {peer.currentScore}
                       </span>
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      {peer.scoreTrend && peer.scoreTrend.length > 0 && (
+                        <div className="flex items-center justify-center">
+                          <Sparkline
+                            data={peer.scoreTrend}
+                            width={50}
+                            height={20}
+                            className="opacity-70"
+                          />
+                        </div>
+                      )}
                     </td>
                   </tr>
                 );
