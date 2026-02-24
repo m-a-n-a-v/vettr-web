@@ -56,7 +56,7 @@ import Breadcrumb from '@/components/ui/Breadcrumb';
 import { StarIcon, StarFilledIcon, ShareIcon, MoreHorizontalIcon, ArrowUpIcon, ArrowDownIcon, UsersIcon, FlagIcon, ShieldCheckIcon, BarChartIcon, DocumentIcon, PrinterIcon } from '@/components/icons';
 import { getScoreColor } from '@/lib/chart-theme';
 
-type Tab = 'overview' | 'pedigree' | 'red-flags';
+type Tab = 'overview' | 'fundamentals' | 'pedigree' | 'red-flags';
 
 function StockDetailContent() {
   const params = useParams();
@@ -105,7 +105,7 @@ function StockDetailContent() {
 
   // Handle keyboard navigation for tabs
   const handleTabKeyDown = (event: React.KeyboardEvent, tab: Tab) => {
-    const tabs: Tab[] = ['overview', 'pedigree', 'red-flags'];
+    const tabs: Tab[] = ['overview', 'fundamentals', 'pedigree', 'red-flags'];
     const currentIndex = tabs.indexOf(tab);
 
     if (event.key === 'ArrowRight') {
@@ -496,6 +496,25 @@ function StockDetailContent() {
             }`}
           >
             Overview
+          </button>
+          <button
+            role="tab"
+            aria-selected={activeTab === 'fundamentals'}
+            aria-controls="fundamentals-panel"
+            id="fundamentals-tab"
+            tabIndex={activeTab === 'fundamentals' ? 0 : -1}
+            onClick={() => setActiveTab('fundamentals')}
+            onKeyDown={(e) => handleTabKeyDown(e, 'fundamentals')}
+            className={`px-1 py-3 font-medium text-sm transition-colors border-b-2 flex items-center gap-1.5 ${
+              activeTab === 'fundamentals'
+                ? 'text-gray-900 dark:text-white border-vettr-accent'
+                : 'text-gray-500 border-transparent hover:text-gray-600 dark:hover:text-gray-300'
+            }`}
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+            </svg>
+            Fundamentals
           </button>
           <button
             role="tab"
@@ -897,6 +916,24 @@ function StockDetailContent() {
                   }
                 />
               )}
+            </div>
+          </motion.div>
+        )}
+
+        {activeTab === 'fundamentals' && (
+          <motion.div
+            role="tabpanel"
+            id="fundamentals-panel"
+            aria-labelledby="fundamentals-tab"
+            key="fundamentals"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: prefersReducedMotion ? 0 : 0.15, ease: 'easeOut' }}
+            className="space-y-6"
+          >
+            <div className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-6">
+              <p className="text-gray-500 dark:text-gray-400 text-center py-8">Fundamentals content coming soon</p>
             </div>
           </motion.div>
         )}

@@ -1,0 +1,293 @@
+{
+  "project": "VETTR Web App - Fundamentals Features",
+  "phase": "Fundamentals Data UI (P0/P1/P2)",
+  "branchName": "ralph/fundamentals-ui",
+  "description": "Add fundamentals data features to the VETTR web app stock detail page. P0: Enhance VETTR Score with fundamentals data. P1: Financial Health Dashboard + Earnings Quality Score. P2: Smart Peer Comparison with financials + Analyst Consensus Dashboard. All data uses dummy/mock values — no backend API changes. Focus on UI/UX only.",
+  "totalStories": 14,
+  "userStories": [
+    {
+      "id": "FUND-001",
+      "title": "Add Fundamentals TypeScript interfaces and dummy data generator",
+      "description": "Create TypeScript interfaces for all fundamentals data structures (financial health, earnings quality, analyst consensus, peer comparison financials) and a dummy data generator module that returns realistic mock data for any ticker.",
+      "acceptanceCriteria": [
+        "Create src/types/fundamentals.ts with interfaces: FinancialHealth, EarningsQuality, AnalystConsensus, PeerFinancials, FundamentalsData (umbrella type)",
+        "FinancialHealth includes: cashRunwayMonths, debtCoverageRatio, workingCapitalTrend (array of {period, value}), freeCashFlowYield, altmanZScore, currentRatio, quickRatio, interestCoverage, debtToEquity, debtToAssets",
+        "EarningsQuality includes: accrualsRatio, cashConversion, revenueToReceivables, consecutiveBeats (number), surpriseHistory (array of {quarter, epsActual, epsEstimate, surprise, surprisePercent}), overallScore (0-100)",
+        "AnalystConsensus includes: totalAnalysts, consensus (string), buyCount, holdCount, sellCount, priceTargetMean, priceTargetMedian, priceTargetHigh, priceTargetLow, currentPrice, upsidePercent, recommendations (array of {period, strongBuy, buy, hold, sell, strongSell}), recentUpgrades (array of {date, firm, action, fromGrade, toGrade})",
+        "PeerFinancials includes: peers (array of {ticker, name, peRatio, evEbitda, grossMargin, operatingMargin, revenueGrowth, roic, debtToEquity, currentScore})",
+        "Create src/lib/dummy-fundamentals.ts that exports getDummyFundamentals(ticker: string): FundamentalsData — returns deterministic but realistic mock data seeded by ticker string",
+        "Dummy data should produce varied but plausible values (e.g., mining sector margins, real-looking analyst names, EPS values that vary by quarter)",
+        "npm run build passes"
+      ],
+      "priority": 1,
+      "passes": true
+    },
+    {
+      "id": "FUND-002",
+      "title": "Create useFundamentals hook with dummy data",
+      "description": "Create a custom React hook that returns fundamentals data using the dummy data generator. Structure it so swapping to real API later is trivial.",
+      "acceptanceCriteria": [
+        "Create src/hooks/useFundamentals.ts that returns { data: FundamentalsData | undefined, isLoading: boolean, error: Error | undefined }",
+        "Hook accepts ticker: string parameter",
+        "Simulates loading with a short timeout (300-500ms) before returning dummy data",
+        "Uses the getDummyFundamentals(ticker) function from dummy-fundamentals.ts",
+        "Has a TODO comment marking where to swap to real API call via SWR",
+        "npm run build passes"
+      ],
+      "priority": 2,
+      "passes": true
+    },
+    {
+      "id": "FUND-003",
+      "title": "Add 'Fundamentals' tab to stock detail page",
+      "description": "Add a 4th tab called 'Fundamentals' to the stock detail page tab bar, between Overview and Pedigree. Wire up the tab switching and create the empty tab container.",
+      "acceptanceCriteria": [
+        "In src/app/(main)/stocks/[ticker]/page.tsx, add 'fundamentals' to the Tab type union: 'overview' | 'fundamentals' | 'pedigree' | 'red-flags'",
+        "Add 'Fundamentals' tab button between Overview and Pedigree in the tab navigation bar",
+        "Tab uses consistent styling with existing tabs (same hover, active indicator, keyboard navigation)",
+        "Fundamentals tab icon: use a bar-chart or trending-up SVG icon consistent with existing icon style",
+        "Tab content area renders a placeholder div when active: 'Fundamentals content coming soon'",
+        "URL query param ?tab=fundamentals works correctly",
+        "Keyboard navigation (arrow keys) includes the new tab",
+        "npm run build passes"
+      ],
+      "priority": 3,
+      "passes": false
+    },
+    {
+      "id": "FUND-004",
+      "title": "Build Financial Health Dashboard component",
+      "description": "Create a comprehensive Financial Health section showing key health indicators with visual gauges and trend sparklines. This is the main P1 feature.",
+      "acceptanceCriteria": [
+        "Create src/components/fundamentals/FinancialHealthDashboard.tsx",
+        "Accepts FinancialHealth data as props",
+        "Displays 6 metric cards in a responsive grid (2 cols mobile, 3 cols desktop):",
+        "  1. Cash Runway: shows months remaining with circular gauge (green >18mo, yellow 6-18mo, red <6mo)",
+        "  2. Altman Z-Score: shows value with status badge (Safe >2.99, Grey Zone 1.81-2.99, Distress <1.81)",
+        "  3. Debt Coverage (EBITDA/Interest): shows ratio with color coding (green >3x, yellow 1.5-3x, red <1.5x)",
+        "  4. Free Cash Flow Yield: shows percentage with color coding (green >5%, yellow 2-5%, red <2%)",
+        "  5. Current Ratio: shows value with status (green >1.5, yellow 1.0-1.5, red <1.0)",
+        "  6. Debt/Equity: shows ratio with status (green <0.5, yellow 0.5-1.0, red >1.0)",
+        "Each card has: metric name, large value display, status badge/indicator, brief explainer tooltip or subtitle",
+        "Working Capital Trend section below cards: small sparkline chart (using Recharts) showing 4 periods of working capital values",
+        "Cards use existing card pattern: bg-vettr-card/50 border border-white/5 rounded-2xl p-5",
+        "Responsive and accessible (ARIA labels on gauges)",
+        "npm run build passes"
+      ],
+      "priority": 4,
+      "passes": false
+    },
+    {
+      "id": "FUND-005",
+      "title": "Build Earnings Quality Score component",
+      "description": "Create a component showing earnings quality assessment with a composite score and individual metrics. This is the second P1 feature.",
+      "acceptanceCriteria": [
+        "Create src/components/fundamentals/EarningsQualityCard.tsx",
+        "Accepts EarningsQuality data as props",
+        "Overall Earnings Quality Score displayed as a large circular badge (reuse VetrScoreBadge pattern but with different label 'EQ Score')",
+        "Score uses 5-tier color scale (same as VETTR score)",
+        "3 quality metrics displayed as horizontal bars below the score:",
+        "  1. Cash Conversion: operatingCashFlow/netIncome ratio — bar fill with color (green >1.0, yellow 0.7-1.0, red <0.7)",
+        "  2. Accruals Ratio: lower is better — bar fill with color (green <0.05, yellow 0.05-0.10, red >0.10)",
+        "  3. Revenue Quality: revenue/receivables trend — bar fill with color coding",
+        "Consecutive Beats/Misses badge: shows streak count with icon (checkmark for beats, x for misses)",
+        "Earnings Surprise History: small table showing last 4 quarters with actual vs estimate, surprise %, and beat/miss icon per row",
+        "Uses existing card and typography patterns",
+        "npm run build passes"
+      ],
+      "priority": 5,
+      "passes": false
+    },
+    {
+      "id": "FUND-006",
+      "title": "Build Analyst Consensus Dashboard component",
+      "description": "Create a component showing analyst ratings distribution, price target range, and recent upgrades/downgrades. This is a P2 feature.",
+      "acceptanceCriteria": [
+        "Create src/components/fundamentals/AnalystConsensusCard.tsx",
+        "Accepts AnalystConsensus data as props",
+        "Consensus Summary section:",
+        "  - Large text showing consensus recommendation (e.g., 'Buy') with analyst count",
+        "  - Horizontal stacked bar showing Buy/Hold/Sell distribution with counts",
+        "  - Bar segments colored: green (buy), gray (hold), red (sell)",
+        "Price Target section:",
+        "  - Visual range indicator showing low → median → high price targets",
+        "  - Current price marked on the range with a vertical line/marker",
+        "  - Upside/downside percentage badge (green for upside, red for downside)",
+        "Recommendation Trend section:",
+        "  - Small grouped bar chart (Recharts) showing strongBuy/buy/hold/sell/strongSell counts across last 4 periods",
+        "Recent Upgrades/Downgrades table:",
+        "  - Last 5 entries showing date, firm, action (upgrade/downgrade/initiate), from→to grade",
+        "  - Action badges: green for upgrade, red for downgrade, blue for initiate",
+        "Uses existing card patterns, responsive layout",
+        "npm run build passes"
+      ],
+      "priority": 6,
+      "passes": false
+    },
+    {
+      "id": "FUND-007",
+      "title": "Build Smart Peer Comparison component with financial metrics",
+      "description": "Create a radar chart and comparison table showing how the stock's financial metrics compare to sector peers. This is a P2 feature.",
+      "acceptanceCriteria": [
+        "Create src/components/fundamentals/PeerComparisonFinancials.tsx",
+        "Accepts PeerFinancials data and current ticker as props",
+        "Radar/Spider Chart (using Recharts RadarChart):",
+        "  - 6 axes: P/E Ratio, EV/EBITDA, Gross Margin, Operating Margin, Revenue Growth, ROIC",
+        "  - Current stock shown as filled area (vettr-accent green)",
+        "  - Peer average shown as dashed outline",
+        "  - Values normalized to 0-100 scale for chart (with lower-is-better metrics inverted)",
+        "  - Legend showing current stock vs peer average",
+        "Comparison Table below chart:",
+        "  - Columns: Ticker, P/E, EV/EBITDA, Gross Margin, Op Margin, Rev Growth, Debt/Equity, VETTR Score",
+        "  - Current stock row highlighted with accent border",
+        "  - Best-in-class values highlighted (bold or subtle green background)",
+        "  - Sortable columns (click header to sort)",
+        "  - 5-8 peer stocks shown",
+        "Uses table pattern from design system (sticky header, hover rows)",
+        "Responsive: on mobile, table scrolls horizontally",
+        "npm run build passes"
+      ],
+      "priority": 7,
+      "passes": false
+    },
+    {
+      "id": "FUND-008",
+      "title": "Compose Fundamentals tab with all sections",
+      "description": "Wire up all fundamentals components into the Fundamentals tab on the stock detail page, arranged in a clear visual hierarchy.",
+      "acceptanceCriteria": [
+        "In the stock detail page, the Fundamentals tab renders all 4 sections in order:",
+        "  1. Financial Health Dashboard (full width)",
+        "  2. Earnings Quality Score (left) + Analyst Consensus (right) in 2-col grid on desktop, stacked on mobile",
+        "  3. Smart Peer Comparison (full width)",
+        "Sections separated by consistent spacing (mb-8)",
+        "Each section has a clear heading (text-lg font-semibold text-white) with an icon",
+        "Section headings: 'Financial Health', 'Earnings Quality', 'Analyst Consensus', 'Peer Comparison'",
+        "Data loaded via useFundamentals(ticker) hook",
+        "Loading state shows skeleton placeholders for each section",
+        "Create src/components/ui/SkeletonFundamentals.tsx with appropriate skeleton shapes",
+        "Tab content has smooth entrance animation (framer-motion fade-in) matching other tabs",
+        "npm run build passes"
+      ],
+      "priority": 8,
+      "passes": false
+    },
+    {
+      "id": "FUND-009",
+      "title": "Enhance VETTR Score breakdown with fundamentals indicators",
+      "description": "P0: Add fundamentals-sourced health indicators to the existing VETTR Score section on the Overview tab, showing users what's driving the score.",
+      "acceptanceCriteria": [
+        "In the Overview tab VETTR Score section, add a new 'Score Drivers' subsection below the 4-pillar breakdown bars",
+        "Create src/components/fundamentals/ScoreDrivers.tsx",
+        "Shows 4 compact indicator rows (one per pillar) with the key metric driving each pillar:",
+        "  1. Financial Survival → Cash Runway badge (e.g., '14.2 months') with color dot",
+        "  2. Operational Efficiency → Gross Margin badge (e.g., '38.2%') with color dot",
+        "  3. Shareholder Structure → Insider Ownership badge (e.g., '12.4%') with color dot",
+        "  4. Market Sentiment → Analyst Consensus badge (e.g., 'Buy (8 analysts)') with color dot",
+        "Color dots use the same 5-tier color scale based on the metric value",
+        "Each row is a single line: [pillar icon] [pillar name] [spacer] [metric badge]",
+        "Clicking any row navigates to the Fundamentals tab (?tab=fundamentals)",
+        "Subtle 'View all fundamentals →' link at bottom",
+        "Data from useFundamentals hook",
+        "Graceful fallback if fundamentals data is loading or unavailable",
+        "npm run build passes"
+      ],
+      "priority": 9,
+      "passes": false
+    },
+    {
+      "id": "FUND-010",
+      "title": "Add Financial Statements Summary section to Fundamentals tab",
+      "description": "Add a collapsible Financial Statements section showing key income statement, balance sheet, and cash flow items across 4 annual periods.",
+      "acceptanceCriteria": [
+        "Create src/components/fundamentals/FinancialStatements.tsx",
+        "Add FinancialStatements interface to src/types/fundamentals.ts with annualData (array of 4 periods), each period having: date, revenue, costOfRevenue, grossProfit, operatingIncome, netIncome, totalAssets, totalLiabilities, totalEquity, operatingCashFlow, capex, freeCashFlow",
+        "Add financialStatements field to FundamentalsData umbrella type",
+        "Update dummy data generator to produce 4 years of statement data with realistic growth patterns",
+        "Component shows 3 collapsible sections (accordion-style): Income Statement, Balance Sheet, Cash Flow",
+        "Each section is a table with periods as columns (2021, 2022, 2023, 2024) and line items as rows",
+        "Values formatted with $M/$B suffixes",
+        "Year-over-year growth shown as small colored percentage next to each value (green positive, red negative)",
+        "Sections default to collapsed, click header to expand/collapse with smooth animation",
+        "Add to Fundamentals tab between Earnings Quality and Peer Comparison sections",
+        "npm run build passes"
+      ],
+      "priority": 10,
+      "passes": false
+    },
+    {
+      "id": "FUND-011",
+      "title": "Add Key Metrics summary cards to stock detail header area",
+      "description": "Enhance the existing Key Metrics cards in the Overview tab to include 2 fundamentals-sourced metrics alongside the existing 4.",
+      "acceptanceCriteria": [
+        "In the Overview tab Key Metrics section (currently 4 cards: Market Cap, Exchange, Sector, Recent Filings), expand to 6 cards in a responsive grid",
+        "Add 2 new metric cards sourced from fundamentals dummy data:",
+        "  1. 'P/E Ratio' card showing trailing PE with forward PE in smaller text below",
+        "  2. 'Div Yield' card showing dividend yield percentage (or 'N/A' if not applicable)",
+        "New cards use exact same styling as existing metric cards",
+        "Grid adjusts: 2 cols mobile, 3 cols tablet, 6 cols desktop (or 3x2 grid)",
+        "Values from useFundamentals hook",
+        "Add peRatio (trailing and forward) and dividendYield to FundamentalsData type and dummy data generator",
+        "Show subtle loading skeleton while fundamentals data loads",
+        "npm run build passes"
+      ],
+      "priority": 11,
+      "passes": false
+    },
+    {
+      "id": "FUND-012",
+      "title": "Add Short Interest indicator to Overview tab",
+      "description": "Add a compact Short Interest section to the Overview tab showing days to cover and short interest percentage. This is unique TMX data.",
+      "acceptanceCriteria": [
+        "Create src/components/fundamentals/ShortInterestBadge.tsx",
+        "Add ShortInterest interface to fundamentals types: shortInterest (shares), shortInterestPercent, daysToCover, asOfDate",
+        "Add shortInterest to FundamentalsData type and dummy data generator",
+        "Badge displays: short interest % with days-to-cover in parentheses (e.g., '3.2% (2.1 days)')",
+        "Color coding: green <3%, yellow 3-10%, red >10%",
+        "Small info tooltip explaining what short interest means",
+        "Placed in the Overview tab near the Key Metrics section (below metrics grid, above peer comparison)",
+        "Compact single-line or small card design, not a full section",
+        "npm run build passes"
+      ],
+      "priority": 12,
+      "passes": false
+    },
+    {
+      "id": "FUND-013",
+      "title": "Add Insider Activity summary to Fundamentals tab",
+      "description": "Add an Insider Activity section showing recent insider transactions and ownership breakdown.",
+      "acceptanceCriteria": [
+        "Create src/components/fundamentals/InsiderActivity.tsx",
+        "Add InsiderActivity interface to fundamentals types: insidersPercent, institutionsPercent, publicPercent, netBuySellRatio, recentTransactions (array of {name, relation, type: 'buy'|'sell', shares, date})",
+        "Add insiderActivity to FundamentalsData type and dummy data generator",
+        "Ownership Breakdown: horizontal stacked bar showing Insiders / Institutions / Public split with legend",
+        "Net Activity badge: shows net buy/sell direction with arrow icon (green up for net buying, red down for net selling)",
+        "Recent Transactions table: last 5 transactions with name, type (Buy badge green / Sell badge red), shares, date",
+        "Placed in Fundamentals tab after Analyst Consensus section",
+        "Uses existing card and table patterns",
+        "npm run build passes"
+      ],
+      "priority": 13,
+      "passes": false
+    },
+    {
+      "id": "FUND-014",
+      "title": "Polish, responsive testing, and accessibility pass",
+      "description": "Final polish pass ensuring all fundamentals components are responsive, accessible, properly themed for dark mode, and the build is clean.",
+      "acceptanceCriteria": [
+        "All fundamentals components render correctly at 375px (mobile), 768px (tablet), 1024px (laptop), 1440px (desktop) viewports",
+        "All charts (Recharts) are responsive and readable at all sizes",
+        "All interactive elements have ARIA labels and keyboard accessibility",
+        "Skeleton loading states appear correctly during data load",
+        "All text is readable (proper contrast ratios)",
+        "No horizontal overflow / scroll issues on mobile",
+        "Tab navigation includes Fundamentals in keyboard sequence",
+        "Print styles: fundamentals data prints cleanly (charts may show as tables)",
+        "No TypeScript errors, no lint warnings",
+        "npm run build passes with zero errors and zero warnings",
+        "npm run lint passes"
+      ],
+      "priority": 14,
+      "passes": false
+    }
+  ]
+}

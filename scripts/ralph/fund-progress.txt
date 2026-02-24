@@ -1,0 +1,57 @@
+# VETTR Web App - Fundamentals Features Ralph Progress Log
+Started: Sun Feb 23 2026
+---
+
+## FUND-001: Add Fundamentals TypeScript interfaces and dummy data generator
+Status: COMPLETE
+Date: Sun Feb 23 2026
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Created comprehensive TypeScript interfaces in src/types/fundamentals.ts
+  - FinancialHealth interface with 10 metrics (cash runway, Altman Z-Score, debt ratios, working capital trend)
+  - EarningsQuality interface with accruals ratio, cash conversion, consecutive beats, and surprise history
+  - AnalystConsensus interface with ratings distribution, price targets, and recent upgrades/downgrades
+  - PeerFinancials interface with comparative metrics for peer companies
+  - FundamentalsData umbrella type combining all data structures
+- Created deterministic dummy data generator in src/lib/dummy-fundamentals.ts
+  - Hash-based seeding for consistent results per ticker
+  - SeededRandom class for deterministic random generation
+  - Realistic value ranges based on Canadian mining sector patterns (typical VETTR focus)
+  - 4 periods of historical data (quarters for working capital, quarters for earnings)
+  - Varied analyst firm names from major Canadian brokerages
+  - Peer company selection from TSX mining stocks
+  - Main export: getDummyFundamentals(ticker: string): FundamentalsData
+- Build and lint checks passed successfully
+- Committed as: feat: FUND-001 - Add Fundamentals TypeScript interfaces and dummy data generator
+
+**Learnings for future iterations:**
+- The dummy data generator uses a simple hash function to convert ticker strings to deterministic seeds
+- All random values are generated through SeededRandom class to ensure consistency
+- Mining sector biases were applied (e.g., typical margins, Canadian analyst firms, TSX peers)
+- Data structures are designed to be swap-ready for real API integration later
+- TypeScript strict mode requires careful typing of all fields and array elements
+---
+
+## FUND-002: Create useFundamentals hook with dummy data
+Status: COMPLETE
+Date: Sun Feb 23 2026
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Created src/hooks/useFundamentals.ts following the existing useVetrScore pattern
+- Hook returns { data: FundamentalsData | undefined, isLoading: boolean, error: Error | undefined }
+- Accepts ticker: string and shouldFetch?: boolean parameters
+- Simulates network delay with 300-500ms timeout before returning dummy data
+- Uses getDummyFundamentals(ticker) from the dummy data generator
+- Includes comprehensive TODO comment with future SWR-based API implementation pattern
+- Loading state management via useState/useEffect
+- Error handling for potential data generation failures
+- Build and lint checks passed successfully
+- Committed as: feat: FUND-002 - Create useFundamentals hook with dummy data
+
+**Learnings for future iterations:**
+- Hook follows the same pattern as useVetrScore for consistency across the codebase
+- Simulated loading delay adds realism to the UX during development
+- The commented-out SWR implementation provides a clear migration path for backend integration
+- Using useState/useEffect for the dummy implementation keeps the API surface identical to the future SWR version
+- shouldFetch parameter enables conditional data fetching (useful for performance optimization)
+---
