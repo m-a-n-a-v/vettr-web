@@ -54,3 +54,31 @@ Details:
 - Color semantics matter: for short interest, declining = positive (green), rising = negative (red) since it's a bearish metric
 - Historical data generation should maintain realistic constraints (0.5-15% range for short interest)
 ---
+
+## FUND2-003: Create reusable Sparkline component
+Status: COMPLETE
+Date: Mon Feb 24 2026
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Created src/components/ui/Sparkline.tsx as a lightweight, reusable sparkline component
+- Component features:
+  - Pure SVG implementation (no Recharts dependency) for minimal overhead
+  - Accepts data array and optional props: width (default 60px), height (default 20px), color, showDot (default true), className
+  - Auto-color detection based on trend: green if last > first (trending up), red if declining, gray if flat
+  - Smooth polyline rendering with proper scaling based on data min/max
+  - Small dot on last data point for emphasis
+  - Edge case handling: empty arrays, single values, flat data (prevents division by zero)
+  - Uses vectorEffect="non-scaling-stroke" to maintain consistent line width
+- Tested with multiple data patterns: trending up, trending down, flat, volatile, custom colors, edge cases
+- Positioned for use in cards (60-80px), tables (50px), and inline with metrics
+- npm run build passes successfully
+- Component ready for integration in next stories (Overview metrics, Financial Health cards, Fundamentals tables)
+
+**Learnings for future iterations:**
+- Pure SVG sparklines are much lighter than Recharts for simple trend visualization
+- polyline with preserveAspectRatio="none" provides smooth line rendering without complex path interpolation
+- Auto-color detection from first/last value is simple but effective for trend indication
+- vectorEffect="non-scaling-stroke" ensures consistent visual weight across different sizes
+- Edge case handling (empty arrays, single points) is critical for reusable components
+- className prop enables flexible positioning (inline, absolute, etc.) for different use cases
+---
