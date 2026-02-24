@@ -55,3 +55,33 @@ Details:
 - Using useState/useEffect for the dummy implementation keeps the API surface identical to the future SWR version
 - shouldFetch parameter enables conditional data fetching (useful for performance optimization)
 ---
+## FUND-003: Add 'Fundamentals' tab to stock detail page
+Status: COMPLETE
+Date: Sun Feb 23 2026
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Modified src/app/(main)/stocks/[ticker]/page.tsx to add the Fundamentals tab
+- Updated Tab type union from 'overview' | 'pedigree' | 'red-flags' to include 'fundamentals' (line 59)
+- Updated handleTabKeyDown function to include 'fundamentals' in the tabs array for keyboard navigation (line 107)
+- Added Fundamentals tab button in the tab navigation bar between Overview and Pedigree (lines 500-521)
+  - Includes bar-chart SVG icon matching design system standards
+  - Uses consistent styling with existing tabs (hover, active states, border indicator)
+  - Properly configured with ARIA attributes for accessibility
+  - Supports keyboard navigation via arrow keys, Home, and End keys
+- Added Fundamentals tab content panel with placeholder message "Fundamentals content coming soon" (lines 904-917)
+  - Uses framer-motion for smooth entrance/exit animations
+  - Follows same animation pattern as other tabs
+  - Proper ARIA labeling for accessibility
+- URL query param ?tab=fundamentals functionality works automatically via existing useEffect hook
+- Build and lint checks passed successfully
+- Committed as: feat: FUND-003 - Add 'Fundamentals' tab to stock detail page
+
+**Learnings for future iterations:**
+- The Tab type union needs to be updated in multiple places (type definition, keyboard nav array)
+- Tab order in the navigation bar must match the order in the keyboard navigation array
+- The existing URL param sync logic (lines 143-162) handles new tabs automatically
+- Framer Motion AnimatePresence with mode="wait" ensures smooth tab transitions
+- Tab buttons use tabIndex={-1} when inactive to remove them from tab order, improving keyboard UX
+- The bar-chart icon (3 vertical bars) was chosen to represent financial data visually
+- Using flex items-center gap-1.5 allows icon and text to align properly in the tab button
+---
