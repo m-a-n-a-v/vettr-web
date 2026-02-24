@@ -24,3 +24,33 @@ Details:
 - Area charts with gradients create excellent visual hierarchy for ownership trends
 - Pulse animations on badges draw attention to positive signals without being distracting
 ---
+
+## FUND2-002: Enhance Short Interest with trend chart and squeeze potential indicator
+Status: COMPLETE
+Date: Mon Feb 24 2026
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Updated ShortInterest interface in src/types/fundamentals.ts with new fields: shortInterestHistory (6 months of data), squeezePotential ('high' | 'moderate' | 'low'), and shortInterestChange (1-month % change)
+- Enhanced dummy data generator (src/lib/dummy-fundamentals.ts) to produce:
+  - 6 months of historical short interest data with realistic trend patterns (declining, rising, or volatile)
+  - Squeeze potential calculation based on 3 factors: high SI (>8%), declining trend, and high days to cover (>5)
+  - 1-month change calculation comparing current vs prior month
+- Created new ShortInterestSection component (src/components/fundamentals/ShortInterestSection.tsx):
+  - Retained original badge display showing short interest % and days to cover with color coding (green <3%, yellow 3-10%, red >10%)
+  - Added Squeeze Potential badge with pulse animation for 'high' potential, color-coded appropriately
+  - Added 1-Month Change indicator with directional arrow (green for declining = less bearish, red for rising = more bearish)
+  - Integrated Recharts AreaChart showing 6-month short interest % trend with gradient fill
+  - Added explanatory text for squeeze potential criteria based on current level
+  - Preserved original tooltip functionality explaining what short interest means
+- Replaced ShortInterestBadge with ShortInterestSection in Overview tab (src/app/(main)/stocks/[ticker]/page.tsx)
+- All components follow VETTR design system patterns: vettr-card backgrounds, proper color coding, typography hierarchy
+- npm run build passes successfully
+- npm run lint passes (1 pre-existing warning in unrelated file)
+
+**Learnings for future iterations:**
+- Short interest trend analysis benefits from deterministic trend patterns (declining/rising/volatile) rather than pure random walk
+- Squeeze potential is best calculated from multiple factors rather than single threshold - creates more nuanced signal
+- Area charts with dynamic gradient colors based on current value create strong visual impact
+- Color semantics matter: for short interest, declining = positive (green), rising = negative (red) since it's a bearish metric
+- Historical data generation should maintain realistic constraints (0.5-15% range for short interest)
+---
