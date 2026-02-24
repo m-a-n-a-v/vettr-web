@@ -1,0 +1,102 @@
+/**
+ * TypeScript interfaces for fundamentals data structures
+ * Used by the Fundamentals tab and related components
+ */
+
+/**
+ * Financial Health indicators and metrics
+ */
+export interface FinancialHealth {
+  cashRunwayMonths: number;
+  debtCoverageRatio: number; // EBITDA/Interest
+  workingCapitalTrend: Array<{
+    period: string;
+    value: number;
+  }>;
+  freeCashFlowYield: number; // Percentage
+  altmanZScore: number;
+  currentRatio: number;
+  quickRatio: number;
+  interestCoverage: number;
+  debtToEquity: number;
+  debtToAssets: number;
+}
+
+/**
+ * Earnings Quality assessment metrics
+ */
+export interface EarningsQuality {
+  accrualsRatio: number;
+  cashConversion: number; // Operating Cash Flow / Net Income
+  revenueToReceivables: number;
+  consecutiveBeats: number; // Number of consecutive quarters beating estimates
+  surpriseHistory: Array<{
+    quarter: string;
+    epsActual: number;
+    epsEstimate: number;
+    surprise: number;
+    surprisePercent: number;
+  }>;
+  overallScore: number; // 0-100
+}
+
+/**
+ * Analyst Consensus and recommendations
+ */
+export interface AnalystConsensus {
+  totalAnalysts: number;
+  consensus: string; // e.g., "Buy", "Hold", "Sell"
+  buyCount: number;
+  holdCount: number;
+  sellCount: number;
+  priceTargetMean: number;
+  priceTargetMedian: number;
+  priceTargetHigh: number;
+  priceTargetLow: number;
+  currentPrice: number;
+  upsidePercent: number; // Can be negative for downside
+  recommendations: Array<{
+    period: string;
+    strongBuy: number;
+    buy: number;
+    hold: number;
+    sell: number;
+    strongSell: number;
+  }>;
+  recentUpgrades: Array<{
+    date: string;
+    firm: string;
+    action: 'upgrade' | 'downgrade' | 'initiate';
+    fromGrade: string;
+    toGrade: string;
+  }>;
+}
+
+/**
+ * Peer Comparison Financial metrics
+ */
+export interface PeerFinancials {
+  peers: Array<{
+    ticker: string;
+    name: string;
+    peRatio: number;
+    evEbitda: number;
+    grossMargin: number; // Percentage
+    operatingMargin: number; // Percentage
+    revenueGrowth: number; // Percentage
+    roic: number; // Return on Invested Capital, percentage
+    debtToEquity: number;
+    currentScore: number; // VETTR Score 0-100
+  }>;
+}
+
+/**
+ * Umbrella type containing all fundamentals data for a stock
+ */
+export interface FundamentalsData {
+  ticker: string;
+  financialHealth: FinancialHealth;
+  earningsQuality: EarningsQuality;
+  analystConsensus: AnalystConsensus;
+  peerFinancials: PeerFinancials;
+}
