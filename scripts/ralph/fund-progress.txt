@@ -455,3 +455,57 @@ Details:
 - Asset multiples and cash conversion ratios create financially coherent dummy statements
 - margin expansion/contraction over years creates realistic trend patterns
 ---
+## FUND-011: Add Key Metrics summary cards to stock detail header area
+Status: COMPLETE
+Date: Sun Feb 23 2026
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Added peRatio, peRatioForward, and dividendYield fields to FundamentalsData interface (src/types/fundamentals.ts)
+  - peRatio: trailing P/E ratio
+  - peRatioForward: forward P/E ratio
+  - dividendYield: dividend yield percentage (0-10)
+- Updated dummy data generator (src/lib/dummy-fundamentals.ts) to produce P/E and dividend data:
+  - Trailing P/E: 5-80 range (typical market range)
+  - Forward P/E: 4-70 range (typically lower than trailing)
+  - Dividend yield: 0.5-8.0% with 60% probability of having a dividend (40% don't pay dividends)
+  - Deterministic generation based on ticker hash
+- Enhanced Overview tab Key Metrics section (src/app/(main)/stocks/[ticker]/page.tsx):
+  - Expanded from 4 metric cards to 6 cards
+  - Updated grid layout: grid-cols-2 md:grid-cols-3 lg:grid-cols-6
+  - Responsive design: 2 cols mobile, 3 cols tablet, 6 cols desktop
+- Added P/E Ratio card (5th card):
+  - Shows trailing P/E as main value
+  - Shows forward P/E as smaller subtitle text (Fwd: X.X)
+  - Uses fundamentals data from useFundamentals hook
+  - Loading skeleton during data fetch
+  - Graceful fallback to N/A when data unavailable
+- Added Div Yield card (6th card):
+  - Shows dividend yield as percentage (e.g., 3.25%)
+  - Displays N/A when dividendYield is 0 (no dividend)
+  - Same styling as other metric cards
+  - Loading skeleton during data fetch
+- Updated loading skeleton in stock detail page:
+  - Changed from 4 to 6 skeleton cards
+  - Grid layout matches the actual cards (2/3/6 columns)
+- All new cards follow exact design system patterns:
+  - bg-gray-50 dark:bg-white/[0.03] rounded-xl p-4
+  - text-xs uppercase tracking-wider label
+  - font-semibold value text
+  - Consistent spacing and typography
+- Build and lint checks passed successfully
+- Committed as: feat: FUND-011 - Add Key Metrics summary cards to stock detail header area
+
+**Learnings for future iterations:**
+- The 6-column grid layout (lg:grid-cols-6) creates a clean single-row layout on desktop
+- On tablet (md:grid-cols-3), cards arrange in 2 rows of 3
+- On mobile (grid-cols-2), cards stack in 3 rows of 2
+- Conditional rendering pattern for fundamentals data: loading skeleton → actual data → fallback N/A
+- Forward P/E is typically lower than trailing P/E (expected earnings growth)
+- 60% dividend probability reflects reality where many growth/mining stocks don't pay dividends
+- Small subtitle text (text-xs text-gray-500 mt-1) works well for secondary metric values
+- Using toFixed(1) for P/E ratios and toFixed(2) for dividend yield provides appropriate precision
+- dividendYield > 0 check ensures we show N/A instead of 0.00% for non-dividend stocks
+- Inline loading skeleton (animate-pulse with bg-gray-200 dark:bg-white/5) matches card styling
+- The useFundamentals hook is already called in the component, so new cards immediately have access to data
+---
+

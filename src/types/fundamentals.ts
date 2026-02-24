@@ -115,6 +115,16 @@ export interface FinancialStatements {
 }
 
 /**
+ * Short Interest data (unique TMX data)
+ */
+export interface ShortInterest {
+  shortInterest: number; // Number of shares short
+  shortInterestPercent: number; // Percentage of float
+  daysToCover: number; // Days to cover based on average volume
+  asOfDate: string; // Date of the data
+}
+
+/**
  * Umbrella type containing all fundamentals data for a stock
  */
 export interface FundamentalsData {
@@ -127,4 +137,5 @@ export interface FundamentalsData {
   peRatio: number; // Trailing P/E ratio
   peRatioForward: number; // Forward P/E ratio
   dividendYield: number; // Dividend yield percentage (0-10)
+  shortInterest: ShortInterest;
 }

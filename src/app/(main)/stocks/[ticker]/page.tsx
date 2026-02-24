@@ -58,6 +58,7 @@ import { AnalystConsensusCard } from '@/components/fundamentals/AnalystConsensus
 import { PeerComparisonFinancials } from '@/components/fundamentals/PeerComparisonFinancials';
 import { ScoreDrivers } from '@/components/fundamentals/ScoreDrivers';
 import { FinancialStatements } from '@/components/fundamentals/FinancialStatements';
+import { ShortInterestBadge } from '@/components/fundamentals/ShortInterestBadge';
 import { SkeletonStockDetailHeader, SkeletonVetrScoreSection, SkeletonFilingRow, SkeletonMetricCard, SkeletonFundamentals } from '@/components/ui/SkeletonLoader';
 import Breadcrumb from '@/components/ui/Breadcrumb';
 import { StarIcon, StarFilledIcon, ShareIcon, MoreHorizontalIcon, ArrowUpIcon, ArrowDownIcon, UsersIcon, FlagIcon, ShieldCheckIcon, BarChartIcon, DocumentIcon, PrinterIcon } from '@/components/icons';
@@ -735,6 +736,13 @@ function StockDetailContent() {
                 </div>
               </div>
             </div>
+
+            {/* Short Interest Badge */}
+            {fundamentals && !fundamentalsLoading && (
+              <div className="flex justify-start">
+                <ShortInterestBadge shortInterest={fundamentals.shortInterest} />
+              </div>
+            )}
 
             {/* Peer Comparison */}
             <VetrScoreComparison

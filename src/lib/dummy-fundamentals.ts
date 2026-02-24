@@ -4,7 +4,7 @@
  * Data is deterministic (same ticker always returns same values) using ticker string hash as seed
  */
 
-import { FundamentalsData, FinancialHealth, EarningsQuality, AnalystConsensus, PeerFinancials, FinancialStatements } from '@/types/fundamentals';
+import { FundamentalsData, FinancialHealth, EarningsQuality, AnalystConsensus, PeerFinancials, FinancialStatements, ShortInterest } from '@/types/fundamentals';
 
 /**
  * Simple hash function to generate a seed from ticker string
@@ -342,6 +342,34 @@ function generateFinancialStatements(rng: SeededRandom): FinancialStatements {
 }
 
 /**
+ * Generate dummy Short Interest data
+ */
+function generateShortInterest(rng: SeededRandom): ShortInterest {
+  // Short interest as percentage of float (0.5% to 15%)
+  const shortInterestPercent = parseFloat(rng.range(0.5, 15).toFixed(2));
+
+  // Estimate shares short based on typical float size (10M-100M shares)
+  const estimatedFloat = rng.range(10, 100) * 1000000;
+  const shortInterest = Math.round(estimatedFloat * (shortInterestPercent / 100));
+
+  // Days to cover (0.5 to 10 days)
+  const daysToCover = parseFloat(rng.range(0.5, 10).toFixed(1));
+
+  // Generate a recent date (within last 2 weeks)
+  const daysAgo = Math.floor(rng.range(1, 14));
+  const asOfDate = new Date();
+  asOfDate.setDate(asOfDate.getDate() - daysAgo);
+  const dateString = asOfDate.toISOString().split('T')[0]; // YYYY-MM-DD format
+
+  return {
+    shortInterest,
+    shortInterestPercent,
+    daysToCover,
+    asOfDate: dateString,
+  };
+}
+
+/**
  * Main function to generate complete dummy fundamentals data for a ticker
  * Data is deterministic based on ticker hash
  */
@@ -367,5 +395,6 @@ export function getDummyFundamentals(ticker: string): FundamentalsData {
     peRatio,
     peRatioForward,
     dividendYield,
+    shortInterest: generateShortInterest(rng),
   };
 }
