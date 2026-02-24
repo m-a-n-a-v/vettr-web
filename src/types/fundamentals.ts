@@ -122,6 +122,13 @@ export interface ShortInterest {
   shortInterestPercent: number; // Percentage of float
   daysToCover: number; // Days to cover based on average volume
   asOfDate: string; // Date of the data
+  shortInterestHistory: Array<{
+    date: string; // Date of the measurement
+    shortInterest: number; // Number of shares short
+    shortInterestPercent: number; // Percentage of float
+  }>;
+  squeezePotential: 'high' | 'moderate' | 'low'; // Short squeeze probability
+  shortInterestChange: number; // 1-month change in percentage points
 }
 
 /**

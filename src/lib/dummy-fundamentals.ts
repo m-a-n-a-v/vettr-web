@@ -361,11 +361,77 @@ function generateShortInterest(rng: SeededRandom): ShortInterest {
   asOfDate.setDate(asOfDate.getDate() - daysAgo);
   const dateString = asOfDate.toISOString().split('T')[0]; // YYYY-MM-DD format
 
+  // Generate 6 months of historical short interest data
+  const shortInterestHistory = [];
+  const monthsToGenerate = 6;
+
+  // Determine trend direction: declining, rising, or volatile
+  const trendType = rng.choice(['declining', 'rising', 'volatile']);
+
+  for (let i = monthsToGenerate - 1; i >= 0; i--) {
+    const monthDate = new Date();
+    monthDate.setMonth(monthDate.getMonth() - i);
+    monthDate.setDate(15); // Mid-month for consistency
+    const historyDateString = monthDate.toISOString().split('T')[0];
+
+    let historyPercent: number;
+
+    if (trendType === 'declining') {
+      // Gradually declining from higher to current (bearish sentiment fading)
+      const startPercent = shortInterestPercent * rng.range(1.5, 2.5);
+      historyPercent = startPercent - ((startPercent - shortInterestPercent) / (monthsToGenerate - 1)) * (monthsToGenerate - 1 - i);
+    } else if (trendType === 'rising') {
+      // Gradually rising from lower to current (bearish sentiment building)
+      const startPercent = shortInterestPercent * rng.range(0.4, 0.7);
+      historyPercent = startPercent + ((shortInterestPercent - startPercent) / (monthsToGenerate - 1)) * (monthsToGenerate - 1 - i);
+    } else {
+      // Volatile: fluctuates around current level
+      historyPercent = shortInterestPercent * rng.range(0.7, 1.4);
+    }
+
+    historyPercent = parseFloat(Math.max(0.5, Math.min(15, historyPercent)).toFixed(2));
+    const historyShortInterest = Math.round(estimatedFloat * (historyPercent / 100));
+
+    shortInterestHistory.push({
+      date: historyDateString,
+      shortInterest: historyShortInterest,
+      shortInterestPercent: historyPercent,
+    });
+  }
+
+  // Calculate 1-month change (difference between current and 1 month ago)
+  const oneMonthAgo = shortInterestHistory[shortInterestHistory.length - 2] || shortInterestHistory[shortInterestHistory.length - 1];
+  const shortInterestChange = parseFloat((shortInterestPercent - oneMonthAgo.shortInterestPercent).toFixed(2));
+
+  // Determine squeeze potential based on:
+  // 1. High short interest (>8% = higher potential)
+  // 2. Declining short interest trend (shorts covering = higher potential)
+  // 3. Days to cover (>5 days = harder to cover = higher potential)
+
+  let squeezePotential: 'high' | 'moderate' | 'low';
+
+  const isHighSI = shortInterestPercent > 8;
+  const isDeclining = shortInterestChange < -0.5;
+  const isHighDTC = daysToCover > 5;
+
+  const squeezeFactors = [isHighSI, isDeclining, isHighDTC].filter(Boolean).length;
+
+  if (squeezeFactors >= 2) {
+    squeezePotential = 'high';
+  } else if (squeezeFactors === 1) {
+    squeezePotential = 'moderate';
+  } else {
+    squeezePotential = 'low';
+  }
+
   return {
     shortInterest,
     shortInterestPercent,
     daysToCover,
     asOfDate: dateString,
+    shortInterestHistory,
+    squeezePotential,
+    shortInterestChange,
   };
 }
 

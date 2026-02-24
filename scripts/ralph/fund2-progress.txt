@@ -1,3 +1,26 @@
 # VETTR Web App - Fundamentals Phase 2 Ralph Progress Log
 Started: Mon Feb 24 2026
 ---
+
+## FUND2-001: Enhance Insider Activity with Smart Money signal and accumulation/distribution indicator
+Status: COMPLETE
+Date: Mon Feb 24 2026
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Updated InsiderActivity interface in src/types/fundamentals.ts with new fields: institutionChangePercent, topHoldersConcentration, smartMoneySignal, and quarterlyOwnershipHistory
+- Enhanced dummy data generator (src/lib/dummy-fundamentals.ts) to produce realistic smart money signals based on institutional flow, concentration risk levels, and 4 quarters of ownership history
+- Completely redesigned src/components/fundamentals/InsiderActivity.tsx:
+  - Added Smart Money Signal badge in header with pulse animation for 'accumulating' state
+  - Created 3-column metrics grid featuring Institutional Flow (3-month % change with directional arrow), Concentration Risk (top 5 holders % with Low/Moderate/High badge), and Net Activity
+  - Integrated Recharts AreaChart showing quarterly ownership trend for both insiders and institutions with custom gradients
+  - Maintained existing ownership breakdown stacked bar and recent transactions table
+- All components follow VETTR design system: vettr-card backgrounds, emerald/yellow/red color coding, proper typography hierarchy
+- npm run build passes successfully
+- npm run lint passes (1 pre-existing warning in unrelated file)
+
+**Learnings for future iterations:**
+- Recharts Tooltip formatter requires handling undefined values in TypeScript - use `(value: number | undefined) => value !== undefined ? ... : 'N/A'`
+- Smart money signals work well with deterministic dummy data by deriving signal from institutional change threshold (>5% = accumulating, <-5% = distributing)
+- Area charts with gradients create excellent visual hierarchy for ownership trends
+- Pulse animations on badges draw attention to positive signals without being distracting
+---
