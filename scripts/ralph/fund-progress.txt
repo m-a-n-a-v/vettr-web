@@ -188,3 +188,118 @@ Details:
 - Table is mobile-friendly with overflow-x-auto wrapper
 - Each metric bar includes a subtitle explaining what it measures
 ---
+## FUND-006: Build Analyst Consensus Dashboard component
+Status: COMPLETE
+Date: Sun Feb 23 2026
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Created src/components/fundamentals/AnalystConsensusCard.tsx with comprehensive analyst coverage data display
+- Component includes 4 main sections:
+  1. Consensus Summary:
+     - Large text display showing consensus recommendation (e.g., "Buy") with analyst count
+     - Horizontal stacked bar showing Buy/Hold/Sell distribution with animated width transitions
+     - Bar segments colored: emerald-500 (buy), gray-500 (hold), red-500 (sell)
+     - Distribution legend showing counts for each category with colored dots
+  2. Price Target section:
+     - Visual range indicator showing low/median/high price targets
+     - Range bar with green gradient overlay (emerald-500 with varying opacity)
+     - Current price marked with white vertical line positioned dynamically
+     - Current price label displayed above the marker
+     - Upside/downside percentage badge (green for positive, red for negative)
+  3. Recommendation Trend chart:
+     - Stacked bar chart using Recharts showing strongBuy/buy/hold/sell/strongSell across 4 periods
+     - Bars stacked vertically with top corners rounded on top bar only
+     - Color gradient: dark green → light green → gray → orange → red
+     - Responsive container at 200px height
+     - Vettr theme tooltip styling
+  4. Recent Upgrades/Downgrades table:
+     - Shows last 5 analyst actions with date, firm, action, and grade change
+     - Action badges with dynamic styling:
+       - Green (emerald-400/10) for upgrades
+       - Red (red-400/10) for downgrades
+       - Blue (blue-400/10) for initiations
+     - Grade change displayed with arrow icon (from → to)
+     - Hover effect on rows (bg-white/[0.03])
+- All sections follow design system patterns:
+  - bg-vettr-card/50 with border-white/5
+  - rounded-2xl with p-5 padding
+  - Hover effects with vettr-accent border
+  - Proper typography hierarchy and spacing
+- Chart icon (bar chart SVG) in header matching existing icon style
+- Stacked bar animations use 1000ms duration with ease-out easing
+- Price target marker position calculated dynamically based on current price vs. range
+- Table responsive with overflow-x-auto wrapper
+- Build and lint checks passed successfully
+- Committed as: feat: FUND-006 - Build Analyst Consensus Dashboard component
+
+**Learnings for future iterations:**
+- Stacked bars created with flex layout and percentage-based widths (buyPercent, holdPercent, sellPercent)
+- Animation delay of 100ms before triggering width transitions creates smooth entrance effect
+- Price target range visualization uses absolute positioning for current price marker
+- Marker calculation: ((currentPrice - low) / (high - low)) * 100 gives position percentage
+- Recharts stacked bars use stackId="a" to group all bars in same stack
+- Only the top bar in a stack should have rounded top corners (radius={[4, 4, 0, 0]})
+- Action badge color determined by string matching (includes "upgrade"/"downgrade"/"initiate")
+- Arrow icon inline in table cell for grade transitions keeps layout compact
+- Border-b on table rows creates clean separation without full grid borders
+- Using slice(0, 5) ensures only first 5 upgrades/downgrades are displayed
+- Recommendation trend data transformed from flat structure to Recharts-friendly format with capital-case keys
+---
+## FUND-007: Build Smart Peer Comparison component with financial metrics
+Status: COMPLETE
+Date: Sun Feb 23 2026
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Created src/components/fundamentals/PeerComparisonFinancials.tsx with comprehensive peer comparison functionality
+- Component includes radar/spider chart for visual comparison:
+  - 6 axes: P/E Ratio, EV/EBITDA, Gross Margin, Operating Margin, Revenue Growth, ROIC
+  - Current stock shown as filled green area (#00E676 with 25% opacity)
+  - Peer average shown as dashed gray outline (#64748b with strokeDasharray 5 5)
+  - Values normalized to 0-100 scale with appropriate max values per metric
+  - Lower-is-better metrics (P/E, EV/EBITDA) are inverted for intuitive visualization
+  - Custom tooltip showing metric name with current vs peer average values
+  - Legend displays current ticker name dynamically
+- Comparison table with full functionality:
+  - 8 columns: Ticker, P/E, EV/EBITDA, Gross Margin, Op Margin, Rev Growth, D/E, VETTR Score
+  - Current stock row highlighted with accent border (border-l-2 border-l-vettr-accent) and subtle background (bg-vettr-accent/5)
+  - Best-in-class values highlighted with bold font weight
+  - Sortable columns with visual indicators (up/down arrow SVG)
+  - Sort state management via useState (sortField, sortDirection)
+  - Dynamic sorting handles both string and numeric values
+  - VETTR Score column displays colored badges using getScoreColor function
+  - Sticky first column (ticker) with left-0 positioning for horizontal scroll
+  - 5-8 peer stocks displayed (data from dummy generator)
+- Responsive design:
+  - Table wrapped in overflow-x-auto for horizontal scroll on mobile
+  - Sticky header (top-0) and sticky first column (left-0) with backdrop-blur-sm
+  - min-w-max on table ensures proper layout during scroll
+  - Card pattern with bg-vettr-card/50 and border-white/5
+- All table styling follows design system patterns:
+  - Hover rows with bg-white/[0.03]
+  - Border-b border-white/5 for row separation
+  - Proper typography hierarchy (text-xs for headers, text-sm for cells)
+  - Gray uppercase headers with tracking-wider
+- Radar chart uses Recharts RadarChart component:
+  - ResponsiveContainer at 300px height
+  - PolarGrid with subtle stroke (rgba(255, 255, 255, 0.1))
+  - PolarAngleAxis with metric labels
+  - PolarRadiusAxis domain [0, 100]
+  - Two Radar overlays (peer avg and current)
+- Build and lint checks passed successfully
+- Committed as: feat: FUND-007 - Build Smart Peer Comparison component with financial metrics
+
+**Learnings for future iterations:**
+- Radar chart normalization requires different max values per metric (P/E: 80, EV/EBITDA: 30, Margins: 50-100, ROIC: 40)
+- Lower-is-better metrics (valuation multiples, leverage ratios) need inversion: 100 - normalizedValue
+- Peer averages calculated by filtering out current stock and averaging peer values
+- Sortable table headers use onClick handlers that toggle sort direction on same field, reset to desc on new field
+- Best-in-class highlighting requires calculating min/max across all peers based on metric type
+- Sticky positioning requires combining sticky, left-0/top-0, and backdrop-blur-sm for proper layering
+- Current stock identification uses ticker comparison (peer.ticker === currentTicker)
+- VETTR score badges use inline styles for dynamic coloring with getScoreColor function
+- Table uses text-right for numeric columns, text-left for ticker column
+- Radar Legend formatter function allows dynamic label transformation
+- Using find() to locate currentStock, then building radarData array conditionally
+- Sort indicators (arrows) rendered inline with flex justify-end for right-aligned headers
+- min-w-max prevents table collapse during horizontal scroll on narrow viewports
+---
