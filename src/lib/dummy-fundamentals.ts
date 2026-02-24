@@ -349,6 +349,14 @@ export function getDummyFundamentals(ticker: string): FundamentalsData {
   const seed = hashTicker(ticker);
   const rng = new SeededRandom(seed * 1000000);
 
+  // Generate P/E ratios
+  const peRatio = parseFloat(rng.range(5, 80).toFixed(1)); // Trailing P/E
+  const peRatioForward = parseFloat(rng.range(4, 70).toFixed(1)); // Forward P/E (typically lower)
+
+  // Generate dividend yield (0-10%, but many mining stocks don't pay dividends)
+  const hasDividend = rng.next() > 0.4; // 60% chance of having a dividend
+  const dividendYield = hasDividend ? parseFloat(rng.range(0.5, 8.0).toFixed(2)) : 0;
+
   return {
     ticker,
     financialHealth: generateFinancialHealth(rng),
@@ -356,5 +364,8 @@ export function getDummyFundamentals(ticker: string): FundamentalsData {
     analystConsensus: generateAnalystConsensus(rng, ticker),
     peerFinancials: generatePeerFinancials(rng, ticker),
     financialStatements: generateFinancialStatements(rng),
+    peRatio,
+    peRatioForward,
+    dividendYield,
   };
 }

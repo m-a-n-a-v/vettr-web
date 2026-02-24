@@ -357,7 +357,9 @@ function StockDetailContent() {
               <SkeletonVetrScoreSection />
               <div>
                 <div className="h-6 w-32 bg-gray-100 dark:bg-white/5 rounded animate-pulse mb-4"></div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                  <SkeletonMetricCard />
+                  <SkeletonMetricCard />
                   <SkeletonMetricCard />
                   <SkeletonMetricCard />
                   <SkeletonMetricCard />
@@ -664,7 +666,7 @@ function StockDetailContent() {
               {/* Key Metrics */}
               <div className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-6 print-avoid-break print-page-break">
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Key Metrics</h2>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                   <div className="bg-gray-50 dark:bg-white/[0.03] rounded-xl p-4">
                     <p className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Market Cap</p>
                     <p className="text-gray-900 dark:text-white font-semibold">
@@ -687,6 +689,49 @@ function StockDetailContent() {
                       {filings?.length || 0}
                     </p>
                   </div>
+
+                  {/* P/E Ratio - from fundamentals data */}
+                  {fundamentalsLoading ? (
+                    <div className="bg-gray-50 dark:bg-white/[0.03] rounded-xl p-4 animate-pulse">
+                      <div className="h-3 w-12 bg-gray-200 dark:bg-white/5 rounded mb-2"></div>
+                      <div className="h-5 w-16 bg-gray-200 dark:bg-white/5 rounded"></div>
+                    </div>
+                  ) : fundamentals ? (
+                    <div className="bg-gray-50 dark:bg-white/[0.03] rounded-xl p-4">
+                      <p className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">P/E Ratio</p>
+                      <p className="text-gray-900 dark:text-white font-semibold">
+                        {fundamentals.peRatio.toFixed(1)}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Fwd: {fundamentals.peRatioForward.toFixed(1)}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="bg-gray-50 dark:bg-white/[0.03] rounded-xl p-4">
+                      <p className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">P/E Ratio</p>
+                      <p className="text-gray-900 dark:text-white font-semibold">N/A</p>
+                    </div>
+                  )}
+
+                  {/* Div Yield - from fundamentals data */}
+                  {fundamentalsLoading ? (
+                    <div className="bg-gray-50 dark:bg-white/[0.03] rounded-xl p-4 animate-pulse">
+                      <div className="h-3 w-12 bg-gray-200 dark:bg-white/5 rounded mb-2"></div>
+                      <div className="h-5 w-16 bg-gray-200 dark:bg-white/5 rounded"></div>
+                    </div>
+                  ) : fundamentals ? (
+                    <div className="bg-gray-50 dark:bg-white/[0.03] rounded-xl p-4">
+                      <p className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Div Yield</p>
+                      <p className="text-gray-900 dark:text-white font-semibold">
+                        {fundamentals.dividendYield > 0 ? `${fundamentals.dividendYield.toFixed(2)}%` : 'N/A'}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="bg-gray-50 dark:bg-white/[0.03] rounded-xl p-4">
+                      <p className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Div Yield</p>
+                      <p className="text-gray-900 dark:text-white font-semibold">N/A</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

@@ -124,4 +124,7 @@ export interface FundamentalsData {
   analystConsensus: AnalystConsensus;
   peerFinancials: PeerFinancials;
   financialStatements: FinancialStatements;
+  peRatio: number; // Trailing P/E ratio
+  peRatioForward: number; // Forward P/E ratio
+  dividendYield: number; // Dividend yield percentage (0-10)
 }
