@@ -86,7 +86,7 @@ export function AnalystConsensusCard({ data }: AnalystConsensusCardProps) {
         </div>
 
         {/* Stacked Bar */}
-        <div className="flex h-3 rounded-full overflow-hidden bg-white/5">
+        <div className="flex h-3 rounded-full overflow-hidden bg-white/5" role="img" aria-label={`Analyst ratings: ${buyPercent.toFixed(0)}% buy, ${holdPercent.toFixed(0)}% hold, ${sellPercent.toFixed(0)}% sell`}>
           <div
             className="bg-emerald-500 transition-all duration-1000 ease-out"
             style={{ width: animateWidths ? `${buyPercent}%` : '0%' }}

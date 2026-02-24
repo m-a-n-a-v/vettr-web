@@ -52,6 +52,11 @@ export function ShortInterestBadge({ shortInterest }: ShortInterestBadgeProps) {
         className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg border ${colors.bg} ${colors.border} transition-all duration-300 hover:border-vettr-accent/40 cursor-help`}
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
+        onFocus={() => setShowTooltip(true)}
+        onBlur={() => setShowTooltip(false)}
+        tabIndex={0}
+        role="button"
+        aria-label={`Short Interest: ${shortInterest.shortInterestPercent.toFixed(2)}% with ${shortInterest.daysToCover.toFixed(1)} days to cover`}
       >
         {/* Info icon */}
         <svg

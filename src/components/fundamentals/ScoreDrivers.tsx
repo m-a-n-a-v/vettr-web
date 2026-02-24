@@ -91,6 +91,7 @@ export function ScoreDrivers({ ticker, fundamentals }: ScoreDriversProps) {
             key={index}
             onClick={handleNavigateToFundamentals}
             className="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.03] transition-colors group cursor-pointer"
+            aria-label={`${driver.pillar}: ${driver.label} is ${driver.metric}. Click to view fundamentals tab.`}
           >
             <div className="flex items-center gap-3">
               <div className="text-gray-400 dark:text-gray-500 group-hover:text-vettr-accent transition-colors">
@@ -122,6 +123,7 @@ export function ScoreDrivers({ ticker, fundamentals }: ScoreDriversProps) {
       <button
         onClick={handleNavigateToFundamentals}
         className="w-full mt-4 text-xs text-vettr-accent hover:text-vettr-accent/80 transition-colors flex items-center justify-center gap-1 group"
+        aria-label="View all fundamentals data"
       >
         <span>View all fundamentals</span>
         <svg

@@ -56,7 +56,7 @@ function MetricCard({ label, value, subtitle, status, gauge }: MetricCardProps) 
           {label}
         </div>
         {gauge !== undefined && (
-          <div className="relative inline-flex items-center justify-center" style={{ width: size, height: size }}>
+          <div className="relative inline-flex items-center justify-center" style={{ width: size, height: size }} role="img" aria-label={`${label} gauge at ${gauge.toFixed(0)}%`}>
             <svg width={size} height={size} className="transform -rotate-90">
               {/* Track ring (background) */}
               <circle

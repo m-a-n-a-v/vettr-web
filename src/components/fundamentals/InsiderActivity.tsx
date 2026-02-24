@@ -48,7 +48,7 @@ export function InsiderActivityComponent({ data }: InsiderActivityProps) {
         </div>
 
         {/* Stacked Bar */}
-        <div className="flex h-8 rounded-lg overflow-hidden bg-white/5 mb-2">
+        <div className="flex h-8 rounded-lg overflow-hidden bg-white/5 mb-2" role="img" aria-label={`Ownership: ${data.insidersPercent.toFixed(1)}% insiders, ${data.institutionsPercent.toFixed(1)}% institutions, ${data.publicPercent.toFixed(1)}% public`}>
           <div
             className="bg-vettr-accent transition-all duration-1000 ease-out flex items-center justify-center"
             style={{ width: animateWidths ? `${data.insidersPercent}%` : '0%' }}

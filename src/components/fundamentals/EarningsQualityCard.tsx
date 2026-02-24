@@ -91,7 +91,7 @@ export function EarningsQualityCard({ data }: EarningsQualityCardProps) {
 
       {/* EQ Score Badge */}
       <div className="flex flex-col items-center mb-6">
-        <div className="relative inline-flex items-center justify-center" style={{ width: badgeSize, height: badgeSize }}>
+        <div className="relative inline-flex items-center justify-center" style={{ width: badgeSize, height: badgeSize }} role="img" aria-label={`Earnings Quality Score: ${animatedScore} out of 100`}>
           <svg width={badgeSize} height={badgeSize} className="transform -rotate-90">
             {/* Track ring (background) */}
             <circle
