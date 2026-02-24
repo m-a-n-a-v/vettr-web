@@ -386,3 +386,72 @@ Details:
 - Hover animation on arrow icon uses translate-x-0.5 for subtle rightward movement
 - Component gracefully handles missing fundamentals data with early return null
 ---
+
+## FUND-010: Add Financial Statements Summary section to Fundamentals tab
+Status: COMPLETE
+Date: Sun Feb 23 2026
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Added FinancialStatements interface to src/types/fundamentals.ts with comprehensive financial data structure
+  - annualData array with 4 periods of data (2024, 2023, 2022, 2021)
+  - Each period includes: date, revenue, costOfRevenue, grossProfit, operatingIncome, netIncome (Income Statement)
+  - Balance Sheet fields: totalAssets, totalLiabilities, totalEquity
+  - Cash Flow fields: operatingCashFlow, capex, freeCashFlow
+- Updated FundamentalsData umbrella type to include financialStatements field
+- Enhanced dummy data generator (src/lib/dummy-fundamentals.ts) with generateFinancialStatements function:
+  - Creates 4 years of realistic financial data (2021-2024) with growth patterns
+  - Base revenue range: $50M-$500M with annual growth rate between -10% to +25%
+  - Realistic margin calculations: grossMargin (25%-55%), operatingMargin (5%-25%), netMargin (2%-15%)
+  - Margin expansion/contraction over time (±2-3% per year)
+  - Balance sheet scaled to revenue with realistic asset multiples (1.2x-2.5x)
+  - Cash flow conversion ratios (0.8x-1.3x) applied to net income
+  - All values in millions ($M), formatted to 2 decimal places
+  - Data reversed to show most recent year first
+- Created src/components/fundamentals/FinancialStatements.tsx with collapsible accordion sections:
+  - 3 sections: Income Statement (5 line items), Balance Sheet (3 items), Cash Flow Statement (3 items)
+  - Each section is a clickable header with expand/collapse functionality
+  - Smooth animation using max-height transition (300ms duration)
+  - Chevron icon rotates 180° when expanded
+  - All sections default to collapsed state for clean initial presentation
+- Financial statement tables with comprehensive features:
+  - Periods displayed as columns (2024, 2023, 2022, 2021) from left to right
+  - Line items as rows with sticky first column for horizontal scrolling
+  - Values formatted with formatValue function: $M for millions, $B for billions (≥$1000M)
+  - Year-over-year growth calculated and displayed below each value
+  - Growth percentages color-coded: green (positive) or red (negative)
+  - Growth shown with + prefix for positive values
+  - Proper table styling with border-b on rows, sticky header with backdrop-blur-sm
+- Icons for each section using inline SVG:
+  - Income Statement: grid/dashboard icon
+  - Balance Sheet: balance/scale icon
+  - Cash Flow Statement: dollar sign/cash icon
+  - All icons use w-4 h-4 size with text-vettr-accent color
+- Added section to Fundamentals tab in stock detail page (src/app/(main)/stocks/[ticker]/page.tsx):
+  - Positioned between Earnings Quality and Peer Comparison sections as specified
+  - Section header with document icon and "Financial Statements" title
+  - Consistent spacing (space-y-4) and styling with other sections
+  - Added import for FinancialStatements component
+- All cards follow design system patterns:
+  - bg-vettr-card/50 with border-white/5
+  - rounded-2xl with proper padding
+  - Hover effects (hover:border-vettr-accent/20, hover:bg-white/[0.03])
+  - Smooth transitions (transition-all duration-300)
+- Build and lint checks passed successfully
+- Committed as: feat: FUND-010 - Add Financial Statements Summary section to Fundamentals tab
+
+**Learnings for future iterations:**
+- Collapsible sections implemented with useState managing a Set of open section IDs
+- max-height animation creates smooth expand/collapse (max-h-0 to max-h-[1000px])
+- Combined opacity and max-height transitions for professional accordion effect
+- formatValue function handles both millions and billions with appropriate suffixes
+- Growth calculation handles division by zero with null check
+- First period (most recent) shows no growth % since there's no previous period to compare
+- Sticky columns require left-0 positioning plus bg-vettr-card/80 backdrop-blur-sm for proper layering
+- Line item arrays defined outside component for better organization and reusability
+- getValue callbacks provide clean abstraction for accessing period data
+- Table uses min-w-max to prevent collapse during horizontal scroll on mobile
+- Reversed annualData in generator so [0] is most recent year (2024) for easier access
+- Deterministic dummy data maintains realistic relationships between income/balance/cash flow statements
+- Asset multiples and cash conversion ratios create financially coherent dummy statements
+- margin expansion/contraction over years creates realistic trend patterns
+---
