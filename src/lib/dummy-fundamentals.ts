@@ -4,7 +4,7 @@
  * Data is deterministic (same ticker always returns same values) using ticker string hash as seed
  */
 
-import { FundamentalsData, FinancialHealth, EarningsQuality, AnalystConsensus, PeerFinancials, FinancialStatements, ShortInterest } from '@/types/fundamentals';
+import { FundamentalsData, FinancialHealth, EarningsQuality, AnalystConsensus, PeerFinancials, FinancialStatements, ShortInterest, InsiderActivity } from '@/types/fundamentals';
 
 /**
  * Simple hash function to generate a seed from ticker string
@@ -370,6 +370,80 @@ function generateShortInterest(rng: SeededRandom): ShortInterest {
 }
 
 /**
+ * Generate dummy Insider Activity data
+ */
+function generateInsiderActivity(rng: SeededRandom): InsiderActivity {
+  // Ownership distribution
+  // Insiders: 5% to 35% (Canadian mining companies often have significant insider ownership)
+  const insidersPercent = parseFloat(rng.range(5, 35).toFixed(1));
+
+  // Institutions: 10% to 60% (varies widely)
+  const institutionsPercent = parseFloat(rng.range(10, 60).toFixed(1));
+
+  // Public: remainder (ensure total is 100%)
+  const publicPercent = parseFloat((100 - insidersPercent - institutionsPercent).toFixed(1));
+
+  // Net buy/sell ratio (-1.0 to +1.0)
+  // Positive = net buying, negative = net selling
+  const netBuySellRatio = parseFloat(rng.range(-1.0, 1.0).toFixed(2));
+
+  // Generate recent transactions (5 transactions)
+  const insiderNames = [
+    'John McDonald',
+    'Sarah Chen',
+    'Michael Thompson',
+    'Jennifer Williams',
+    'Robert Martinez',
+    'Emily Johnson',
+    'David Anderson',
+    'Lisa Brown',
+  ];
+
+  const relations = ['CEO', 'CFO', 'Director', 'COO', 'VP Operations', 'VP Exploration', 'Chairman', 'Officer'];
+
+  const recentTransactions = [];
+  for (let i = 0; i < 5; i++) {
+    const name = rng.choice(insiderNames);
+    const relation = rng.choice(relations);
+
+    // Bias toward buying if netBuySellRatio is positive, selling if negative
+    const isBuy = netBuySellRatio > 0
+      ? rng.next() < 0.7  // 70% chance of buy when net buying
+      : rng.next() < 0.3; // 30% chance of buy when net selling
+
+    const type: 'buy' | 'sell' = isBuy ? 'buy' : 'sell';
+
+    // Shares traded (1,000 to 500,000)
+    const shares = Math.round(rng.range(1, 500) * 1000);
+
+    // Date within last 90 days
+    const daysAgo = Math.floor(rng.range(1, 90));
+    const date = new Date();
+    date.setDate(date.getDate() - daysAgo);
+    const dateString = date.toISOString().split('T')[0];
+
+    recentTransactions.push({
+      name,
+      relation,
+      type,
+      shares,
+      date: dateString,
+    });
+  }
+
+  // Sort by date (most recent first)
+  recentTransactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+  return {
+    insidersPercent,
+    institutionsPercent,
+    publicPercent,
+    netBuySellRatio,
+    recentTransactions,
+  };
+}
+
+/**
  * Main function to generate complete dummy fundamentals data for a ticker
  * Data is deterministic based on ticker hash
  */
@@ -396,5 +470,6 @@ export function getDummyFundamentals(ticker: string): FundamentalsData {
     peRatioForward,
     dividendYield,
     shortInterest: generateShortInterest(rng),
+    insiderActivity: generateInsiderActivity(rng),
   };
 }

@@ -59,6 +59,7 @@ import { PeerComparisonFinancials } from '@/components/fundamentals/PeerComparis
 import { ScoreDrivers } from '@/components/fundamentals/ScoreDrivers';
 import { FinancialStatements } from '@/components/fundamentals/FinancialStatements';
 import { ShortInterestBadge } from '@/components/fundamentals/ShortInterestBadge';
+import { InsiderActivityComponent } from '@/components/fundamentals/InsiderActivity';
 import { SkeletonStockDetailHeader, SkeletonVetrScoreSection, SkeletonFilingRow, SkeletonMetricCard, SkeletonFundamentals } from '@/components/ui/SkeletonLoader';
 import Breadcrumb from '@/components/ui/Breadcrumb';
 import { StarIcon, StarFilledIcon, ShareIcon, MoreHorizontalIcon, ArrowUpIcon, ArrowDownIcon, UsersIcon, FlagIcon, ShieldCheckIcon, BarChartIcon, DocumentIcon, PrinterIcon } from '@/components/icons';
@@ -1037,6 +1038,11 @@ function StockDetailContent() {
                       <h2 className="text-lg font-semibold text-white">Analyst Consensus</h2>
                     </div>
                     <AnalystConsensusCard data={fundamentals.analystConsensus} />
+                  </div>
+
+                  {/* Insider Activity Section */}
+                  <div className="space-y-4">
+                    <InsiderActivityComponent data={fundamentals.insiderActivity} />
                   </div>
                 </div>
 

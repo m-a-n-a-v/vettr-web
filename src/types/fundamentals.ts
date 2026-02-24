@@ -125,6 +125,23 @@ export interface ShortInterest {
 }
 
 /**
+ * Insider Activity and ownership breakdown
+ */
+export interface InsiderActivity {
+  insidersPercent: number; // Insider ownership percentage
+  institutionsPercent: number; // Institutional ownership percentage
+  publicPercent: number; // Public ownership percentage
+  netBuySellRatio: number; // Net buy/sell ratio (positive = net buying, negative = net selling)
+  recentTransactions: Array<{
+    name: string; // Insider name
+    relation: string; // Relation to company (e.g., "CEO", "Director", "Officer")
+    type: 'buy' | 'sell';
+    shares: number; // Number of shares
+    date: string; // Transaction date
+  }>;
+}
+
+/**
  * Umbrella type containing all fundamentals data for a stock
  */
 export interface FundamentalsData {
@@ -138,4 +155,5 @@ export interface FundamentalsData {
   peRatioForward: number; // Forward P/E ratio
   dividendYield: number; // Dividend yield percentage (0-10)
   shortInterest: ShortInterest;
+  insiderActivity: InsiderActivity;
 }
