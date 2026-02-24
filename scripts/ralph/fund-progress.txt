@@ -509,3 +509,58 @@ Details:
 - The useFundamentals hook is already called in the component, so new cards immediately have access to data
 ---
 
+## FUND-012: Add Short Interest indicator to Overview tab
+Status: COMPLETE
+Date: Sun Feb 23 2026
+Working Directory: /Users/manav/Space/code/vettr-web
+Details:
+- Added ShortInterest interface to src/types/fundamentals.ts
+  - Fields: shortInterest (shares), shortInterestPercent, daysToCover, asOfDate
+- Updated FundamentalsData umbrella type to include shortInterest field
+- Enhanced dummy data generator (src/lib/dummy-fundamentals.ts) with generateShortInterest function:
+  - Short interest percentage: 0.5-15% range (realistic for Canadian small-caps)
+  - Days to cover: 0.5-10 days range
+  - Estimated shares short based on typical float sizes (10M-100M shares)
+  - Recent date generation (within last 14 days) for asOfDate field
+  - Deterministic generation using SeededRandom for consistency
+- Created src/components/fundamentals/ShortInterestBadge.tsx component:
+  - Compact inline badge displaying short interest % and days to cover in parentheses
+  - Color coding based on short interest percentage:
+    - Green (emerald-400): <3% (low short interest, less bearish)
+    - Yellow (yellow-400): 3-10% (moderate short interest)
+    - Red (red-400): >10% (high short interest, more bearish)
+  - Info icon (circle with exclamation) inline with badge
+  - Hover tooltip explaining what short interest means and showing as-of date
+  - Tooltip positioned above badge with arrow (bottom-full left-0 mb-2)
+  - Smooth transitions on hover (border color changes to vettr-accent/40)
+  - Badge styling: inline-flex with gap-2, px-3 py-2, rounded-lg
+  - Typography: uppercase tracking-wider label, semibold value, small days text
+- Integrated ShortInterestBadge into Overview tab (src/app/(main)/stocks/[ticker]/page.tsx):
+  - Added import for ShortInterestBadge component
+  - Positioned below Key Metrics section, above Peer Comparison (line ~738-742)
+  - Wrapped in conditional render: only shows when fundamentals data is loaded
+  - Single-line layout with flex justify-start for left alignment
+  - Clean spacing between sections
+- All styling follows design system patterns:
+  - Color-coded backgrounds (bg-{color}-400/10) and text (text-{color}-400)
+  - Border styling with color matching (border-{color}-400/20)
+  - Vettr dark theme card styling for tooltip (bg-vettr-card, border-white/10)
+  - Proper typography hierarchy and spacing
+- Build and lint checks passed successfully
+- Committed as: feat: FUND-012 - Add Short Interest indicator to Overview tab
+
+**Learnings for future iterations:**
+- Short interest is a unique TMX data point valuable for Canadian small-cap stocks
+- Color coding follows the same 3-tier pattern (green/yellow/red) used elsewhere in the app
+- Tooltip implementation uses absolute positioning with bottom-full for above-badge placement
+- MouseEnter/MouseLeave handlers manage tooltip visibility via useState
+- Days to cover formatted with toFixed(1) for single decimal precision
+- Short interest percentage formatted with toFixed(2) for two decimal precision
+- Info icon provides visual cue that badge is interactive/has tooltip
+- Conditional rendering (!fundamentalsLoading && fundamentals) ensures badge only shows when data is ready
+- Badge is intentionally compact (single-line) per acceptance criteria, not a full section
+- Positioned exactly where specified: below Key Metrics grid, above Peer Comparison
+- Date formatting uses toLocaleDateString() for locale-appropriate display in tooltip
+- Using inline-flex instead of flex allows badge to size to content width, not full parent width
+---
+
