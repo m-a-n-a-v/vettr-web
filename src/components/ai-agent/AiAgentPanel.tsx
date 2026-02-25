@@ -20,6 +20,7 @@ export function AiAgentPanel({
   children,
 }: AiAgentPanelProps) {
   const contentRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   // Handle Escape key to close panel
   useEffect(() => {
@@ -32,6 +33,42 @@ export function AiAgentPanel({
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isOpen, onClose]);
+
+  // Focus trap: keep focus within panel when open
+  useEffect(() => {
+    if (!isOpen || !panelRef.current) return;
+
+    const panel = panelRef.current;
+    const focusableElements = panel.querySelectorAll(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    const firstElement = focusableElements[0] as HTMLElement;
+    const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
+
+    // Focus first element when panel opens
+    firstElement?.focus();
+
+    const handleTabKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+
+      if (e.shiftKey) {
+        // Shift + Tab: focus last element if at first
+        if (document.activeElement === firstElement) {
+          e.preventDefault();
+          lastElement?.focus();
+        }
+      } else {
+        // Tab: focus first element if at last
+        if (document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement?.focus();
+        }
+      }
+    };
+
+    panel.addEventListener('keydown', handleTabKey);
+    return () => panel.removeEventListener('keydown', handleTabKey);
+  }, [isOpen, children]);
 
   // Auto-scroll to bottom when conversation updates
   useEffect(() => {
@@ -51,6 +88,7 @@ export function AiAgentPanel({
     <AnimatePresence>
       {isOpen && (
         <motion.div
+          ref={panelRef}
           initial={{ opacity: 0, y: 20, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -60,6 +98,11 @@ export function AiAgentPanel({
           aria-modal="true"
           aria-labelledby="ai-panel-title"
         >
+          {/* Drag Handle (Mobile only) */}
+          <div className="md:hidden flex justify-center pt-2 pb-1 shrink-0">
+            <div className="w-10 h-1 rounded-full bg-white/20" />
+          </div>
+
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 shrink-0">
             <div className="flex items-center gap-2">
@@ -85,7 +128,7 @@ export function AiAgentPanel({
                 VETTR AI
               </h2>
               {ticker && (
-                <span className="bg-vettr-accent/10 text-vettr-accent rounded-lg px-2 py-0.5 text-sm font-mono font-semibold">
+                <span className="bg-vettr-accent/10 text-vettr-accent rounded-lg px-2 py-0.5 text-sm font-mono font-semibold max-w-[150px] truncate">
                   {ticker}
                 </span>
               )}

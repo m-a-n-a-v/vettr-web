@@ -22,10 +22,14 @@ interface AiAgentContextType {
   ticker: string | null;
   conversation: AiAgentConversationEntry[];
   isLoading: boolean;
+  error: string | null;
+  lastQuestion: AiAgentQuestion | null;
   togglePanel: () => void;
   setTicker: (ticker: string) => void;
   askQuestion: (question: AiAgentQuestion) => Promise<void>;
   resetConversation: () => void;
+  retryLastQuestion: () => Promise<void>;
+  clearError: () => void;
 }
 
 const AiAgentContext = createContext<AiAgentContextType | null>(null);
@@ -59,6 +63,8 @@ export function AiAgentProvider({ children }: AiAgentProviderProps) {
     []
   );
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [lastQuestion, setLastQuestion] = useState<AiAgentQuestion | null>(null);
 
   // Load isOpen from sessionStorage on mount
   useEffect(() => {
@@ -97,6 +103,10 @@ export function AiAgentProvider({ children }: AiAgentProviderProps) {
     setConversation([]);
   }, []);
 
+  const clearError = useCallback(() => {
+    setError(null);
+  }, []);
+
   const askQuestion = useCallback(
     async (question: AiAgentQuestion) => {
       if (!ticker) {
@@ -105,9 +115,20 @@ export function AiAgentProvider({ children }: AiAgentProviderProps) {
       }
 
       setIsLoading(true);
+      setError(null);
+      setLastQuestion(question);
+
+      // Create timeout promise (10 seconds)
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error('TIMEOUT')), 10000);
+      });
 
       try {
-        const response = await apiAskQuestion(question.id, ticker);
+        // Race between API call and timeout
+        const response = await Promise.race([
+          apiAskQuestion(question.id, ticker),
+          timeoutPromise,
+        ]);
 
         // Add to conversation
         const entry: AiAgentConversationEntry = {
@@ -124,8 +145,10 @@ export function AiAgentProvider({ children }: AiAgentProviderProps) {
         if (error instanceof Error) {
           const errorMessage = error.message || 'Unknown error';
 
-          // Check if it's a tier limit error
-          if (
+          // Check if it's a timeout
+          if (errorMessage === 'TIMEOUT') {
+            setError('Taking longer than expected. Please try again.');
+          } else if (
             errorMessage.includes('limit') ||
             errorMessage.includes('429') ||
             errorMessage.includes('TIER_LIMIT_EXCEEDED')
@@ -135,13 +158,10 @@ export function AiAgentProvider({ children }: AiAgentProviderProps) {
               'error'
             );
           } else {
-            showToast(
-              `Failed to get response: ${errorMessage}`,
-              'error'
-            );
+            setError(errorMessage);
           }
         } else {
-          showToast('Failed to get response from AI agent', 'error');
+          setError('Failed to get response from AI agent');
         }
 
         // Mutate usage even on error to refresh the count
@@ -153,15 +173,25 @@ export function AiAgentProvider({ children }: AiAgentProviderProps) {
     [ticker, apiAskQuestion, showToast, mutateUsage]
   );
 
+  const retryLastQuestion = useCallback(async () => {
+    if (lastQuestion) {
+      await askQuestion(lastQuestion);
+    }
+  }, [lastQuestion, askQuestion]);
+
   const value: AiAgentContextType = {
     isOpen,
     ticker,
     conversation,
     isLoading,
+    error,
+    lastQuestion,
     togglePanel,
     setTicker,
     askQuestion,
     resetConversation,
+    retryLastQuestion,
+    clearError,
   };
 
   return (
