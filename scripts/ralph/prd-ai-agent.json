@@ -1,0 +1,207 @@
+{
+  "project": "VETTR Web App - AI Agent",
+  "phase": "Phase 2",
+  "branchName": "ralph/vettr-web-ai-agent",
+  "description": "VETTR AI Agent frontend — a conversational chat overlay for stock fundamentals analysis. Global floating button with ticker-aware context (auto-detects on stock pages, picker elsewhere). Users select from pre-defined questions and receive opinionated responses with verdicts. Includes daily usage tracking with upgrade prompts. Built with React 19, TypeScript, Tailwind CSS, Framer Motion, SWR.",
+  "totalStories": 11,
+  "userStories": [
+    {
+      "id": "WEB-066",
+      "title": "Create AI agent TypeScript types and API hooks",
+      "description": "As a developer, I want typed interfaces and SWR hooks for the AI agent API so that components can fetch questions, submit answers, and track usage with full type safety.",
+      "acceptanceCriteria": [
+        "Create src/types/ai-agent.ts with interfaces: AiAgentQuestion { id: string, label: string, category: string, parent_id: string | null, icon: string }, AiAgentDetail { label: string, value: string, status: 'safe' | 'warning' | 'danger' | 'neutral' }, AiAgentResponseData { summary: string, details: AiAgentDetail[], verdict: string, verdict_color: 'green' | 'yellow' | 'red' }, AiAgentResponse { question_id: string, ticker: string, response: AiAgentResponseData, follow_up_questions: AiAgentQuestion[], usage: AiAgentUsage }, AiAgentUsage { used: number, limit: number, remaining: number, resets_at: string }, AiAgentConversationEntry { question: AiAgentQuestion, response: AiAgentResponse, timestamp: number }",
+        "Create src/hooks/useAiAgentQuestions.ts — SWR hook calling GET /ai-agent/questions, accepts optional parentId param, returns { questions: AiAgentQuestion[], isLoading, error }",
+        "Create src/hooks/useAiAgent.ts — exports askQuestion(questionId: string, ticker: string) async function using api.post('/ai-agent/ask', { question_id, ticker }), returns typed AiAgentResponse",
+        "Create src/hooks/useAiAgentUsage.ts — SWR hook calling GET /ai-agent/usage, returns { usage: AiAgentUsage | undefined, isLoading, error, mutate }",
+        "All hooks use 'use client' directive and follow existing SWR patterns (conditional fetching, error handling)",
+        "npm run build passes"
+      ],
+      "priority": 1,
+      "passes": true
+    },
+    {
+      "id": "WEB-067",
+      "title": "Create VETTR AI floating action button",
+      "description": "As a user, I want to see a floating AI button on all main pages so that I can quickly access the VETTR AI assistant from anywhere in the app.",
+      "acceptanceCriteria": [
+        "Create src/components/ai-agent/AiAgentButton.tsx as a floating action button (FAB)",
+        "Position: fixed bottom-right, bottom-24 right-4 on mobile (clearing bottom nav), bottom-6 right-6 on desktop",
+        "Design: 56px circle with VETTR AI sparkle/brain SVG icon in vettr-accent green on dark background (bg-vettr-dark border border-white/10)",
+        "Show remaining questions badge: small circle (20px) at top-right of button showing remaining count (e.g., '3'), badge uses bg-vettr-accent text-vettr-navy for contrast",
+        "Subtle breathing pulse animation when idle: scale oscillates 1.0 to 1.03 over 3 seconds (use CSS animation, not Framer Motion to reduce bundle)",
+        "Click calls togglePanel() from AiAgent context",
+        "When panel is open, button shows X (close) icon instead of sparkle icon",
+        "Keyboard accessible: focusable with tab, Enter/Space toggles panel, aria-label='Open VETTR AI assistant'",
+        "npm run build passes"
+      ],
+      "priority": 2,
+      "passes": true
+    },
+    {
+      "id": "WEB-068",
+      "title": "Create AI agent chat panel overlay",
+      "description": "As a user, I want a slide-in chat panel when I click the AI button so that I can interact with VETTR AI without leaving my current page.",
+      "acceptanceCriteria": [
+        "Create src/components/ai-agent/AiAgentPanel.tsx as a slide-in overlay panel",
+        "Desktop: 400px wide, anchored to bottom-right, max-height 600px with rounded-2xl corners, positioned above the FAB button",
+        "Mobile (<768px): full-width, slides up from bottom, takes 85vh height with rounded-t-2xl top corners",
+        "Header: 'VETTR AI' title in font-semibold with sparkle icon, current ticker shown as accent chip (e.g., 'SHOP' in bg-vettr-accent/10 text-vettr-accent rounded-lg), close X button on right",
+        "Content area: scrollable div with conversation entries (questions + responses), auto-scrolls to bottom on new entries",
+        "Footer: usage bar component (from WEB-071) showing daily usage",
+        "Panel background: bg-vettr-dark border border-white/10 with subtle shadow-2xl",
+        "Framer Motion animation: slide up from bottom with spring physics (type: 'spring', damping: 25, stiffness: 300)",
+        "Closes on Escape key press",
+        "z-index: z-40 (above main content, below modals at z-50)",
+        "npm run build passes"
+      ],
+      "priority": 3,
+      "passes": true
+    },
+    {
+      "id": "WEB-069",
+      "title": "Create question selection cards UI",
+      "description": "As a user, I want to see clearly labeled question cards I can tap to ask VETTR AI about a stock so that I don't have to type anything.",
+      "acceptanceCriteria": [
+        "Create src/components/ai-agent/AiAgentQuestions.tsx accepting questions: AiAgentQuestion[] and onSelect: (question: AiAgentQuestion) => void props",
+        "Initial questions (6 cards): rendered as styled cards in a 1-column layout with left icon, question text, and right chevron arrow",
+        "Card style: bg-white/5 border border-white/10 rounded-xl px-4 py-3 hover:border-vettr-accent/30 hover:bg-white/10 transition-all cursor-pointer",
+        "Each card has a category-specific icon (SVG): health=heart, analyst=chart-bar, insider=users, valuation=scale, earnings=trending-up, red-flags=flag",
+        "Question text interpolates {TICKER} with actual ticker (e.g., 'How financially healthy is SHOP?')",
+        "Follow-up questions (after a response): rendered as smaller chips in a flex-wrap row below the response, style: bg-vettr-accent/10 text-vettr-accent text-xs rounded-full px-3 py-1.5 hover:bg-vettr-accent/20 cursor-pointer",
+        "Disabled state when isLoading=true: opacity-50 pointer-events-none",
+        "When daily limit is reached: all cards show opacity-40 with 'Upgrade to ask more' overlay",
+        "Stagger-in animation: each card fades in with 50ms delay using Framer Motion",
+        "npm run build passes"
+      ],
+      "priority": 4,
+      "passes": true
+    },
+    {
+      "id": "WEB-070",
+      "title": "Create response display component with verdict badges",
+      "description": "As a user, I want to see AI responses formatted as clear, visual cards with colored verdicts and data points so that I can quickly understand the analysis.",
+      "acceptanceCriteria": [
+        "Create src/components/ai-agent/AiAgentResponse.tsx accepting response: AiAgentResponseData prop",
+        "Layout: chat-bubble style card with rounded-2xl bg-vettr-card/50 border border-white/5 p-4",
+        "Top: verdict badge — rounded-full px-3 py-1 text-xs font-semibold, color based on verdict_color (green: bg-green-500/10 text-green-400, yellow: bg-yellow-500/10 text-yellow-400, red: bg-red-500/10 text-red-400)",
+        "Middle: summary text — text-sm text-gray-300 leading-relaxed, supports markdown bold (**text**) rendered as <strong> tags via simple regex replacement",
+        "Bottom: details grid — 2-column grid of label/value pairs, each with a small status dot (8px circle) colored by status field (safe=green, warning=yellow, danger=red, neutral=gray)",
+        "Loading state: create AiAgentResponseSkeleton with 3-dot pulse animation (three circles animating opacity in sequence) and 'Analyzing...' text",
+        "Fade-in animation when response arrives (opacity 0->1, y: 10->0 over 300ms)",
+        "npm run build passes"
+      ],
+      "priority": 5,
+      "passes": true
+    },
+    {
+      "id": "WEB-071",
+      "title": "Create usage counter bar and upgrade prompt",
+      "description": "As a user, I want to see how many questions I have left today and get prompted to upgrade when I hit the limit so that I understand the value of upgrading.",
+      "acceptanceCriteria": [
+        "Create src/components/ai-agent/AiAgentUsageBar.tsx accepting usage: AiAgentUsage | undefined prop",
+        "Progress bar: thin horizontal bar (h-1.5 rounded-full) showing used/limit ratio, fill color transitions from vettr-accent (under 50%) to yellow-400 (50-80%) to red-400 (80%+)",
+        "Text below bar: 'X of Y questions used today' in text-xs text-gray-500",
+        "When limit reached (remaining === 0): bar is fully red, text changes to 'Daily limit reached' in text-red-400",
+        "Upgrade CTA appears when remaining <= 1 OR limit reached: 'Upgrade to PRO for 15/day' or 'Upgrade to PREMIUM for unlimited' based on current tier, styled as text-vettr-accent text-xs hover:underline cursor-pointer, links to /profile",
+        "Countdown: show 'Resets in Xh Ym' calculated from resets_at ISO timestamp, updates every minute",
+        "For PREMIUM users (limit = -1 or Infinity): show 'Unlimited questions' with no progress bar",
+        "Loading state: skeleton bar with pulse animation",
+        "npm run build passes"
+      ],
+      "priority": 6,
+      "passes": true
+    },
+    {
+      "id": "WEB-072",
+      "title": "Create ticker context detection and stock picker",
+      "description": "As a user, I want the AI panel to automatically know which stock I'm looking at, or let me pick one if I'm on a different page, so that questions are always relevant.",
+      "acceptanceCriteria": [
+        "Create src/components/ai-agent/AiAgentTickerPicker.tsx for selecting a stock when not on a stock detail page",
+        "Auto-detection: when pathname matches /stocks/[ticker], extract ticker from URL and auto-set in AI agent context",
+        "Ticker display: in panel header, show ticker as a chip (bg-vettr-accent/10 text-vettr-accent rounded-lg px-2 py-0.5 text-sm font-mono font-semibold) with an X button to clear/change",
+        "When no ticker is set (not on stock page): show a mini search input in the panel body instead of questions — placeholder: 'Search for a stock to get started...'",
+        "Search uses existing useStockSearch hook with 300ms debounce",
+        "Search results: list of up to 5 stocks with ticker + company name, clicking one sets the ticker in context and shows questions",
+        "Changing ticker resets the conversation (clears all entries)",
+        "Search input style follows existing app pattern: bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm",
+        "npm run build passes"
+      ],
+      "priority": 7,
+      "passes": true
+    },
+    {
+      "id": "WEB-073",
+      "title": "Create AI agent context provider for state management",
+      "description": "As a developer, I want a React context to manage AI agent state (open/closed, ticker, conversation, loading) so that all AI agent components can share state cleanly.",
+      "acceptanceCriteria": [
+        "Create src/contexts/AiAgentContext.tsx with AiAgentProvider and useAiAgent hook",
+        "State: isOpen (boolean), ticker (string | null), conversation (AiAgentConversationEntry[]), isLoading (boolean)",
+        "Actions: togglePanel() — toggles isOpen, setTicker(ticker: string) — sets ticker and resets conversation, askQuestion(question: AiAgentQuestion) — sets isLoading, calls API via useAiAgent hook, appends entry to conversation, clears isLoading, resetConversation() — clears conversation array",
+        "Persist isOpen in sessionStorage key 'vettr_ai_panel_open' so panel state survives page navigation within session",
+        "Auto-detect ticker from pathname on mount and on pathname changes (usePathname from next/navigation)",
+        "When askQuestion succeeds, mutate usage SWR cache to reflect updated count",
+        "When askQuestion gets 429 (TIER_LIMIT_EXCEEDED), show toast via useToast with upgrade message",
+        "Provider wraps children, exports via useAiAgentContext() hook with null check",
+        "npm run build passes"
+      ],
+      "priority": 8,
+      "passes": true
+    },
+    {
+      "id": "WEB-074",
+      "title": "Integrate AI agent components in main app layout",
+      "description": "As a user, I want the AI agent button and panel to be available on all authenticated pages so that I can access it from anywhere in the app.",
+      "acceptanceCriteria": [
+        "Modify src/app/(main)/layout.tsx to add AiAgentProvider wrapping MainLayoutContent (inside QuickSearchProvider, after ProtectedRoute)",
+        "Add <AiAgentButton /> component inside the ProtectedRoute div, after the QuickSearch component",
+        "Add <AiAgentPanel /> component after AiAgentButton",
+        "Panel renders conditionally based on isOpen from context",
+        "Ensure z-index layering: main content (z-10) < AI panel (z-40) < modals (z-50) < toast (z-[100])",
+        "AI button does NOT appear on auth pages ((auth) route group) — only in (main) layout",
+        "Panel does not interfere with existing overlays: QuickSearch (cmd+K), Onboarding, KeyboardShortcutsModal, ExecutiveDetail modal, VetrScoreDetail modal",
+        "On stock detail page navigation, AI agent context auto-updates ticker",
+        "npm run build and npm run lint pass"
+      ],
+      "priority": 9,
+      "passes": true
+    },
+    {
+      "id": "WEB-075",
+      "title": "Add animations, transitions, and conversation flow polish",
+      "description": "As a user, I want smooth animations and a polished conversation flow so that interacting with VETTR AI feels premium and responsive.",
+      "acceptanceCriteria": [
+        "AiAgentButton breathing pulse: CSS keyframes animation, scale 1.0->1.03->1.0 over 3s, infinite loop, pauses when panel is open",
+        "Panel open/close: Framer Motion AnimatePresence with spring animation (initial: { opacity: 0, y: 20, scale: 0.95 }, animate: { opacity: 1, y: 0, scale: 1 })",
+        "Question cards: stagger children with 50ms delay per card on mount (Framer Motion staggerChildren)",
+        "Response appear: fade up animation (opacity 0->1, y: 10->0) with 300ms duration after data loads",
+        "Follow-up chips: fade in 200ms after response animation completes",
+        "Auto-scroll: when new conversation entry is added, smoothly scroll content area to bottom (scrollIntoView with behavior: 'smooth')",
+        "Loading dots: three 8px circles with sequential opacity animation (0.3->1->0.3) offset by 150ms each",
+        "Conversation history: previous Q&A pairs stay visible above, slightly dimmed (opacity-70), current Q&A is full opacity",
+        "npm run build passes"
+      ],
+      "priority": 10,
+      "passes": true
+    },
+    {
+      "id": "WEB-076",
+      "title": "Mobile responsiveness and edge case handling",
+      "description": "As a user on mobile, I want the AI panel to work well on small screens, and I want graceful handling of errors and missing data.",
+      "acceptanceCriteria": [
+        "Mobile panel (<768px): full-width bottom sheet taking 85vh, rounded-t-2xl, with drag handle at top (40px wide, 4px tall, rounded-full, bg-white/20 centered)",
+        "Mobile FAB position: bottom-24 right-4 (clears bottom navigation bar which is h-16 + padding)",
+        "When fundamentals data is unavailable for ticker: show friendly message 'Data is not yet available for {TICKER}. Try a different stock.' with search option",
+        "API error handling: show error card with red-400 icon, error message text, and 'Try again' button that re-sends the last question",
+        "Network timeout: after 10s with no response, show 'Taking longer than expected...' with option to cancel",
+        "Empty conversation state: show welcome message 'Ask me anything about {TICKER}' with sparkle icon and the initial question cards below",
+        "Very long stock names: truncate with ellipsis in header chip (max-w-[150px] truncate)",
+        "Viewport resize: panel smoothly adapts between mobile/desktop layouts",
+        "Accessibility: all interactive elements have aria-labels, panel has role='dialog' aria-modal='true', focus trap when panel is open",
+        "npm run build and npm run lint pass"
+      ],
+      "priority": 11,
+      "passes": false
+    }
+  ]
+}
