@@ -10,7 +10,7 @@ import QuickSearch from '@/components/QuickSearch';
 import { AiAgentButton } from '@/components/ai-agent/AiAgentButton';
 import { AiAgentPanel } from '@/components/ai-agent/AiAgentPanel';
 import { AiAgentQuestions } from '@/components/ai-agent/AiAgentQuestions';
-import { AiAgentResponse } from '@/components/ai-agent/AiAgentResponse';
+import { AiAgentResponse, AiAgentResponseSkeleton } from '@/components/ai-agent/AiAgentResponse';
 import { AiAgentUsageBar } from '@/components/ai-agent/AiAgentUsageBar';
 import { AiAgentTickerPicker } from '@/components/ai-agent/AiAgentTickerPicker';
 import { useAuth } from '@/contexts/AuthContext';
@@ -117,39 +117,50 @@ function MainLayoutContent({ children }: { children: React.ReactNode }) {
           ) : (
             <div className="space-y-4">
               {/* Render conversation history */}
-              {conversation.map((entry, index) => (
-                <div key={entry.timestamp} className="space-y-3">
-                  {/* Question asked (optional display) */}
-                  <div className="text-xs text-gray-500 dark:text-gray-500">
-                    {entry.question.label.replace(/\{TICKER\}/g, ticker)}
-                  </div>
+              {conversation.map((entry, index) => {
+                const isLatest = index === conversation.length - 1;
+                return (
+                  <div
+                    key={entry.timestamp}
+                    className={`space-y-3 transition-opacity duration-300 ${
+                      isLatest ? 'opacity-100' : 'opacity-70'
+                    }`}
+                  >
+                    {/* Question asked (optional display) */}
+                    <div className="text-xs text-gray-500 dark:text-gray-500">
+                      {entry.question.label.replace(/\{TICKER\}/g, ticker)}
+                    </div>
 
-                  {/* Response */}
-                  <AiAgentResponse response={entry.response.response} />
+                    {/* Response */}
+                    <AiAgentResponse response={entry.response.response} />
 
-                  {/* Follow-up questions (only for most recent entry) */}
-                  {index === conversation.length - 1 &&
-                    entry.response.follow_up_questions &&
-                    entry.response.follow_up_questions.length > 0 && (
-                      <div className="space-y-2">
-                        <div className="text-xs text-gray-500 dark:text-gray-500 font-medium">
-                          Follow-up questions:
+                    {/* Follow-up questions (only for most recent entry) */}
+                    {isLatest &&
+                      entry.response.follow_up_questions &&
+                      entry.response.follow_up_questions.length > 0 && (
+                        <div className="space-y-2">
+                          <div className="text-xs text-gray-500 dark:text-gray-500 font-medium">
+                            Follow-up questions:
+                          </div>
+                          <AiAgentQuestions
+                            questions={entry.response.follow_up_questions}
+                            onSelect={askQuestion}
+                            ticker={ticker}
+                            isLoading={aiLoading}
+                            limitReached={usage?.remaining === 0}
+                            variant="follow-up"
+                          />
                         </div>
-                        <AiAgentQuestions
-                          questions={entry.response.follow_up_questions}
-                          onSelect={askQuestion}
-                          ticker={ticker}
-                          isLoading={aiLoading}
-                          limitReached={usage?.remaining === 0}
-                          variant="follow-up"
-                        />
-                      </div>
-                    )}
-                </div>
-              ))}
+                      )}
+                  </div>
+                );
+              })}
+
+              {/* Loading skeleton (when waiting for response) */}
+              {aiLoading && <AiAgentResponseSkeleton />}
 
               {/* Initial questions (when no conversation) */}
-              {conversation.length === 0 && (
+              {conversation.length === 0 && !aiLoading && (
                 <div className="space-y-3">
                   <div className="text-center py-4">
                     <div className="text-sm text-gray-400 dark:text-gray-400 mb-3">
