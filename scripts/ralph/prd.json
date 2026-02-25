@@ -164,7 +164,7 @@
         "npm run build and npm run lint pass"
       ],
       "priority": 9,
-      "passes": false
+      "passes": true
     },
     {
       "id": "WEB-075",
