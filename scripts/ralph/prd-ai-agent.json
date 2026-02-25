@@ -18,7 +18,7 @@
         "npm run build passes"
       ],
       "priority": 1,
-      "passes": false
+      "passes": true
     },
     {
       "id": "WEB-067",
@@ -182,7 +182,7 @@
         "npm run build passes"
       ],
       "priority": 10,
-      "passes": false
+      "passes": true
     },
     {
       "id": "WEB-076",
@@ -201,7 +201,7 @@
         "npm run build and npm run lint pass"
       ],
       "priority": 11,
-      "passes": false
+      "passes": true
     }
   ]
 }
