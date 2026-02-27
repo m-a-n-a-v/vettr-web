@@ -15,9 +15,10 @@ interface UseSubscriptionReturn {
  * Hook to fetch current subscription tier and limits
  * @returns Subscription object with tier and limits, loading/error states, and mutate function
  */
-export function useSubscription(): UseSubscriptionReturn {
+export function useSubscription(options?: { enabled?: boolean }): UseSubscriptionReturn {
+  const enabled = options?.enabled ?? true;
   const { data, error, isLoading, mutate } = useSWR<Subscription, Error>(
-    '/subscription',
+    enabled ? '/subscription' : null,
     async (url: string): Promise<Subscription> => {
       const response = await api.get<Subscription>(url);
       if (!response.success || !response.data) {

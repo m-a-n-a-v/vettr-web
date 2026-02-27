@@ -8,6 +8,7 @@ import { useSearchParams } from 'next/navigation'
 import { useStocks } from '@/hooks/useStocks'
 import { useWatchlist } from '@/hooks/useWatchlist'
 import { useSubscription } from '@/hooks/useSubscription'
+import { useAuth } from '@/contexts/AuthContext'
 import { useToast } from '@/contexts/ToastContext'
 import { useRefresh } from '@/hooks/useRefresh'
 import { usePullToRefresh } from '@/hooks/usePullToRefresh'
@@ -58,6 +59,7 @@ function StocksPageContent() {
   const [currentPage, setCurrentPage] = useState(1)
   const [perPage, setPerPage] = useState(25)
   const hasLoadedOnce = useRef(false)
+  const { isAuthenticated } = useAuth()
   const { showToast } = useToast()
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
 
@@ -101,8 +103,8 @@ function StocksPageContent() {
     limit: perPage,
     offset: (currentPage - 1) * perPage,
   })
-  const { watchlist, addToWatchlist, removeFromWatchlist, isAdding, isRemoving, isLoading: watchlistLoading } = useWatchlist()
-  const { subscription, isLoading: subscriptionLoading } = useSubscription()
+  const { watchlist, addToWatchlist, removeFromWatchlist, isAdding, isRemoving, isLoading: watchlistLoading } = useWatchlist({ enabled: isAuthenticated })
+  const { subscription, isLoading: subscriptionLoading } = useSubscription({ enabled: isAuthenticated })
 
   // Track first load for skeleton
   useEffect(() => {
