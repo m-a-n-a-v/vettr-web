@@ -74,8 +74,8 @@ export default function FilingDetailPage() {
         <EmptyState
           title="Filing Not Found"
           description="The filing you're looking for could not be found or has been removed."
-          actionLabel="Back to Discovery"
-          onAction={() => router.push('/discovery')}
+          actionLabel="Back to News"
+          onAction={() => router.push('/news')}
         />
       </div>
     );
@@ -117,7 +117,7 @@ export default function FilingDetailPage() {
         {/* Breadcrumb */}
         <Breadcrumb
           items={[
-            { label: 'Filings', href: '/discovery' },
+            { label: 'Filings', href: '/news' },
             { label: filing.title }
           ]}
         />

@@ -11,6 +11,7 @@ import UpgradeModal from '@/components/UpgradeModal';
 import { useToast } from '@/contexts/ToastContext';
 import FeedbackForm from '@/components/FeedbackForm';
 import Onboarding from '@/components/Onboarding';
+import PortfolioManager from '@/components/PortfolioManager';
 import { SkeletonUserHeader, SkeletonProfileSection } from '@/components/ui/SkeletonLoader';
 import { api } from '@/lib/api-client';
 
@@ -284,6 +285,9 @@ export default function ProfilePage() {
             </Link>
           </div>
         </div>
+
+        {/* Portfolio Management */}
+        <PortfolioManager />
 
         {/* Account Section */}
         <div className="bg-white dark:bg-vettr-card/30 border border-gray-200 dark:border-white/5 rounded-2xl overflow-hidden">

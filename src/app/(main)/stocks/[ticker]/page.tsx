@@ -32,6 +32,7 @@ import { useExecutives } from '@/hooks/useExecutives';
 import { useWatchlist } from '@/hooks/useWatchlist';
 import { useRedFlags } from '@/hooks/useRedFlags';
 import { useRedFlagHistory } from '@/hooks/useRedFlagHistory';
+import { useAllHoldings } from '@/hooks/usePortfolio';
 
 import { useVetrScoreComparison } from '@/hooks/useVetrScoreComparison';
 import { useVetrScoreTrend } from '@/hooks/useVetrScoreTrend';
@@ -110,6 +111,9 @@ function StockDetailContent() {
   const { data: fundamentals, isLoading: fundamentalsLoading } = useFundamentals({ ticker });
   const { comparison, isLoading: comparisonLoading } = useVetrScoreComparison({ ticker });
   const { trend, isLoading: trendLoading } = useVetrScoreTrend({ ticker });
+
+  const { holdings: allHoldings } = useAllHoldings();
+  const tickerHoldings = useMemo(() => allHoldings.filter(h => h.ticker === ticker), [allHoldings, ticker]);
 
   const isInWatchlist = watchlist.some(item => item.ticker === ticker);
   const isTogglingFavorite = isAdding || isRemoving;
@@ -491,6 +495,29 @@ function StockDetailContent() {
             )}
           </div>
         </div>
+
+        {/* Portfolio Holdings Banner */}
+        {tickerHoldings.length > 0 && (
+          <div className="mb-4 bg-vettr-accent/5 border border-vettr-accent/20 rounded-xl p-3">
+            <div className="flex items-center gap-3 flex-wrap">
+              <span className="text-xs font-semibold text-vettr-accent uppercase tracking-wide">In Your Portfolio</span>
+              {tickerHoldings.map((h) => (
+                <div key={h.id} className="flex items-center gap-3 text-xs">
+                  <span className="text-gray-900 dark:text-white font-medium">{h.quantity.toLocaleString()} shares</span>
+                  <span className="text-gray-500">@ ${h.average_cost?.toFixed(2) ?? 'N/A'}</span>
+                  {h.unrealized_pnl != null && (
+                    <span className={h.unrealized_pnl >= 0 ? 'text-vettr-accent font-medium' : 'text-red-400 font-medium'}>
+                      {h.unrealized_pnl >= 0 ? '+' : ''}{h.unrealized_pnl_pct?.toFixed(2) ?? '0.00'}%
+                    </span>
+                  )}
+                  {h.current_value != null && (
+                    <span className="text-gray-400">${h.current_value.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Tab navigation */}
         <div className="sticky top-16 z-30 bg-lightBg dark:bg-vettr-navy py-3 -mx-6 px-6 flex gap-6 border-b border-gray-200 dark:border-white/5 mb-6" role="tablist" aria-label="Stock information tabs">

@@ -34,7 +34,7 @@ export default function StockNotFound() {
             Browse Stocks
           </Link>
           <Link
-            href="/discovery"
+            href="/stocks"
             className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white font-semibold rounded-xl hover:bg-gray-200 dark:hover:bg-white/10 transition-colors"
           >
             <SearchIcon className="w-4 h-4" />

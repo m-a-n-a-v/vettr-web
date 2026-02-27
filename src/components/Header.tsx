@@ -13,20 +13,22 @@ import { SearchIcon, RefreshIcon, BellIcon, ChevronDownIcon, CheckCircleIcon, Al
 // Map pathname to page title
 const getPageTitle = (pathname: string): string => {
   if (pathname === '/pulse') return 'Pulse';
-  if (pathname === '/discovery') return 'Discovery';
+  if (pathname === '/news') return 'News';
   if (pathname === '/stocks') return 'Stocks';
   if (pathname?.startsWith('/stocks/')) {
-    // Extract ticker from path
     const parts = pathname.split('/');
     const ticker = parts[2];
     return ticker?.toUpperCase() || 'Stock Details';
   }
   if (pathname?.startsWith('/filings/')) return 'Filing Details';
-  if (pathname === '/alerts') return 'Alerts';
+  if (pathname === '/ai') return 'AI Analysis';
   if (pathname === '/profile') return 'Profile';
   if (pathname === '/profile/settings') return 'Settings';
   if (pathname === '/profile/glossary') return 'Glossary';
   if (pathname === '/profile/faq') return 'FAQ';
+  // Legacy routes
+  if (pathname === '/discovery') return 'Discovery';
+  if (pathname === '/alerts') return 'Alerts';
   return 'VETTR';
 };
 
@@ -317,7 +319,7 @@ export function Header() {
                   {/* Footer */}
                   <div className="px-4 py-2.5 border-t border-gray-200 dark:border-white/5">
                     <Link
-                      href="/alerts"
+                      href="/pulse"
                       onClick={() => setIsNotificationsOpen(false)}
                       className="block text-center text-xs font-medium text-vettr-accent hover:text-vettr-accent/80 transition-colors"
                     >

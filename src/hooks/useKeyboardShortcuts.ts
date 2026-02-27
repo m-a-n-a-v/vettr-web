@@ -88,9 +88,9 @@ export const useKeyboardShortcuts = (options: UseKeyboardShortcutsOptions = {}) 
       // Number keys 1-5: Navigate to tabs
       const navigationMap: Record<string, string> = {
         '1': '/pulse',
-        '2': '/discovery',
+        '2': '/news',
         '3': '/stocks',
-        '4': '/alerts',
+        '4': '/ai',
         '5': '/profile',
       };
 

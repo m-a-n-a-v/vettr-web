@@ -4,12 +4,12 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useUnreadAlertCount } from '@/hooks/useUnreadAlertCount';
+import { usePortfolioAlertUnreadCount } from '@/hooks/usePortfolioAlerts';
 import {
   PulseIcon,
-  CompassIcon,
+  NewspaperIcon,
   GridIcon,
-  BellIcon,
+  ChatIcon,
   UserIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -24,9 +24,9 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { label: 'Pulse', href: '/pulse', icon: PulseIcon },
-  { label: 'Discovery', href: '/discovery', icon: CompassIcon },
+  { label: 'News', href: '/news', icon: NewspaperIcon },
   { label: 'Stocks', href: '/stocks', icon: GridIcon },
-  { label: 'Alerts', href: '/alerts', icon: BellIcon },
+  { label: 'AI', href: '/ai', icon: ChatIcon },
   { label: 'Profile', href: '/profile', icon: UserIcon },
 ];
 
@@ -56,7 +56,7 @@ export function Navigation() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const { unreadCount } = useUnreadAlertCount();
+  const { unreadCount } = usePortfolioAlertUnreadCount();
 
   const isActive = (href: string) => {
     return pathname === href || pathname?.startsWith(href + '/');
@@ -132,7 +132,7 @@ export function Navigation() {
                   >
                     <span className="relative">
                       <IconComponent className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
-                      {item.href === '/alerts' && unreadCount > 0 && (
+                      {item.href === '/pulse' && unreadCount > 0 && (
                         <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold px-1">
                           {unreadCount > 99 ? '99+' : unreadCount}
                         </span>
@@ -226,7 +226,7 @@ export function Navigation() {
                   )}
                   <span className="relative">
                     <IconComponent className="w-5 h-5" aria-hidden="true" />
-                    {item.href === '/alerts' && unreadCount > 0 && (
+                    {item.href === '/pulse' && unreadCount > 0 && (
                       <span className="absolute -top-1.5 -right-2 min-w-[16px] h-4 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold px-1">
                         {unreadCount > 99 ? '99+' : unreadCount}
                       </span>
