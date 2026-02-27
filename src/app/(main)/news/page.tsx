@@ -1,7 +1,18 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import { useNewsArticles, useMaterialNews, useFilingCalendar } from '@/hooks/useNews';
+
+// ─── BNN RSS Item type (from /api/news) ───
+interface BnnRssItem {
+  title: string;
+  link: string;
+  description: string;
+  pubDate: string;
+  source: string;
+  imageUrl: string | null;
+}
 
 const SOURCE_LABELS: Record<string, string> = {
   all: 'All Sources',
@@ -27,20 +38,97 @@ const FILING_STATUS_COLORS: Record<string, string> = {
 };
 
 export default function NewsPage() {
+  const { isAuthenticated } = useAuth();
   const [activeSource, setActiveSource] = useState<string>('all');
   const [activeTab, setActiveTab] = useState<'news' | 'filings'>('news');
 
-  const { articles, isLoading: isLoadingNews } = useNewsArticles({
+  // BNN RSS feed (always available, no auth needed)
+  const [bnnArticles, setBnnArticles] = useState<BnnRssItem[]>([]);
+  const [isLoadingBnn, setIsLoadingBnn] = useState(true);
+
+  // Backend API data (requires auth)
+  const { articles: backendArticles, isLoading: isLoadingBackend } = useNewsArticles({
     source: activeSource === 'all' ? undefined : activeSource,
     limit: 20,
   });
-  const { articles: materialNews, isLoading: isLoadingMaterial } = useMaterialNews(5);
+  const { articles: materialNews } = useMaterialNews(5);
   const { filings, isLoading: isLoadingFilings } = useFilingCalendar({ limit: 20 });
+
+  // Fetch BNN RSS from our Next.js API route (no auth required)
+  useEffect(() => {
+    const fetchBnnRss = async () => {
+      try {
+        setIsLoadingBnn(true);
+        const res = await fetch('/api/news');
+        if (res.ok) {
+          const data = await res.json();
+          setBnnArticles(data.items ?? []);
+        }
+      } catch (err) {
+        console.error('Failed to fetch BNN RSS:', err);
+      } finally {
+        setIsLoadingBnn(false);
+      }
+    };
+    fetchBnnRss();
+  }, []);
+
+  // Merge backend articles with BNN RSS (deduplicate by title)
+  const allArticles = useMemo(() => {
+    // If we have backend articles, use those as primary
+    if (backendArticles.length > 0) {
+      // Filter by source if selected
+      if (activeSource !== 'all' && activeSource !== 'bnn') {
+        return backendArticles;
+      }
+      // Merge BNN RSS with backend (backend takes priority)
+      const backendTitles = new Set(backendArticles.map((a) => a.title.toLowerCase().trim()));
+      const uniqueBnn = bnnArticles
+        .filter((b) => !backendTitles.has(b.title.toLowerCase().trim()))
+        .map((b) => ({
+          id: `bnn-${b.link}`,
+          source: 'bnn' as const,
+          source_url: b.link,
+          title: b.title,
+          summary: b.description,
+          content: null,
+          image_url: b.imageUrl,
+          published_at: b.pubDate ? new Date(b.pubDate).toISOString() : new Date().toISOString(),
+          tickers: [] as string[],
+          sectors: [] as string[],
+          is_material: false,
+        }));
+      return [...backendArticles, ...uniqueBnn].sort(
+        (a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime()
+      );
+    }
+
+    // No backend articles - use BNN RSS directly
+    if (activeSource !== 'all' && activeSource !== 'bnn') {
+      return []; // No data for non-BNN sources without backend
+    }
+
+    return bnnArticles.map((b) => ({
+      id: `bnn-${b.link}`,
+      source: 'bnn' as const,
+      source_url: b.link,
+      title: b.title,
+      summary: b.description,
+      content: null,
+      image_url: b.imageUrl,
+      published_at: b.pubDate ? new Date(b.pubDate).toISOString() : new Date().toISOString(),
+      tickers: [] as string[],
+      sectors: [] as string[],
+      is_material: false,
+    }));
+  }, [backendArticles, bnnArticles, activeSource]);
 
   const overdueFilings = useMemo(
     () => filings.filter((f) => f.status === 'overdue'),
     [filings]
   );
+
+  const isLoadingNews = isLoadingBnn && isLoadingBackend;
 
   return (
     <div className="p-4 md:p-6 space-y-6 max-w-7xl mx-auto">
@@ -135,14 +223,14 @@ export default function NewsPage() {
                 </div>
               ))}
             </div>
-          ) : articles.length === 0 ? (
+          ) : allArticles.length === 0 ? (
             <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-              <p className="text-lg font-medium">No news articles yet</p>
-              <p className="text-sm mt-1">News aggregation will populate as market data flows in.</p>
+              <p className="text-lg font-medium">No news articles for this source</p>
+              <p className="text-sm mt-1">Try selecting &quot;All Sources&quot; or &quot;BNN Bloomberg&quot;.</p>
             </div>
           ) : (
             <div className="space-y-3">
-              {articles.map((article) => (
+              {allArticles.map((article) => (
                 <a
                   key={article.id}
                   href={article.source_url ?? '#'}
@@ -171,7 +259,14 @@ export default function NewsPage() {
                         </p>
                       )}
                       <div className="flex items-center gap-2 mt-2 text-xs text-gray-400 dark:text-gray-500">
-                        <span>{new Date(article.published_at).toLocaleDateString()}</span>
+                        <span>
+                          {new Date(article.published_at).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            hour: 'numeric',
+                            minute: '2-digit',
+                          })}
+                        </span>
                         {article.tickers.length > 0 && (
                           <>
                             <span>&middot;</span>
@@ -186,6 +281,7 @@ export default function NewsPage() {
                           src={article.image_url}
                           alt=""
                           className="w-full h-full object-cover"
+                          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                         />
                       </div>
                     )}
@@ -209,8 +305,15 @@ export default function NewsPage() {
             </div>
           ) : filings.length === 0 ? (
             <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-              <p className="text-lg font-medium">No upcoming filings</p>
-              <p className="text-sm mt-1">Filing calendar entries will appear as they are tracked.</p>
+              <svg className="w-12 h-12 mx-auto mb-4 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+              </svg>
+              <p className="text-lg font-medium">No upcoming filings tracked</p>
+              <p className="text-sm mt-1">
+                {isAuthenticated
+                  ? 'Filing calendar entries will appear as they are tracked for your watchlist stocks.'
+                  : 'Sign in to track filing dates for stocks in your portfolio.'}
+              </p>
             </div>
           ) : (
             <div className="space-y-3">

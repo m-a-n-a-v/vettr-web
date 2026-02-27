@@ -7,6 +7,8 @@ import { useWatchlist } from '@/hooks/useWatchlist';
 import { useAllHoldings } from '@/hooks/usePortfolio';
 import { api } from '@/lib/api-client';
 import { ChatIcon } from '@/components/icons';
+import LoginPrompt from '@/components/ui/LoginPrompt';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface ConversationEntry {
   role: 'user' | 'assistant';
@@ -18,6 +20,7 @@ interface ConversationEntry {
 }
 
 export default function AiPage() {
+  const { isAuthenticated } = useAuth();
   const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
   const [conversation, setConversation] = useState<ConversationEntry[]>([]);
   const [isAsking, setIsAsking] = useState(false);
@@ -80,6 +83,28 @@ export default function AiPage() {
       setIsAsking(false);
     }
   }, [selectedTicker, isAsking]);
+
+  if (!isAuthenticated) {
+    return (
+      <div className="p-4 md:p-6 max-w-4xl mx-auto">
+        <div className="mb-6">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-vettr-accent/20 to-vettr-accent/5 flex items-center justify-center">
+              <ChatIcon className="w-5 h-5 text-vettr-accent" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">AI Analysis</h1>
+              <p className="text-sm text-gray-500 dark:text-gray-400">AI-powered stock analysis for your portfolio</p>
+            </div>
+          </div>
+        </div>
+        <LoginPrompt
+          title="Sign in to use AI Analysis"
+          message="Get AI-powered insights, ask questions about any stock, and receive personalized analysis for your portfolio."
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 md:p-6 max-w-4xl mx-auto">

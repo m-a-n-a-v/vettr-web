@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { Navigation } from '@/components/Navigation';
 import { Header } from '@/components/Header';
 import Onboarding from '@/components/Onboarding';
@@ -75,7 +74,6 @@ function MainLayoutContent({ children }: { children: React.ReactNode }) {
   });
 
   return (
-    <ProtectedRoute>
       <div className="min-h-screen bg-lightBg dark:bg-vettr-navy transition-colors duration-200 relative">
         {/* Background gradients for depth - subtle in both modes */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(0,230,118,0.02)_0%,_transparent_50%)] dark:bg-[radial-gradient(ellipse_at_top_right,_rgba(0,230,118,0.04)_0%,_transparent_50%)] pointer-events-none" />
@@ -212,7 +210,6 @@ function MainLayoutContent({ children }: { children: React.ReactNode }) {
           </div>
         </AiAgentPanel>
       </div>
-    </ProtectedRoute>
   );
 }
 

@@ -12,6 +12,7 @@ import { useToast } from '@/contexts/ToastContext';
 import FeedbackForm from '@/components/FeedbackForm';
 import Onboarding from '@/components/Onboarding';
 import PortfolioManager from '@/components/PortfolioManager';
+import LoginPrompt from '@/components/ui/LoginPrompt';
 import { SkeletonUserHeader, SkeletonProfileSection } from '@/components/ui/SkeletonLoader';
 import { api } from '@/lib/api-client';
 
@@ -180,15 +181,16 @@ export default function ProfilePage() {
     setPasswordError('');
   };
 
-  // Loading state
+  // Guest state - show login prompt
   if (!user) {
     return (
       <div className="min-h-screen bg-lightBg dark:bg-vettr-navy pb-20 md:pb-6">
-        <div className="max-w-4xl mx-auto p-6 space-y-6">
-          <SkeletonUserHeader />
-          <SkeletonProfileSection />
-          <SkeletonProfileSection />
-          <SkeletonProfileSection />
+        <div className="max-w-4xl mx-auto p-6">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Profile</h1>
+          <LoginPrompt
+            title="Sign in to manage your profile"
+            message="Create an account to connect your portfolio, track your watchlist, and customize your VETTR experience."
+          />
         </div>
       </div>
     );

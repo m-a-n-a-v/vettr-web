@@ -15,6 +15,8 @@ import EmptyState from '@/components/ui/EmptyState'
 import RefreshButton from '@/components/ui/RefreshButton'
 import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator'
 import { ArrowUpIcon, ArrowDownIcon, FlagIcon, AlertTriangleIcon, StarIcon, BriefcaseIcon } from '@/components/icons'
+import LoginPrompt from '@/components/ui/LoginPrompt'
+import { useAuth } from '@/contexts/AuthContext'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState, useEffect, useMemo, useCallback } from 'react'
@@ -40,9 +42,10 @@ const ALERT_TYPE_LABELS: Record<string, string> = {
 export default function PulsePage() {
   const router = useRouter()
   const { showToast } = useToast()
+  const { isAuthenticated } = useAuth()
   const [isMobile, setIsMobile] = useState(false)
 
-  // Portfolio data
+  // Portfolio data (only fetch when authenticated)
   const { summaries: portfolioSummaries, isLoading: isLoadingPortfolio, mutate: mutatePortfolio } = usePortfolioSummary()
   const { alerts, mutate: mutateAlerts } = usePortfolioAlerts({ unreadOnly: true, limit: 5 })
   const { unreadCount, mutate: mutateUnreadCount } = usePortfolioAlertUnreadCount()
@@ -184,7 +187,46 @@ export default function PulsePage() {
         </div>
       </div>
 
-      {isEmptyWatchlist && !hasPortfolio && (
+      {/* Guest CTA - when not logged in */}
+      {!isAuthenticated && (
+        <section className="mb-6">
+          <div className="bg-gradient-to-r from-vettr-accent/10 to-blue-500/10 border border-vettr-accent/20 rounded-2xl p-6">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-xl bg-vettr-accent/20 flex items-center justify-center flex-shrink-0">
+                <BriefcaseIcon className="w-6 h-6 text-vettr-accent" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-base font-semibold text-gray-900 dark:text-white">Welcome to VETTR</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  Sign in to connect your portfolio, get AI-powered insights, and receive personalized alerts for your Canadian small-cap holdings.
+                </p>
+                <div className="flex items-center gap-3 mt-4">
+                  <Link
+                    href="/login"
+                    className="px-4 py-2 bg-vettr-accent text-vettr-navy text-sm font-semibold rounded-lg hover:bg-vettr-accent/90 transition-colors"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    href="/signup"
+                    className="px-4 py-2 bg-white/80 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white text-sm font-semibold rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+                  >
+                    Create Account
+                  </Link>
+                  <Link
+                    href="/stocks"
+                    className="text-sm text-gray-500 dark:text-gray-400 hover:text-vettr-accent transition-colors ml-1"
+                  >
+                    Browse Stocks &rarr;
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {isAuthenticated && isEmptyWatchlist && !hasPortfolio && (
         <EmptyState
           icon={<StarIcon className="w-16 h-16 text-gray-600" />}
           title="Get Started with VETTR"
