@@ -15,9 +15,10 @@ interface UseRedFlagTrendReturn {
  * Hook to fetch global red flag trend data
  * @returns RedFlagTrend object with total active flags, 30-day change, and severity breakdown
  */
-export function useRedFlagTrend(): UseRedFlagTrendReturn {
+export function useRedFlagTrend(options?: { enabled?: boolean }): UseRedFlagTrendReturn {
+  const enabled = options?.enabled ?? true;
   const { data, error, isLoading, mutate } = useSWR<RedFlagTrend, Error>(
-    '/red-flags/trend',
+    enabled ? '/red-flags/trend' : null,
     async (url: string): Promise<RedFlagTrend> => {
       const response = await api.get<RedFlagTrend>(url);
       if (!response.success || !response.data) {

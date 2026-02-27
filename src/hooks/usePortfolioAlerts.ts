@@ -9,7 +9,9 @@ export function usePortfolioAlerts(options?: {
   unreadOnly?: boolean;
   limit?: number;
   offset?: number;
+  enabled?: boolean;
 }) {
+  const enabled = options?.enabled ?? true;
   const params = new URLSearchParams();
   if (options?.unreadOnly) params.set('unread_only', 'true');
   if (options?.limit) params.set('limit', String(options.limit));
@@ -19,7 +21,7 @@ export function usePortfolioAlerts(options?: {
   const url = `/portfolio-alerts${queryString ? `?${queryString}` : ''}`;
 
   const { data, error, isLoading, mutate } = useSWR<PaginatedResponse<PortfolioAlert>>(
-    url,
+    enabled ? url : null,
     async (fetchUrl: string) => {
       const response = await api.get<PaginatedResponse<PortfolioAlert>>(fetchUrl);
       if (!response.success || !response.data) {
@@ -39,9 +41,10 @@ export function usePortfolioAlerts(options?: {
   };
 }
 
-export function usePortfolioAlertUnreadCount() {
+export function usePortfolioAlertUnreadCount(options?: { enabled?: boolean }) {
+  const enabled = options?.enabled ?? true;
   const { data, error, isLoading, mutate } = useSWR<{ count: number }>(
-    '/portfolio-alerts/unread-count',
+    enabled ? '/portfolio-alerts/unread-count' : null,
     async (url: string) => {
       const response = await api.get<{ count: number }>(url);
       if (!response.success || !response.data) {

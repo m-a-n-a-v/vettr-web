@@ -21,7 +21,8 @@ interface UseWatchlistReturn {
  * Hook to fetch and manage watchlist (favorites)
  * Provides add and remove mutations with optimistic updates
  */
-export function useWatchlist(): UseWatchlistReturn {
+export function useWatchlist(options?: { enabled?: boolean }): UseWatchlistReturn {
+  const enabled = options?.enabled ?? true;
   const [isAdding, setIsAdding] = useState(false);
   const [isRemoving, setIsRemoving] = useState(false);
 
@@ -36,7 +37,7 @@ export function useWatchlist(): UseWatchlistReturn {
   const { data, error, isLoading, mutate } = useSWR<
     PaginatedResponse<Stock>,
     Error
-  >('/watchlist', fetcher, {
+  >(enabled ? '/watchlist' : null, fetcher, {
     dedupingInterval: 30000, // Cache watchlist for 30s — only changes on user action
   });
 

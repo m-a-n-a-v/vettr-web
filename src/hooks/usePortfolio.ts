@@ -35,9 +35,10 @@ export function usePortfolios() {
 
 // --- Portfolio Summary ---
 
-export function usePortfolioSummary() {
+export function usePortfolioSummary(options?: { enabled?: boolean }) {
+  const enabled = options?.enabled ?? true;
   const { data, error, isLoading, mutate } = useSWR<PortfolioSummary[]>(
-    '/portfolio/summary',
+    enabled ? '/portfolio/summary' : null,
     async (url: string) => {
       const response = await api.get<PortfolioSummary[]>(url);
       if (!response.success || !response.data) {

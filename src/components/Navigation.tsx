@@ -54,9 +54,9 @@ const getTierBadgeColor = (tier: string): string => {
 
 export function Navigation() {
   const pathname = usePathname();
-  const { user, logout } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const { unreadCount } = usePortfolioAlertUnreadCount();
+  const { unreadCount } = usePortfolioAlertUnreadCount({ enabled: isAuthenticated });
 
   const isActive = (href: string) => {
     return pathname === href || pathname?.startsWith(href + '/');

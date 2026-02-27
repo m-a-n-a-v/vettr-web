@@ -369,10 +369,9 @@ export async function apiClient<T = unknown>(
           // Retry the original request with new token
           return apiClient<T>(endpoint, { ...options, skipRefresh: true });
         } else {
-          // Refresh failed, redirect to login
-          if (typeof window !== 'undefined') {
-            window.location.href = '/login';
-          }
+          // Refresh failed — return error without redirecting.
+          // Pages/components handle AUTH_REQUIRED gracefully
+          // (e.g., show LoginPrompt) instead of forcing a redirect.
           return {
             success: false,
             error: {

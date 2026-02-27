@@ -4,13 +4,14 @@ import useSWR from 'swr';
 import { api } from '@/lib/api-client';
 import type { PortfolioInsight } from '@/types/portfolio';
 
-export function usePortfolioInsights(portfolioId?: string) {
+export function usePortfolioInsights(portfolioId?: string, options?: { enabled?: boolean }) {
+  const enabled = options?.enabled ?? true;
   const url = portfolioId
     ? `/portfolio-insights/${portfolioId}`
     : '/portfolio-insights';
 
   const { data, error, isLoading, mutate } = useSWR<PortfolioInsight[]>(
-    url,
+    enabled ? url : null,
     async (fetchUrl: string) => {
       const response = await api.get<PortfolioInsight[]>(fetchUrl);
       if (!response.success || !response.data) {

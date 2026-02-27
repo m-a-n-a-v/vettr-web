@@ -34,8 +34,8 @@ function MainLayoutContent({ children }: { children: React.ReactNode }) {
     askQuestion,
     retryLastQuestion,
   } = useAiAgentContext();
-  const { questions: initialQuestions } = useAiAgentQuestions();
-  const { usage } = useAiAgentUsage();
+  const { questions: initialQuestions } = useAiAgentQuestions({ shouldFetch: isAuthenticated });
+  const { usage } = useAiAgentUsage({ enabled: isAuthenticated });
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showKeyboardShortcutsModal, setShowKeyboardShortcutsModal] = useState(false);
 

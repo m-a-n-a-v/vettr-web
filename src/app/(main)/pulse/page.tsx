@@ -46,16 +46,16 @@ export default function PulsePage() {
   const [isMobile, setIsMobile] = useState(false)
 
   // Portfolio data (only fetch when authenticated)
-  const { summaries: portfolioSummaries, isLoading: isLoadingPortfolio, mutate: mutatePortfolio } = usePortfolioSummary()
-  const { alerts, mutate: mutateAlerts } = usePortfolioAlerts({ unreadOnly: true, limit: 5 })
-  const { unreadCount, mutate: mutateUnreadCount } = usePortfolioAlertUnreadCount()
-  const { insights, mutate: mutateInsights } = usePortfolioInsights()
+  const { summaries: portfolioSummaries, isLoading: isLoadingPortfolio, mutate: mutatePortfolio } = usePortfolioSummary({ enabled: isAuthenticated })
+  const { alerts, mutate: mutateAlerts } = usePortfolioAlerts({ unreadOnly: true, limit: 5, enabled: isAuthenticated })
+  const { unreadCount, mutate: mutateUnreadCount } = usePortfolioAlertUnreadCount({ enabled: isAuthenticated })
+  const { insights, mutate: mutateInsights } = usePortfolioInsights(undefined, { enabled: isAuthenticated })
   const { articles: materialNews } = useMaterialNews(3)
 
-  // Existing watchlist data (kept for secondary sections)
-  const { watchlist: stocks, isLoading: isLoadingStocks, mutate: mutateStocks } = useWatchlist()
-  const { summary: pulseSummary, isLoading: isLoadingPulse, mutate: mutatePulse } = usePulseSummary()
-  const { trend: redFlagTrend, mutate: mutateRedFlagTrend } = useRedFlagTrend()
+  // Existing watchlist data (kept for secondary sections — only when authenticated)
+  const { watchlist: stocks, isLoading: isLoadingStocks, mutate: mutateStocks } = useWatchlist({ enabled: isAuthenticated })
+  const { summary: pulseSummary, isLoading: isLoadingPulse, mutate: mutatePulse } = usePulseSummary({ enabled: isAuthenticated })
+  const { trend: redFlagTrend, mutate: mutateRedFlagTrend } = useRedFlagTrend({ enabled: isAuthenticated })
 
   const hasPortfolio = portfolioSummaries.length > 0
 

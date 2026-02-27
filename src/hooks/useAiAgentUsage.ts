@@ -15,9 +15,10 @@ interface UseAiAgentUsageReturn {
  * Hook to fetch AI agent usage statistics
  * @returns Usage object with used/limit/remaining counts, reset time, loading/error states, and mutate function
  */
-export function useAiAgentUsage(): UseAiAgentUsageReturn {
+export function useAiAgentUsage(options?: { enabled?: boolean }): UseAiAgentUsageReturn {
+  const enabled = options?.enabled ?? true;
   const { data, error, isLoading, mutate } = useSWR<AiAgentUsage, Error>(
-    '/ai-agent/usage',
+    enabled ? '/ai-agent/usage' : null,
     async (url: string) => {
       const response = await api.get<AiAgentUsage>(url);
       if (!response.success || !response.data) {

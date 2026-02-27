@@ -16,9 +16,10 @@ interface UsePulseSummaryReturn {
  * Returns watchlist health, sector exposure, and red flag categories
  * Cached for 60 seconds
  */
-export function usePulseSummary(): UsePulseSummaryReturn {
+export function usePulseSummary(options?: { enabled?: boolean }): UsePulseSummaryReturn {
+  const enabled = options?.enabled ?? true;
   const { data, error, isLoading, mutate } = useSWR<PulseSummary, Error>(
-    '/pulse/summary',
+    enabled ? '/pulse/summary' : null,
     async (url: string): Promise<PulseSummary> => {
       const response = await api.get<PulseSummary>(url);
       if (!response.success || !response.data) {
