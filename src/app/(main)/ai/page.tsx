@@ -26,10 +26,10 @@ export default function AiPage() {
   const [isAsking, setIsAsking] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { questions: initialQuestions } = useAiAgentQuestions();
-  const { usage } = useAiAgentUsage();
-  const { watchlist: stocks } = useWatchlist();
-  const { holdings } = useAllHoldings();
+  const { questions: initialQuestions } = useAiAgentQuestions({ shouldFetch: isAuthenticated });
+  const { usage } = useAiAgentUsage({ enabled: isAuthenticated });
+  const { watchlist: stocks } = useWatchlist({ enabled: isAuthenticated });
+  const { holdings } = useAllHoldings({ enabled: isAuthenticated });
 
   // Combine stock tickers from watchlist and portfolio
   const availableTickers = Array.from(

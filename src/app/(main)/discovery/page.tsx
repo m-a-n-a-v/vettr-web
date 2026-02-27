@@ -9,6 +9,7 @@ import { useStocks } from '@/hooks/useStocks';
 import { useFilings } from '@/hooks/useFilings';
 import { useWatchlist } from '@/hooks/useWatchlist';
 import { useDiscoveryCollections } from '@/hooks/useDiscoveryCollections';
+import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/contexts/ToastContext';
 import { useRefresh } from '@/hooks/useRefresh';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
@@ -61,6 +62,7 @@ function DiscoveryPageContent() {
   });
   const [isMobile, setIsMobile] = useState(false);
   const [isClient, setIsClient] = useState(false);
+  const { isAuthenticated } = useAuth();
   const { showToast } = useToast();
 
   // Fetch all stocks (shares SWR cache key with Pulse page: /stocks?limit=100&offset=0)
@@ -104,8 +106,8 @@ function DiscoveryPageContent() {
     // We'll filter client-side if needed
   });
 
-  // Fetch watchlist for favorites
-  const { watchlist, addToWatchlist, removeFromWatchlist, isAdding, isRemoving } = useWatchlist();
+  // Fetch watchlist for favorites (only when authenticated)
+  const { watchlist, addToWatchlist, removeFromWatchlist, isAdding, isRemoving } = useWatchlist({ enabled: isAuthenticated });
 
   // Fetch discovery collections
   const { collections, isLoading: isLoadingCollections } = useDiscoveryCollections();

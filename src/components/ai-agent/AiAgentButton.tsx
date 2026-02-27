@@ -1,6 +1,7 @@
 'use client';
 
 import { useAiAgentUsage } from '@/hooks/useAiAgentUsage';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface AiAgentButtonProps {
   isOpen?: boolean;
@@ -8,7 +9,8 @@ interface AiAgentButtonProps {
 }
 
 export function AiAgentButton({ isOpen = false, onClick }: AiAgentButtonProps) {
-  const { usage } = useAiAgentUsage();
+  const { isAuthenticated } = useAuth();
+  const { usage } = useAiAgentUsage({ enabled: isAuthenticated });
 
   const handleClick = () => {
     onClick?.();

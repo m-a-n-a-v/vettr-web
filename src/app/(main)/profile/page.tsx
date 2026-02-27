@@ -18,8 +18,8 @@ import { api } from '@/lib/api-client';
 
 export default function ProfilePage() {
   const { user, logout, refreshUser } = useAuth();
-  const { subscription, isLoading: isLoadingSubscription } = useSubscription();
-  const { watchlist, isLoading: isLoadingWatchlist } = useWatchlist();
+  const { subscription, isLoading: isLoadingSubscription } = useSubscription({ enabled: !!user });
+  const { watchlist, isLoading: isLoadingWatchlist } = useWatchlist({ enabled: !!user });
   const { showToast } = useToast();
 
   const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);

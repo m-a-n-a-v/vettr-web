@@ -10,6 +10,7 @@ import { useAlertRules } from '@/hooks/useAlertRules';
 import { useAlertTriggers } from '@/hooks/useAlertTriggers';
 import { useWatchlist } from '@/hooks/useWatchlist';
 import { useSubscription } from '@/hooks/useSubscription';
+import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/contexts/ToastContext';
 import type { AlertRule, AlertType } from '@/types/api';
 import { shareContent } from '@/lib/share';
@@ -35,10 +36,11 @@ function AlertsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  const { isAuthenticated } = useAuth();
   const { rules, isLoading, error, deleteRule, toggleRule, createRule, updateRule, isCreating, isUpdating, isDeleting } = useAlertRules();
   const { triggers, isLoading: triggersLoading, markAsRead, markAllAsRead, deleteTrigger, isMarkingAllRead } = useAlertTriggers();
-  const { watchlist, isInWatchlist } = useWatchlist();
-  const { subscription } = useSubscription();
+  const { watchlist, isInWatchlist } = useWatchlist({ enabled: isAuthenticated });
+  const { subscription } = useSubscription({ enabled: isAuthenticated });
   const { showToast } = useToast();
 
   // Initialize state from URL params

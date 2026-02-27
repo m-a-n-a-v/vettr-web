@@ -12,9 +12,10 @@ import type {
 
 // --- Portfolio List ---
 
-export function usePortfolios() {
+export function usePortfolios(options?: { enabled?: boolean }) {
+  const enabled = options?.enabled ?? true;
   const { data, error, isLoading, mutate } = useSWR<Portfolio[]>(
-    '/portfolio',
+    enabled ? '/portfolio' : null,
     async (url: string) => {
       const response = await api.get<Portfolio[]>(url);
       if (!response.success || !response.data) {
@@ -59,9 +60,10 @@ export function usePortfolioSummary(options?: { enabled?: boolean }) {
 
 // --- All Holdings ---
 
-export function useAllHoldings() {
+export function useAllHoldings(options?: { enabled?: boolean }) {
+  const enabled = options?.enabled ?? true;
   const { data, error, isLoading, mutate } = useSWR<PortfolioHolding[]>(
-    '/portfolio/holdings',
+    enabled ? '/portfolio/holdings' : null,
     async (url: string) => {
       const response = await api.get<PortfolioHolding[]>(url);
       if (!response.success || !response.data) {
