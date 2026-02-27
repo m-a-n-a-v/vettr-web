@@ -77,6 +77,8 @@ const withPWA = require('next-pwa')({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // Next.js 16+ defaults to Turbopack; declare empty config to allow build
+  turbopack: {},
   // Image optimization configuration
   images: {
     // Allow external image domains if needed in the future
