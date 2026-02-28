@@ -48,7 +48,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           localStorage.removeItem('vettr_refresh_token');
         }
       } catch (error) {
-        console.error('Failed to fetch user data:', error);
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Failed to fetch user data:', error);
+        }
         localStorage.removeItem('vettr_access_token');
         localStorage.removeItem('vettr_refresh_token');
       } finally {
@@ -71,7 +73,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error(response.error?.message || 'Login failed');
       }
     } catch (error) {
-      console.error('Login error:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Login error:', error);
+      }
       throw error;
     }
   }, []);
@@ -88,7 +92,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error(response.error?.message || 'Signup failed');
       }
     } catch (error) {
-      console.error('Signup error:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Signup error:', error);
+      }
       throw error;
     }
   }, []);
@@ -99,11 +105,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await authApi.logout();
       setUser(null);
     } catch (error) {
-      console.error('Logout error:', error);
       // Continue with local cleanup even if API call fails
       localStorage.removeItem('vettr_access_token');
       localStorage.removeItem('vettr_refresh_token');
       setUser(null);
+    } finally {
+      // Clear all SW caches on logout to prevent stale auth data serving wrong user
+      if (typeof window !== 'undefined' && 'caches' in window) {
+        caches.keys().then(names => {
+          names.forEach(name => caches.delete(name));
+        });
+      }
     }
   }, []);
 
@@ -114,7 +126,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(response.data);
       }
     } catch (error) {
-      console.error('Failed to refresh user data:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Failed to refresh user data:', error);
+      }
     }
   }, []);
 

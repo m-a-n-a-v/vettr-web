@@ -202,7 +202,9 @@ async function refreshAccessToken(): Promise<AuthTokens | null> {
       clearTokens();
       return null;
     } catch (error) {
-      console.error('Token refresh failed:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Token refresh failed:', error);
+      }
       clearTokens();
       return null;
     } finally {
@@ -385,7 +387,9 @@ export async function apiClient<T = unknown>(
       // Handle 429 Too Many Requests - return error immediately, NO internal retries
       // SWR will handle retry scheduling at its own (slower) pace
       if (response.status === 429) {
-        console.warn(`[API] Rate limited (429) for ${url}. No retry — SWR will handle revalidation.`);
+        if (process.env.NODE_ENV === 'development') {
+          console.warn(`[API] Rate limited (429) for ${url}. No retry — SWR will handle revalidation.`);
+        }
         showRateLimitToast(5);
         return {
           success: false,
@@ -431,7 +435,9 @@ export async function apiClient<T = unknown>(
       return finalResponse;
     } catch (error) {
       // Network or timeout error
-      console.error('API request failed:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('API request failed:', error);
+      }
 
       // Check if it's a timeout error
       if (error instanceof Error && error.message.includes('timeout')) {

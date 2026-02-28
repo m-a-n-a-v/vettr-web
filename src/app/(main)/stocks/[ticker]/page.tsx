@@ -67,6 +67,7 @@ import { ShortInterestSection } from '@/components/fundamentals/ShortInterestSec
 import { InsiderActivityComponent } from '@/components/fundamentals/InsiderActivity';
 import { SkeletonStockDetailHeader, SkeletonVetrScoreSection, SkeletonFilingRow, SkeletonMetricCard, SkeletonFundamentals } from '@/components/ui/SkeletonLoader';
 import Breadcrumb from '@/components/ui/Breadcrumb';
+import { FinancialDisclaimer } from '@/components/FinancialDisclaimer';
 import { StarIcon, StarFilledIcon, ShareIcon, MoreHorizontalIcon, ArrowUpIcon, ArrowDownIcon, UsersIcon, FlagIcon, ShieldCheckIcon, BarChartIcon, DocumentIcon, PrinterIcon } from '@/components/icons';
 import { getScoreColor } from '@/lib/chart-theme';
 
@@ -525,6 +526,8 @@ function StockDetailContent() {
             )}
           </div>
         </div>
+
+        <FinancialDisclaimer className="mb-4" />
 
         {/* Portfolio Holdings Banner */}
         {tickerHoldings.length > 0 && (

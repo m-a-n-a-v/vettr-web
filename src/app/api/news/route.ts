@@ -109,12 +109,24 @@ function extractTag(block: string, tag: string): string | null {
 
 /** Strip HTML tags and decode common entities */
 function cleanText(text: string): string {
-  return text
-    .replace(/<[^>]+>/g, '')
+  return stripHtml(text);
+}
+
+// Strip HTML tags with multiple passes to handle malformed HTML
+const stripHtml = (html: string): string => {
+  // Decode common HTML entities first
+  let text = html
     .replace(/&amp;/g, '&')
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
-    .trim();
-}
+    .replace(/&nbsp;/g, ' ');
+  // Strip tags iteratively until stable
+  let prev = '';
+  while (prev !== text) {
+    prev = text;
+    text = text.replace(/<[^>]*>/g, '');
+  }
+  return text.trim();
+};
