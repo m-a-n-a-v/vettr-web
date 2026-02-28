@@ -8,6 +8,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { useStocks } from '@/hooks/useStocks'
 import { useWatchlist } from '@/hooks/useWatchlist'
 import { useSubscription } from '@/hooks/useSubscription'
+import { useSectors } from '@/hooks/useSectors'
 import { useAuth } from '@/contexts/AuthContext'
 import { useToast } from '@/contexts/ToastContext'
 import { useRefresh } from '@/hooks/useRefresh'
@@ -72,6 +73,11 @@ function StocksPageContent() {
   const hasLoadedOnce = useRef(false)
   const { showToast } = useToast()
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
+  const [selectedSectors, setSelectedSectors] = useState<string[]>([])
+  const [activeTab, setActiveTab] = useState<'all' | 'most_active'>('all')
+
+  // Fetch available sectors for filter chips
+  const { sectors: availableSectors } = useSectors()
 
   // Load view preference from localStorage on mount
   useEffect(() => {
@@ -107,9 +113,16 @@ function StocksPageContent() {
     return () => clearTimeout(handler)
   }, [searchInput])
 
-  // Fetch stocks with pagination
+  // Determine effective sort based on active tab
+  const effectiveSort = activeTab === 'most_active' ? 'price_change_percent' as SortOption : sortBy
+  const effectiveOrder = activeTab === 'most_active' ? 'desc' as const : sortOrder
+
+  // Fetch stocks with pagination and sector filter
   const { stocks, pagination, isLoading: stocksLoading, isError: stocksError, mutate: mutateStocks } = useStocks({
     search: searchQuery || undefined,
+    sector: selectedSectors.length > 0 ? selectedSectors.join(',') : undefined,
+    sort: effectiveSort,
+    order: effectiveOrder,
     limit: perPage,
     offset: (currentPage - 1) * perPage,
   })
@@ -140,10 +153,21 @@ function StocksPageContent() {
     window.history.replaceState(null, '', newUrl)
   }, [searchQuery, sortBy, sortOrder, isClient])
 
-  // Reset to page 1 when search/sort/perPage changes
+  // Reset to page 1 when search/sort/perPage/sector/tab changes
   useEffect(() => {
     setCurrentPage(1)
-  }, [searchQuery, sortBy, sortOrder, perPage])
+  }, [searchQuery, sortBy, sortOrder, perPage, selectedSectors, activeTab])
+
+  // Sector filter toggle
+  const toggleSector = useCallback((sector: string) => {
+    setSelectedSectors(prev =>
+      prev.includes(sector) ? prev.filter(s => s !== sector) : [...prev, sector]
+    )
+  }, [])
+
+  const clearSectors = useCallback(() => {
+    setSelectedSectors([])
+  }, [])
 
   // Refresh handler
   const handleRefreshData = useCallback(async () => {
@@ -540,6 +564,37 @@ function StocksPageContent() {
         )}
       </div>
 
+      {/* Sector Filter Chips */}
+      {availableSectors.length > 0 && (
+        <div className="mb-4 overflow-x-auto scrollbar-hide">
+          <div className="flex gap-2 pb-1">
+            <button
+              onClick={clearSectors}
+              className={`flex-shrink-0 px-4 py-2 rounded-full text-xs font-medium transition-all ${
+                selectedSectors.length === 0
+                  ? 'bg-vettr-accent text-white shadow-sm'
+                  : 'bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-white/10 hover:bg-gray-200 dark:hover:bg-white/10'
+              }`}
+            >
+              All
+            </button>
+            {availableSectors.map(sector => (
+              <button
+                key={sector}
+                onClick={() => toggleSector(sector)}
+                className={`flex-shrink-0 px-4 py-2 rounded-full text-xs font-medium transition-all ${
+                  selectedSectors.includes(sector)
+                    ? 'bg-vettr-accent text-white shadow-sm'
+                    : 'bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-white/10 hover:bg-gray-200 dark:hover:bg-white/10'
+                }`}
+              >
+                {sector}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Filter bar - single row design */}
       <div className="mb-6 bg-gray-50 dark:bg-vettr-card/30 border border-gray-200 dark:border-white/5 rounded-2xl p-3">
         <div className="flex flex-col md:flex-row gap-3">
@@ -592,8 +647,34 @@ function StocksPageContent() {
         </div>
       </div>
 
+      {/* Sort Tabs */}
+      <div className="flex gap-1 mb-4 bg-gray-100 dark:bg-vettr-card/30 border border-gray-200 dark:border-white/5 rounded-xl p-1 w-fit">
+        <button
+          onClick={() => setActiveTab('all')}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+            activeTab === 'all'
+              ? 'bg-white dark:bg-vettr-card text-gray-900 dark:text-white shadow-sm'
+              : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+          }`}
+        >
+          All Stocks
+        </button>
+        <button
+          onClick={() => setActiveTab('most_active')}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+            activeTab === 'most_active'
+              ? 'bg-white dark:bg-vettr-card text-gray-900 dark:text-white shadow-sm'
+              : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+          }`}
+        >
+          Most Active
+        </button>
+      </div>
+
       {/* All Stocks Section Header */}
-      <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">All Stocks</h2>
+      <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+        {activeTab === 'most_active' ? 'Most Active Stocks' : 'All Stocks'}
+      </h2>
 
       {/* Stock count */}
       <div className="mb-4 text-sm text-gray-400 dark:text-gray-500">

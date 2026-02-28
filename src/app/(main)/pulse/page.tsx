@@ -3,7 +3,7 @@
 import { useWatchlist } from '@/hooks/useWatchlist'
 import { useRedFlagTrend } from '@/hooks/useRedFlagTrend'
 import { usePulseSummary } from '@/hooks/usePulseSummary'
-import { usePortfolioSummary } from '@/hooks/usePortfolio'
+import { usePortfolioSummary, useAllHoldings } from '@/hooks/usePortfolio'
 import { usePortfolioAlerts, usePortfolioAlertUnreadCount, markAlertRead, markAllAlertsRead } from '@/hooks/usePortfolioAlerts'
 import { usePortfolioInsights, dismissInsight } from '@/hooks/usePortfolioInsights'
 import { useMaterialNews } from '@/hooks/useNews'
@@ -56,6 +56,9 @@ export default function PulsePage() {
   const { insights, mutate: mutateInsights } = usePortfolioInsights(undefined, { enabled: isAuthenticated })
   const { articles: materialNews } = useMaterialNews(3)
 
+  // Portfolio holdings for the Portfolio Review section
+  const { holdings, isLoading: isLoadingHoldings, mutate: mutateHoldings } = useAllHoldings({ enabled: isAuthenticated })
+
   // Existing watchlist data (kept for secondary sections — only when authenticated)
   const { watchlist: stocks, isLoading: isLoadingStocks, mutate: mutateStocks } = useWatchlist({ enabled: isAuthenticated })
   const { summary: pulseSummary, isLoading: isLoadingPulse, mutate: mutatePulse } = usePulseSummary({ enabled: isAuthenticated })
@@ -95,10 +98,10 @@ export default function PulsePage() {
     ? ((portfolioTotals.vettrCoverageValue / portfolioTotals.totalValue) * 100)
     : 0
 
-  // Derived watchlist data
-  const sortedByChange = useMemo(() => stocks ? [...stocks].sort((a, b) => (b.price_change_percent || 0) - (a.price_change_percent || 0)) : [], [stocks])
-  const topGainers = sortedByChange.filter(s => (s.price_change_percent || 0) > 0).slice(0, 3)
-  const topLosers = sortedByChange.filter(s => (s.price_change_percent || 0) < 0).slice(-3).reverse()
+  // Derived portfolio holdings data (for Portfolio Review section)
+  const sortedByChange = useMemo(() => holdings ? [...holdings].sort((a, b) => (b.price_change_percent || 0) - (a.price_change_percent || 0)) : [], [holdings])
+  const topGainers = sortedByChange.filter(h => (h.price_change_percent || 0) > 0).slice(0, 3)
+  const topLosers = sortedByChange.filter(h => (h.price_change_percent || 0) < 0).slice(-3).reverse()
   const activeInsights = useMemo(() => insights.filter(i => !i.is_dismissed).slice(0, 4), [insights])
 
   // Mobile detection
@@ -112,12 +115,12 @@ export default function PulsePage() {
   // Refresh
   const handleRefreshData = useCallback(async () => {
     try {
-      await Promise.all([mutatePortfolio(), mutateStocks(), mutateAlerts(), mutateInsights(), mutateRedFlagTrend(), mutatePulse(), mutateUnreadCount()])
+      await Promise.all([mutatePortfolio(), mutateHoldings(), mutateStocks(), mutateAlerts(), mutateInsights(), mutateRedFlagTrend(), mutatePulse(), mutateUnreadCount()])
       showToast('Data refreshed successfully', 'success')
     } catch {
       showToast('Failed to refresh data', 'error')
     }
-  }, [mutatePortfolio, mutateStocks, mutateAlerts, mutateInsights, mutateRedFlagTrend, mutatePulse, mutateUnreadCount, showToast])
+  }, [mutatePortfolio, mutateHoldings, mutateStocks, mutateAlerts, mutateInsights, mutateRedFlagTrend, mutatePulse, mutateUnreadCount, showToast])
 
   const { isRefreshing, lastRefreshed, handleRefresh, canRefresh } = useRefresh({ onRefresh: handleRefreshData, debounceMs: 5000 })
   const { isPulling, pullDistance } = usePullToRefresh({ onRefresh: handleRefresh, enabled: isMobile, threshold: 80 })
@@ -151,25 +154,25 @@ export default function PulsePage() {
     }
   }, [mutateAlerts, mutateUnreadCount])
 
-  const isLoading = isLoadingPortfolio || isLoadingStocks
-  const isEmptyWatchlist = !isLoadingStocks && stocks.length === 0
+  const isLoading = isLoadingPortfolio || isLoadingHoldings
+  const isEmptyPortfolio = !isLoadingHoldings && holdings.length === 0
 
-  // Watchlist health (existing logic)
-  const watchlistHealth = pulseSummary?.watchlist_health ?? (() => {
-    const total = stocks?.length || 0
-    const elite = stocks?.filter(s => (s.vetr_score || 0) >= 90).length || 0
-    const contender = stocks?.filter(s => (s.vetr_score || 0) >= 75 && (s.vetr_score || 0) < 90).length || 0
-    const watchlistCount = stocks?.filter(s => (s.vetr_score || 0) >= 50 && (s.vetr_score || 0) < 75).length || 0
-    const speculative = stocks?.filter(s => (s.vetr_score || 0) >= 30 && (s.vetr_score || 0) < 50).length || 0
-    const toxic = stocks?.filter(s => (s.vetr_score || 0) < 30).length || 0
+  // Portfolio health (computed from portfolio holdings' VETR scores)
+  const portfolioHealth = useMemo(() => {
+    const total = holdings?.length || 0
+    const elite = holdings?.filter(h => (h.vetr_score || 0) >= 90).length || 0
+    const contender = holdings?.filter(h => (h.vetr_score || 0) >= 75 && (h.vetr_score || 0) < 90).length || 0
+    const watchCount = holdings?.filter(h => (h.vetr_score || 0) >= 50 && (h.vetr_score || 0) < 75).length || 0
+    const speculative = holdings?.filter(h => (h.vetr_score || 0) >= 30 && (h.vetr_score || 0) < 50).length || 0
+    const toxic = holdings?.filter(h => (h.vetr_score || 0) < 30).length || 0
     return {
       elite: { count: elite, pct: total > 0 ? Math.round((elite / total) * 100) : 0 },
       contender: { count: contender, pct: total > 0 ? Math.round((contender / total) * 100) : 0 },
-      watchlist: { count: watchlistCount, pct: total > 0 ? Math.round((watchlistCount / total) * 100) : 0 },
+      watchlist: { count: watchCount, pct: total > 0 ? Math.round((watchCount / total) * 100) : 0 },
       speculative: { count: speculative, pct: total > 0 ? Math.round((speculative / total) * 100) : 0 },
       toxic: { count: toxic, pct: total > 0 ? Math.round((toxic / total) * 100) : 0 },
     }
-  })()
+  }, [holdings])
 
   const redFlagCategories = pulseSummary?.red_flag_categories
 
@@ -257,7 +260,7 @@ export default function PulsePage() {
       )}
 
       {/* Fallback: authenticated, no portfolio, no sample selected, and samples loaded but empty */}
-      {isAuthenticated && !hasPortfolio && isHydrated && !samplePortfolioId && !isLoadingSamples && samplePortfolios.length === 0 && isEmptyWatchlist && (
+      {isAuthenticated && !hasPortfolio && isHydrated && !samplePortfolioId && !isLoadingSamples && samplePortfolios.length === 0 && isEmptyPortfolio && (
         <EmptyState
           icon={<StarIcon className="w-16 h-16 text-gray-600" />}
           title="Get Started with VETTR"
@@ -400,7 +403,7 @@ export default function PulsePage() {
       )}
 
       {/* Connect Portfolio CTA (when no portfolio and no sample dashboard showing) */}
-      {!hasPortfolio && !isEmptyWatchlist && !(samplePortfolioId && selectedSamplePortfolio) && (
+      {!hasPortfolio && !isEmptyPortfolio && !(samplePortfolioId && selectedSamplePortfolio) && (
         <section className="mb-6">
           <div className="bg-gradient-to-r from-vettr-accent/10 to-vettr-accent/5 border border-vettr-accent/20 rounded-2xl p-5">
             <div className="flex items-start gap-4">
@@ -425,7 +428,7 @@ export default function PulsePage() {
       )}
 
       {/* =================== WATCHLIST/MARKET SECTION =================== */}
-      {!isEmptyWatchlist && (
+      {!isEmptyPortfolio && (
         <>
           {/* Material News */}
           {materialNews.length > 0 && (
@@ -452,9 +455,9 @@ export default function PulsePage() {
             </section>
           )}
 
-          {/* Market Overview Row */}
+          {/* Portfolio Review Row */}
           <section className="mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Watchlist Overview</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Portfolio Review</h2>
             {isLoading ? (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 {[1, 2, 3].map(i => (
@@ -463,24 +466,24 @@ export default function PulsePage() {
               </div>
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                {/* Watchlist Health */}
+                {/* Portfolio Health */}
                 <div className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-5">
-                  <p className="text-xs text-gray-500 uppercase tracking-wider mb-3 font-medium">Watchlist Health</p>
+                  <p className="text-xs text-gray-500 uppercase tracking-wider mb-3 font-medium">Portfolio Health</p>
                   <div className="flex h-6 rounded-lg overflow-hidden gap-0.5 mb-4">
-                    {watchlistHealth.elite.count > 0 && (
-                      <div className="rounded-md transition-all duration-500" style={{ width: `${watchlistHealth.elite.pct}%`, backgroundColor: '#10B981' }} />
+                    {portfolioHealth.elite.count > 0 && (
+                      <div className="rounded-md transition-all duration-500" style={{ width: `${portfolioHealth.elite.pct}%`, backgroundColor: '#10B981' }} />
                     )}
-                    {watchlistHealth.contender.count > 0 && (
-                      <div className="rounded-md transition-all duration-500" style={{ width: `${watchlistHealth.contender.pct}%`, backgroundColor: '#14B8A6' }} />
+                    {portfolioHealth.contender.count > 0 && (
+                      <div className="rounded-md transition-all duration-500" style={{ width: `${portfolioHealth.contender.pct}%`, backgroundColor: '#14B8A6' }} />
                     )}
-                    {watchlistHealth.watchlist.count > 0 && (
-                      <div className="rounded-md transition-all duration-500" style={{ width: `${watchlistHealth.watchlist.pct}%`, backgroundColor: '#F59E0B' }} />
+                    {portfolioHealth.watchlist.count > 0 && (
+                      <div className="rounded-md transition-all duration-500" style={{ width: `${portfolioHealth.watchlist.pct}%`, backgroundColor: '#F59E0B' }} />
                     )}
-                    {watchlistHealth.speculative.count > 0 && (
-                      <div className="rounded-md transition-all duration-500" style={{ width: `${watchlistHealth.speculative.pct}%`, backgroundColor: '#F97316' }} />
+                    {portfolioHealth.speculative.count > 0 && (
+                      <div className="rounded-md transition-all duration-500" style={{ width: `${portfolioHealth.speculative.pct}%`, backgroundColor: '#F97316' }} />
                     )}
-                    {watchlistHealth.toxic.count > 0 && (
-                      <div className="rounded-md transition-all duration-500" style={{ width: `${watchlistHealth.toxic.pct}%`, backgroundColor: '#EF4444' }} />
+                    {portfolioHealth.toxic.count > 0 && (
+                      <div className="rounded-md transition-all duration-500" style={{ width: `${portfolioHealth.toxic.pct}%`, backgroundColor: '#EF4444' }} />
                     )}
                   </div>
                   <div className="space-y-1.5">
@@ -496,7 +499,7 @@ export default function PulsePage() {
                           <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: color }} />
                           <span className="text-xs text-gray-400">{label}</span>
                         </div>
-                        <span className="text-sm font-semibold text-gray-900 dark:text-white">{watchlistHealth[key].count}</span>
+                        <span className="text-sm font-semibold text-gray-900 dark:text-white">{portfolioHealth[key].count}</span>
                       </div>
                     ))}
                   </div>
@@ -509,15 +512,15 @@ export default function PulsePage() {
                     <p className="text-sm text-gray-500 text-center py-6">No gainers today</p>
                   ) : (
                     <div className="space-y-2">
-                      {topGainers.map((stock) => (
-                        <Link key={stock.ticker} href={`/stocks/${stock.ticker}`} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-colors">
+                      {topGainers.map((holding) => (
+                        <Link key={holding.ticker} href={`/stocks/${holding.ticker}`} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-colors">
                           <div>
-                            <span className="text-sm font-bold text-gray-900 dark:text-white">{stock.ticker}</span>
-                            <p className="text-[11px] text-gray-500 truncate max-w-[120px]">{stock.company_name}</p>
+                            <span className="text-sm font-bold text-gray-900 dark:text-white">{holding.ticker}</span>
+                            <p className="text-[11px] text-gray-500 truncate max-w-[120px]">{holding.name}</p>
                           </div>
                           <div className="flex items-center gap-1 text-vettr-accent">
                             <ArrowUpIcon className="w-3 h-3" />
-                            <span className="text-sm font-semibold">{Math.abs(stock.price_change_percent || 0).toFixed(2)}%</span>
+                            <span className="text-sm font-semibold">{Math.abs(holding.price_change_percent || 0).toFixed(2)}%</span>
                           </div>
                         </Link>
                       ))}
@@ -532,15 +535,15 @@ export default function PulsePage() {
                     <p className="text-sm text-gray-500 text-center py-6">No losers today</p>
                   ) : (
                     <div className="space-y-2">
-                      {topLosers.map((stock) => (
-                        <Link key={stock.ticker} href={`/stocks/${stock.ticker}`} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-colors">
+                      {topLosers.map((holding) => (
+                        <Link key={holding.ticker} href={`/stocks/${holding.ticker}`} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-colors">
                           <div>
-                            <span className="text-sm font-bold text-gray-900 dark:text-white">{stock.ticker}</span>
-                            <p className="text-[11px] text-gray-500 truncate max-w-[120px]">{stock.company_name}</p>
+                            <span className="text-sm font-bold text-gray-900 dark:text-white">{holding.ticker}</span>
+                            <p className="text-[11px] text-gray-500 truncate max-w-[120px]">{holding.name}</p>
                           </div>
                           <div className="flex items-center gap-1 text-red-400">
                             <ArrowDownIcon className="w-3 h-3" />
-                            <span className="text-sm font-semibold">{Math.abs(stock.price_change_percent || 0).toFixed(2)}%</span>
+                            <span className="text-sm font-semibold">{Math.abs(holding.price_change_percent || 0).toFixed(2)}%</span>
                           </div>
                         </Link>
                       ))}

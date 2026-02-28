@@ -29,6 +29,8 @@ export interface PortfolioHolding {
   currency: string;
   exchange: string | null;
   sector: string | null;
+  vetr_score: number | null;
+  price_change_percent: number | null;
 }
 
 export interface PortfolioSummary {
