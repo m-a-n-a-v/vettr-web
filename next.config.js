@@ -79,6 +79,8 @@ const nextConfig = {
   reactStrictMode: true,
   // Next.js 16+ defaults to Turbopack; declare empty config to allow build
   turbopack: {},
+  // Allow dev origins for preview tools
+  allowedDevOrigins: ['127.0.0.1'],
   // Image optimization configuration
   images: {
     // Allow external image domains if needed in the future
