@@ -174,6 +174,20 @@ export default function PulsePage() {
     }
   }, [holdings])
 
+  // Sector split (computed from portfolio holdings' sectors)
+  const SECTOR_COLORS = ['#6366F1', '#8B5CF6', '#EC4899', '#F43F5E', '#F97316', '#EAB308', '#22C55E', '#14B8A6', '#06B6D4', '#3B82F6']
+  const sectorSplit = useMemo(() => {
+    if (!holdings || holdings.length === 0) return []
+    const counts: Record<string, number> = {}
+    holdings.forEach(h => {
+      const sector = h.sector || 'Other'
+      counts[sector] = (counts[sector] || 0) + 1
+    })
+    return Object.entries(counts)
+      .map(([sector, sectorCount]) => ({ sector, count: sectorCount, pct: Math.round((sectorCount / holdings.length) * 100) }))
+      .sort((a, b) => b.count - a.count)
+  }, [holdings])
+
   const redFlagCategories = pulseSummary?.red_flag_categories
 
   const formatCurrency = (value: number) => {
@@ -427,195 +441,229 @@ export default function PulsePage() {
         </section>
       )}
 
-      {/* =================== WATCHLIST/MARKET SECTION =================== */}
-      {!isEmptyPortfolio && (
-        <>
-          {/* Material News */}
-          {materialNews.length > 0 && (
-            <section className="mb-6">
-              <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 dark:from-amber-500/5 dark:to-orange-500/5 border border-amber-500/20 rounded-xl p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-sm font-semibold text-amber-600 dark:text-amber-400">Material Events</h3>
-                  <Link href="/news" className="text-xs text-amber-500 hover:underline">View All</Link>
+      {/* =================== MARKET & PORTFOLIO SECTION =================== */}
+
+      {/* Material News — visible whenever there are articles */}
+      {materialNews.length > 0 && (
+        <section className="mb-6">
+          <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 dark:from-amber-500/5 dark:to-orange-500/5 border border-amber-500/20 rounded-xl p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold text-amber-600 dark:text-amber-400">Material Events</h3>
+              <Link href="/news" className="text-xs text-amber-500 hover:underline">View All</Link>
+            </div>
+            <div className="space-y-2">
+              {materialNews.map((article) => (
+                <div key={article.id} className="flex items-start gap-3">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 mt-2 flex-shrink-0" />
+                  <div>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">{article.title}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                      {article.tickers.join(', ')} &middot; {new Date(article.published_at).toLocaleDateString()}
+                    </p>
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  {materialNews.map((article) => (
-                    <div key={article.id} className="flex items-start gap-3">
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500 mt-2 flex-shrink-0" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">{article.title}</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                          {article.tickers.join(', ')} &middot; {new Date(article.published_at).toLocaleDateString()}
-                        </p>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Portfolio Review — visible when user has portfolio holdings */}
+      {hasPortfolio && (
+        <section className="mb-6">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Portfolio Review</h2>
+          {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[1, 2, 3, 4].map(i => (
+                <div key={i} className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-5 h-48 animate-pulse" />
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Portfolio Health */}
+              <div className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-5">
+                <p className="text-xs text-gray-500 uppercase tracking-wider mb-3 font-medium">Portfolio Health</p>
+                <div className="flex h-6 rounded-lg overflow-hidden gap-0.5 mb-4">
+                  {portfolioHealth.elite.count > 0 && (
+                    <div className="rounded-md transition-all duration-500" style={{ width: `${portfolioHealth.elite.pct}%`, backgroundColor: '#10B981' }} />
+                  )}
+                  {portfolioHealth.contender.count > 0 && (
+                    <div className="rounded-md transition-all duration-500" style={{ width: `${portfolioHealth.contender.pct}%`, backgroundColor: '#14B8A6' }} />
+                  )}
+                  {portfolioHealth.watchlist.count > 0 && (
+                    <div className="rounded-md transition-all duration-500" style={{ width: `${portfolioHealth.watchlist.pct}%`, backgroundColor: '#F59E0B' }} />
+                  )}
+                  {portfolioHealth.speculative.count > 0 && (
+                    <div className="rounded-md transition-all duration-500" style={{ width: `${portfolioHealth.speculative.pct}%`, backgroundColor: '#F97316' }} />
+                  )}
+                  {portfolioHealth.toxic.count > 0 && (
+                    <div className="rounded-md transition-all duration-500" style={{ width: `${portfolioHealth.toxic.pct}%`, backgroundColor: '#EF4444' }} />
+                  )}
+                </div>
+                <div className="space-y-1.5">
+                  {[
+                    { key: 'elite' as const, label: 'Elite', color: '#10B981' },
+                    { key: 'contender' as const, label: 'Contender', color: '#14B8A6' },
+                    { key: 'watchlist' as const, label: 'Watch', color: '#F59E0B' },
+                    { key: 'speculative' as const, label: 'Speculative', color: '#F97316' },
+                    { key: 'toxic' as const, label: 'Toxic', color: '#EF4444' },
+                  ].map(({ key, label, color }) => (
+                    <div key={key} className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: color }} />
+                        <span className="text-xs text-gray-400">{label}</span>
                       </div>
+                      <span className="text-sm font-semibold text-gray-900 dark:text-white">{portfolioHealth[key].count}</span>
                     </div>
                   ))}
                 </div>
               </div>
-            </section>
-          )}
 
-          {/* Portfolio Review Row */}
-          <section className="mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Portfolio Review</h2>
-            {isLoading ? (
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                {[1, 2, 3].map(i => (
-                  <div key={i} className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-5 h-48 animate-pulse" />
-                ))}
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                {/* Portfolio Health */}
-                <div className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-5">
-                  <p className="text-xs text-gray-500 uppercase tracking-wider mb-3 font-medium">Portfolio Health</p>
-                  <div className="flex h-6 rounded-lg overflow-hidden gap-0.5 mb-4">
-                    {portfolioHealth.elite.count > 0 && (
-                      <div className="rounded-md transition-all duration-500" style={{ width: `${portfolioHealth.elite.pct}%`, backgroundColor: '#10B981' }} />
-                    )}
-                    {portfolioHealth.contender.count > 0 && (
-                      <div className="rounded-md transition-all duration-500" style={{ width: `${portfolioHealth.contender.pct}%`, backgroundColor: '#14B8A6' }} />
-                    )}
-                    {portfolioHealth.watchlist.count > 0 && (
-                      <div className="rounded-md transition-all duration-500" style={{ width: `${portfolioHealth.watchlist.pct}%`, backgroundColor: '#F59E0B' }} />
-                    )}
-                    {portfolioHealth.speculative.count > 0 && (
-                      <div className="rounded-md transition-all duration-500" style={{ width: `${portfolioHealth.speculative.pct}%`, backgroundColor: '#F97316' }} />
-                    )}
-                    {portfolioHealth.toxic.count > 0 && (
-                      <div className="rounded-md transition-all duration-500" style={{ width: `${portfolioHealth.toxic.pct}%`, backgroundColor: '#EF4444' }} />
-                    )}
-                  </div>
-                  <div className="space-y-1.5">
-                    {[
-                      { key: 'elite' as const, label: 'Elite', color: '#10B981' },
-                      { key: 'contender' as const, label: 'Contender', color: '#14B8A6' },
-                      { key: 'watchlist' as const, label: 'Watch', color: '#F59E0B' },
-                      { key: 'speculative' as const, label: 'Speculative', color: '#F97316' },
-                      { key: 'toxic' as const, label: 'Toxic', color: '#EF4444' },
-                    ].map(({ key, label, color }) => (
-                      <div key={key} className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: color }} />
-                          <span className="text-xs text-gray-400">{label}</span>
-                        </div>
-                        <span className="text-sm font-semibold text-gray-900 dark:text-white">{portfolioHealth[key].count}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Top Gainers */}
-                <div className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-5">
-                  <p className="text-xs text-gray-500 uppercase tracking-wider mb-3 font-medium">Top Gainers</p>
-                  {topGainers.length === 0 ? (
-                    <p className="text-sm text-gray-500 text-center py-6">No gainers today</p>
-                  ) : (
-                    <div className="space-y-2">
-                      {topGainers.map((holding) => (
-                        <Link key={holding.ticker} href={`/stocks/${holding.ticker}`} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-colors">
-                          <div>
-                            <span className="text-sm font-bold text-gray-900 dark:text-white">{holding.ticker}</span>
-                            <p className="text-[11px] text-gray-500 truncate max-w-[120px]">{holding.name}</p>
-                          </div>
-                          <div className="flex items-center gap-1 text-vettr-accent">
-                            <ArrowUpIcon className="w-3 h-3" />
-                            <span className="text-sm font-semibold">{Math.abs(holding.price_change_percent || 0).toFixed(2)}%</span>
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* Top Losers */}
-                <div className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-5">
-                  <p className="text-xs text-gray-500 uppercase tracking-wider mb-3 font-medium">Top Losers</p>
-                  {topLosers.length === 0 ? (
-                    <p className="text-sm text-gray-500 text-center py-6">No losers today</p>
-                  ) : (
-                    <div className="space-y-2">
-                      {topLosers.map((holding) => (
-                        <Link key={holding.ticker} href={`/stocks/${holding.ticker}`} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-colors">
-                          <div>
-                            <span className="text-sm font-bold text-gray-900 dark:text-white">{holding.ticker}</span>
-                            <p className="text-[11px] text-gray-500 truncate max-w-[120px]">{holding.name}</p>
-                          </div>
-                          <div className="flex items-center gap-1 text-red-400">
-                            <ArrowDownIcon className="w-3 h-3" />
-                            <span className="text-sm font-semibold">{Math.abs(holding.price_change_percent || 0).toFixed(2)}%</span>
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </section>
-
-          {/* Red Flag Summary */}
-          <section className="mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Red Flag Summary</h2>
-            {isLoadingPulse ? (
-              <div className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-6 h-40 animate-pulse" />
-            ) : (
+              {/* Sector Split */}
               <div className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-5">
-                <div className="flex flex-wrap gap-3 mb-4">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-500/10 text-red-400 text-sm font-medium">
-                    <FlagIcon className="w-3.5 h-3.5" />
-                    Critical ({redFlagCategories?.critical_count ?? redFlagTrend?.breakdown_by_severity?.critical ?? 0})
-                  </span>
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-orange-500/10 text-orange-400 text-sm font-medium">
-                    <AlertTriangleIcon className="w-3.5 h-3.5" />
-                    Warnings ({redFlagCategories?.warning_count ?? redFlagTrend?.breakdown_by_severity?.moderate ?? 0})
-                  </span>
-                </div>
-
-                {redFlagCategories && redFlagCategories.categories.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    {redFlagCategories.categories.map((cat) => (
-                      <div key={cat.category} className={`rounded-xl p-4 border ${cat.severity === 'critical' ? 'border-red-500/20 bg-red-500/5' : 'border-orange-500/20 bg-orange-500/5'}`}>
-                        <div className="flex items-center gap-2 mb-2">
-                          <div className={`w-2 h-2 rounded-full ${cat.severity === 'critical' ? 'bg-red-400' : 'bg-orange-400'}`} />
-                          <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">{cat.category}</span>
-                        </div>
-                        <p className="text-sm font-semibold text-gray-900 dark:text-white">{cat.label}</p>
-                        <p className="text-xs text-gray-500 mt-1">{cat.stock_count} stock{cat.stock_count !== 1 ? 's' : ''} affected</p>
-                      </div>
-                    ))}
-                  </div>
+                <p className="text-xs text-gray-500 uppercase tracking-wider mb-3 font-medium">Sector Split</p>
+                {sectorSplit.length === 0 ? (
+                  <p className="text-sm text-gray-500 text-center py-6">No sector data</p>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    {['Financial Risk', 'Governance', 'Momentum'].map((cat) => (
-                      <div key={cat} className="rounded-xl p-4 border border-gray-200 dark:border-white/5 bg-gray-50 dark:bg-white/[0.02]">
-                        <div className="flex items-center gap-2 mb-2">
-                          <div className="w-2 h-2 rounded-full bg-green-400" />
-                          <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">{cat}</span>
-                        </div>
-                        <p className="text-sm font-semibold text-gray-500">All Clear</p>
-                        <p className="text-xs text-gray-600 mt-1">No flags detected</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {redFlagCategories?.latest_alert && (
-                  <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-red-500/5 border border-red-500/10 mt-4">
-                    {redFlagCategories.latest_alert.is_new && (
-                      <span className="flex-shrink-0 px-2 py-0.5 text-[10px] font-bold uppercase bg-red-500 text-white rounded">New</span>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <span className="text-sm font-medium text-gray-900 dark:text-white">{redFlagCategories.latest_alert.ticker}</span>
-                      <span className="text-sm text-gray-400"> — {redFlagCategories.latest_alert.label}</span>
+                  <>
+                    <div className="flex h-6 rounded-lg overflow-hidden gap-0.5 mb-4">
+                      {sectorSplit.map((s, i) => (
+                        <div key={s.sector} className="rounded-md transition-all duration-500" style={{ width: `${s.pct}%`, backgroundColor: SECTOR_COLORS[i % SECTOR_COLORS.length] }} />
+                      ))}
                     </div>
-                    <Link href={`/stocks/${redFlagCategories.latest_alert.ticker}`} className="text-xs text-vettr-accent hover:underline flex-shrink-0">View</Link>
+                    <div className="space-y-1.5">
+                      {sectorSplit.slice(0, 6).map((s, i) => (
+                        <div key={s.sector} className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: SECTOR_COLORS[i % SECTOR_COLORS.length] }} />
+                            <span className="text-xs text-gray-400 truncate max-w-[100px]">{s.sector}</span>
+                          </div>
+                          <span className="text-sm font-semibold text-gray-900 dark:text-white">{s.count} <span className="text-xs text-gray-400 font-normal">({s.pct}%)</span></span>
+                        </div>
+                      ))}
+                      {sectorSplit.length > 6 && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-gray-400">+ {sectorSplit.length - 6} more</span>
+                          <span className="text-sm font-semibold text-gray-900 dark:text-white">{sectorSplit.slice(6).reduce((sum, s) => sum + s.count, 0)}</span>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Top Gainers */}
+              <div className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-5">
+                <p className="text-xs text-gray-500 uppercase tracking-wider mb-3 font-medium">Top Gainers</p>
+                {topGainers.length === 0 ? (
+                  <p className="text-sm text-gray-500 text-center py-6">No gainers today</p>
+                ) : (
+                  <div className="space-y-2">
+                    {topGainers.map((holding) => (
+                      <Link key={holding.ticker} href={`/stocks/${holding.ticker}`} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-colors">
+                        <div>
+                          <span className="text-sm font-bold text-gray-900 dark:text-white">{holding.ticker}</span>
+                          <p className="text-[11px] text-gray-500 truncate max-w-[120px]">{holding.name}</p>
+                        </div>
+                        <div className="flex items-center gap-1 text-vettr-accent">
+                          <ArrowUpIcon className="w-3 h-3" />
+                          <span className="text-sm font-semibold">{Math.abs(holding.price_change_percent || 0).toFixed(2)}%</span>
+                        </div>
+                      </Link>
+                    ))}
                   </div>
                 )}
               </div>
-            )}
-          </section>
-        </>
+
+              {/* Top Losers */}
+              <div className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-5">
+                <p className="text-xs text-gray-500 uppercase tracking-wider mb-3 font-medium">Top Losers</p>
+                {topLosers.length === 0 ? (
+                  <p className="text-sm text-gray-500 text-center py-6">No losers today</p>
+                ) : (
+                  <div className="space-y-2">
+                    {topLosers.map((holding) => (
+                      <Link key={holding.ticker} href={`/stocks/${holding.ticker}`} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-colors">
+                        <div>
+                          <span className="text-sm font-bold text-gray-900 dark:text-white">{holding.ticker}</span>
+                          <p className="text-[11px] text-gray-500 truncate max-w-[120px]">{holding.name}</p>
+                        </div>
+                        <div className="flex items-center gap-1 text-red-400">
+                          <ArrowDownIcon className="w-3 h-3" />
+                          <span className="text-sm font-semibold">{Math.abs(holding.price_change_percent || 0).toFixed(2)}%</span>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* Red Flag Summary — visible when user is authenticated */}
+      {isAuthenticated && (
+        <section className="mb-6">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Red Flag Summary</h2>
+          {isLoadingPulse ? (
+            <div className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-6 h-40 animate-pulse" />
+          ) : (
+            <div className="bg-white/80 dark:bg-vettr-card/50 border border-gray-200 dark:border-white/5 rounded-2xl p-5">
+              <div className="flex flex-wrap gap-3 mb-4">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-500/10 text-red-400 text-sm font-medium">
+                  <FlagIcon className="w-3.5 h-3.5" />
+                  Critical ({redFlagCategories?.critical_count ?? redFlagTrend?.breakdown_by_severity?.critical ?? 0})
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-orange-500/10 text-orange-400 text-sm font-medium">
+                  <AlertTriangleIcon className="w-3.5 h-3.5" />
+                  Warnings ({redFlagCategories?.warning_count ?? redFlagTrend?.breakdown_by_severity?.moderate ?? 0})
+                </span>
+              </div>
+
+              {redFlagCategories && redFlagCategories.categories.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {redFlagCategories.categories.map((cat) => (
+                    <div key={cat.category} className={`rounded-xl p-4 border ${cat.severity === 'critical' ? 'border-red-500/20 bg-red-500/5' : 'border-orange-500/20 bg-orange-500/5'}`}>
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className={`w-2 h-2 rounded-full ${cat.severity === 'critical' ? 'bg-red-400' : 'bg-orange-400'}`} />
+                        <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">{cat.category}</span>
+                      </div>
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white">{cat.label}</p>
+                      <p className="text-xs text-gray-500 mt-1">{cat.stock_count} stock{cat.stock_count !== 1 ? 's' : ''} affected</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {['Financial Risk', 'Governance', 'Momentum'].map((cat) => (
+                    <div key={cat} className="rounded-xl p-4 border border-gray-200 dark:border-white/5 bg-gray-50 dark:bg-white/[0.02]">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-2 h-2 rounded-full bg-green-400" />
+                        <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">{cat}</span>
+                      </div>
+                      <p className="text-sm font-semibold text-gray-500">All Clear</p>
+                      <p className="text-xs text-gray-600 mt-1">No flags detected</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {redFlagCategories?.latest_alert && (
+                <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-red-500/5 border border-red-500/10 mt-4">
+                  {redFlagCategories.latest_alert.is_new && (
+                    <span className="flex-shrink-0 px-2 py-0.5 text-[10px] font-bold uppercase bg-red-500 text-white rounded">New</span>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <span className="text-sm font-medium text-gray-900 dark:text-white">{redFlagCategories.latest_alert.ticker}</span>
+                    <span className="text-sm text-gray-400"> — {redFlagCategories.latest_alert.label}</span>
+                  </div>
+                  <Link href={`/stocks/${redFlagCategories.latest_alert.ticker}`} className="text-xs text-vettr-accent hover:underline flex-shrink-0">View</Link>
+                </div>
+              )}
+            </div>
+          )}
+        </section>
       )}
     </div>
   )
