@@ -7,6 +7,7 @@ import { ToastProvider } from '@/contexts/ToastContext'
 import { ThemeProvider } from '@/contexts/ThemeContext'
 import OfflineBanner from '@/components/ui/OfflineBanner'
 import { CookieConsent } from '@/components/CookieConsent'
+import { OnboardingDisclaimer } from '@/components/OnboardingDisclaimer'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/react'
 
@@ -106,6 +107,7 @@ export default function RootLayout({
             <SpeedInsights />
           </>
         )}
+        <OnboardingDisclaimer />
         <CookieConsent />
       </body>
     </html>

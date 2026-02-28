@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import type { NewsArticle } from '@/types/portfolio';
 
 interface NewsCardProps {
@@ -53,11 +54,13 @@ export default function NewsCard({ article }: NewsCardProps) {
           </div>
         </div>
         {article.image_url && (
-          <div className="w-16 h-16 rounded-lg bg-gray-200 dark:bg-white/10 flex-shrink-0 overflow-hidden">
-            <img
+          <div className="w-16 h-16 rounded-lg bg-gray-200 dark:bg-white/10 flex-shrink-0 overflow-hidden relative">
+            <Image
               src={article.image_url}
               alt=""
-              className="w-full h-full object-cover"
+              fill
+              sizes="64px"
+              className="object-cover"
             />
           </div>
         )}
