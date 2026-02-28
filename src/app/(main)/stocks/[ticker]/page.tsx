@@ -25,7 +25,9 @@ function usePrefersReducedMotion() {
 
   return prefersReducedMotion;
 }
+import { useAuth } from '@/contexts/AuthContext';
 import { useStock } from '@/hooks/useStock';
+import { useStockPreview } from '@/hooks/useStockPreview';
 import { useVetrScore } from '@/hooks/useVetrScore';
 import { useFilings } from '@/hooks/useFilings';
 import { useExecutives } from '@/hooks/useExecutives';
@@ -33,6 +35,7 @@ import { useWatchlist } from '@/hooks/useWatchlist';
 import { useRedFlags } from '@/hooks/useRedFlags';
 import { useRedFlagHistory } from '@/hooks/useRedFlagHistory';
 import { useAllHoldings } from '@/hooks/usePortfolio';
+import StockPreviewOverlay from '@/components/stock/StockPreviewOverlay';
 
 import { useVetrScoreComparison } from '@/hooks/useVetrScoreComparison';
 import { useVetrScoreTrend } from '@/hooks/useVetrScoreTrend';
@@ -95,28 +98,55 @@ function StockDetailContent() {
   // Score detail modal state
   const [showScoreDetail, setShowScoreDetail] = useState(false);
 
+  // Auth check for conditional rendering
+  const { isAuthenticated } = useAuth();
+
   // Set client flag on mount
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  const { stock, isLoading: stockLoading, error: stockError } = useStock(ticker);
-  const { score, isLoading: scoreLoading } = useVetrScore({ ticker });
-  const { filings, isLoading: filingsLoading } = useFilings({ ticker, limit: 5 });
-  // Fetch all executives for this ticker — client-side filtering via filteredAndSortedExecutives
-  const { executives, isLoading: executivesLoading } = useExecutives({ ticker });
-  const { watchlist, isAdding, isRemoving, addToWatchlist, removeFromWatchlist } = useWatchlist();
-  const { redFlags, isLoading: redFlagsLoading, mutate: mutateRedFlags } = useRedFlags({ ticker });
-  const { history: flagHistory, isLoading: flagHistoryLoading } = useRedFlagHistory({ ticker, limit: 10 });
-  const { data: fundamentals, isLoading: fundamentalsLoading } = useFundamentals({ ticker });
-  const { comparison, isLoading: comparisonLoading } = useVetrScoreComparison({ ticker });
-  const { trend, isLoading: trendLoading } = useVetrScoreTrend({ ticker });
+  // Public preview for guests (no auth required)
+  const { preview, isLoading: previewLoading } = useStockPreview(ticker, { enabled: !isAuthenticated });
 
-  const { holdings: allHoldings } = useAllHoldings();
+  // Auth-required hooks — only fetch when authenticated
+  const { stock, isLoading: stockLoading, error: stockError } = useStock(ticker, isAuthenticated);
+  const { score, isLoading: scoreLoading } = useVetrScore({ ticker, shouldFetch: isAuthenticated });
+  const { filings, isLoading: filingsLoading } = useFilings({ ticker, limit: 5, shouldFetch: isAuthenticated });
+  // Fetch all executives for this ticker — client-side filtering via filteredAndSortedExecutives
+  const { executives, isLoading: executivesLoading } = useExecutives({ ticker, shouldFetch: isAuthenticated });
+  const { watchlist, isAdding, isRemoving, addToWatchlist, removeFromWatchlist } = useWatchlist({ enabled: isAuthenticated });
+  const { redFlags, isLoading: redFlagsLoading, mutate: mutateRedFlags } = useRedFlags({ ticker, shouldFetch: isAuthenticated });
+  const { history: flagHistory, isLoading: flagHistoryLoading } = useRedFlagHistory({ ticker, limit: 10, shouldFetch: isAuthenticated });
+  const { data: fundamentals, isLoading: fundamentalsLoading } = useFundamentals({ ticker, shouldFetch: isAuthenticated });
+  const { comparison, isLoading: comparisonLoading } = useVetrScoreComparison({ ticker, shouldFetch: isAuthenticated });
+  const { trend, isLoading: trendLoading } = useVetrScoreTrend({ ticker, shouldFetch: isAuthenticated });
+
+  const { holdings: allHoldings } = useAllHoldings({ enabled: isAuthenticated });
   const tickerHoldings = useMemo(() => allHoldings.filter(h => h.ticker === ticker), [allHoldings, ticker]);
 
   const isInWatchlist = watchlist.some(item => item.ticker === ticker);
   const isTogglingFavorite = isAdding || isRemoving;
+
+  // Guest view: show preview overlay with score + pillars, blur the rest
+  if (!isAuthenticated) {
+    if (previewLoading) {
+      return (
+        <div className="p-4 md:p-6 pb-20 md:pb-6 flex items-center justify-center min-h-[60vh]">
+          <div className="w-8 h-8 border-2 border-vettr-accent border-t-transparent rounded-full animate-spin" />
+        </div>
+      );
+    }
+    if (preview) {
+      return <StockPreviewOverlay preview={preview} />;
+    }
+    // If preview fails, show not found
+    return (
+      <div className="p-4 md:p-6 pb-20 md:pb-6 flex items-center justify-center min-h-[60vh]">
+        <p className="text-gray-400">Stock not found. <a href="/" className="text-vettr-accent hover:underline">Search again</a></p>
+      </div>
+    );
+  }
 
   // Handle keyboard navigation for tabs
   const handleTabKeyDown = (event: React.KeyboardEvent, tab: Tab) => {

@@ -9,6 +9,7 @@ interface UseFilingsParams {
   limit?: number;
   offset?: number;
   filingType?: string; // Filter by filing type
+  shouldFetch?: boolean; // Conditionally skip fetching (default: true)
 }
 
 interface UseFilingsReturn {
@@ -29,7 +30,7 @@ interface UseFilingsReturn {
  * Supports pagination with limit/offset
  */
 export function useFilings(params: UseFilingsParams = {}): UseFilingsReturn {
-  const { ticker, limit = 25, offset = 0, filingType } = params;
+  const { ticker, limit = 25, offset = 0, filingType, shouldFetch = true } = params;
 
   // Build query string
   const queryParams = new URLSearchParams();
@@ -55,7 +56,7 @@ export function useFilings(params: UseFilingsParams = {}): UseFilingsReturn {
   const { data, error, isLoading, mutate } = useSWR<
     PaginatedResponse<Filing>,
     Error
-  >(key, fetcher, {
+  >(shouldFetch ? key : null, fetcher, {
     dedupingInterval: 60000, // Cache filings for 60s — filings don't change frequently
   });
 

@@ -587,3 +587,60 @@ export interface PulseSummary {
   sector_exposure: SectorExposure[];
   red_flag_categories: RedFlagCategories;
 }
+
+// =============================================================================
+// Stock Preview Types (for guest partial view)
+// =============================================================================
+
+export interface StockPreviewPillar {
+  score: number;
+  weight: number;
+}
+
+export interface StockPreview {
+  ticker: string;
+  company_name: string;
+  exchange: string;
+  sector: string;
+  market_cap: number | null;
+  current_price: number | null;
+  price_change_percent: number | null;
+  vetr_score: number | null;
+  pillars: {
+    financial_survival: StockPreviewPillar;
+    operational_efficiency: StockPreviewPillar;
+    shareholder_structure: StockPreviewPillar;
+    market_sentiment: StockPreviewPillar;
+  } | null;
+  null_pillars: string[];
+}
+
+// =============================================================================
+// Sample Portfolio Types
+// =============================================================================
+
+export interface SamplePortfolioStock {
+  ticker: string;
+  name: string;
+  exchange: string;
+  sector: string;
+  market_cap: number | null;
+  price: number | null;
+  price_change: number | null;
+  vetr_score: number | null;
+}
+
+export interface SamplePortfolio {
+  id: string;
+  name: string;
+  tagline: string;
+  icon: string;
+  criteria_summary: string;
+  stock_count: number;
+  total_notional_value: number;
+  stocks: SamplePortfolioStock[];
+}
+
+export interface SamplePortfoliosData {
+  portfolios: SamplePortfolio[];
+}

@@ -1,0 +1,1120 @@
+{
+  "project": "VETTR Web App",
+  "phase": "Phase 1",
+  "branchName": "ralph/vettr-web",
+  "description": "A responsive web application for VETTR - a stock analysis platform focused on Canadian small-cap stocks. Built with Next.js 14+ (App Router), TypeScript, Tailwind CSS. Connects to live production backend at https://vettr-backend.vercel.app/v1. Deployed on Vercel.",
+  "totalStories": 65,
+  "userStories": [
+    {
+      "id": "WEB-001",
+      "title": "Initialize Next.js project with TypeScript and Tailwind CSS",
+      "description": "Set up a new Next.js 14+ project using App Router, TypeScript strict mode, Tailwind CSS 3, and ESLint. Configure project structure with src/app directory layout.",
+      "acceptanceCriteria": [
+        "Next.js 14+ with App Router initialized",
+        "TypeScript strict mode enabled in tsconfig.json",
+        "Tailwind CSS 3 configured with custom VETTR color palette (dark navy #0D1B2A, accent green #00E676, warning amber #FFB300, error red #FF5252)",
+        "ESLint + Prettier configured",
+        "src/app/(auth) and src/app/(main) route groups created",
+        "npm run build passes with zero errors",
+        "npm run lint passes with zero errors"
+      ],
+      "priority": 1,
+      "passes": true
+    },
+    {
+      "id": "WEB-002",
+      "title": "Configure environment variables and API client",
+      "description": "Create environment configuration for the backend API URL and admin secret. Build a typed API client using fetch with JWT token management, automatic refresh, and error handling.",
+      "acceptanceCriteria": [
+        ".env.local.example created with NEXT_PUBLIC_API_URL=https://vettr-backend.vercel.app/v1",
+        "src/lib/api-client.ts exports typed fetch wrapper with Authorization header injection",
+        "Automatic JWT refresh on 401 responses using /auth/refresh endpoint",
+        "Token storage in localStorage (access_token) and secure cookie (refresh_token)",
+        "Standard error handling that returns typed ApiError objects",
+        "Request/response types match backend OpenAPI spec",
+        "npm run build passes"
+      ],
+      "priority": 2,
+      "passes": true
+    },
+    {
+      "id": "WEB-003",
+      "title": "Create shared TypeScript types and interfaces",
+      "description": "Define all TypeScript types matching the backend API schemas: Stock, Filing, Executive, AlertRule, User, VetrScore, RedFlag, and API response wrappers.",
+      "acceptanceCriteria": [
+        "src/types/api.ts contains Stock, Filing, Executive, AlertRule, User, Subscription types",
+        "src/types/api.ts contains VetrScore, VetrScoreHistory, RedFlag, RedFlagHistory types",
+        "src/types/api.ts contains ApiResponse<T>, PaginatedResponse<T>, ApiError types",
+        "All types match backend response shapes exactly",
+        "src/types/api.ts contains SyncPull, SyncPush, SyncResolve request/response types",
+        "npm run build passes"
+      ],
+      "priority": 3,
+      "passes": true
+    },
+    {
+      "id": "WEB-004",
+      "title": "Build authentication context and provider",
+      "description": "Create React context for auth state management with login, signup, logout, and token refresh. Include protected route wrapper component.",
+      "acceptanceCriteria": [
+        "src/contexts/AuthContext.tsx provides user state, login, signup, logout, isAuthenticated",
+        "Login calls POST /auth/login with email/password",
+        "Signup calls POST /auth/signup with email/password/displayName",
+        "Logout calls POST /auth/logout and clears tokens",
+        "AuthProvider wraps the app in src/app/layout.tsx",
+        "src/components/ProtectedRoute.tsx redirects to /login if not authenticated",
+        "npm run build passes"
+      ],
+      "priority": 4,
+      "passes": true
+    },
+    {
+      "id": "WEB-005",
+      "title": "Create responsive app shell and navigation layout",
+      "description": "Build the main app layout with a responsive navigation system: bottom tab bar on mobile (< 768px), sidebar on tablet/desktop (>= 768px). Five tabs: Pulse, Discovery, Stocks, Alerts, Profile.",
+      "acceptanceCriteria": [
+        "src/app/(main)/layout.tsx renders navigation + content area",
+        "Mobile (< 768px): fixed bottom tab bar with 5 icons + labels",
+        "Tablet/Desktop (>= 768px): collapsible left sidebar with icons + labels",
+        "Active tab highlighted with accent color (#00E676)",
+        "Tab icons: chart-line (Pulse), search (Discovery), list (Stocks), bell (Alerts), user (Profile)",
+        "Dark theme by default (background #0D1B2A, text white)",
+        "Smooth transitions between tabs",
+        "npm run build passes"
+      ],
+      "priority": 5,
+      "passes": true
+    },
+    {
+      "id": "WEB-006",
+      "title": "Build login page",
+      "description": "Create the login page at /login with email and password fields, form validation, error display, and links to signup. Clean dark-themed design matching VETTR branding.",
+      "acceptanceCriteria": [
+        "src/app/(auth)/login/page.tsx renders login form",
+        "Email and password input fields with validation",
+        "Submit button calls auth context login",
+        "Loading spinner during API call",
+        "Error message display for invalid credentials",
+        "Link to /signup page",
+        "VETTR logo/branding at top",
+        "Responsive layout (centered card on desktop, full-width on mobile)",
+        "Redirects to /pulse on successful login",
+        "npm run build passes"
+      ],
+      "priority": 6,
+      "passes": true
+    },
+    {
+      "id": "WEB-007",
+      "title": "Build signup page",
+      "description": "Create the signup page at /signup with email, password, confirm password, and display name fields.",
+      "acceptanceCriteria": [
+        "src/app/(auth)/signup/page.tsx renders signup form",
+        "Email, password, confirm password, display name fields",
+        "Password match validation",
+        "Password strength indicator (min 8 chars)",
+        "Submit calls auth context signup",
+        "Loading state and error display",
+        "Link to /login page",
+        "Redirects to /pulse on success",
+        "npm run build passes"
+      ],
+      "priority": 7,
+      "passes": true
+    },
+    {
+      "id": "WEB-008",
+      "title": "Create stock data hooks and API service",
+      "description": "Build custom React hooks for fetching stock data from the backend: useStocks, useStock, useStockSearch. Use SWR or React Query for caching and revalidation.",
+      "acceptanceCriteria": [
+        "src/hooks/useStocks.ts returns paginated stock list with loading/error states",
+        "src/hooks/useStock.ts returns single stock detail by ticker",
+        "src/hooks/useStockSearch.ts returns search results with debounced input",
+        "All hooks use the typed API client",
+        "Automatic refetch on window focus",
+        "Loading and error states properly typed",
+        "SWR or React Query configured with sensible cache/stale times",
+        "npm run build passes"
+      ],
+      "priority": 8,
+      "passes": true
+    },
+    {
+      "id": "WEB-009",
+      "title": "Create filing, executive, and watchlist hooks",
+      "description": "Build hooks for filings, executives, and watchlist CRUD operations.",
+      "acceptanceCriteria": [
+        "src/hooks/useFilings.ts returns filings list (all or by stock ticker)",
+        "src/hooks/useFiling.ts returns single filing detail",
+        "src/hooks/useExecutives.ts returns executives list (all or by stock ticker)",
+        "src/hooks/useExecutive.ts returns single executive detail",
+        "src/hooks/useWatchlist.ts returns watchlist with add/remove mutations",
+        "src/hooks/useMarkFilingRead.ts marks filing as read via POST",
+        "npm run build passes"
+      ],
+      "priority": 9,
+      "passes": true
+    },
+    {
+      "id": "WEB-010",
+      "title": "Create VETTR score, red flag, and alert hooks",
+      "description": "Build hooks for VETTR scores, red flags, alert rules, and subscription data.",
+      "acceptanceCriteria": [
+        "src/hooks/useVetrScore.ts returns score with component breakdown",
+        "src/hooks/useVetrScoreHistory.ts returns score history for charting",
+        "src/hooks/useRedFlags.ts returns red flags with composite score",
+        "src/hooks/useRedFlagHistory.ts returns paginated flag history",
+        "src/hooks/useAlertRules.ts returns rules with create/update/delete/toggle mutations",
+        "src/hooks/useSubscription.ts returns current tier and limits",
+        "npm run build passes"
+      ],
+      "priority": 10,
+      "passes": true
+    },
+    {
+      "id": "WEB-011",
+      "title": "Build reusable UI components: Cards, Badges, Chips",
+      "description": "Create shared UI components used across multiple pages: StockCard, VetrScoreBadge, SectorChip, FilingTypeIcon, PriceChangeIndicator, SkeletonLoader.",
+      "acceptanceCriteria": [
+        "src/components/ui/StockCard.tsx shows ticker, name, price, change%, vetr score",
+        "src/components/ui/VetrScoreBadge.tsx shows circular colored score (green >=80, yellow >=60, orange >=40, red <40)",
+        "src/components/ui/SectorChip.tsx shows sector label in a pill shape",
+        "src/components/ui/FilingTypeIcon.tsx shows icon + color by filing type (MD&A, Press Release, Financial Statements)",
+        "src/components/ui/PriceChangeIndicator.tsx shows +/-% in green/red with arrow",
+        "src/components/ui/SkeletonLoader.tsx shows pulsing placeholder shapes",
+        "All components responsive and dark-theme styled",
+        "npm run build passes"
+      ],
+      "priority": 11,
+      "passes": true
+    },
+    {
+      "id": "WEB-012",
+      "title": "Build reusable UI components: Inputs, Modals, Toasts",
+      "description": "Create shared UI primitives: SearchInput, SelectDropdown, Modal, Toast notification system, EmptyState, LoadingSpinner.",
+      "acceptanceCriteria": [
+        "src/components/ui/SearchInput.tsx with icon, clear button, debounced onChange",
+        "src/components/ui/SelectDropdown.tsx styled select with options",
+        "src/components/ui/Modal.tsx with backdrop, close button, animations",
+        "src/components/ui/Toast.tsx with success/error/warning variants, auto-dismiss",
+        "src/contexts/ToastContext.tsx provides showToast function globally",
+        "src/components/ui/EmptyState.tsx with icon, message, optional action button",
+        "src/components/ui/LoadingSpinner.tsx centered spinner",
+        "npm run build passes"
+      ],
+      "priority": 12,
+      "passes": true
+    },
+    {
+      "id": "WEB-013",
+      "title": "Build Pulse page - Market Overview dashboard",
+      "description": "Create the Pulse (home) page showing market overview metrics, recent events, top VETTR scores, and top movers.",
+      "acceptanceCriteria": [
+        "src/app/(main)/pulse/page.tsx is the default authenticated route",
+        "Market Overview section: 4 metric cards (Stocks Tracked, Avg VETTR Score, Top Gainer, Top Loser)",
+        "Recent Events section: up to 5 most recent filings with type icons, ticker, date, material flag",
+        "Top VETTR Scores: horizontal scroll of top 5 stocks by score",
+        "Top Movers: up to 5 stocks with largest absolute price changes",
+        "Last refreshed timestamp banner",
+        "Skeleton loading state on initial load",
+        "Clicking filing navigates to filing detail",
+        "Clicking stock navigates to stock detail",
+        "Responsive grid layout (1 col mobile, 2 col tablet, 3-4 col desktop)",
+        "npm run build passes"
+      ],
+      "priority": 13,
+      "passes": true
+    },
+    {
+      "id": "WEB-014",
+      "title": "Build Discovery page - Stock and Filing browser",
+      "description": "Create the Discovery page with search bar, sector filter chips, featured stocks carousel, and recent filings list.",
+      "acceptanceCriteria": [
+        "src/app/(main)/discovery/page.tsx renders Discovery view",
+        "Search bar at top for stock ticker/name/sector search",
+        "Horizontal sector filter chips (All + dynamic sectors from data)",
+        "Featured Stocks: horizontal scroll of up to 8 stock cards filtered by sector",
+        "Recent Filings: list of 10 most recent filings filtered by sector",
+        "Each filing row shows type icon, title, ticker, date, material indicator",
+        "Search + sector filter combine (AND logic)",
+        "Skeleton loading states",
+        "Navigation to stock detail and filing detail on click",
+        "npm run build passes"
+      ],
+      "priority": 14,
+      "passes": true
+    },
+    {
+      "id": "WEB-015",
+      "title": "Build Stocks page - Full stock list with filters and sorting",
+      "description": "Create the Stocks page showing all tracked stocks with search, sort, favorites filter, and pagination.",
+      "acceptanceCriteria": [
+        "src/app/(main)/stocks/page.tsx renders stock list",
+        "Search bar filters by ticker or company name",
+        "Sort dropdown: VETTR Score, Price, Price Change %, Name, Sector",
+        "Ascending/descending toggle button",
+        "Favorites-only toggle (star icon)",
+        "Stock count display (e.g., '25 stocks')",
+        "Each row shows: company initials avatar, ticker (with star if favorite), name, price, change%, VETTR score badge",
+        "Click row navigates to /stocks/[ticker]",
+        "Responsive: list on mobile, table-like grid on desktop",
+        "Skeleton loading state",
+        "Empty state when no results match filters",
+        "npm run build passes"
+      ],
+      "priority": 15,
+      "passes": true
+    },
+    {
+      "id": "WEB-016",
+      "title": "Build Stock Detail page - Overview tab",
+      "description": "Create the stock detail page with Overview tab showing price header, VETTR score, key metrics grid, and recent filings.",
+      "acceptanceCriteria": [
+        "src/app/(main)/stocks/[ticker]/page.tsx renders stock detail",
+        "3-tab navigation: Overview, Pedigree, Red Flags",
+        "Overview tab is default",
+        "Price header: company name, price (large), change% (colored), sector chip, exchange chip",
+        "VETTR Score section: large circular score visualization with color",
+        "Key Metrics grid: Market Cap, Exchange, Sector, Filings count",
+        "Recent Filings list: type icon, title, date, material flag, summary preview",
+        "Favorite toggle button (star) in header",
+        "Share button in header",
+        "Responsive layout",
+        "npm run build passes"
+      ],
+      "priority": 16,
+      "passes": true
+    },
+    {
+      "id": "WEB-017",
+      "title": "Build Stock Detail page - Pedigree (Executives) tab",
+      "description": "Create the Pedigree tab showing executive team with search, filter, and sort capabilities.",
+      "acceptanceCriteria": [
+        "Pedigree tab accessible from stock detail page tabs",
+        "Executive list with search by name",
+        "Filter by title (CEO, CFO, etc.)",
+        "Sort by: title, tenure, experience, specialization",
+        "Each executive card shows: initials avatar, name, title, years at company, specialization badge, total experience, tenure risk indicator",
+        "Tenure risk color coding: green (Stable), yellow (Watch), red (Flight Risk)",
+        "Click executive opens executive detail modal or page",
+        "Empty state if no executives",
+        "npm run build passes"
+      ],
+      "priority": 17,
+      "passes": true
+    },
+    {
+      "id": "WEB-018",
+      "title": "Build Executive Detail modal/page",
+      "description": "Create executive detail view showing full profile, career timeline, education, social links, and risk assessment.",
+      "acceptanceCriteria": [
+        "src/components/ExecutiveDetail.tsx renders full executive profile",
+        "Header: initials avatar, name, title, company, tenure, total experience",
+        "Career Timeline: current + previous companies with years",
+        "Education section",
+        "Specialization badge",
+        "Social links: LinkedIn, Twitter (if available)",
+        "Tenure stability assessment with risk level",
+        "Share button",
+        "Close/back navigation",
+        "npm run build passes"
+      ],
+      "priority": 18,
+      "passes": true
+    },
+    {
+      "id": "WEB-019",
+      "title": "Build Stock Detail page - Red Flags tab",
+      "description": "Create the Red Flags tab showing overall score, flag breakdown progress bars, detected flags list, and flag history timeline.",
+      "acceptanceCriteria": [
+        "Red Flags tab accessible from stock detail page tabs",
+        "Overall Red Flag Score: circular progress indicator (0-100) with color coding",
+        "Flag Breakdown: 5 horizontal progress bars (Consolidation Velocity 30%, Financing Velocity 25%, Executive Churn 20%, Disclosure Gaps 15%, Debt Trend 10%)",
+        "Detected Flags list: icon, name, explanation, severity badge (Low/Moderate/High/Critical)",
+        "Flag History section: timeline of recent flag detections with dates",
+        "Acknowledge all flags button",
+        "Click flag shows detailed explanation",
+        "npm run build passes"
+      ],
+      "priority": 19,
+      "passes": true
+    },
+    {
+      "id": "WEB-020",
+      "title": "Build VETTR Score detail modal",
+      "description": "Create a modal showing VETTR score component breakdown with individual category scores.",
+      "acceptanceCriteria": [
+        "src/components/VetrScoreDetail.tsx renders score breakdown",
+        "Overall score prominently displayed",
+        "Component scores: Pedigree, Filing Velocity, Red Flag, Growth, Governance",
+        "Each component shows score value and visual bar",
+        "Bonus points and penalty points displayed",
+        "Color coding per component (green/yellow/orange/red)",
+        "Explanation of scoring methodology",
+        "Close button",
+        "npm run build passes"
+      ],
+      "priority": 20,
+      "passes": true
+    },
+    {
+      "id": "WEB-021",
+      "title": "Build Filing Detail page",
+      "description": "Create filing detail view showing full filing information, summary, and related stock card.",
+      "acceptanceCriteria": [
+        "src/app/(main)/filings/[id]/page.tsx renders filing detail",
+        "Header: filing type icon (colored), title, status badge",
+        "Stock info: ticker + company name",
+        "Full date filed",
+        "Summary section with full text",
+        "Filing details grid: Type, Date, Material (Yes/No), Status (Read/Unread)",
+        "Related Stock card: initials, ticker, name, price, change%, VETTR score",
+        "Auto-marks filing as read on view (calls POST /filings/:id/read)",
+        "Click related stock navigates to stock detail",
+        "npm run build passes"
+      ],
+      "priority": 21,
+      "passes": true
+    },
+    {
+      "id": "WEB-022",
+      "title": "Build Alerts page - Rules list and recent triggers",
+      "description": "Create the Alerts page showing recent alert triggers and user's alert rules with filtering.",
+      "acceptanceCriteria": [
+        "src/app/(main)/alerts/page.tsx renders alerts view",
+        "Recent Triggers section: up to 5 most recent triggered alerts with icon, ticker, type, date",
+        "My Alert Rules section with filter tabs: Active, Inactive, All",
+        "Each rule row: stock ticker, alert type, condition, frequency, toggle switch, edit/delete buttons",
+        "Toggle switch enables/disables rule (calls enable/disable endpoint)",
+        "Delete with confirmation dialog",
+        "Create new alert button (+ FAB on mobile, button on desktop)",
+        "Empty state with CTA to create first alert",
+        "npm run build passes"
+      ],
+      "priority": 22,
+      "passes": true
+    },
+    {
+      "id": "WEB-023",
+      "title": "Build Alert Rule Creator modal",
+      "description": "Create multi-step modal for creating new alert rules: select stock, select type, configure condition, set frequency.",
+      "acceptanceCriteria": [
+        "src/components/AlertRuleCreator.tsx renders multi-step form in modal",
+        "Step 1: Stock selector with search",
+        "Step 2: Alert type selection (Red Flag, Financing, Executive Changes, Consolidation, Drill Results)",
+        "Step 3: Condition configuration (threshold values if applicable)",
+        "Step 4: Frequency selection (Real-time, Daily, Weekly)",
+        "Step 5: Review and confirm",
+        "Progress indicator showing current step",
+        "Back/Next navigation between steps",
+        "Submit calls POST /alerts/rules",
+        "Success toast on creation",
+        "npm run build passes"
+      ],
+      "priority": 23,
+      "passes": true
+    },
+    {
+      "id": "WEB-024",
+      "title": "Build Alert Rule Editor",
+      "description": "Create edit flow for existing alert rules, pre-filling current values.",
+      "acceptanceCriteria": [
+        "Reuses AlertRuleCreator component in edit mode",
+        "Pre-fills all fields from existing rule data",
+        "Submit calls PUT /alerts/rules/:id",
+        "Success toast on update",
+        "Delete option with confirmation",
+        "Cancel returns to alerts list unchanged",
+        "npm run build passes"
+      ],
+      "priority": 24,
+      "passes": true
+    },
+    {
+      "id": "WEB-025",
+      "title": "Build Profile page - User info, subscription, and data sync",
+      "description": "Create the Profile page showing user info header, subscription details, data sync status, and settings links.",
+      "acceptanceCriteria": [
+        "src/app/(main)/profile/page.tsx renders profile view",
+        "User header: initials avatar, display name, email, tier badge (Free/Pro/Premium)",
+        "Subscription section: current plan, watchlist limit, stocks tracked count",
+        "Data Sync section: last sync timestamp, sync frequency",
+        "Data & Storage: favorites count, clear cache button",
+        "Help & Learning: links to Glossary, FAQ",
+        "About: version, Terms of Service, Privacy Policy, Contact Support",
+        "Sign Out button with confirmation",
+        "Responsive layout",
+        "npm run build passes"
+      ],
+      "priority": 25,
+      "passes": true
+    },
+    {
+      "id": "WEB-026",
+      "title": "Build Settings page",
+      "description": "Create settings page with notification preferences, alert toggles, and appearance options.",
+      "acceptanceCriteria": [
+        "src/app/(main)/profile/settings/page.tsx renders settings",
+        "Notification Settings: enable/disable notification toggles",
+        "Alert Preferences: Red Flag, Financing, Drill Result, Management Change toggles with colored icons",
+        "Appearance: dark mode toggle (default on)",
+        "Default sort order picker",
+        "Settings saved to backend via PUT /users/me/settings",
+        "Back navigation to profile",
+        "npm run build passes"
+      ],
+      "priority": 26,
+      "passes": true
+    },
+    {
+      "id": "WEB-027",
+      "title": "Build Glossary page",
+      "description": "Create glossary page with searchable financial terms and definitions.",
+      "acceptanceCriteria": [
+        "src/app/(main)/profile/glossary/page.tsx renders glossary",
+        "Alphabetical list of financial/VETTR terms",
+        "Search bar to filter terms",
+        "Terms include: VETTR Score, Red Flag, Pedigree, Filing, Market Cap, etc.",
+        "Expandable/collapsible term definitions",
+        "At least 20 relevant terms defined",
+        "npm run build passes"
+      ],
+      "priority": 27,
+      "passes": true
+    },
+    {
+      "id": "WEB-028",
+      "title": "Build FAQ page",
+      "description": "Create FAQ page with common questions and answers about the VETTR platform.",
+      "acceptanceCriteria": [
+        "src/app/(main)/profile/faq/page.tsx renders FAQ",
+        "Accordion-style expandable Q&A items",
+        "At least 15 relevant questions covering: VETTR scoring, red flags, executives, alerts, subscription tiers, data freshness",
+        "Search/filter functionality",
+        "Back navigation to profile",
+        "npm run build passes"
+      ],
+      "priority": 28,
+      "passes": true
+    },
+    {
+      "id": "WEB-029",
+      "title": "Build Feedback form",
+      "description": "Create feedback submission form accessible from the profile page.",
+      "acceptanceCriteria": [
+        "src/components/FeedbackForm.tsx renders in modal",
+        "Category selector: Bug Report, Feature Request, General Feedback",
+        "Text area for feedback message",
+        "Optional email field",
+        "Submit button with loading state",
+        "Success confirmation on submit",
+        "npm run build passes"
+      ],
+      "priority": 29,
+      "passes": true
+    },
+    {
+      "id": "WEB-030",
+      "title": "Build Onboarding flow for new users",
+      "description": "Create multi-step onboarding walkthrough shown on first login, explaining each tab and feature.",
+      "acceptanceCriteria": [
+        "src/components/Onboarding.tsx renders full-screen overlay walkthrough",
+        "5 slides: Welcome, Pulse tab, Discovery, Stocks & VETTR Score, Alerts & Red Flags",
+        "Each slide has illustration/icon, title, description",
+        "Next/Previous/Skip buttons",
+        "Progress dots indicator",
+        "Shown on first login (stored in localStorage)",
+        "Accessible again from Profile > View Onboarding",
+        "npm run build passes"
+      ],
+      "priority": 30,
+      "passes": true
+    },
+    {
+      "id": "WEB-031",
+      "title": "Implement watchlist (favorites) functionality",
+      "description": "Wire up add/remove favorite on stock cards and stock detail page. Show favorites count in profile. Filter stocks list by favorites.",
+      "acceptanceCriteria": [
+        "Star icon on stock cards toggles favorite state",
+        "Star icon on stock detail header toggles favorite",
+        "Add favorite calls POST /watchlist/:ticker",
+        "Remove favorite calls DELETE /watchlist/:ticker",
+        "Optimistic UI update (instant star toggle before API confirms)",
+        "Favorites count shown in Profile > Data & Storage",
+        "Stocks page favorites-only filter works with watchlist data",
+        "Toast notification on add/remove",
+        "npm run build passes"
+      ],
+      "priority": 31,
+      "passes": true
+    },
+    {
+      "id": "WEB-032",
+      "title": "Implement share functionality",
+      "description": "Add share buttons for stocks, executives, filings, and alerts using Web Share API with clipboard fallback.",
+      "acceptanceCriteria": [
+        "Share button on stock detail generates formatted text (ticker, name, score, price, sector)",
+        "Share button on executive detail generates profile summary",
+        "Share button on filing detail generates filing info",
+        "Share button on triggered alerts generates alert summary",
+        "Uses Web Share API if available (navigator.share)",
+        "Falls back to clipboard copy with toast 'Copied to clipboard'",
+        "npm run build passes"
+      ],
+      "priority": 32,
+      "passes": true
+    },
+    {
+      "id": "WEB-033",
+      "title": "Implement filing read status tracking",
+      "description": "Track which filings the user has read, show unread indicators, and auto-mark as read on view.",
+      "acceptanceCriteria": [
+        "Unread filings show blue dot indicator in filing lists",
+        "Opening filing detail calls POST /filings/:id/read",
+        "Read status persists across sessions (stored on backend)",
+        "Filing detail shows Read/Unread status in details grid",
+        "Unread count shown where relevant",
+        "npm run build passes"
+      ],
+      "priority": 33,
+      "passes": true
+    },
+    {
+      "id": "WEB-034",
+      "title": "Implement red flag acknowledgment",
+      "description": "Allow users to acknowledge individual and all red flags for a stock.",
+      "acceptanceCriteria": [
+        "Acknowledge button on individual red flag items",
+        "Acknowledge All button on Red Flags tab",
+        "Acknowledged flags show checkmark/dimmed state",
+        "Calls POST /red-flags/:id/acknowledge for individual",
+        "Calls POST /stocks/:ticker/red-flags/acknowledge-all for bulk",
+        "Acknowledged state persists (per-user on backend)",
+        "npm run build passes"
+      ],
+      "priority": 34,
+      "passes": true
+    },
+    {
+      "id": "WEB-035",
+      "title": "Build VETTR Score history chart",
+      "description": "Add interactive line chart showing VETTR score history over time on stock detail page using a lightweight charting library.",
+      "acceptanceCriteria": [
+        "Install lightweight chart library (recharts or chart.js with react-chartjs-2)",
+        "Line chart on stock Overview tab showing score history",
+        "Time range selector: 1M, 3M, 6M, 12M, 24M",
+        "Hover/touch shows tooltip with exact score and date",
+        "Chart uses VETTR accent green color for line",
+        "Dark theme compatible (dark background, light grid lines)",
+        "Falls back to 'Not enough data' message if < 2 data points",
+        "npm run build passes"
+      ],
+      "priority": 35,
+      "passes": true
+    },
+    {
+      "id": "WEB-036",
+      "title": "Build VETTR Score comparison view",
+      "description": "Show how a stock's VETTR score compares to sector peers using the compare endpoint.",
+      "acceptanceCriteria": [
+        "Section on stock Overview tab showing peer comparison",
+        "Calls GET /stocks/:ticker/vetr-score/compare",
+        "Shows stock's percentile rank within sector",
+        "Bar chart or ranking list of sector peers with scores",
+        "Current stock highlighted",
+        "Sector average indicator",
+        "npm run build passes"
+      ],
+      "priority": 36,
+      "passes": true
+    },
+    {
+      "id": "WEB-037",
+      "title": "Build VETTR Score trend indicator",
+      "description": "Show score trend direction and momentum on stock detail page.",
+      "acceptanceCriteria": [
+        "Calls GET /stocks/:ticker/vetr-score/trend",
+        "Shows trend direction: Improving, Stable, Declining with arrow icon",
+        "Momentum value displayed",
+        "Recent changes listed",
+        "Integrated into stock Overview tab near VETTR score section",
+        "Color coded (green improving, yellow stable, red declining)",
+        "npm run build passes"
+      ],
+      "priority": 37,
+      "passes": true
+    },
+    {
+      "id": "WEB-038",
+      "title": "Add responsive table/grid view toggle for Stocks page",
+      "description": "Allow users to switch between card view and table view on the Stocks page. Table view shows more data in compact format on desktop.",
+      "acceptanceCriteria": [
+        "Toggle button: Card View (grid icon) / Table View (table icon)",
+        "Card view: current responsive card layout",
+        "Table view: sortable columns (Ticker, Name, Price, Change%, VETTR Score, Sector, Market Cap)",
+        "Clickable column headers to sort",
+        "Table view only available on desktop (>= 1024px), auto-switches to cards on mobile",
+        "View preference saved in localStorage",
+        "npm run build passes"
+      ],
+      "priority": 38,
+      "passes": true
+    },
+    {
+      "id": "WEB-039",
+      "title": "Add keyboard shortcuts for power users",
+      "description": "Implement keyboard shortcuts for common navigation and actions on desktop.",
+      "acceptanceCriteria": [
+        "Cmd/Ctrl+K opens quick stock search overlay",
+        "1-5 switches between tabs (Pulse, Discovery, Stocks, Alerts, Profile)",
+        "Escape closes modals and search overlay",
+        "? opens keyboard shortcuts help modal",
+        "Shortcuts only active on desktop (not when typing in input fields)",
+        "Help modal lists all available shortcuts",
+        "npm run build passes"
+      ],
+      "priority": 39,
+      "passes": true
+    },
+    {
+      "id": "WEB-040",
+      "title": "Build quick search overlay (Cmd+K)",
+      "description": "Create a spotlight-style quick search overlay for rapidly finding stocks.",
+      "acceptanceCriteria": [
+        "src/components/QuickSearch.tsx renders overlay modal",
+        "Opens with Cmd/Ctrl+K",
+        "Search input with auto-focus",
+        "Real-time results as user types (debounced)",
+        "Shows matching stocks with ticker, name, price, score",
+        "Arrow keys navigate results, Enter selects",
+        "Selected stock navigates to detail page",
+        "Recent searches shown when input is empty",
+        "Escape or click backdrop closes",
+        "npm run build passes"
+      ],
+      "priority": 40,
+      "passes": true
+    },
+    {
+      "id": "WEB-041",
+      "title": "Add pull-to-refresh on mobile and refresh button on desktop",
+      "description": "Implement data refresh mechanism appropriate to each viewport.",
+      "acceptanceCriteria": [
+        "Mobile: pull-to-refresh gesture on Pulse, Discovery, Stocks pages",
+        "Desktop: refresh button in top bar with loading animation",
+        "Refresh re-fetches data from all active hooks",
+        "Last refreshed timestamp updates on success",
+        "Error toast if refresh fails",
+        "Debounce to prevent rapid repeated refreshes (min 5s between)",
+        "npm run build passes"
+      ],
+      "priority": 41,
+      "passes": true
+    },
+    {
+      "id": "WEB-042",
+      "title": "Implement error boundary and 404 page",
+      "description": "Add React error boundaries for graceful error handling and a custom 404 page.",
+      "acceptanceCriteria": [
+        "src/app/not-found.tsx custom 404 page with VETTR branding",
+        "src/app/error.tsx global error boundary with retry button",
+        "src/app/(main)/stocks/[ticker]/not-found.tsx for invalid tickers",
+        "Error boundary catches rendering errors and shows fallback UI",
+        "Retry button attempts to re-render the component",
+        "Report bug link in error UI",
+        "npm run build passes"
+      ],
+      "priority": 42,
+      "passes": true
+    },
+    {
+      "id": "WEB-043",
+      "title": "Add loading states with skeleton screens for all pages",
+      "description": "Implement skeleton loading screens that match the layout of each page for a polished loading experience.",
+      "acceptanceCriteria": [
+        "Pulse page skeleton: 4 metric card placeholders, event list placeholders, score card placeholders",
+        "Discovery page skeleton: search bar, filter chips, stock card placeholders, filing list placeholders",
+        "Stocks page skeleton: search bar, stock row placeholders",
+        "Stock Detail skeleton: price header, score circle, metrics grid, filings list placeholders",
+        "Alerts page skeleton: trigger cards, rule list placeholders",
+        "Profile page skeleton: user header, settings sections",
+        "All skeletons use animated pulse effect",
+        "npm run build passes"
+      ],
+      "priority": 43,
+      "passes": true
+    },
+    {
+      "id": "WEB-044",
+      "title": "Implement dark/light mode toggle",
+      "description": "Add theme switching between dark and light modes with system preference detection.",
+      "acceptanceCriteria": [
+        "src/contexts/ThemeContext.tsx manages theme state",
+        "Three options: Dark (default), Light, System",
+        "Dark theme: #0D1B2A background, white text, dark cards",
+        "Light theme: white background, dark text, light cards",
+        "System follows prefers-color-scheme media query",
+        "Theme preference saved in localStorage",
+        "Toggle in Settings page and optionally in sidebar/navbar",
+        "All components properly themed (no hardcoded colors)",
+        "Smooth transition when switching themes",
+        "npm run build passes"
+      ],
+      "priority": 44,
+      "passes": true
+    },
+    {
+      "id": "WEB-045",
+      "title": "Implement responsive data tables for filings and executives",
+      "description": "On desktop, show filings and executives in proper data tables with sortable columns. On mobile, show as cards.",
+      "acceptanceCriteria": [
+        "Filing lists on desktop: table with columns (Type, Title, Stock, Date, Material, Status)",
+        "Filing lists on mobile: compact card layout",
+        "Executive lists on desktop: table with columns (Name, Title, Tenure, Experience, Specialization, Risk)",
+        "Executive lists on mobile: card layout",
+        "Sortable column headers",
+        "Responsive breakpoint at 768px",
+        "npm run build passes"
+      ],
+      "priority": 45,
+      "passes": true
+    },
+    {
+      "id": "WEB-046",
+      "title": "Add page metadata and SEO for public pages",
+      "description": "Configure Next.js metadata for all pages including title, description, and Open Graph tags.",
+      "acceptanceCriteria": [
+        "Root layout has base metadata: title 'VETTR', description, favicon",
+        "Each page has unique title (e.g., 'Pulse | VETTR', 'Stocks | VETTR')",
+        "Stock detail pages have dynamic title: '{Ticker} - {Name} | VETTR'",
+        "Open Graph image configured (VETTR branded)",
+        "robots.txt configured (allow for public, noindex for authenticated pages)",
+        "npm run build passes"
+      ],
+      "priority": 46,
+      "passes": true
+    },
+    {
+      "id": "WEB-047",
+      "title": "Implement infinite scroll / load more for stock list",
+      "description": "Add pagination with infinite scroll or load-more button for the stocks list.",
+      "acceptanceCriteria": [
+        "Stocks page loads initial batch (25 stocks)",
+        "Scroll to bottom triggers loading next batch (infinite scroll on mobile)",
+        "Load More button on desktop as alternative",
+        "Loading indicator during fetch",
+        "No duplicate stocks in list",
+        "Works correctly with active search/filter/sort",
+        "Pagination params (limit, offset) sent to API",
+        "npm run build passes"
+      ],
+      "priority": 47,
+      "passes": true
+    },
+    {
+      "id": "WEB-048",
+      "title": "Add breadcrumb navigation for detail pages",
+      "description": "Show breadcrumb trail on detail pages for easy navigation back to parent pages.",
+      "acceptanceCriteria": [
+        "src/components/ui/Breadcrumb.tsx renders clickable breadcrumb trail",
+        "Stock detail: Stocks > {Ticker}",
+        "Filing detail: Filings > {Filing Title}",
+        "Executive detail: Stocks > {Ticker} > Pedigree > {Name}",
+        "Settings: Profile > Settings",
+        "Glossary: Profile > Glossary",
+        "FAQ: Profile > FAQ",
+        "Breadcrumb items are clickable links",
+        "npm run build passes"
+      ],
+      "priority": 48,
+      "passes": true
+    },
+    {
+      "id": "WEB-049",
+      "title": "Implement optimistic updates for mutations",
+      "description": "Add optimistic UI updates for watchlist toggle, alert toggle, and filing read status to feel instant.",
+      "acceptanceCriteria": [
+        "Watchlist add/remove updates UI immediately, reverts on API error",
+        "Alert rule enable/disable updates toggle immediately, reverts on error",
+        "Filing read status updates immediately on view",
+        "Red flag acknowledge updates immediately",
+        "Error toast shown if API call fails with revert",
+        "npm run build passes"
+      ],
+      "priority": 49,
+      "passes": true
+    },
+    {
+      "id": "WEB-050",
+      "title": "Add animation and transitions throughout the app",
+      "description": "Add subtle animations for page transitions, modal open/close, card hover effects, and loading states.",
+      "acceptanceCriteria": [
+        "Install framer-motion",
+        "Page transitions: fade in on route change",
+        "Modal: slide up + fade backdrop on open, reverse on close",
+        "Card hover: subtle lift/shadow effect on desktop",
+        "Tab switch: horizontal slide animation",
+        "Toast: slide in from top, fade out on dismiss",
+        "Skeleton: smooth pulse animation",
+        "Score badge: number count-up animation on load",
+        "All animations respect prefers-reduced-motion",
+        "npm run build passes"
+      ],
+      "priority": 50,
+      "passes": true
+    },
+    {
+      "id": "WEB-051",
+      "title": "Build responsive header bar with logo and user menu",
+      "description": "Create a top header bar with VETTR logo, page title, and user dropdown menu.",
+      "acceptanceCriteria": [
+        "Header bar visible on all authenticated pages",
+        "Left: VETTR text logo",
+        "Center: current page title (responsive - hidden on mobile)",
+        "Right: user initials avatar dropdown",
+        "Dropdown: Profile, Settings, Sign Out",
+        "Dropdown: current tier badge",
+        "Mobile: hamburger menu or simplified header",
+        "Sticky/fixed position",
+        "npm run build passes"
+      ],
+      "priority": 51,
+      "passes": true
+    },
+    {
+      "id": "WEB-052",
+      "title": "Add global red flag trend summary to Pulse page",
+      "description": "Show global red flag trend statistics on the Pulse dashboard.",
+      "acceptanceCriteria": [
+        "New section on Pulse page: Red Flag Trends",
+        "Calls GET /red-flags/trend",
+        "Shows: total active flags, 30-day change, breakdown by severity",
+        "Severity breakdown: Critical, High, Moderate, Low with counts",
+        "Color-coded severity indicators",
+        "Click through to see detailed red flag history",
+        "npm run build passes"
+      ],
+      "priority": 52,
+      "passes": true
+    },
+    {
+      "id": "WEB-053",
+      "title": "Implement URL-based state for filters and search",
+      "description": "Sync search, sort, and filter state with URL query parameters so users can bookmark and share filtered views.",
+      "acceptanceCriteria": [
+        "Stocks page: ?search=, ?sort=, ?order=, ?favorites= in URL",
+        "Discovery page: ?search=, ?sector= in URL",
+        "Alerts page: ?filter= in URL",
+        "URL updates as user changes filters (without page reload)",
+        "Bookmarking URL restores exact filter state",
+        "Browser back/forward navigates filter history",
+        "npm run build passes"
+      ],
+      "priority": 53,
+      "passes": true
+    },
+    {
+      "id": "WEB-054",
+      "title": "Add service worker for offline capability",
+      "description": "Configure Next.js PWA with service worker for offline access to previously loaded data.",
+      "acceptanceCriteria": [
+        "Install next-pwa or similar PWA plugin",
+        "Service worker caches static assets and API responses",
+        "App works offline with cached data",
+        "Offline banner shown when network unavailable",
+        "Automatic sync when connection restored",
+        "PWA manifest with VETTR branding (name, icons, theme color)",
+        "Installable as PWA on mobile (Add to Home Screen)",
+        "npm run build passes"
+      ],
+      "priority": 54,
+      "passes": true
+    },
+    {
+      "id": "WEB-055",
+      "title": "Add accessibility (a11y) improvements",
+      "description": "Ensure the app meets WCAG 2.1 AA accessibility standards.",
+      "acceptanceCriteria": [
+        "All interactive elements have proper aria-labels",
+        "Keyboard navigation works for all features (Tab, Enter, Escape)",
+        "Focus indicators visible on all focusable elements",
+        "Color contrast meets 4.5:1 ratio for text",
+        "Screen reader friendly: headings hierarchy, landmarks, live regions",
+        "Images and icons have alt text",
+        "Form inputs have associated labels",
+        "Skip to main content link",
+        "npm run build passes"
+      ],
+      "priority": 55,
+      "passes": true
+    },
+    {
+      "id": "WEB-056",
+      "title": "Implement rate limit handling in API client",
+      "description": "Handle 429 (Too Many Requests) responses gracefully with retry logic and user feedback.",
+      "acceptanceCriteria": [
+        "API client detects 429 status code",
+        "Reads Retry-After header for wait time",
+        "Automatic retry after specified delay (max 3 retries)",
+        "User-facing toast: 'Rate limited. Retrying in X seconds...'",
+        "Exponential backoff on repeated rate limits",
+        "Rate limit state shown in UI if persistent",
+        "npm run build passes"
+      ],
+      "priority": 56,
+      "passes": true
+    },
+    {
+      "id": "WEB-057",
+      "title": "Add data export functionality",
+      "description": "Allow users to export stock data, watchlist, and alert rules as CSV.",
+      "acceptanceCriteria": [
+        "Export button on Stocks page exports visible stocks as CSV",
+        "Export button on Profile exports watchlist as CSV",
+        "Export button on Alerts exports alert rules as CSV",
+        "CSV includes all visible columns",
+        "File download triggered in browser",
+        "Filename includes date (e.g., vettr-stocks-2026-02-11.csv)",
+        "npm run build passes"
+      ],
+      "priority": 57,
+      "passes": false
+    },
+    {
+      "id": "WEB-058",
+      "title": "Configure Vercel deployment",
+      "description": "Set up Vercel project for automatic deployment from GitHub, configure environment variables, and deploy.",
+      "acceptanceCriteria": [
+        "vercel.json configured with framework preset for Next.js",
+        "Environment variables set on Vercel: NEXT_PUBLIC_API_URL=https://vettr-backend.vercel.app/v1",
+        "Automatic deployments from main branch",
+        "Preview deployments for pull requests",
+        "Custom domain ready (if configured)",
+        "Production build succeeds on Vercel",
+        "All pages load correctly on production URL",
+        "npm run build passes locally before deploy"
+      ],
+      "priority": 58,
+      "passes": false
+    },
+    {
+      "id": "WEB-059",
+      "title": "Add Vercel Analytics and Speed Insights",
+      "description": "Integrate Vercel Analytics and Speed Insights for production monitoring.",
+      "acceptanceCriteria": [
+        "Install @vercel/analytics and @vercel/speed-insights",
+        "Analytics component added to root layout",
+        "Speed Insights component added to root layout",
+        "Verify analytics appear in Vercel dashboard after deploy",
+        "npm run build passes"
+      ],
+      "priority": 59,
+      "passes": false
+    },
+    {
+      "id": "WEB-060",
+      "title": "Performance optimization: Image optimization and lazy loading",
+      "description": "Optimize images, implement lazy loading for below-fold content, and add code splitting.",
+      "acceptanceCriteria": [
+        "Use Next.js Image component for all images",
+        "Lazy load sections below the fold (React.lazy or dynamic imports)",
+        "Dynamic imports for chart components (recharts/chart.js)",
+        "Dynamic imports for modal contents",
+        "Prefetch stock detail data on hover (desktop)",
+        "Bundle size analysis added (npm run analyze)",
+        "npm run build passes"
+      ],
+      "priority": 60,
+      "passes": false
+    },
+    {
+      "id": "WEB-061",
+      "title": "Add comprehensive loading and empty states for all views",
+      "description": "Ensure every data-driven view has proper loading skeleton, empty state, and error state.",
+      "acceptanceCriteria": [
+        "Every page/section has: loading skeleton, empty state message, error state with retry",
+        "Loading skeletons match content layout shapes",
+        "Empty states have helpful message and optional action (e.g., 'No stocks match. Clear filters?')",
+        "Error states show error message + retry button",
+        "Network error: 'Unable to connect. Check your connection.'",
+        "Consistent design language across all states",
+        "npm run build passes"
+      ],
+      "priority": 61,
+      "passes": false
+    },
+    {
+      "id": "WEB-062",
+      "title": "Add print styles for stock reports",
+      "description": "Add CSS print styles so stock detail pages print cleanly as reports.",
+      "acceptanceCriteria": [
+        "@media print styles in global CSS",
+        "Navigation hidden when printing",
+        "Stock detail prints as clean report: header, score, metrics, filings, executives",
+        "Print button on stock detail page",
+        "Colors adjusted for print (dark backgrounds removed)",
+        "Page breaks configured for sections",
+        "npm run build passes"
+      ],
+      "priority": 62,
+      "passes": false
+    },
+    {
+      "id": "WEB-063",
+      "title": "Write README.md with setup and deployment instructions",
+      "description": "Create comprehensive README with project overview, local setup, development commands, architecture overview, and deployment guide.",
+      "acceptanceCriteria": [
+        "README.md in project root",
+        "Project description and features list",
+        "Tech stack section (Next.js, TypeScript, Tailwind, etc.)",
+        "Prerequisites (Node.js 18+, npm)",
+        "Local setup steps (clone, install, env vars, dev server)",
+        "Available npm scripts documented",
+        "Project structure overview",
+        "Deployment instructions (Vercel)",
+        "API connection details",
+        "npm run build passes"
+      ],
+      "priority": 63,
+      "passes": false
+    },
+    {
+      "id": "WEB-064",
+      "title": "End-to-end smoke test of all pages and features",
+      "description": "Verify all pages load, all API connections work, all interactive features function, and no console errors.",
+      "acceptanceCriteria": [
+        "Login/signup flow works end-to-end",
+        "All 5 tabs render with real data from production API",
+        "Stock detail page loads with all 3 tabs (Overview, Pedigree, Red Flags)",
+        "Filing detail page loads and marks as read",
+        "Alert CRUD operations work (create, edit, toggle, delete)",
+        "Watchlist add/remove works",
+        "Search, filter, and sort work on all applicable pages",
+        "Share functionality works",
+        "Profile and settings pages render correctly",
+        "No console errors on any page",
+        "Responsive layout works at 375px, 768px, 1024px, 1440px viewports",
+        "npm run build passes with zero warnings"
+      ],
+      "priority": 64,
+      "passes": false
+    },
+    {
+      "id": "WEB-065",
+      "title": "Final cleanup: remove unused code, fix lint warnings, verify production build",
+      "description": "Final pass to clean up any unused imports, dead code, lint warnings, and ensure production build is clean.",
+      "acceptanceCriteria": [
+        "npm run lint passes with zero warnings",
+        "npm run build passes with zero warnings",
+        "No unused imports or variables",
+        "No console.log statements in production code",
+        "No TODO comments left unresolved",
+        "All TypeScript types properly defined (no 'any' types)",
+        "Package.json has correct project name and version",
+        "All environment variables documented in .env.local.example"
+      ],
+      "priority": 65,
+      "passes": false
+    }
+  ]
+}

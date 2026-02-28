@@ -9,6 +9,7 @@ interface UseExecutivesParams {
   search?: string; // Search by name (used for search endpoint)
   limit?: number;
   offset?: number;
+  shouldFetch?: boolean; // Conditionally skip fetching (default: true)
 }
 
 interface UseExecutivesReturn {
@@ -32,7 +33,7 @@ interface UseExecutivesReturn {
 export function useExecutives(
   params: UseExecutivesParams = {}
 ): UseExecutivesReturn {
-  const { ticker, search, limit = 25, offset = 0 } = params;
+  const { ticker, search, limit = 25, offset = 0, shouldFetch = true } = params;
 
   // Determine the endpoint based on whether we have a ticker and/or search
   let key: string | null = null;
@@ -61,7 +62,7 @@ export function useExecutives(
   const { data, error, isLoading, mutate } = useSWR<
     PaginatedResponse<Executive>,
     Error
-  >(key, fetcher, {
+  >(shouldFetch ? key : null, fetcher, {
     dedupingInterval: 60000, // Cache executives list for 60s
   });
 

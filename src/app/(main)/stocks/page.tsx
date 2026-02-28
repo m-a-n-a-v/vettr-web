@@ -4,7 +4,7 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useMemo, useEffect, useCallback, useRef, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { useStocks } from '@/hooks/useStocks'
 import { useWatchlist } from '@/hooks/useWatchlist'
 import { useSubscription } from '@/hooks/useSubscription'
@@ -46,6 +46,17 @@ const PER_PAGE_OPTIONS = [25, 50, 100] as const
 
 function StocksPageContent() {
   const searchParams = useSearchParams()
+  const router = useRouter()
+  const { isAuthenticated } = useAuth()
+
+  // Redirect guests to landing page — stocks listing is for authenticated users only
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.replace('/')
+    }
+  }, [isAuthenticated, router])
+
+  if (!isAuthenticated) return null // prevent flash while redirecting
 
   // Initialize state from URL params
   // Separate display value (updates instantly on keystroke) from debounced query (triggers API calls)
@@ -59,7 +70,6 @@ function StocksPageContent() {
   const [currentPage, setCurrentPage] = useState(1)
   const [perPage, setPerPage] = useState(25)
   const hasLoadedOnce = useRef(false)
-  const { isAuthenticated } = useAuth()
   const { showToast } = useToast()
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
 

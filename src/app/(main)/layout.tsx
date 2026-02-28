@@ -19,6 +19,7 @@ import { AiAgentProvider, useAiAgentContext } from '@/contexts/AiAgentContext';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useAiAgentQuestions } from '@/hooks/useAiAgentQuestions';
 import { useAiAgentUsage } from '@/hooks/useAiAgentUsage';
+import { usePushNotifications } from '@/hooks/usePushNotifications';
 
 function MainLayoutContent({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
@@ -36,6 +37,7 @@ function MainLayoutContent({ children }: { children: React.ReactNode }) {
   } = useAiAgentContext();
   const { questions: initialQuestions } = useAiAgentQuestions({ shouldFetch: isAuthenticated });
   const { usage } = useAiAgentUsage({ enabled: isAuthenticated });
+  usePushNotifications();
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showKeyboardShortcutsModal, setShowKeyboardShortcutsModal] = useState(false);
 

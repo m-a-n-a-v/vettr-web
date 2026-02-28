@@ -7,6 +7,8 @@ import { usePortfolioSummary } from '@/hooks/usePortfolio'
 import { usePortfolioAlerts, usePortfolioAlertUnreadCount, markAlertRead, markAllAlertsRead } from '@/hooks/usePortfolioAlerts'
 import { usePortfolioInsights, dismissInsight } from '@/hooks/usePortfolioInsights'
 import { useMaterialNews } from '@/hooks/useNews'
+import { useSamplePortfolios } from '@/hooks/useSamplePortfolios'
+import { useSamplePortfolioSelection } from '@/hooks/useSamplePortfolioSelection'
 import { useToast } from '@/contexts/ToastContext'
 import { useRefresh } from '@/hooks/useRefresh'
 import { usePullToRefresh } from '@/hooks/usePullToRefresh'
@@ -14,6 +16,8 @@ import VetrScoreBadge from '@/components/ui/VetrScoreBadge'
 import EmptyState from '@/components/ui/EmptyState'
 import RefreshButton from '@/components/ui/RefreshButton'
 import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator'
+import SamplePortfolioPicker from '@/components/pulse/SamplePortfolioPicker'
+import SamplePortfolioDashboard from '@/components/pulse/SamplePortfolioDashboard'
 import { ArrowUpIcon, ArrowDownIcon, FlagIcon, AlertTriangleIcon, StarIcon, BriefcaseIcon } from '@/components/icons'
 import LoginPrompt from '@/components/ui/LoginPrompt'
 import { useAuth } from '@/contexts/AuthContext'
@@ -58,6 +62,15 @@ export default function PulsePage() {
   const { trend: redFlagTrend, mutate: mutateRedFlagTrend } = useRedFlagTrend({ enabled: isAuthenticated })
 
   const hasPortfolio = portfolioSummaries.length > 0
+
+  // Sample portfolio state (for authenticated users without a real portfolio)
+  const { selectedId: samplePortfolioId, select: selectSamplePortfolio, isHydrated } = useSamplePortfolioSelection()
+  const needsSamplePortfolio = isAuthenticated && !hasPortfolio && !isLoadingPortfolio
+  const { portfolios: samplePortfolios, isLoading: isLoadingSamples } = useSamplePortfolios({ enabled: needsSamplePortfolio })
+  const selectedSamplePortfolio = useMemo(
+    () => samplePortfolios.find((p) => p.id === samplePortfolioId) || null,
+    [samplePortfolios, samplePortfolioId]
+  )
 
   // Aggregate portfolio totals
   const portfolioTotals = useMemo(() => {
@@ -226,7 +239,25 @@ export default function PulsePage() {
         </section>
       )}
 
-      {isAuthenticated && isEmptyWatchlist && !hasPortfolio && (
+      {/* Sample Portfolio Flow (authenticated, no real portfolio) */}
+      {needsSamplePortfolio && isHydrated && !samplePortfolioId && (
+        <section className="mb-6">
+          <SamplePortfolioPicker
+            portfolios={samplePortfolios}
+            isLoading={isLoadingSamples}
+            onSelect={selectSamplePortfolio}
+          />
+        </section>
+      )}
+
+      {needsSamplePortfolio && isHydrated && samplePortfolioId && selectedSamplePortfolio && (
+        <section className="mb-6">
+          <SamplePortfolioDashboard portfolio={selectedSamplePortfolio} />
+        </section>
+      )}
+
+      {/* Fallback: authenticated, no portfolio, no sample selected, and samples loaded but empty */}
+      {isAuthenticated && !hasPortfolio && isHydrated && !samplePortfolioId && !isLoadingSamples && samplePortfolios.length === 0 && isEmptyWatchlist && (
         <EmptyState
           icon={<StarIcon className="w-16 h-16 text-gray-600" />}
           title="Get Started with VETTR"
@@ -368,8 +399,8 @@ export default function PulsePage() {
         </>
       )}
 
-      {/* Connect Portfolio CTA (when no portfolio) */}
-      {!hasPortfolio && !isEmptyWatchlist && (
+      {/* Connect Portfolio CTA (when no portfolio and no sample dashboard showing) */}
+      {!hasPortfolio && !isEmptyWatchlist && !(samplePortfolioId && selectedSamplePortfolio) && (
         <section className="mb-6">
           <div className="bg-gradient-to-r from-vettr-accent/10 to-vettr-accent/5 border border-vettr-accent/20 rounded-2xl p-5">
             <div className="flex items-start gap-4">
