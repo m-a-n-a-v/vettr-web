@@ -15,30 +15,30 @@ export default function VetrScoreDetail({ score, onClose }: VetrScoreDetailProps
 
   // Get color based on score value (5-tier scale)
   const getScoreColor = (value: number): string => {
-    if (value >= 90) return 'text-[#166534]'; // dark green
-    if (value >= 75) return 'text-vettr-accent'; // green
+    if (value >= 90) return 'text-[#198754]'; // dark green
+    if (value >= 75) return 'text-[#84CC16]'; // lime green
     if (value >= 50) return 'text-[#FBBF24]'; // yellow
-    if (value >= 30) return 'text-[#FB923C]'; // orange
-    return 'text-[#F87171]'; // red
+    if (value >= 30) return 'text-[#F97316]'; // orange
+    return 'text-[#DC2626]'; // deep red
   };
 
   // Pillar descriptions for methodology section
   const pillarMethodology = [
     {
       label: 'Financial Survival',
-      description: 'Measures cash runway and solvency. Higher scores indicate stronger financial stability and ability to sustain operations. Combines cash position analysis with debt coverage metrics.'
+      description: 'Cash runway with FCF Rule + debt health'
     },
     {
       label: 'Operational Efficiency',
-      description: 'Evaluates how efficiently the company operates relative to revenue and expenses. Analyzes operational efficiency ratios to assess management effectiveness.'
+      description: 'Sector-specific operational efficiency (mining: exploration ratio, tech: R&D ratio, producer: gross margin)'
     },
     {
       label: 'Shareholder Structure',
-      description: 'Assesses pedigree, dilution patterns, and insider alignment. Higher scores indicate better shareholder protection and institutional confidence. Includes investor quality and ownership stability.'
+      description: 'Executive pedigree, dilution penalty, SEDI insider conviction, warrant overhang proximity'
     },
     {
       label: 'Market Sentiment',
-      description: 'Measures market liquidity and news velocity. Reflects market confidence and trading activity. Combines liquidity metrics with news sentiment analysis.'
+      description: 'Liquidity, technical momentum, news velocity, short interest risk, analyst consensus'
     },
   ];
 
@@ -102,7 +102,8 @@ export default function VetrScoreDetail({ score, onClose }: VetrScoreDetailProps
                   subScores: score.shareholder_structure ? [
                     { label: 'Pedigree', value: score.shareholder_structure.sub_scores?.pedigree },
                     { label: 'Dilution Penalty', value: score.shareholder_structure.sub_scores?.dilution_penalty },
-                    { label: 'Insider Alignment', value: score.shareholder_structure.sub_scores?.insider_alignment },
+                    { label: 'SEDI Insider Conviction', value: score.shareholder_structure.sub_scores?.sedi_insider_conviction },
+                    { label: 'Warrant Overhang', value: score.shareholder_structure.sub_scores?.warrant_overhang },
                   ] : [],
                 },
                 {
@@ -112,6 +113,9 @@ export default function VetrScoreDetail({ score, onClose }: VetrScoreDetailProps
                   subScores: score.market_sentiment ? [
                     { label: 'Liquidity', value: score.market_sentiment.sub_scores?.liquidity },
                     { label: 'News Velocity', value: score.market_sentiment.sub_scores?.news_velocity },
+                    { label: 'Technical Momentum', value: score.market_sentiment.sub_scores?.technical_momentum },
+                    { label: 'Short Squeeze', value: score.market_sentiment.sub_scores?.short_squeeze },
+                    { label: 'Analyst Consensus', value: score.market_sentiment.sub_scores?.analyst_consensus },
                   ] : [],
                 },
               ].map(({ label, pillar, color, subScores }) => {
@@ -200,11 +204,11 @@ export default function VetrScoreDetail({ score, onClose }: VetrScoreDetailProps
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Score Ratings</h3>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: '#166534' }} />
+                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: '#198754' }} />
                 <span className="text-gray-400 text-xs">90-100</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full bg-vettr-accent" />
+                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: '#84CC16' }} />
                 <span className="text-gray-400 text-xs">75-89</span>
               </div>
               <div className="flex items-center gap-2">
@@ -212,11 +216,11 @@ export default function VetrScoreDetail({ score, onClose }: VetrScoreDetailProps
                 <span className="text-gray-400 text-xs">50-74</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: '#FB923C' }} />
+                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: '#F97316' }} />
                 <span className="text-gray-400 text-xs">30-49</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: '#F87171' }} />
+                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: '#DC2626' }} />
                 <span className="text-gray-400 text-xs">0-29</span>
               </div>
             </div>

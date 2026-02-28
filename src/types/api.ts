@@ -229,7 +229,10 @@ export interface OperationalEfficiencySubScores {
 export interface ShareholderStructureSubScores {
   pedigree: number;
   dilution_penalty: number;
-  insider_alignment: number;
+  sedi_insider_conviction: number;
+  warrant_overhang: number;
+  /** @deprecated kept for backward compatibility, use sedi_insider_conviction instead */
+  insider_alignment?: number;
 }
 
 /**
@@ -238,6 +241,9 @@ export interface ShareholderStructureSubScores {
 export interface MarketSentimentSubScores {
   liquidity: number;
   news_velocity: number;
+  technical_momentum: number;
+  short_squeeze: number;
+  analyst_consensus: number;
 }
 
 /**

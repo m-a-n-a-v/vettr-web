@@ -18,9 +18,9 @@ export function ScoreDrivers({ ticker, fundamentals }: ScoreDriversProps) {
 
   const { financialHealth, earningsQuality, analystConsensus } = fundamentals;
 
-  // Calculate insider ownership (for demo, use a realistic value from fundamentals data if available)
+  // Calculate insider conviction (for demo, use a realistic value from fundamentals data if available)
   // For now, we'll derive it from the financial health or use a placeholder
-  const insiderOwnership = 12.4; // Placeholder - in real app, would come from fundamentals data
+  const insiderConviction = 12.4; // Placeholder - in real app, would come from fundamentals data
 
   // Define the 4 score drivers aligned with the 4 pillars
   const drivers = [
@@ -60,9 +60,9 @@ export function ScoreDrivers({ ticker, fundamentals }: ScoreDriversProps) {
           <path d="M16 3.13a4 4 0 0 1 0 7.75" />
         </svg>
       ),
-      metric: `${insiderOwnership.toFixed(1)}%`,
-      label: 'Insider Ownership',
-      value: Math.min(100, insiderOwnership * 5), // Normalize to 0-100 (20% insider = 100 score)
+      metric: `${insiderConviction.toFixed(1)}%`,
+      label: 'Insider Conviction',
+      value: Math.min(100, insiderConviction * 5), // Normalize to 0-100 (20% insider = 100 score)
     },
     {
       pillar: 'Market Sentiment',

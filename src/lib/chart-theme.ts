@@ -84,11 +84,11 @@ export const chartTheme = {
 
 // Helper function to get score color (5-tier scale)
 export const getScoreColor = (score: number): string => {
-  if (score >= 90) return '#166534'; // dark green
-  if (score >= 75) return colors.vettrAccent; // green (#00E676)
+  if (score >= 90) return '#198754'; // dark green
+  if (score >= 75) return '#84CC16'; // lime green
   if (score >= 50) return colors.yellow400; // yellow (#FBBF24)
-  if (score >= 30) return colors.orange400; // orange (#FB923C)
-  return colors.red400; // red (#F87171)
+  if (score >= 30) return '#F97316'; // orange
+  return '#DC2626'; // deep red
 };
 
 // Custom tooltip style factory
