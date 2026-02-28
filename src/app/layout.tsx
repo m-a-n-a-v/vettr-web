@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import { ClerkProvider } from '@clerk/nextjs'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { SWRProvider } from '@/lib/swr-config'
 import { ToastProvider } from '@/contexts/ToastContext'
@@ -89,27 +90,29 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className={`${inter.variable} font-sans antialiased`}>
-        <ThemeProvider>
-          <SWRProvider>
-            <AuthProvider>
-              <ToastProvider>
-                <OfflineBanner />
-                {children}
-              </ToastProvider>
-            </AuthProvider>
-          </SWRProvider>
-        </ThemeProvider>
-        {process.env.NODE_ENV === 'production' && (
-          <>
-            <Analytics />
-            <SpeedInsights />
-          </>
-        )}
-        <OnboardingDisclaimer />
-        <CookieConsent />
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <body className={`${inter.variable} font-sans antialiased`}>
+          <ThemeProvider>
+            <SWRProvider>
+              <AuthProvider>
+                <ToastProvider>
+                  <OfflineBanner />
+                  {children}
+                </ToastProvider>
+              </AuthProvider>
+            </SWRProvider>
+          </ThemeProvider>
+          {process.env.NODE_ENV === 'production' && (
+            <>
+              <Analytics />
+              <SpeedInsights />
+            </>
+          )}
+          <OnboardingDisclaimer />
+          <CookieConsent />
+        </body>
+      </html>
+    </ClerkProvider>
   )
 }

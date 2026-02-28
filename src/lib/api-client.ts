@@ -7,7 +7,18 @@
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://vettr-backend.vercel.app/v1';
 
-// Token storage keys
+// ---------------------------------------------------------------------------
+// Clerk token getter — injected by AuthContext so the api-client doesn't
+// import React hooks directly (which would break server components).
+// ---------------------------------------------------------------------------
+let _clerkGetToken: (() => Promise<string | null>) | null = null;
+
+/** Called once from AuthProvider when the Clerk session is available. */
+export function setClerkTokenGetter(getter: () => Promise<string | null>): void {
+  _clerkGetToken = getter;
+}
+
+// Token storage keys (legacy, kept for migration period)
 const ACCESS_TOKEN_KEY = 'vettr_access_token';
 const REFRESH_TOKEN_KEY = 'vettr_refresh_token';
 
@@ -344,9 +355,16 @@ export async function apiClient<T = unknown>(
       ...(requestOptions.headers as Record<string, string>),
     };
 
-    // Add Authorization header if auth is required
+    // Add Authorization header if auth is required.
+    // Prefer Clerk's session token; fall back to legacy localStorage token.
     if (requestOptions.requiresAuth) {
-      const accessToken = getAccessToken();
+      let accessToken: string | null = null;
+      if (_clerkGetToken) {
+        accessToken = await _clerkGetToken();
+      }
+      if (!accessToken) {
+        accessToken = getAccessToken();
+      }
       if (accessToken) {
         requestHeaders['Authorization'] = `Bearer ${accessToken}`;
       }

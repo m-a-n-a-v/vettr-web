@@ -1,14 +1,17 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { api, authApi } from '@/lib/api-client';
+import { useUser, useAuth as useClerkAuth } from '@clerk/nextjs';
+import { api, setClerkTokenGetter } from '@/lib/api-client';
 import { User } from '@/types/api';
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  /** @deprecated Clerk handles login via the /login page. */
   login: (email: string, password: string) => Promise<void>;
+  /** @deprecated Clerk handles signup via the /signup page. */
   signup: (email: string, password: string, displayName: string) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
@@ -17,123 +20,77 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { isLoaded, isSignedIn } = useUser();
+  const { getToken, signOut } = useClerkAuth();
 
-  const isAuthenticated = !!user;
+  const [vettrUser, setVettrUser] = useState<User | null>(null);
+  const [isFetchingUser, setIsFetchingUser] = useState(false);
 
-  // Check if user is already logged in on mount
+  // Register the Clerk token getter with the API client so every
+  // authenticated request automatically carries the current session token.
   useEffect(() => {
-    const checkAuth = async () => {
-      if (typeof window === 'undefined') {
-        setIsLoading(false);
-        return;
-      }
+    setClerkTokenGetter(getToken as () => Promise<string | null>);
+  }, [getToken]);
 
-      const accessToken = localStorage.getItem('vettr_access_token');
-      if (!accessToken) {
-        setIsLoading(false);
-        return;
-      }
+  // Fetch our DB user whenever Clerk sign-in state becomes active.
+  useEffect(() => {
+    if (!isLoaded) return;
 
-      try {
-        // Fetch current user data to verify token validity
-        // Use a shorter timeout (10s) for auth check to avoid blocking the UI
-        const response = await api.get<User>('/users/me', { timeout: 10000 });
-        if (response.success && response.data) {
-          setUser(response.data);
-        } else {
-          // Token is invalid, clear it
-          localStorage.removeItem('vettr_access_token');
-          localStorage.removeItem('vettr_refresh_token');
-        }
-      } catch (error) {
-        if (process.env.NODE_ENV === 'development') {
-          console.error('Failed to fetch user data:', error);
-        }
-        localStorage.removeItem('vettr_access_token');
-        localStorage.removeItem('vettr_refresh_token');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkAuth();
-  }, []);
-
-  const login = useCallback(async (email: string, password: string) => {
-    try {
-      const response = await authApi.login(email, password);
-      if (response.success && response.data) {
-        const { user: userData } = response.data;
-        // Tokens are already stored by authApi.login
-        // Set user state
-        setUser(userData);
-      } else {
-        throw new Error(response.error?.message || 'Login failed');
-      }
-    } catch (error) {
-      if (process.env.NODE_ENV === 'development') {
-        console.error('Login error:', error);
-      }
-      throw error;
+    if (isSignedIn && !vettrUser && !isFetchingUser) {
+      setIsFetchingUser(true);
+      api
+        .get<User>('/users/me')
+        .then((response) => {
+          if (response.success && response.data) {
+            setVettrUser(response.data);
+          }
+        })
+        .catch(() => {
+          // Network error — will retry on next sign-in state change.
+        })
+        .finally(() => setIsFetchingUser(false));
     }
-  }, []);
 
-  const signup = useCallback(async (email: string, password: string, displayName: string) => {
-    try {
-      const response = await authApi.signup(email, password, displayName);
-      if (response.success && response.data) {
-        const { user: userData } = response.data;
-        // Tokens are already stored by authApi.signup
-        // Set user state
-        setUser(userData);
-      } else {
-        throw new Error(response.error?.message || 'Signup failed');
-      }
-    } catch (error) {
-      if (process.env.NODE_ENV === 'development') {
-        console.error('Signup error:', error);
-      }
-      throw error;
+    if (!isSignedIn) {
+      setVettrUser(null);
     }
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoaded, isSignedIn]);
 
   const logout = useCallback(async () => {
-    try {
-      // Call logout endpoint (clears tokens and redirects)
-      await authApi.logout();
-      setUser(null);
-    } catch (error) {
-      // Continue with local cleanup even if API call fails
-      localStorage.removeItem('vettr_access_token');
-      localStorage.removeItem('vettr_refresh_token');
-      setUser(null);
-    } finally {
-      // Clear all SW caches on logout to prevent stale auth data serving wrong user
-      if (typeof window !== 'undefined' && 'caches' in window) {
-        caches.keys().then(names => {
-          names.forEach(name => caches.delete(name));
-        });
-      }
+    await signOut();
+    setVettrUser(null);
+    // Clear SW caches to prevent stale auth data being served.
+    if (typeof window !== 'undefined' && 'caches' in window) {
+      const names = await caches.keys();
+      await Promise.all(names.map((n) => caches.delete(n)));
     }
-  }, []);
+  }, [signOut]);
 
   const refreshUser = useCallback(async () => {
-    try {
-      const response = await api.get<User>('/users/me');
-      if (response.success && response.data) {
-        setUser(response.data);
-      }
-    } catch (error) {
-      if (process.env.NODE_ENV === 'development') {
-        console.error('Failed to refresh user data:', error);
-      }
+    const response = await api.get<User>('/users/me');
+    if (response.success && response.data) {
+      setVettrUser(response.data);
     }
   }, []);
 
+  // Kept for backward compatibility — Clerk now owns the auth flow.
+  const login = useCallback(async (_email: string, _password: string) => {
+    throw new Error('Use the /login page — Clerk handles authentication.');
+  }, []);
+
+  const signup = useCallback(
+    async (_email: string, _password: string, _displayName: string) => {
+      throw new Error('Use the /signup page — Clerk handles account creation.');
+    },
+    [],
+  );
+
+  const isAuthenticated = !!vettrUser && !!isSignedIn;
+  const isLoading = !isLoaded || (!!isSignedIn && isFetchingUser);
+
   const value: AuthContextType = {
-    user,
+    user: vettrUser,
     isAuthenticated,
     isLoading,
     login,
