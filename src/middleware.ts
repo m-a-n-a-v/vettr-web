@@ -1,6 +1,7 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 
+
 const isProtectedRoute = createRouteMatcher([
   '/pulse(.*)',
   '/alerts(.*)',
@@ -10,15 +11,8 @@ const isProtectedRoute = createRouteMatcher([
   '/ai(.*)',
 ]);
 
-const isAuthRoute = createRouteMatcher(['/login(.*)', '/signup(.*)', '/sso-callback(.*)']);
-
 export default clerkMiddleware(async (auth, req) => {
   const { userId } = await auth();
-
-  // Redirect authenticated users away from login/signup
-  if (isAuthRoute(req) && userId) {
-    return NextResponse.redirect(new URL('/pulse', req.url));
-  }
 
   // Redirect unauthenticated users away from protected routes
   if (isProtectedRoute(req) && !userId) {
