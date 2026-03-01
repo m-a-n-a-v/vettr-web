@@ -3,12 +3,11 @@ import { NextResponse } from 'next/server';
 
 const isProtectedRoute = createRouteMatcher([
   '/pulse(.*)',
-  '/stocks(.*)',
   '/alerts(.*)',
   '/profile(.*)',
   '/watchlist(.*)',
   '/discovery(.*)',
-  '/search(.*)',
+  '/ai(.*)',
 ]);
 
 const isAuthRoute = createRouteMatcher(['/login(.*)', '/signup(.*)', '/sso-callback(.*)']);
