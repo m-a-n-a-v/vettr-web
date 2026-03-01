@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { useUser, useAuth as useClerkAuth } from '@clerk/nextjs';
 import { api, setClerkTokenGetter } from '@/lib/api-client';
 import { User } from '@/types/api';
@@ -33,27 +33,64 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [getToken]);
 
   // Fetch our DB user whenever Clerk sign-in state becomes active.
+  // Retries up to 3 times with back-off to handle cases where the
+  // Clerk session token isn't immediately available after sign-in.
+  const retryRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   useEffect(() => {
     if (!isLoaded) return;
 
-    if (isSignedIn && !vettrUser && !isFetchingUser) {
-      setIsFetchingUser(true);
-      api
-        .get<User>('/users/me')
-        .then((response) => {
-          if (response.success && response.data) {
-            setVettrUser(response.data);
-          }
-        })
-        .catch(() => {
-          // Network error — will retry on next sign-in state change.
-        })
-        .finally(() => setIsFetchingUser(false));
-    }
-
     if (!isSignedIn) {
       setVettrUser(null);
+      return;
     }
+
+    if (vettrUser || isFetchingUser) return;
+
+    let cancelled = false;
+
+    async function fetchUser(attempt: number) {
+      if (cancelled) return;
+      setIsFetchingUser(true);
+
+      try {
+        // Ensure the Clerk token is available before calling the backend
+        const token = await getToken();
+        if (!token) {
+          if (attempt < 3 && !cancelled) {
+            setIsFetchingUser(false);
+            retryRef.current = setTimeout(() => fetchUser(attempt + 1), 1000 * (attempt + 1));
+            return;
+          }
+          setIsFetchingUser(false);
+          return;
+        }
+
+        const response = await api.get<User>('/users/me');
+        if (!cancelled && response.success && response.data) {
+          setVettrUser(response.data);
+        } else if (!cancelled && attempt < 3) {
+          // Backend returned an error — retry after delay
+          retryRef.current = setTimeout(() => fetchUser(attempt + 1), 1500 * (attempt + 1));
+          return;
+        }
+      } catch {
+        // Network error — retry
+        if (!cancelled && attempt < 3) {
+          retryRef.current = setTimeout(() => fetchUser(attempt + 1), 1500 * (attempt + 1));
+          return;
+        }
+      }
+
+      if (!cancelled) setIsFetchingUser(false);
+    }
+
+    fetchUser(0);
+
+    return () => {
+      cancelled = true;
+      if (retryRef.current) clearTimeout(retryRef.current);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoaded, isSignedIn]);
 

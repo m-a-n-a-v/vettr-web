@@ -383,23 +383,30 @@ export async function apiClient<T = unknown>(
 
       // Handle 401 Unauthorized - attempt token refresh
       if (response.status === 401 && requestOptions.requiresAuth && !requestOptions.skipRefresh) {
-        const tokens = await refreshAccessToken();
-
-        if (tokens) {
-          // Retry the original request with new token
-          return apiClient<T>(endpoint, { ...options, skipRefresh: true });
+        // If using Clerk, force a fresh token and retry once
+        if (_clerkGetToken) {
+          const freshToken = await _clerkGetToken();
+          if (freshToken) {
+            return apiClient<T>(endpoint, { ...options, skipRefresh: true });
+          }
         } else {
-          // Refresh failed — return error without redirecting.
-          // Pages/components handle AUTH_REQUIRED gracefully
-          // (e.g., show LoginPrompt) instead of forcing a redirect.
-          return {
-            success: false,
-            error: {
-              code: 'AUTH_REQUIRED',
-              message: 'Authentication required. Please log in.',
-            },
-          };
+          // Legacy path: try localStorage refresh token
+          const tokens = await refreshAccessToken();
+          if (tokens) {
+            return apiClient<T>(endpoint, { ...options, skipRefresh: true });
+          }
         }
+
+        // All refresh attempts failed — return error without redirecting.
+        // Pages/components handle AUTH_REQUIRED gracefully
+        // (e.g., show LoginPrompt) instead of forcing a redirect.
+        return {
+          success: false,
+          error: {
+            code: 'AUTH_REQUIRED',
+            message: 'Authentication required. Please log in.',
+          },
+        };
       }
 
       // Handle 429 Too Many Requests - return error immediately, NO internal retries
