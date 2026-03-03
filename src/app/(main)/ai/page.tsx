@@ -39,6 +39,9 @@ export default function AiPage() {
     ])
   ).sort();
 
+  // Replace {TICKER} placeholder in question labels with the selected ticker
+  const fillTicker = (text: string) => text.replace(/\{TICKER\}/g, selectedTicker ?? '');
+
   const askQuestion = useCallback(async (questionId: string, label: string) => {
     if (!selectedTicker || isAsking) return;
     setError(null);
@@ -117,7 +120,7 @@ export default function AiPage() {
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">AI Analysis</h1>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Ask questions about any stock in your portfolio or watchlist
+              Ask questions about any stock in your watchlist or portfolio
             </p>
           </div>
         </div>
@@ -221,11 +224,11 @@ export default function AiPage() {
                       {entry.follow_ups.map((q) => (
                         <button
                           key={q.id}
-                          onClick={() => askQuestion(q.id, q.short_label || q.label)}
+                          onClick={() => askQuestion(q.id, fillTicker(q.short_label || q.label))}
                           disabled={isAsking}
                           className="px-3 py-1.5 rounded-lg text-xs font-medium bg-vettr-accent/10 text-vettr-accent hover:bg-vettr-accent/20 transition-colors disabled:opacity-50"
                         >
-                          {q.short_label || q.label}
+                          {fillTicker(q.short_label || q.label)}
                         </button>
                       ))}
                     </div>
@@ -258,12 +261,12 @@ export default function AiPage() {
               {initialQuestions.map((q: any) => (
                 <button
                   key={q.id}
-                  onClick={() => askQuestion(q.id, q.short_label || q.label)}
+                  onClick={() => askQuestion(q.id, fillTicker(q.short_label || q.label))}
                   disabled={isAsking}
                   className="text-left px-4 py-3 rounded-xl bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 hover:border-vettr-accent hover:bg-vettr-accent/5 transition-all disabled:opacity-50"
                 >
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {q.label}
+                    {fillTicker(q.label)}
                   </p>
                   {q.description && (
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">

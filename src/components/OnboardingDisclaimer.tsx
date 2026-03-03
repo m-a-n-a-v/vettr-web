@@ -1,19 +1,25 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 
 const DISCLAIMER_KEY = 'vettr_disclaimer_accepted';
 const DISCLAIMER_VERSION = '1.0';
 
+// Pages where the disclaimer should not block navigation
+const EXCLUDED_PATHS = ['/', '/login', '/signup', '/forgot-password', '/reset-password'];
+
 export function OnboardingDisclaimer() {
+  const pathname = usePathname();
   const [show, setShow] = useState(false);
 
   useEffect(() => {
+    if (EXCLUDED_PATHS.includes(pathname)) return;
     const accepted = localStorage.getItem(DISCLAIMER_KEY);
     if (accepted !== DISCLAIMER_VERSION) {
       setShow(true);
     }
-  }, []);
+  }, [pathname]);
 
   const handleAccept = () => {
     localStorage.setItem(DISCLAIMER_KEY, DISCLAIMER_VERSION);
