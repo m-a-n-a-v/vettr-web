@@ -38,7 +38,7 @@ export default function VetrScoreDetail({ score, onClose }: VetrScoreDetailProps
     },
     {
       label: 'Market Sentiment',
-      description: 'Liquidity, technical momentum, news velocity, short interest risk, analyst consensus'
+      description: 'Liquidity health, news velocity, short interest risk, analyst consensus + Hourly Action Overlay (±7.5 tilt)'
     },
   ];
 
@@ -113,7 +113,6 @@ export default function VetrScoreDetail({ score, onClose }: VetrScoreDetailProps
                   subScores: score.market_sentiment ? [
                     { label: 'Liquidity', value: score.market_sentiment.sub_scores?.liquidity },
                     { label: 'News Velocity', value: score.market_sentiment.sub_scores?.news_velocity },
-                    { label: 'Technical Momentum', value: score.market_sentiment.sub_scores?.technical_momentum },
                     { label: 'Short Squeeze', value: score.market_sentiment.sub_scores?.short_squeeze },
                     { label: 'Analyst Consensus', value: score.market_sentiment.sub_scores?.analyst_consensus },
                   ] : [],
@@ -157,6 +156,41 @@ export default function VetrScoreDetail({ score, onClose }: VetrScoreDetailProps
             </div>
           </div>
 
+          {/* Hourly Action Overlay */}
+          {score.hourly_action_overlay && (
+            <div className="bg-gray-50 dark:bg-white/[0.03] rounded-xl p-4">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-gray-900 dark:text-white font-medium">Hourly Action Overlay</span>
+                <span className={`font-bold ${score.hourly_action_overlay.dynamic_tilt >= 0 ? 'text-[#84CC16]' : 'text-[#F97316]'}`}>
+                  {score.hourly_action_overlay.dynamic_tilt >= 0 ? '+' : ''}{score.hourly_action_overlay.dynamic_tilt.toFixed(2)}
+                </span>
+              </div>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                Volatility-adjusted price action tilt (±7.5 max) applied to base score
+              </p>
+              <div className="space-y-2 text-xs">
+                <div className="flex justify-between text-gray-400">
+                  <span>Hourly Return:</span>
+                  <span>{score.hourly_action_overlay.return_pct >= 0 ? '+' : ''}{score.hourly_action_overlay.return_pct.toFixed(2)}%</span>
+                </div>
+                <div className="flex justify-between text-gray-400">
+                  <span>14-Day ATR%:</span>
+                  <span>{score.hourly_action_overlay.atr_pct.toFixed(2)}%</span>
+                </div>
+                <div className="flex justify-between text-gray-400">
+                  <span>Z-Score:</span>
+                  <span>{score.hourly_action_overlay.z_score.toFixed(2)}</span>
+                </div>
+                {score.base_score != null && (
+                  <div className="flex justify-between text-gray-400 pt-1 border-t border-gray-200 dark:border-white/5">
+                    <span>Base Score:</span>
+                    <span>{score.base_score}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Null Pillars Notice */}
           {score.null_pillars && score.null_pillars.length > 0 && (
             <div className="pt-4 border-t border-gray-200 dark:border-white/5">
@@ -192,7 +226,7 @@ export default function VetrScoreDetail({ score, onClose }: VetrScoreDetailProps
                 ))}
                 <div className="mt-4 p-4 bg-vettr-accent/5 border border-vettr-accent/20 rounded-xl">
                   <p className="text-gray-500 dark:text-gray-400 text-xs leading-relaxed">
-                    <strong className="text-gray-900 dark:text-white">Formula:</strong> The overall VETTR Score is calculated using a weighted average of four pillars: Financial Survival, Operational Efficiency, Shareholder Structure, and Market Sentiment. Each pillar&apos;s weight is dynamically adjusted based on data availability. When a pillar lacks sufficient data, it is marked as null and its weight is redistributed proportionally among the remaining pillars. Scores range from 0-100, with higher scores indicating lower risk and stronger fundamentals.
+                    <strong className="text-gray-900 dark:text-white">Formula:</strong> The base VETTR Score is calculated using a weighted average of four pillars: Financial Survival, Operational Efficiency, Shareholder Structure, and Market Sentiment. The Hourly Action Overlay then applies a volatility-adjusted tilt (±7.5 max) based on real-time price action vs 14-day ATR. Each pillar&apos;s weight is dynamically adjusted based on data availability. Scores range from 0-100, with higher scores indicating lower risk and stronger fundamentals.
                   </p>
                 </div>
               </div>

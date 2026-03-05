@@ -241,9 +241,19 @@ export interface ShareholderStructureSubScores {
 export interface MarketSentimentSubScores {
   liquidity: number;
   news_velocity: number;
-  technical_momentum: number;
   short_squeeze: number;
   analyst_consensus: number;
+}
+
+/**
+ * Hourly Action Overlay data (replaces Technical Momentum)
+ * Applied as ±7.5 point tilt to the overall VETR score
+ */
+export interface HourlyActionOverlay {
+  return_pct: number;
+  z_score: number;
+  atr_pct: number;
+  dynamic_tilt: number;
 }
 
 /**
@@ -261,6 +271,8 @@ export interface VetrScorePillar<T> {
 export interface VetrScore {
   ticker: string;
   overall_score: number;
+  base_score?: number;
+  hourly_action_overlay?: HourlyActionOverlay;
   financial_survival: VetrScorePillar<FinancialSurvivalSubScores>;
   operational_efficiency: VetrScorePillar<OperationalEfficiencySubScores>;
   shareholder_structure: VetrScorePillar<ShareholderStructureSubScores>;
